@@ -116,6 +116,20 @@ namespace ExpandWorld {
       return false;
     }
   }
+  [HarmonyPatch(typeof(WaterVolume), "SetupMaterial")]
+  public class SetupMaterial {
+    public static void Refresh() {
+      var objects = Object.FindObjectsOfType<WaterVolume>();
+      foreach (var water in objects) {
+        water.m_waterSurface.material.SetFloat("_WaterEdge", Settings.WorldTotalRadius);
+      }
+    }
+    // Copy paste from the base game code.
+    public static void Prefix(WaterVolume __instance) {
+      var obj = __instance;
+      obj.m_waterSurface.material.SetFloat("_WaterEdge", Settings.WorldTotalRadius);
+    }
+  }
   [HarmonyPatch(typeof(EnvMan), "UpdateWind")]
   public class UpdateWind {
     // Copy paste from the base game code.

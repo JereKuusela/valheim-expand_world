@@ -40,10 +40,10 @@ namespace ExpandWorld {
         obj.m_explored = new bool[obj.m_textureSize * obj.m_textureSize];
         obj.m_exploredOthers = new bool[obj.m_textureSize * obj.m_textureSize];
         obj.Start();
-        obj.ForceRegen();
       }
-      if (ForceRegen) {
+      if (ForceRegen || TextureSizeChanged) {
         obj.ForceRegen();
+        SetupMaterial.Refresh();
       }
       TextureSizeChanged = false;
       ForceRegen = false;
@@ -121,7 +121,7 @@ namespace ExpandWorld {
         var zone = ZoneSystem.instance.GetZone(position);
         var zoneText = "zone: " + zone.x + "/" + zone.y;
         var positionText = "x: " + position.x.ToString("F0") + " z: " + position.z.ToString("F0");
-        var distanceText = "distance: " + Utils.DistanceXZ(position, player.transform.position).ToString("P0") + " meters";
+        var distanceText = "distance: " + Utils.DistanceXZ(position, player.transform.position).ToString("F0") + " meters";
         var text = "\n\n" + previousText + "\n" + zoneText + "\n" + positionText + "\n" + distanceText;
         obj.m_biomeNameLarge.text = text;
       }
