@@ -12,9 +12,8 @@ namespace ExpandWorld {
     }
   }
 
-  [HarmonyPatch(typeof(ZoneSystem), "Awake")]
+  [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Awake))]
   public class ZoneSystemAwake {
-    // Copy paste from the base game code.
     public static void Postfix(ZoneSystem __instance) {
       __instance.m_activeArea = Settings.ActiveArea;
     }

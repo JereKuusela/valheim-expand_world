@@ -2,7 +2,7 @@ using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld {
 
-  [HarmonyPatch(typeof(Minimap), "Awake")]
+  [HarmonyPatch(typeof(Minimap), nameof(Minimap.Awake))]
   public class MinimapAwake {
     // Applies the map parameter changes.
     public static float OriginalPixelSize;
@@ -17,19 +17,7 @@ namespace ExpandWorld {
     }
   }
 
-  [HarmonyPatch(typeof(Minimap), "OnMapLeftClick")]
-  public class OnMapLeftClick {
-    public static bool Prefix(Minimap __instance) {
-      if (Input.GetKey(KeyCode.LeftControl)) {
-        Vector3 pos = __instance.ScreenToWorldPoint(Input.mousePosition);
-        Console.instance.TryRunCommand("goto " + pos.x + " " + pos.z);
-        return false;
-      }
-      return true;
-    }
-  }
-
-  [HarmonyPatch(typeof(Minimap), "SetMapMode")]
+  [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapMode))]
   public class SetMapMode {
     public static bool ForceRegen = false;
     public static bool TextureSizeChanged = false;
@@ -50,81 +38,20 @@ namespace ExpandWorld {
     }
   }
 
-  [HarmonyPatch(typeof(Minimap), "SetMapData")]
-  public class SetMapData {
-    // Copy paste from the base code.
-    // Changed that explored is not loaded if texture size is different.
+  [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapData))]
+  public class InitializeWhenDimensionsChange {
     public static bool Prefix(Minimap __instance, byte[] data) {
       var obj = __instance;
       ZPackage zpackage = new ZPackage(data);
-      int num = zpackage.ReadInt();
-      if (num >= 7) {
-        ZLog.Log("Unpacking compressed mapdata " + zpackage.Size());
-        zpackage = zpackage.ReadCompressedPackage();
-      }
-      obj.Reset();
+      var num = zpackage.ReadInt();
+      if (num >= 7) zpackage = zpackage.ReadCompressedPackage();
       int num2 = zpackage.ReadInt();
-      if (obj.m_textureSize == num2) {
-        for (int i = 0; i < obj.m_explored.Length; i++) {
-          if (zpackage.ReadBool()) {
-            int x = i % num2;
-            int y = i / num2;
-            obj.Explore(x, y);
-          }
-        }
-        if (num >= 5) {
-          for (int j = 0; j < obj.m_exploredOthers.Length; j++) {
-            if (zpackage.ReadBool()) {
-              int x2 = j % num2;
-              int y2 = j / num2;
-              obj.ExploreOthers(x2, y2);
-            }
-          }
-        }
-      }
-      if (num >= 2) {
-        int num3 = zpackage.ReadInt();
-        obj.ClearPins();
-        for (int k = 0; k < num3; k++) {
-          string name = zpackage.ReadString();
-          Vector3 pos = zpackage.ReadVector3();
-          Minimap.PinType type = (Minimap.PinType)zpackage.ReadInt();
-          bool isChecked = num >= 3 && zpackage.ReadBool();
-          long ownerID = (num >= 6) ? zpackage.ReadLong() : 0L;
-          obj.AddPin(pos, type, name, true, isChecked, ownerID);
-        }
-      }
-      if (num >= 4) {
-        bool publicReferencePosition = zpackage.ReadBool();
-        ZNet.instance.SetPublicReferencePosition(publicReferencePosition);
-      }
+      if (obj.m_textureSize == num2) return true;
+      // Base game code would stop initializxing.
+      obj.Reset();
+      obj.ClearPins();
       obj.m_fogTexture.Apply();
       return false;
-    }
-  }
-
-
-  [HarmonyPatch(typeof(Minimap), "UpdateBiome")]
-
-  public class Minimap_ShowPos {
-    // Text doesn't always get updated so extra stuff must be reseted manually.
-    private static string previousText = "";
-    public static void Prefix(Minimap __instance) {
-      __instance.m_biomeNameLarge.text = previousText;
-
-    }
-    public static void Postfix(Minimap __instance, Player player) {
-      var obj = __instance;
-      previousText = obj.m_biomeNameLarge.text;
-      if (Terminal.m_cheat && obj.m_mode == Minimap.MapMode.Large) {
-        var position = obj.ScreenToWorldPoint(ZInput.IsMouseActive() ? Input.mousePosition : new Vector3((float)(Screen.width / 2), (float)(Screen.height / 2)));
-        var zone = ZoneSystem.instance.GetZone(position);
-        var zoneText = "zone: " + zone.x + "/" + zone.y;
-        var positionText = "x: " + position.x.ToString("F0") + " z: " + position.z.ToString("F0");
-        var distanceText = "distance: " + Utils.DistanceXZ(position, player.transform.position).ToString("F0") + " meters";
-        var text = "\n\n" + previousText + "\n" + zoneText + "\n" + positionText + "\n" + distanceText;
-        obj.m_biomeNameLarge.text = text;
-      }
     }
   }
 }

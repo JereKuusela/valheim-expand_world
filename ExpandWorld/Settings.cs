@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace ExpandWorld {
   public static class Settings {
+    public static ConfigEntry<bool> configModifyBiomes;
+    public static bool ModifyBiomes => configModifyBiomes.Value;
     public static ConfigEntry<int> configWorldRadius;
     public static int WorldRadius => configWorldRadius.Value;
     public static ConfigEntry<int> configWorldEdgeSize;
@@ -88,6 +90,8 @@ namespace ExpandWorld {
     private static void ForceRegen(object e, System.EventArgs s) => SetMapMode.ForceRegen = true;
     public static void Init(ConfigFile config) {
       var section = "1. General";
+      configModifyBiomes = config.Bind(section, "Modify biomes", true, "Can be disabled if another mod is affecting biomes.");
+      configModifyBiomes.SettingChanged += ForceRegen;
       configWorldRadius = config.Bind(section, "World radius", 10000, "Radius of the world in meters (excluding the edge).");
       configWorldRadius.SettingChanged += ForceRegen;
       configWorldEdgeSize = config.Bind(section, "World edge size", 500, "Size of the edge area in meters.");

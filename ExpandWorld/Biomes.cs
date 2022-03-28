@@ -3,7 +3,7 @@ using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld {
 
-  [HarmonyPatch(typeof(WorldGenerator), "GetBiome", new Type[] { typeof(float), typeof(float) })]
+  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new Type[] { typeof(float), typeof(float) })]
   public class GetBiome {
     // Copy paste from the base game code.
 
@@ -70,6 +70,7 @@ namespace ExpandWorld {
       }
     }
     public static bool Prefix(WorldGenerator __instance, float wx, float wy, ref Heightmap.Biome __result) {
+      if (!Settings.ModifyBiomes) return true;
       var obj = __instance;
       if (obj.m_world.m_menu) return true;
       __result = Get(obj, wx, wy);
