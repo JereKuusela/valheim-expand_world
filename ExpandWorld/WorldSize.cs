@@ -184,4 +184,11 @@ public class UpdateWind {
                 () => Settings.WorldTotalRadius).operand)
         .InstructionEnumeration();
   }
+
+  [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Awake))]
+  public class SetActiveArea {
+    static void Postfix(ZoneSystem __instance) {
+      __instance.m_activeArea = Settings.ActiveArea;
+    }
+  }
 }

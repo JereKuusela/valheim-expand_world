@@ -15,9 +15,9 @@ public class Settings {
   public static int WorldEdgeSize => ConfigWrapper.TryParseInt(configWorldEdgeSize);
   public static int WorldTotalRadius => WorldRadius + WorldEdgeSize;
   public static ConfigEntry<string> configMapSize;
-  public static int MapSize => ConfigWrapper.TryParseInt(configMapSize);
+  public static float MapSize => ConfigWrapper.TryParseFloat(configMapSize);
   public static ConfigEntry<string> configMapPixelSize;
-  public static int MapPixelSize => ConfigWrapper.TryParseInt(configMapPixelSize);
+  public static float MapPixelSize => ConfigWrapper.TryParseFloat(configMapPixelSize);
   public static ConfigEntry<string> configActivateArea;
   public static int ActiveArea => ConfigWrapper.TryParseInt(configActivateArea);
 
@@ -105,17 +105,19 @@ public class Settings {
     configMapSize = wrapper.Bind(section, "Minimap size multiplier", "1", "Multiplier to the minimap size.");
     configMapSize.SettingChanged += (e, s) => {
       SetMapMode.TextureSizeChanged = true;
-      Minimap.instance.m_textureSize = MinimapAwake.OriginalTextureSize * MapSize;
-      Minimap.instance.m_mapImageLarge.rectTransform.localScale = new Vector3(MapSize, MapSize, MapSize);
+      if (Minimap.instance) {
+        Minimap.instance.m_textureSize = (int)(MinimapAwake.OriginalTextureSize * MapSize);
+        Minimap.instance.m_mapImageLarge.rectTransform.localScale = new Vector3(MapSize, MapSize, MapSize);
+      }
     };
     configMapPixelSize = wrapper.Bind(section, "Minimap pixel size multiplier", "1", "Granularity of the minimap.");
     configMapPixelSize.SettingChanged += (e, s) => {
       SetMapMode.ForceRegen = true;
-      Minimap.instance.m_pixelSize = MinimapAwake.OriginalPixelSize * MapPixelSize;
+      if (Minimap.instance) Minimap.instance.m_pixelSize = MinimapAwake.OriginalPixelSize * MapPixelSize;
     };
     configActivateArea = wrapper.Bind(section, "Active area", "2", "Amounts of zones loaded around the player.");
     configActivateArea.SettingChanged += (e, s) => {
-      ZoneSystem.instance.m_activeArea = ActiveArea;
+      if (ZoneSystem.instance) ZoneSystem.instance.m_activeArea = ActiveArea;
     };
 
     section = "2. Biomes";

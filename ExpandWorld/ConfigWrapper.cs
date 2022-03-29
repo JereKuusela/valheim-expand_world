@@ -81,6 +81,10 @@ public class ConfigWrapper {
     if (float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result)) return result;
     return defaultValue;
   }
+  public static float TryParseFloat(ConfigEntry<string> setting) {
+    if (float.TryParse(setting.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result)) return result;
+    return TryParseFloat((string)setting.DefaultValue, 0f);
+  }
   private static void SetValue(Terminal context, ConfigEntry<int> setting, string name, string value) {
     if (value == "") {
       AddMessage(context, $"{name}: {setting.Value}.");

@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
@@ -9,12 +10,31 @@ public class MinimapAwake {
   public static int OriginalTextureSize;
   static void Postfix(Minimap __instance) {
     OriginalTextureSize = __instance.m_textureSize;
-    __instance.m_textureSize *= Settings.MapSize;
+    __instance.m_textureSize = (int)(__instance.m_textureSize * Settings.MapSize);
     __instance.m_minZoom /= Settings.MapSize;
     OriginalPixelSize = __instance.m_pixelSize;
     __instance.m_pixelSize *= Settings.MapPixelSize;
     __instance.m_mapImageLarge.rectTransform.localScale = new Vector3(Settings.MapSize, Settings.MapSize, Settings.MapSize);
+    // Already generated.
+    SetMapMode.ForceRegen = false;
   }
+}
+
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new Type[] { typeof(int), typeof(int) })]
+public class PreventExploreWhenDirty1 {
+  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new Type[] { typeof(Vector3), typeof(float) })]
+public class PreventExploreWhenDirty2 {
+  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.ExploreOthers))]
+public class PreventExploreOthersWhenDirty {
+  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.ExploreAll))]
+public class PreventExploreAllWhenDirty {
+  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
 }
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapMode))]
