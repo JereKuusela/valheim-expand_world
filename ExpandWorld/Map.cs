@@ -17,6 +17,7 @@ public class MinimapAwake {
     __instance.m_mapImageLarge.rectTransform.localScale = new Vector3(Settings.MapSize, Settings.MapSize, Settings.MapSize);
     // Already generated.
     SetMapMode.ForceRegen = false;
+    SetMapMode.TextureSizeChanged = false;
   }
 }
 

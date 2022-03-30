@@ -37,6 +37,9 @@ public class EdgeOfWorldKill {
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight {
+  static void Postfix(ref float __result) {
+    __result *= Settings.AltitudeMultiplier;
+  }
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
     return new CodeMatcher(instructions)
         .MatchForward(
@@ -122,20 +125,7 @@ public class GetEdgeHeight {
         .InstructionEnumeration();
   }
 }
-[HarmonyPatch(typeof(WaterVolume), nameof(WaterVolume.GetWaterSurface))]
-public class GetWaterSurface {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Settings.WorldTotalRadius).operand)
-        .InstructionEnumeration();
-  }
-}
+
 [HarmonyPatch(typeof(WaterVolume), nameof(WaterVolume.SetupMaterial))]
 public class SetupMaterial {
   public static void Refresh() {
@@ -184,11 +174,27 @@ public class UpdateWind {
                 () => Settings.WorldTotalRadius).operand)
         .InstructionEnumeration();
   }
+}
 
-  [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Awake))]
-  public class SetActiveArea {
-    static void Postfix(ZoneSystem __instance) {
-      __instance.m_activeArea = Settings.ActiveArea;
-    }
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Awake))]
+public class SetActiveArea {
+  static void Postfix(ZoneSystem __instance) {
+    __instance.m_activeArea = Settings.ActiveArea;
+  }
+}
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.PlaceRivers))]
+public class PlaceRivers {
+  static bool Prefix(ref List<WorldGenerator.River> __result) {
+    if (Settings.Rivers) return true;
+    __result = new();
+    return false;
+  }
+}
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.PlaceStreams))]
+public class PlaceStreams {
+  static bool Prefix(ref List<WorldGenerator.River> __result) {
+    if (Settings.Streams) return true;
+    __result = new();
+    return false;
   }
 }

@@ -28,13 +28,14 @@ public class GetBiome {
     max = Settings.DeepNorthMax;
     curve = Settings.DeepNorthCurvature;
     curvedMagnitude = new Vector2(wx, wy + curve).magnitude;
+    var mountainsHeight = Settings.MountainsAltitudeMin / 200f;
     if (curvedMagnitude > min + curve + num && magnitude < max) {
-      if (baseHeight > 0.4f) {
+      if (baseHeight > mountainsHeight) {
         return Heightmap.Biome.Mountain;
       }
       return Heightmap.Biome.DeepNorth;
     } else {
-      if (baseHeight > 0.4f) {
+      if (baseHeight > mountainsHeight) {
         return Heightmap.Biome.Mountain;
       }
       min = Settings.SwampMin;

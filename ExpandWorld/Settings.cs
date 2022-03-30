@@ -18,9 +18,30 @@ public class Settings {
   public static float MapSize => ConfigWrapper.TryParseFloat(configMapSize);
   public static ConfigEntry<string> configMapPixelSize;
   public static float MapPixelSize => ConfigWrapper.TryParseFloat(configMapPixelSize);
+  public static ConfigEntry<string> configServerTimeout;
+  public static float ServerTimeout => ConfigWrapper.TryParseFloat(configServerTimeout);
   public static ConfigEntry<string> configActivateArea;
   public static int ActiveArea => ConfigWrapper.TryParseInt(configActivateArea);
 
+
+  public static ConfigEntry<bool> configRivers;
+  public static bool Rivers => configRivers.Value;
+  public static ConfigEntry<bool> configStreams;
+  public static bool Streams => configStreams.Value;
+  public static ConfigEntry<string> configWaterLevel;
+  public static float WaterLevel => ConfigWrapper.TryParseFloat(configWaterLevel);
+  public static ConfigEntry<string> configAltitudeMultiplier;
+  public static float AltitudeMultiplier => ConfigWrapper.TryParseFloat(configAltitudeMultiplier);
+  public static ConfigEntry<string> configWaveMultiplier;
+  public static float WaveMultiplier => ConfigWrapper.TryParseFloat(configWaveMultiplier);
+  public static ConfigEntry<bool> configWaveOnlyHeight;
+  public static bool WaveOnlyHeight => configWaveOnlyHeight.Value;
+
+
+
+
+  public static ConfigEntry<string> configMountainsAltitudeMin;
+  public static int MountainsAltitudeMin => ConfigWrapper.TryParseInt(configMountainsAltitudeMin);
 
   public static ConfigEntry<int> configMeadowsMin;
   public static int MeadowsMin => configMeadowsMin.Value * WorldRadius / 100;
@@ -91,7 +112,17 @@ public class Settings {
   public static ConfigEntry<string> configRiverSeed;
   public static int RiverSeed => ConfigWrapper.TryParseInt(configRiverSeed);
 
-  private static void ForceRegen(object e, System.EventArgs s) => SetMapMode.ForceRegen = true;
+  private static void ForceRegen(object e, System.EventArgs s) => ForceRegen();
+  private static void ForceRegen() {
+    if (ZoneSystem.instance != null) {
+      foreach (var heightmap in Heightmap.m_heightmaps) {
+        heightmap.m_buildData = null;
+        heightmap.Regenerate();
+      }
+    }
+    if (ClutterSystem.instance != null) ClutterSystem.instance.m_forceRebuild = true;
+    SetMapMode.ForceRegen = true;
+  }
   public static void Init(ConfigSync configSync, ConfigFile configFile) {
     var wrapper = new ConfigWrapper("expand_config", configFile, configSync);
     var section = "1. General";
@@ -104,23 +135,71 @@ public class Settings {
     configWorldEdgeSize.SettingChanged += ForceRegen;
     configMapSize = wrapper.Bind(section, "Minimap size multiplier", "1", "Multiplier to the minimap size.");
     configMapSize.SettingChanged += (e, s) => {
+      if (!Minimap.instance) return;
+      var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
+      if (newValue == Minimap.instance.m_textureSize) return;
       SetMapMode.TextureSizeChanged = true;
-      if (Minimap.instance) {
-        Minimap.instance.m_textureSize = (int)(MinimapAwake.OriginalTextureSize * MapSize);
-        Minimap.instance.m_mapImageLarge.rectTransform.localScale = new Vector3(MapSize, MapSize, MapSize);
-      }
+      Minimap.instance.m_textureSize = newValue;
+      Minimap.instance.m_mapImageLarge.rectTransform.localScale = new Vector3(MapSize, MapSize, MapSize);
     };
     configMapPixelSize = wrapper.Bind(section, "Minimap pixel size multiplier", "1", "Granularity of the minimap.");
     configMapPixelSize.SettingChanged += (e, s) => {
+      if (!Minimap.instance) return;
+      var newValue = MinimapAwake.OriginalPixelSize * MapPixelSize;
+      if (newValue == Minimap.instance.m_pixelSize) return;
       SetMapMode.ForceRegen = true;
-      if (Minimap.instance) Minimap.instance.m_pixelSize = MinimapAwake.OriginalPixelSize * MapPixelSize;
+      Minimap.instance.m_pixelSize = newValue;
     };
+    configServerTimeout = wrapper.Bind(section, "Timeout in servers", "30", "Timeout before clients get disconnected. Must be increased for bigger map sizes (for the initial loading).");
+    configServerTimeout.SettingChanged += (e, s) => {
+      ZRpc.m_timeout = ServerTimeout;
+    };
+    ZRpc.m_timeout = ServerTimeout;
     configActivateArea = wrapper.Bind(section, "Active area", "2", "Amounts of zones loaded around the player.");
     configActivateArea.SettingChanged += (e, s) => {
       if (ZoneSystem.instance) ZoneSystem.instance.m_activeArea = ActiveArea;
     };
 
-    section = "2. Biomes";
+    section = "2. Features";
+    configRivers = wrapper.Bind(section, "Rivers", true, "Enables rivers.");
+    configRivers.SettingChanged += (s, e) => {
+      if (WorldGenerator.instance != null) {
+        WorldGenerator.instance.m_riverPoints.Clear();
+        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceStreams();
+        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceRivers();
+      }
+      ForceRegen();
+    };
+    configStreams = wrapper.Bind(section, "Streams", true, "Enables streams.");
+    configStreams.SettingChanged += (s, e) => {
+      if (WorldGenerator.instance != null) {
+        WorldGenerator.instance.m_riverPoints.Clear();
+        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceStreams();
+        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceRivers();
+      }
+      ForceRegen();
+    };
+    configWaterLevel = wrapper.Bind(section, "Water level", "30", "Sets the altitude of the water.");
+    configWaterLevel.SettingChanged += (s, e) => {
+      WaterHelper.SetLevel(ZoneSystem.instance);
+      WaterHelper.SetLevel(ClutterSystem.instance);
+      foreach (var obj in WaterHelper.Get()) WaterHelper.SetLevel(obj);
+      ForceRegen();
+    };
+    configAltitudeMultiplier = wrapper.Bind(section, "Altitude multiplier", "1", "Multiplies the world altitude.");
+    configAltitudeMultiplier.SettingChanged += ForceRegen;
+    configWaveMultiplier = wrapper.Bind(section, "Wave multiplier", "1", "Multiplies the wave size.");
+    configWaveMultiplier.SettingChanged += (s, e) => {
+      foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
+    };
+    configWaveOnlyHeight = wrapper.Bind(section, "Wave only height", false, "Multiplier only affects the height.");
+    configWaveOnlyHeight.SettingChanged += (s, e) => {
+      foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
+    };
+
+    section = "3. Biomes";
+    configMountainsAltitudeMin = wrapper.Bind(section, "Mountains minimum altitude", "80", "");
+    configMountainsAltitudeMin.SettingChanged += ForceRegen;
     configMeadowsMin = wrapper.Bind(section, "Meadows start percentage", 0, new ConfigDescription("", new AcceptableValueRange<int>(0, 100)));
     configMeadowsMin.SettingChanged += ForceRegen;
     configMeadowsMax = wrapper.Bind(section, "Meadows end percentage", 50, new ConfigDescription("", new AcceptableValueRange<int>(0, 100)));
@@ -154,7 +233,7 @@ public class Settings {
     configDeepNorthCurvature = wrapper.Bind(section, "Deep north curvature percentage", 40, new ConfigDescription("", new AcceptableValueRange<int>(0, 100)));
     configDeepNorthCurvature.SettingChanged += ForceRegen;
 
-    section = "3. Seed";
+    section = "4. Seed";
     configUseOffsetX = wrapper.Bind(section, "Use custom offset X", false, "Determines x coordinate on the base height map.");
     configUseOffsetX.SettingChanged += ForceRegen;
     configOffsetX = wrapper.Bind(section, "Offset X", "0", "");
