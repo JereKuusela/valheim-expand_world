@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BepInEx.Configuration;
+using ExpandWorld;
 using ServerSync;
 
 namespace Service;
@@ -34,12 +35,33 @@ public class ConfigWrapper {
   public ConfigEntry<bool> BindLocking(string group, string name, bool value, string description) => BindLocking(group, name, value, new ConfigDescription(description));
   public ConfigEntry<T> Bind<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true) {
     var configEntry = ConfigFile.Bind(group, name, value, description);
+    configEntry.SettingChanged += ForceRegen;
     Register(configEntry);
     var syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
     syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
     return configEntry;
   }
   public ConfigEntry<T> Bind<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => Bind(group, name, value, new ConfigDescription(description), synchronizedSetting);
+  private static void ForceRegen(object e, System.EventArgs s) => ForceRegen();
+  private static void ForceRegen() {
+    if (ZoneSystem.instance != null) {
+      foreach (var heightmap in Heightmap.m_heightmaps) {
+        heightmap.m_buildData = null;
+        heightmap.Regenerate();
+      }
+    }
+    if (ClutterSystem.instance != null) ClutterSystem.instance.m_forceRebuild = true;
+    SetMapMode.ForceRegen = true;
+  }
+  public static Dictionary<ConfigEntry<string>, float> Floats = new();
+
+  public ConfigEntry<string> BindFloat(string group, string name, float value, string description, bool synchronizedSetting = true) {
+    var entry = Bind(group, name, value.ToString(), description, synchronizedSetting);
+    entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry);
+    Floats[entry] = TryParseFloat(entry);
+    return entry;
+  }
+
   private static void AddMessage(Terminal context, string message) {
     context.AddString(message);
     Player.m_localPlayer?.Message(MessageHud.MessageType.TopLeft, message);

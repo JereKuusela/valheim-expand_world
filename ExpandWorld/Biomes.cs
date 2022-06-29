@@ -8,20 +8,21 @@ public class GetBiome {
   // Copy paste from the base game code.
 
   private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy) {
-    var magnitude = new Vector2(wx, wy).magnitude;
+    var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     var baseHeight = obj.GetBaseHeight(wx, wy, false);
     var num = obj.WorldAngle(wx, wy) * 100f;
     var angle = 50 * (Mathf.Atan2(wx, wy) + Mathf.PI) / Mathf.PI;
+    var radius = Configuration.WorldRadius;
     if (magnitude > Configuration.WorldTotalRadius || baseHeight <= 0.02f) {
       return Heightmap.Biome.Ocean;
     }
     var min = Configuration.AshlandsMin;
     var max = Configuration.AshlandsMax;
     var curve = Configuration.AshlandsCurvature;
-    var curvedMagnitude = new Vector2(wx, wy - curve).magnitude;
+    var curvedMagnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy - curve).magnitude;
     float amin = Configuration.AshlandsSectorMin;
     float amax = Configuration.AshlandsSectorMax;
-    var distOk = curvedMagnitude > min + curve + num && (max == Configuration.WorldRadius || magnitude < max);
+    var distOk = curvedMagnitude > min + curve + num && (max >= radius || magnitude < max);
     var angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     if (angleOk && distOk) {
       return Heightmap.Biome.AshLands;
@@ -33,10 +34,10 @@ public class GetBiome {
     min = Configuration.DeepNorthMin;
     max = Configuration.DeepNorthMax;
     curve = Configuration.DeepNorthCurvature;
-    curvedMagnitude = new Vector2(wx, wy + curve).magnitude;
+    curvedMagnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy + curve).magnitude;
     amin = Configuration.DeepNorthSectorMin;
     amax = Configuration.DeepNorthSectorMax;
-    distOk = curvedMagnitude > min + curve + num && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = curvedMagnitude > min + curve + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     if (angleOk && distOk) {
       return Heightmap.Biome.DeepNorth;
@@ -45,7 +46,7 @@ public class GetBiome {
     max = Configuration.MountainMax;
     amin = Configuration.MountainSectorMin;
     amax = Configuration.MountainSectorMax;
-    distOk = magnitude > min && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = magnitude > min && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     if (angleOk && distOk) {
       return Heightmap.Biome.Mountain;
@@ -54,7 +55,7 @@ public class GetBiome {
     max = Configuration.SwampMax;
     amin = Configuration.SwampSectorMin;
     amax = Configuration.SwampSectorMax;
-    distOk = magnitude > min && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = magnitude > min && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     var seed = Configuration.UseSwampSeed ? Configuration.SwampSeed : obj.m_offset0;
     if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.SwampAmount && distOk && baseHeight > 0.05f && baseHeight < 0.25f) {
@@ -64,7 +65,7 @@ public class GetBiome {
     max = Configuration.MistlandsMax;
     amin = Configuration.MistlandsSectorMin;
     amax = Configuration.MistlandsSectorMax;
-    distOk = magnitude > min + num && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     seed = Configuration.UseMistlandSeed ? Configuration.MistlandsSeed : obj.m_offset4;
     if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.MistlandsAmount && distOk) {
@@ -74,7 +75,7 @@ public class GetBiome {
     max = Configuration.PlainsMax;
     amin = Configuration.PlainsSectorMin;
     amax = Configuration.PlainsSectorMax;
-    distOk = magnitude > min + num && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     seed = Configuration.UsePlainsSeed ? Configuration.PlainsSeed : obj.m_offset1;
     if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.PlainsAmount && distOk) {
@@ -84,7 +85,7 @@ public class GetBiome {
     max = Configuration.BlackForestMax;
     amin = Configuration.BlackForestSectorMin;
     amax = Configuration.BlackForestSectorMax;
-    distOk = magnitude > min + num && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     seed = Configuration.UseBlackForestSeed ? Configuration.BlackForestSeed : obj.m_offset2;
     if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.BlackForestAmount && distOk) {
@@ -94,17 +95,19 @@ public class GetBiome {
     max = Configuration.MeadowsMax;
     amin = Configuration.MeadowsSectorMin;
     amax = Configuration.MeadowsSectorMax;
-    distOk = magnitude > min + num && (max == Configuration.WorldRadius || magnitude < max);
+    distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     if (angleOk && distOk) return Heightmap.Biome.Meadows;
     if (Enum.TryParse<Heightmap.Biome>(Configuration.DefaultBiome, true, out var biome))
       return biome;
     return Heightmap.Biome.BlackForest;
   }
-  static bool Prefix(WorldGenerator __instance, float wx, float wy, ref Heightmap.Biome __result) {
-    if (!Configuration.ModifyBiomes) return true;
+  static bool Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome __result) {
     var obj = __instance;
     if (obj.m_world.m_menu) return true;
+    wx /= Configuration.WorldStretch;
+    wy /= Configuration.WorldStretch;
+    if (!Configuration.ModifyBiomes) return true;
     __result = Get(obj, wx, wy);
     return false;
   }

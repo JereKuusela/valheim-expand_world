@@ -35,16 +35,6 @@ public class EdgeOfWorldKill {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => WorldSizeHelper.EdgeCheck(instructions);
 }
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight))]
-public class GetBiomeHeight {
-  static void Postfix(WorldGenerator __instance, ref float __result) {
-    if (__instance.m_world.m_menu) return;
-    var waterLevel = Configuration.WaterLevel;
-    __result = waterLevel + (__result - waterLevel) * Configuration.AltitudeMultiplier;
-    __result += Configuration.AltitudeDelta;
-  }
-}
-
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetForestFactor))]
 public class GetForestFactor {
   static void Postfix(ref float __result) {
@@ -56,12 +46,6 @@ public class GetForestFactor {
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight {
-  static void Postfix(WorldGenerator __instance, ref float __result) {
-    if (__instance.m_world.m_menu) return;
-    var waterLevel = Configuration.WaterLevel / 200f;
-    __result = waterLevel + (__result - waterLevel) * Configuration.BaseAltitudeMultiplier;
-    __result += Configuration.BaseAltitudeDelta / 200f;
-  }
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
     return new CodeMatcher(instructions)
         .MatchForward(
@@ -86,28 +70,28 @@ public class GetBaseHeight {
         .SetAndAdvance( // Replace the fixed meters with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius).operand)
+                () => Configuration.WorldRadius / Configuration.WorldStretch).operand)
         .MatchForward(
              useEnd: false,
              new CodeMatch(OpCodes.Ldc_R4, 10000f))
         .SetAndAdvance( // Replace the fixed meters with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius).operand)
+                () => Configuration.WorldRadius / Configuration.WorldStretch).operand)
         .MatchForward(
              useEnd: false,
              new CodeMatch(OpCodes.Ldc_R4, 10500f))
         .SetAndAdvance( // Replace the fixed meters with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius).operand)
+                () => Configuration.WorldTotalRadius / Configuration.WorldStretch).operand)
         .MatchForward(
              useEnd: false,
              new CodeMatch(OpCodes.Ldc_R4, 10500f))
         .SetAndAdvance( // Replace the fixed meters with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius).operand)
+                () => Configuration.WorldTotalRadius / Configuration.WorldStretch).operand)
         .InstructionEnumeration();
   }
 }
