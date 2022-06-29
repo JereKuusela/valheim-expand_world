@@ -3,6 +3,14 @@ using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
 
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.WorldAngle))]
+public class WorldAngle {
+  static bool Prefix(float wx, float wy, ref float __result) {
+    __result = Mathf.Sin(Mathf.Atan2(wx, wy) * Configuration.CircleCurveFrequency);
+    return false;
+  }
+}
+
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
 public class GetBiome {
   // Copy paste from the base game code.
@@ -10,8 +18,9 @@ public class GetBiome {
   private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy) {
     var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     var baseHeight = obj.GetBaseHeight(wx, wy, false);
-    var num = obj.WorldAngle(wx, wy) * 100f;
-    var angle = 50 * (Mathf.Atan2(wx, wy) + Mathf.PI) / Mathf.PI;
+    var num = obj.WorldAngle(wx, wy) * Configuration.CircleCurveWidth;
+    var angle = 50f * (Mathf.Atan2(wx, wy) + Mathf.PI) / Mathf.PI;
+    angle += Configuration.SectorCurveWidth * Mathf.Sin(magnitude / Configuration.SectorCurveLength);
     var radius = Configuration.WorldRadius;
     if (magnitude > Configuration.WorldTotalRadius || baseHeight <= 0.02f) {
       return Heightmap.Biome.Ocean;
