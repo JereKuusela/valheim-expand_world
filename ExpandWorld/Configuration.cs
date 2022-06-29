@@ -36,6 +36,8 @@ public class Configuration {
   public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta];
   public static ConfigEntry<string> configWaveMultiplier;
   public static float WaveMultiplier => ConfigWrapper.Floats[configWaveMultiplier];
+  public static ConfigEntry<string> configLocationsMultiplier;
+  public static float LocationsMultiplier => ConfigWrapper.Floats[configLocationsMultiplier];
   public static ConfigEntry<bool> configWaveOnlyHeight;
   public static bool WaveOnlyHeight => configWaveOnlyHeight.Value;
   public static ConfigEntry<string> configForestMultiplier;
@@ -214,8 +216,8 @@ public class Configuration {
     var section = "1. General";
     configLocked = wrapper.BindLocking(section, "Locked", false, "If locked on the server, the config can't be edited by clients.");
     configModifyBiomes = wrapper.Bind(section, "Modify biomes", true, "Can be disabled if another mod is affecting biomes.");
-    configWorldRadius = wrapper.BindFloat(section, "World radius", 10000, "Radius of the world in meters (excluding the edge).");
-    configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500, "Size of the edge area in meters.");
+    configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, "Radius of the world in meters (excluding the edge).");
+    configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, "Size of the edge area in meters.");
     configMapSize = wrapper.BindFloat(section, "Minimap size multiplier", 1f, "Multiplier to the minimap size.");
     configMapSize.SettingChanged += (e, s) => {
       if (!Minimap.instance) return;
@@ -263,6 +265,7 @@ public class Configuration {
     configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, "Multiplies the biome altitude.");
     configBaseAltitudeDelta = wrapper.BindFloat(section, "Base altitude delta", 0f, "Adds to the base altitude.");
     configAltitudeDelta = wrapper.BindFloat(section, "Altitude delta", 0f, "Adds to the biome altitude.");
+    configLocationsMultiplier = wrapper.BindFloat(section, "Locations multiplier", 1f, "More or less locations.");
     configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, "Multiplies the wave size.");
     configWaveMultiplier.SettingChanged += (s, e) => {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
