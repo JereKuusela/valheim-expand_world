@@ -41,7 +41,7 @@ public class ConfigWrapper {
     syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
     return configEntry;
   }
-  public ConfigEntry<T> Bind<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => Bind(group, name, value, new ConfigDescription(description), synchronizedSetting);
+  public ConfigEntry<T> Bind<T>(string group, string name, T value, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, new ConfigDescription(description), synchronizedSetting);
   private static void ForceRegen(object e, System.EventArgs s) => ForceRegen();
   private static void ForceRegen() {
     if (ZoneSystem.instance != null) {
@@ -54,14 +54,32 @@ public class ConfigWrapper {
     SetMapMode.ForceRegen = true;
   }
   public static Dictionary<ConfigEntry<string>, float> Floats = new();
+  public static Dictionary<ConfigEntry<string>, int> Ints = new();
+  public static Dictionary<ConfigEntry<int>, float> Amounts = new();
 
-  public ConfigEntry<string> BindFloat(string group, string name, float value, string description, bool synchronizedSetting = true) {
+  public ConfigEntry<string> BindFloat(string group, string name, float value, string description = "", bool synchronizedSetting = true) {
     var entry = Bind(group, name, value.ToString(), description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry);
     Floats[entry] = TryParseFloat(entry);
     return entry;
   }
+  public ConfigEntry<string> BindInt(string group, string name, int value, string description = "", bool synchronizedSetting = true) {
+    var entry = Bind(group, name, value.ToString(), description, synchronizedSetting);
+    entry.SettingChanged += (s, e) => Ints[entry] = TryParseInt(entry);
+    Ints[entry] = TryParseInt(entry);
+    return entry;
+  }
+  private static float ConvertAmount(ConfigEntry<int> entry) => 1f - (float)entry.Value / 100f;
 
+  public ConfigEntry<int> BindAmount(string group, string name, int value, string description = "", bool synchronizedSetting = true) {
+    var entry = Bind<int>(group, name, value, new ConfigDescription(description, new AcceptableValueRange<int>(0, 100)), synchronizedSetting);
+    entry.SettingChanged += (s, e) => Amounts[entry] = ConvertAmount(entry);
+    Amounts[entry] = ConvertAmount(entry);
+    return entry;
+  }
+  public ConfigEntry<int> BindRange(string group, string name, int value, string description = "", bool synchronizedSetting = true) {
+    return Bind<int>(group, name, value, new ConfigDescription(description, new AcceptableValueRange<int>(0, 100)), synchronizedSetting);
+  }
   private static void AddMessage(Terminal context, string message) {
     context.AddString(message);
     Player.m_localPlayer?.Message(MessageHud.MessageType.TopLeft, message);
