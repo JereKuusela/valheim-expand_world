@@ -9,12 +9,12 @@ public class HeightHelper {
     return new CodeMatcher(instructions)
          .MatchForward(
              useEnd: false,
-             new CodeMatch(OpCodes.Ldfld))
+             new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset3))))
          .Repeat(matcher => matcher
-           .SetAndAdvance( // Replace the m_offset3 value with a custom function.
+           .SetAndAdvance(
              OpCodes.Call,
              Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                 (WorldGenerator instance) => Settings.UseHeightSeed ? Settings.HeightSeed : instance.m_offset3).operand)
+                 (WorldGenerator instance) => Configuration.UseHeightSeed ? Configuration.HeightSeed : instance.m_offset3).operand)
          )
          .InstructionEnumeration();
   }

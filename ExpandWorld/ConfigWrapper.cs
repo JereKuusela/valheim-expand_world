@@ -9,8 +9,8 @@ namespace Service;
 
 public class ConfigWrapper {
 
-  private ConfigFile ConfigFile = null;
-  private ConfigSync ConfigSync = null;
+  private ConfigFile ConfigFile;
+  private ConfigSync ConfigSync;
   public ConfigWrapper(string command, ConfigFile configFile, ConfigSync configSync) {
     ConfigFile = configFile;
     ConfigSync = configSync;

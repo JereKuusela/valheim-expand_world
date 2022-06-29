@@ -1,4 +1,3 @@
-using System;
 using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
@@ -10,22 +9,22 @@ public class MinimapAwake {
   public static int OriginalTextureSize;
   static void Postfix(Minimap __instance) {
     OriginalTextureSize = __instance.m_textureSize;
-    __instance.m_textureSize = (int)(__instance.m_textureSize * Settings.MapSize);
-    __instance.m_minZoom /= Settings.MapSize;
+    __instance.m_textureSize = (int)(__instance.m_textureSize * Configuration.MapSize);
+    __instance.m_minZoom /= Configuration.MapSize;
     OriginalPixelSize = __instance.m_pixelSize;
-    __instance.m_pixelSize *= Settings.MapPixelSize;
-    __instance.m_mapImageLarge.rectTransform.localScale = new Vector3(Settings.MapSize, Settings.MapSize, Settings.MapSize);
+    __instance.m_pixelSize *= Configuration.MapPixelSize;
+    __instance.m_mapImageLarge.rectTransform.localScale = new(Configuration.MapSize, Configuration.MapSize, Configuration.MapSize);
     // Already generated.
     SetMapMode.ForceRegen = false;
     SetMapMode.TextureSizeChanged = false;
   }
 }
 
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new Type[] { typeof(int), typeof(int) })]
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new[] { typeof(int), typeof(int) })]
 public class PreventExploreWhenDirty1 {
   static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
 }
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new Type[] { typeof(Vector3), typeof(float) })]
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new[] { typeof(Vector3), typeof(float) })]
 public class PreventExploreWhenDirty2 {
   static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
 }
@@ -63,7 +62,7 @@ public class SetMapMode {
 public class InitializeWhenDimensionsChange {
   static bool Prefix(Minimap __instance, byte[] data) {
     var obj = __instance;
-    ZPackage zpackage = new ZPackage(data);
+    ZPackage zpackage = new(data);
     var num = zpackage.ReadInt();
     if (num >= 7) zpackage = zpackage.ReadCompressedPackage();
     int num2 = zpackage.ReadInt();
@@ -74,4 +73,10 @@ public class InitializeWhenDimensionsChange {
     obj.m_fogTexture.Apply();
     return false;
   }
+}
+
+
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
+public class WaitForConfigSync {
+  static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.FirstSync;
 }
