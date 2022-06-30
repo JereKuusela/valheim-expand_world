@@ -45,14 +45,14 @@ public class Configuration {
   public static ConfigEntry<string> configWorldStretch;
   public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
 
-  public static ConfigEntry<string> configSectorCurveLength;
-  public static float SectorCurveLength => ConfigWrapper.Floats[configSectorCurveLength];
-  public static ConfigEntry<string> configSectorCurveWidth;
-  public static float SectorCurveWidth => ConfigWrapper.Floats[configSectorCurveWidth];
-  public static ConfigEntry<string> configCircleCurveFrequency;
-  public static float CircleCurveFrequency => ConfigWrapper.Floats[configCircleCurveFrequency];
-  public static ConfigEntry<string> configCircleCurveWidth;
-  public static float CircleCurveWidth => ConfigWrapper.Floats[configCircleCurveWidth];
+  public static ConfigEntry<string> configDistanceWiggleLength;
+  public static float DistanceWiggleLength => ConfigWrapper.Floats[configDistanceWiggleLength];
+  public static ConfigEntry<string> configDistanceWiggleWidth;
+  public static float DistanceWiggleWidth => ConfigWrapper.Floats[configDistanceWiggleWidth];
+  public static ConfigEntry<string> configWiggleFrequency;
+  public static float WiggleFrequency => ConfigWrapper.Floats[configWiggleFrequency];
+  public static ConfigEntry<string> configWiggleWidth;
+  public static float WiggleWidth => ConfigWrapper.Floats[configWiggleWidth];
 
   public static ConfigEntry<string> configMountainsAltitudeMin;
   public static float MountainsAltitudeMin => ConfigWrapper.Floats[configMountainsAltitudeMin];
@@ -215,10 +215,10 @@ public class Configuration {
   public static void Init(ConfigWrapper wrapper) {
     var section = "1. General";
     configLocked = wrapper.BindLocking(section, "Locked", false, "If locked on the server, the config can't be edited by clients.");
-    configModifyBiomes = wrapper.Bind(section, "Modify biomes", true, "Can be disabled if another mod is affecting biomes.");
+    configModifyBiomes = wrapper.Bind(section, "Modify biomes", true, "If disabled, most biome related settings won't work. Intended for compatibility.");
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, "Radius of the world in meters (excluding the edge).");
-    configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, "Size of the edge area in meters.");
-    configMapSize = wrapper.BindFloat(section, "Minimap size multiplier", 1f, "Multiplier to the minimap size.");
+    configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, "Size of the edge area in meters (added to the radius for the total size).");
+    configMapSize = wrapper.BindFloat(section, "Minimap size", 1f, "Increases the minimap size, but also significantly increases the generation time.");
     configMapSize.SettingChanged += (e, s) => {
       if (!Minimap.instance) return;
       var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
@@ -227,7 +227,7 @@ public class Configuration {
       Minimap.instance.m_textureSize = newValue;
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
     };
-    configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size multiplier", 1f, "Granularity of the minimap.");
+    configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, "Decreases the minimap detail, but doesn't affect the generation time.");
     configMapPixelSize.SettingChanged += (e, s) => {
       if (!Minimap.instance) return;
       var newValue = MinimapAwake.OriginalPixelSize * MapPixelSize;
@@ -235,6 +235,7 @@ public class Configuration {
       SetMapMode.ForceRegen = true;
       Minimap.instance.m_pixelSize = newValue;
     };
+    configWorldStretch = wrapper.BindFloat(section, "World stretch", 1f, "Stretches the world to a bigger area.");
 
     section = "2. Features";
     configRivers = wrapper.Bind(section, "Rivers", true, "Enables rivers.");
@@ -253,19 +254,18 @@ public class Configuration {
         WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceRivers();
       }
     };
-    configWaterLevel = wrapper.BindFloat(section, "Water level", 39, "Sets the altitude of the water.");
+    configWaterLevel = wrapper.BindFloat(section, "Water level", 30f, "Sets the altitude of the water.");
     configWaterLevel.SettingChanged += (s, e) => {
       WaterHelper.SetLevel(ZoneSystem.instance);
       WaterHelper.SetLevel(ClutterSystem.instance);
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetLevel(obj);
     };
-    configWorldStretch = wrapper.BindFloat(section, "World stretch", 1f, "Stretches the world to a bigger area.");
     configForestMultiplier = wrapper.BindFloat(section, "Forest multiplier", 1f, "Multiplies the amount of forest.");
     configBaseAltitudeMultiplier = wrapper.BindFloat(section, "Base altitude multiplier", 1f, "Multiplies the base altitude.");
     configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, "Multiplies the biome altitude.");
     configBaseAltitudeDelta = wrapper.BindFloat(section, "Base altitude delta", 0f, "Adds to the base altitude.");
     configAltitudeDelta = wrapper.BindFloat(section, "Altitude delta", 0f, "Adds to the biome altitude.");
-    configLocationsMultiplier = wrapper.BindFloat(section, "Locations multiplier", 1f, "More or less locations.");
+    configLocationsMultiplier = wrapper.BindFloat(section, "Locations", 1f, "Multiplies the max amount of locations.");
     configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, "Multiplies the wave size.");
     configWaveMultiplier.SettingChanged += (s, e) => {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
@@ -290,11 +290,11 @@ public class Configuration {
     };
     biomes.Sort();
     configDefaultBiome = wrapper.Bind(section, "Default biome", Heightmap.Biome.BlackForest.ToString(), new ConfigDescription("", new AcceptableValueList<string>(biomes.ToArray())));
-    configMountainsAltitudeMin = wrapper.BindFloat(section, "Mountains minimum altitude", 80f);
-    configSectorCurveLength = wrapper.BindFloat(section, "Sector curve length", 500f);
-    configSectorCurveWidth = wrapper.BindFloat(section, "Sector curve width", 1f);
-    configCircleCurveFrequency = wrapper.BindFloat(section, "Circle curve frequency", 20f);
-    configCircleCurveWidth = wrapper.BindFloat(section, "Circle curve width", 100f);
+    configMountainsAltitudeMin = wrapper.BindFloat(section, "Mountain minimum altitude", 80f);
+    configDistanceWiggleLength = wrapper.BindFloat(section, "Distance wiggle length", 500f);
+    configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 1f);
+    configWiggleFrequency = wrapper.BindFloat(section, "Wiggle frequency", 20f, "How many wiggles are per each circle.");
+    configWiggleWidth = wrapper.BindFloat(section, "Wiggle width", 100f, "How many meters are the wiggles.");
     configMeadowsMin = wrapper.BindRange(section, "Meadows begin percentage", 0);
     configMeadowsMax = wrapper.BindRange(section, "Meadows end percentage", 50);
     configMeadowsSectorMin = wrapper.BindRange(section, "Meadows sector begin percentage", 0);

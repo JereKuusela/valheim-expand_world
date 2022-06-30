@@ -6,7 +6,7 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.WorldAngle))]
 public class WorldAngle {
   static bool Prefix(float wx, float wy, ref float __result) {
-    __result = Mathf.Sin(Mathf.Atan2(wx, wy) * Configuration.CircleCurveFrequency);
+    __result = Mathf.Sin(Mathf.Atan2(wx, wy) * Configuration.WiggleFrequency);
     return false;
   }
 }
@@ -18,9 +18,9 @@ public class GetBiome {
   private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy) {
     var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     var baseHeight = obj.GetBaseHeight(wx, wy, false);
-    var num = obj.WorldAngle(wx, wy) * Configuration.CircleCurveWidth;
+    var num = obj.WorldAngle(wx, wy) * Configuration.WiggleWidth;
     var angle = 50f * (Mathf.Atan2(wx, wy) + Mathf.PI) / Mathf.PI;
-    angle += Configuration.SectorCurveWidth * Mathf.Sin(magnitude / Configuration.SectorCurveLength);
+    angle += Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
     var radius = Configuration.WorldRadius;
     if (magnitude > Configuration.WorldTotalRadius || baseHeight <= 0.02f) {
       return Heightmap.Biome.Ocean;
