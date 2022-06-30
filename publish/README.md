@@ -15,7 +15,7 @@ Check any modding [guide](https://youtu.be/WfvA5a5tNHo) if you don't know how.
 - Change biome distribution.
 - Customize the world seed.
 - The minimap is generated in the background, lowering loading times.
-- Config sync to ensure all clients use the same settings (when "Locked" setting is enabled).
+- Config sync to ensure all clients use the same settings (when `Locked` setting is enabled).
 
 # Configuration
 
@@ -25,11 +25,11 @@ Note: Pay extra attention when loading old worlds. Certain configurations can ca
 
 # World size
 
-The size can be increased by changing the "World radius" and "World edge size" settings. The total size is sum of these (default is 10000 + 500 = 15000 meters). Usually there is no need to change the edge size.
+The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 15000 meters). Usually there is no need to change the edge size.
 
-The world can be stretched with "World stretch" setting. This can be used to keep the same world but islands and oceans are just bigger.
+The world can be stretched with `World stretch` setting. This can be used to keep the same world but islands and oceans are just bigger.
 
-The amount of locations (like boss altars) can be changed with "Locations" setting. This can significantly increase the initial world generation time (especially when the game fails to place most locations). If changing this on existing worlds, use `genloc` command to distribute unplaced locations.
+The amount of locations (like boss altars) can be changed with `Locations` setting. This can significantly increase the initial world generation time (especially when the game fails to place most locations). If changing this on existing worlds, use `genloc` command to distribute unplaced locations.
 
 Note: The location minimum and maximum distances are automatically scaled with world radius.
 
@@ -37,7 +37,7 @@ Note: If the game fails to place the spawn altar (for example if no Meadows), th
 
 ## Minimap
 
-The minimap size must be manually changed because there are two different settings. Both of the settings increase the minimap size but have a different drawback. "Minimap size" significantly increases the minimap generation time while "Minimap pixel size" makes the minimap less detailed.
+The minimap size must be manually changed because there are two different settings. Both of the settings increase the minimap size but have a different drawback. `Minimap size` significantly increases the minimap generation time while `Minimap pixel size` makes the minimap less detailed.
 
 Recommended settings:
 - 20000 radius: 2 size, 1 pixel.
@@ -52,13 +52,13 @@ Example generation times:
 - 8 size: 16 minutes.
 - 16 size: 1 hour.
 
-Note: The minimap is generated on the background. This is indicated by a small "Loading" text on the upper right corner.
+Note: The minimap is generated on the background. This is indicated by a small `Loading` text on the upper right corner.
 
-Note: Changing "Minimap size" resets explored areas.
+Note: Changing `Minimap size` resets explored areas.
 
 # Altitude
 
-For the altitude, there are two types of settings: "* altitude delta" and "* altitude multiplier". The multiplier multiplies the distance to the water level (by default at 30 meters). So increasing the multiplier will make water more deeper and other terrain higher. The delta directly affects the altitude. For example positive values will make the underwater terrain more shallow.
+For the altitude, there are two types of settings: `* altitude delta` and `* altitude multiplier`. The multiplier multiplies the distance to the water level (by default at 30 meters). So increasing the multiplier will make water more deeper and other terrain higher. The delta directly affects the altitude. For example positive values will make the underwater terrain more shallow.
 
 The formula is: `water level + (altitude - water level) * multiplier + delta`.
 
@@ -69,9 +69,9 @@ For the total altitude there are three layers:
 
 ## Water
 
-Water level can be changed with "Water level" setting. This is currently experimental and probably causes some glitches.
+Water level can be changed with `Water level` setting. This is currently experimental and probably causes some glitches.
 
-Similarly wave size can be changed with "Wave multiplier" setting. With the "Wave only height" setting causing slightly different behavior. This is also experimental.
+Similarly wave size can be changed with `Wave multiplier` setting. With the `Wave only height` setting causing slightly different behavior. This is also experimental.
 
 # Biomes
 
@@ -83,7 +83,7 @@ Most biomes have five settings which affects their distribution:
 - Sector begin percentage: The start of the sector.
 - Sector end percentage: The end of the sector.
 
-Note: The order of biomes is Ocean, Ashlands, Mountain (from altitude), Deep north, Mountain, Swamp, Mistlands, Plains, Black forest, Meadows and finally the biome defined by "Default biome" setting.
+Note: The order of biomes is Ocean, Ashlands, Mountain (from altitude), Deep north, Mountain, Swamp, Mistlands, Plains, Black forest, Meadows and finally the biome defined by `Default biome` setting.
 
 For sectors:
 - South: 0
@@ -93,38 +93,38 @@ For sectors:
 
 For example 25 sector begin and 75 sector end would make the biome only appear at the upper part of the world. Similarly 80 sector begin and 20 sector end would make the biome only appear at the bottom part.
 
-Note: By default Mountains don't have any sector defined but only appear based on "Mountain minimum altitude" setting.
+Note: By default Mountains don't have any sector defined but only appear based on `Mountain minimum altitude` setting.
 
 Ashlands and Deep north also have a curvature parameter which gives them the curved shape. This is bit hard to explain so better just experiment with different values.
 
 
 ## Biome borders
 
-The default biome distribution causes the biome minimum distance to "wiggle". This means that depending on the sector, the minimum distance is slightly increased or decreased (based on a sin wave). This is intended to make the world look more natural without artificial looking biome borders.
+The default biome distribution causes the biome minimum distance to `wiggle`. This means that depending on the sector, the minimum distance is slightly increased or decreased (based on a sin wave). This is intended to make the world look more natural without artificial looking biome borders.
 
-This is controlled by "Wiggle frequency" and "Wiggle width" settings. Again bit hard to explain but can be easily seen by increasing all biome amounts to 1.
+This is controlled by `Wiggle frequency` and `Wiggle width` settings. Again bit hard to explain but can be easily seen by increasing all biome amounts to 1.
 
-For the biome sector parameters, there are "Distance wiggle length" and "Distance wiggle width" settings. These follow similar logic but are just applied to the sector begin and end percentages.
+For the biome sector parameters, there are `Distance wiggle length` and `Distance wiggle width` settings. These follow similar logic but are just applied to the sector begin and end percentages.
 
 
 # Other
 
-Rivers and streams can be disabled with "Rivers" and "Streams" settings.
+Rivers and streams can be disabled with `Rivers` and `Streams` settings.
 
-Amount of forest can be changed with "Forest multiplier". 
+Amount of forest can be changed with `Forest multiplier`. 
 
 
 # Seeds
 
 The default world generation derives sub seeds from the world seed. This mod allows fine tuning these sub seeds (and adds some new ones) to fine-tune the world. This is probably utterly pointless for most people.
 
-The layout of the world is pre-determined, and each world is just a snapshot of it. The world can be manually moved in this layout with "Offset X" and "Offset Y" settings.
+The layout of the world is pre-determined, and each world is just a snapshot of it. The world can be manually moved in this layout with `Offset X` and `Offset Y` settings.
 
-Each biome adds some height variation on top of the base altitude. This can be controlled with "Height variation seed" setting.
+Each biome adds some height variation on top of the base altitude. This can be controlled with `Height variation seed` setting.
 
-If biome amount is not 1, then the game must decide which areas to fill with the biome. This is controlled by "Black forest seed", "Swamp seed", "Plains seed" and "Mistlands seed" settings.
+If biome amount is not 1, then the game must decide which areas to fill with the biome. This is controlled by `Black forest seed`, `Swamp seed`, `Plains seed` and `Mistlands seed` settings.
 
-Similarly for rivers and streams there are "River seed" and "Stream seed" settings.
+Similarly for rivers and streams there are `River seed` and `Stream seed` settings.
 
 Since number 0 is a valid seed, each setting also a has setting whether to use the custom seed.
 
