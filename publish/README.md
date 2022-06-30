@@ -17,6 +17,8 @@ Check any modding [guide](https://youtu.be/WfvA5a5tNHo) if you don't know how.
 - The minimap is generated in the background, lowering loading times.
 - Config sync to ensure all clients use the same settings (when `Locked` setting is enabled).
 
+For example you can create entirely flat worlds with only Meadows for building. Or group up colder biomes up north while more warmer biomes end up in the other side. Or just have a world with terrain shapes no one has ever seen before.
+
 # Configuration
 
 The mod supports live reloading when changing the configuration (either with [Configuration manager](https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/) or by saving the config file). This can lead to weird behavior so after playing with the settings it's recommended to make a fresh world.
@@ -25,7 +27,7 @@ Note: Pay extra attention when loading old worlds. Certain configurations can ca
 
 # World size
 
-The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 15000 meters). Usually there is no need to change the edge size.
+The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 10500 meters). Usually there is no need to change the edge size.
 
 The world can be stretched with `World stretch` setting. This can be used to keep the same world but islands and oceans are just bigger.
 
@@ -33,7 +35,7 @@ The amount of locations (like boss altars) can be changed with `Locations` setti
 
 Note: The location minimum and maximum distances are automatically scaled with world radius.
 
-Note: If the game fails to place the spawn altar (for example if no Meadows), then it is forcefully placed at the middle of the map. With bad luck, this can be underawter.
+Note: If the game fails to place the spawn altar (for example if no Meadows), then it is forcefully placed at the middle of the map. With bad luck, this can be underwater.
 
 ## Minimap
 
@@ -97,7 +99,6 @@ Note: By default Mountains don't have any sector defined but only appear based o
 
 Ashlands and Deep north also have a curvature parameter which gives them the curved shape. This is bit hard to explain so better just experiment with different values.
 
-
 ## Biome borders
 
 The default biome distribution causes the biome minimum distance to `wiggle`. This means that depending on the sector, the minimum distance is slightly increased or decreased (based on a sin wave). This is intended to make the world look more natural without artificial looking biome borders.
@@ -106,13 +107,11 @@ This is controlled by `Wiggle frequency` and `Wiggle width` settings. Again bit 
 
 For the biome sector parameters, there are `Distance wiggle length` and `Distance wiggle width` settings. These follow similar logic but are just applied to the sector begin and end percentages.
 
-
-# Other
+## Other
 
 Rivers and streams can be disabled with `Rivers` and `Streams` settings.
 
 Amount of forest can be changed with `Forest multiplier`. 
-
 
 # Seeds
 
@@ -131,4 +130,8 @@ Since number 0 is a valid seed, each setting also a has setting whether to use t
 # Changelog
 
 - v1.0
-	- Initial release
+	- Initial release.
+
+Thanks for Azumatt for creating the mod icon!
+
+Thanks for redseiko for the asynchronous minimap generating!
