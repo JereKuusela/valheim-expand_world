@@ -102,7 +102,7 @@ Ashlands and Deep north also have a curvature parameter which gives them the cur
 
 The default biome distribution causes the biome minimum distance to `wiggle`. This means that depending on the sector, the minimum distance is slightly increased or decreased (based on a sin wave). This is intended to make the world look more natural without artificial looking biome borders.
 
-This is controlled by `Wiggle frequency` and `Wiggle width` settings. Again bit hard to explain but can be easily seen by increasing all biome amounts to 1.
+This is controlled by `Wiggle frequency` and `Wiggle width` settings. Again bit hard to explain but can be easily seen by increasing all biome amounts to 1 and setting base altitude multiplier to 0 and delta to 30.
 
 For the biome sector parameters, there are `Distance wiggle length` and `Distance wiggle width` settings. These follow similar logic but are just applied to the sector begin and end percentages.
 
