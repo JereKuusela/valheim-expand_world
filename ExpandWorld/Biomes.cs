@@ -21,10 +21,14 @@ public class GetBiome {
     var num = obj.WorldAngle(wx, wy) * Configuration.WiggleWidth;
     var angle = 50f * (Mathf.Atan2(wx, wy) + Mathf.PI) / Mathf.PI;
     angle += Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
+    if (angle < 0f) angle += 100f;
+    if (angle >= 100f) angle -= 100f;
     var radius = Configuration.WorldRadius;
     if (magnitude > Configuration.WorldTotalRadius || baseHeight <= 0.02f) {
       return Heightmap.Biome.Ocean;
     }
+    var bx = wx / Configuration.BiomeStretch;
+    var by = wy / Configuration.BiomeStretch;
     var min = Configuration.AshlandsMin;
     var max = Configuration.AshlandsMax;
     var curve = Configuration.AshlandsCurvature;
@@ -67,7 +71,7 @@ public class GetBiome {
     distOk = magnitude > min && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     var seed = Configuration.UseSwampSeed ? Configuration.SwampSeed : obj.m_offset0;
-    if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.SwampAmount && distOk && baseHeight > 0.05f && baseHeight < 0.25f) {
+    if (angleOk && Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < Configuration.SwampAmount && distOk && baseHeight > 0.05f && baseHeight < 0.25f) {
       return Heightmap.Biome.Swamp;
     }
     min = Configuration.MistlandsMin;
@@ -77,7 +81,7 @@ public class GetBiome {
     distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     seed = Configuration.UseMistlandSeed ? Configuration.MistlandsSeed : obj.m_offset4;
-    if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.MistlandsAmount && distOk) {
+    if (angleOk && Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < Configuration.MistlandsAmount && distOk) {
       return Heightmap.Biome.Mistlands;
     }
     min = Configuration.PlainsMin;
@@ -87,7 +91,7 @@ public class GetBiome {
     distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     seed = Configuration.UsePlainsSeed ? Configuration.PlainsSeed : obj.m_offset1;
-    if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.PlainsAmount && distOk) {
+    if (angleOk && Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < Configuration.PlainsAmount && distOk) {
       return Heightmap.Biome.Plains;
     }
     min = Configuration.BlackForestMin;
@@ -97,7 +101,7 @@ public class GetBiome {
     distOk = magnitude > min + num && (max >= radius || magnitude < max);
     angleOk = amin > amax ? (angle >= amin || angle < amax) : angle >= amin && angle < amax;
     seed = Configuration.UseBlackForestSeed ? Configuration.BlackForestSeed : obj.m_offset2;
-    if (angleOk && Mathf.PerlinNoise((seed + wx) * 0.001f, (seed + wy) * 0.001f) > Configuration.BlackForestAmount && distOk) {
+    if (angleOk && Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < Configuration.BlackForestAmount && distOk) {
       return Heightmap.Biome.BlackForest;
     }
     min = Configuration.MeadowsMin;

@@ -29,9 +29,11 @@ Note: Pay extra attention when loading old worlds. Certain configurations can ca
 
 The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 10500 meters). Usually there is no need to change the edge size.
 
-The world can be stretched with `World stretch` setting. This can be used to keep the same world but islands and oceans are just bigger.
+The world can be stretched with `Stretch world` setting. This can be used to keep the same world but islands and oceans are just bigger. This will also make biomes bigger which can be further tweaked with `Stretch biomes` setting (for example using 0.5 biome stretch with 2 world stretch).
 
 The amount of locations (like boss altars) can be changed with `Locations` setting. This can significantly increase the initial world generation time (especially when the game fails to place most locations). If changing this on existing worlds, use `genloc` command to distribute unplaced locations.
+
+Note: 2x world radius means 4x world area. So for 20000 radius you would need 4x locations and for 40000 radius you would need 16x locations.
 
 Note: The location minimum and maximum distances are automatically scaled with world radius.
 
@@ -128,6 +130,13 @@ Similarly for rivers and streams there are `River seed` and `Stream seed` settin
 Since number 0 is a valid seed, each setting also a has setting whether to use the custom seed.
 
 # Changelog
+
+- v1.1
+	- WARNING: Contains breaking changes for existing configs.
+	- Fixes wrong default values for settings `Black forest amount` (from 40 to 60), `Swamp amount` (from 60 to 40) and `Plains amount` (from 40 to 60).
+	- Fixes the setting`Distance wiggle width` causing a minor anomaly.
+	- Changes the name of setting `World strech` to `Stretch world` (remember to update existing configs).
+	- Adds a new setting `Stretch biomes`.
 
 - v1.0
 	- Initial release.

@@ -44,6 +44,8 @@ public class Configuration {
   public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier];
   public static ConfigEntry<string> configWorldStretch;
   public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
+  public static ConfigEntry<string> configBiomeStretch;
+  public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
 
   public static ConfigEntry<string> configDistanceWiggleLength;
   public static float DistanceWiggleLength => ConfigWrapper.Floats[configDistanceWiggleLength];
@@ -235,7 +237,8 @@ public class Configuration {
       SetMapMode.ForceRegen = true;
       Minimap.instance.m_pixelSize = newValue;
     };
-    configWorldStretch = wrapper.BindFloat(section, "World stretch", 1f, "Stretches the world to a bigger area.");
+    configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, "Stretches the world to a bigger area.");
+    configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, "Stretches the biomes to a bigger area.");
 
     section = "2. Features";
     configRivers = wrapper.Bind(section, "Rivers", true, "Enables rivers.");
@@ -330,9 +333,9 @@ public class Configuration {
     configDeepNorthSectorMin = wrapper.BindRange(section, "Deep north sector begin percentage", 25);
     configDeepNorthSectorMax = wrapper.BindRange(section, "Deep north sector end percentage", 75);
 
-    configBlackForestAmount = wrapper.BindAmount(section, "Black forest amount", 40);
-    configSwampAmount = wrapper.BindAmount(section, "Swamp amount", 60);
-    configPlainsAmount = wrapper.BindAmount(section, "Plains amount", 40);
+    configBlackForestAmount = wrapper.BindAmount(section, "Black forest amount", 60);
+    configSwampAmount = wrapper.BindAmount(section, "Swamp amount", 40);
+    configPlainsAmount = wrapper.BindAmount(section, "Plains amount", 60);
     configMistlandsAmount = wrapper.BindAmount(section, "Mistlands amount", 50);
 
     configMeadowsAltitudeDelta = wrapper.BindFloat(section, "Meadows altitude delta", 0f);

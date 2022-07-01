@@ -63,7 +63,7 @@ public class GetBaseHeight {
         .SetAndAdvance( // Replace the m_offset1 value with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                (WorldGenerator instance) => Configuration.UseOffsetX ? Configuration.OffsetY : instance.m_offset1).operand)
+                (WorldGenerator instance) => Configuration.UseOffsetY ? Configuration.OffsetY : instance.m_offset1).operand)
         .MatchForward(
              useEnd: false,
              new CodeMatch(OpCodes.Ldc_R4, 10000f))

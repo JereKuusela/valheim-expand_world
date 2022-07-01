@@ -69,7 +69,7 @@ public class ConfigWrapper {
     Ints[entry] = TryParseInt(entry);
     return entry;
   }
-  private static float ConvertAmount(ConfigEntry<int> entry) => 1f - (float)entry.Value / 100f;
+  private static float ConvertAmount(ConfigEntry<int> entry) => (float)entry.Value / 100f;
 
   public ConfigEntry<int> BindAmount(string group, string name, int value, string description = "", bool synchronizedSetting = true) {
     var entry = Bind<int>(group, name, value, new ConfigDescription(description, new AcceptableValueRange<int>(0, 100)), synchronizedSetting);
