@@ -135,10 +135,12 @@ Since number 0 is a valid seed, each setting also a has setting whether to use t
 	- WARNING: Contains breaking changes for existing configs.
 	- Adds a new setting `Stretch biomes`.
 	- Adds an automatic fail-safe if some locations can't be placed (like Moder altar).
+	- Adds data editing for biome weathers, locations and vegetation.
 	- Changes the name of setting `World strech` to `Stretch world` (remember to update existing configs).
 	- Fixes wrong default values for settings `Black forest amount` (from 40 to 60), `Swamp amount` (from 60 to 40) and `Plains amount` (from 40 to 60).
 	- Fixes the setting `Distance wiggle width` causing a minor anomaly.
 	- Fixes the setting `Location`affecting the amount of start temples.
+	- Fixes map data being some reset when joining dedicated servers.
 
 - v1.0
 	- Initial release.

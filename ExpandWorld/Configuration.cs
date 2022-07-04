@@ -62,6 +62,14 @@ public class Configuration {
   public static ConfigEntry<string> configDefaultBiome;
   public static string DefaultBiome => configDefaultBiome.Value;
 
+  public static ConfigEntry<string> configInternalDataBiome;
+  public static ConfigEntry<bool> configDataVegetation;
+  public static bool DataVegetation => configDataVegetation.Value;
+  public static ConfigEntry<bool> configDataLocation;
+  public static bool DataLocation => configDataLocation.Value;
+  public static ConfigEntry<bool> configDataBiome;
+  public static bool DataBiome => configDataBiome.Value;
+
   public static ConfigEntry<string> configMeadowsAltitudeMultiplier;
   public static float MeadowsAltitudeMultiplier => ConfigWrapper.Floats[configMeadowsAltitudeMultiplier];
   public static ConfigEntry<string> configMeadowsAltitudeDelta;
@@ -278,7 +286,13 @@ public class Configuration {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };
 
-    section = "3. Biomes";
+    section = "3. Data";
+    configDataBiome = wrapper.Bind(section, "Biome data", true, "Use biome data");
+    configDataLocation = wrapper.Bind(section, "Location data", true, "Use location data");
+    configDataVegetation = wrapper.Bind(section, "Vegetation data", true, "Use vegetation data");
+    configInternalDataBiome = wrapper.Bind(section, "Internal biome data", "", "Internal field for data sync.");
+    configInternalDataBiome.SettingChanged += (s, e) => BiomeData.Set(configInternalDataBiome.Value);
+    section = "4. Biomes";
     List<string> biomes = new() {
       Heightmap.Biome.AshLands.ToString(),
       Heightmap.Biome.BlackForest.ToString(),
@@ -357,7 +371,7 @@ public class Configuration {
     configOceanAltitudeDelta = wrapper.BindFloat(section, "Ocean altitude delta", 0f);
     configOceanAltitudeMultiplier = wrapper.BindFloat(section, "Ocean altitude multiplier", 1f);
 
-    section = "4. Seed";
+    section = "5. Seed";
     configUseOffsetX = wrapper.Bind(section, "Use custom offset X", false, "Determines x coordinate on the base height map.");
     configOffsetX = wrapper.BindInt(section, "Offset X", 0);
     configUseOffsetY = wrapper.Bind(section, "Use custom offset Y", false, "Determines y coordinate on the base height map.");

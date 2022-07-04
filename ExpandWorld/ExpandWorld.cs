@@ -19,22 +19,29 @@ public class ExpandWorld : BaseUnityPlugin {
     CurrentVersion = VERSION,
     MinimumRequiredVersion = VERSION
   };
-
+  public static string ConfigPath = "";
   public void Awake() {
     Log = Logger;
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
+    ConfigPath = Path.GetDirectoryName(Config.ConfigFilePath);
     Configuration.Init(wrapper);
     Harmony harmony = new(GUID);
     harmony.PatchAll();
     SetupWatcher();
+    BiomeData.SetupWatcher();
+    LocationData.SetupWatcher();
+    VegetationData.SetupWatcher();
   }
 
   private void OnDestroy() {
+    // Should prevent sending the cleared values.
+    ServerSync.ConfigSync.ProcessingServerUpdate = true;
+    Configuration.configInternalDataBiome.Value = "";
     Config.Save();
   }
 
   private void SetupWatcher() {
-    FileSystemWatcher watcher = new(Path.GetDirectoryName(Config.ConfigFilePath), Path.GetFileName(Config.ConfigFilePath));
+    FileSystemWatcher watcher = new(ConfigPath, Path.GetFileName(Config.ConfigFilePath));
     watcher.Changed += ReadConfigValues;
     watcher.Created += ReadConfigValues;
     watcher.Renamed += ReadConfigValues;

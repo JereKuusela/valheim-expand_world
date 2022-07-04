@@ -17,8 +17,18 @@ public class ConfigWrapper {
     ConfigSync = configSync;
 
     new Terminal.ConsoleCommand(command, "[key] [value] - Toggles or sets a config value.", (Terminal.ConsoleEventArgs args) => {
-      if (args.Length < 2) return;
-      if (!SettingHandlers.TryGetValue(args[1].ToLower(), out var handler)) return;
+      if (configSync.IsLocked && !configSync.IsAdmin) {
+        args.Context.AddString("Error: Unable to edit locked config.");
+        return;
+      }
+      if (args.Length < 2) {
+        args.Context.AddString("Error: Missing the key.");
+        return;
+      }
+      if (!SettingHandlers.TryGetValue(args[1].ToLower(), out var handler)) {
+        args.Context.AddString("Error: Key not found.");
+        return;
+      }
       if (args.Length == 2)
         handler(args.Context, "");
       else

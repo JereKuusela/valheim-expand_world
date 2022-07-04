@@ -6,9 +6,7 @@
     <nullable>enable</nullable>
   </PropertyGroup>
   <Target Name="CopyDLL" AfterTargets="Build">
-    <Copy
-      SourceFiles="$(TargetDir)$(ProjectName).dll"
-      DestinationFolder="$(ProjectDir)\..\..\Libs" />
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(ProjectDir)\..\..\Libs" />
     <Message Text="Copied to Libs folder." Importance="High" />
   </Target>
   <ItemGroup>
@@ -46,5 +44,13 @@
       <HintPath>..\..\Libs\assembly_utils_publicized.dll</HintPath>
     </Reference>
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Fody" Version="6.6.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="ILMerge.Fody" Version="1.23.0" PrivateAssets="All" />
+    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" />
+    <PackageReference Include="YamlDotNet" Version="11.2.1" />
+  </ItemGroup>
 </Project>

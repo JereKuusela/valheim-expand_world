@@ -100,7 +100,7 @@ internal class ConfigurationManagerAttributes {
 [PublicAPI]
 public class ConfigSync {
   public static bool ProcessingServerUpdate = false;
-  public bool FirstSync = false;
+  public bool InitialSyncDone = false;
 
   public readonly string Name;
   public string? DisplayName;
@@ -215,7 +215,7 @@ public class ConfigSync {
       isServer = __instance.IsServer();
       foreach (ConfigSync configSync in configSyncs) {
         configSync.IsSourceOfTruth = __instance.IsDedicated() || __instance.IsServer();
-        configSync.FirstSync = configSync.isSourceOfTruth;
+        configSync.InitialSyncDone = configSync.isSourceOfTruth;
         ZRoutedRpc.instance.Register<ZPackage>(configSync.Name + " ConfigSync", configSync.RPC_ConfigSync);
         if (isServer) {
           Debug.Log($"Registered '{configSync.Name} ConfigSync' RPC - waiting for incoming connections");
@@ -275,7 +275,10 @@ public class ConfigSync {
   private readonly Dictionary<string, SortedDictionary<int, byte[]>> configValueCache = new();
   private readonly List<KeyValuePair<long, string>> cacheExpirations = new(); // avoid leaking memory
 
-  private void RPC_InitialConfigSync(ZRpc rpc, ZPackage package) => RPC_ConfigSync(0, package);
+  private void RPC_InitialConfigSync(ZRpc rpc, ZPackage package) {
+    RPC_ConfigSync(0, package);
+    InitialSyncDone = true;
+  }
 
   private void RPC_ConfigSync(long sender, ZPackage package) {
     try {
@@ -373,7 +376,6 @@ public class ConfigSync {
     } finally {
       ProcessingServerUpdate = false;
     }
-    FirstSync = true;
   }
 
   private class ParsedConfigs {

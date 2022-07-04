@@ -10,7 +10,7 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(Minimap))]
 public class MinimapAsync {
   [HarmonyPatch(nameof(Minimap.GenerateWorldMap)), HarmonyPrefix]
-  static bool GenerateWorldMapPrefix(ref Minimap __instance) {
+  static bool GenerateWorldMapPrefix(Minimap __instance) {
     _waterLevel = Configuration.WaterLevel;
     __instance.StartCoroutine(GenerateWorldMapCoroutine(__instance));
     return false;
@@ -31,6 +31,17 @@ public class MinimapAsync {
 
     ZLog.Log($"Starting GenerateWorldMapAsync...");
     Stopwatch stopwatch = Stopwatch.StartNew();
+    var obj = minimap;
+    if (SetMapMode.TextureSizeChanged) {
+      obj.m_explored = new bool[obj.m_textureSize * obj.m_textureSize];
+      obj.m_exploredOthers = new bool[obj.m_textureSize * obj.m_textureSize];
+      obj.Start();
+    }
+    // Some water stuff probably.
+    SetupMaterial.Refresh();
+    SetMapMode.TextureSizeChanged = false;
+    SetMapMode.ForceRegen = false;
+
 
     int size = minimap.m_textureSize * minimap.m_textureSize;
     ZLog.Log($"Task {taskIndex}: Populating texture arrays of size: {size:G}");

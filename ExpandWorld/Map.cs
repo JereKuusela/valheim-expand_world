@@ -44,17 +44,8 @@ public class SetMapMode {
   static void Prefix(Minimap __instance, Minimap.MapMode mode) {
     var obj = __instance;
     if (mode == obj.m_mode || mode != Minimap.MapMode.Large) return;
-    if (TextureSizeChanged) {
-      obj.m_explored = new bool[obj.m_textureSize * obj.m_textureSize];
-      obj.m_exploredOthers = new bool[obj.m_textureSize * obj.m_textureSize];
-      obj.Start();
-    }
-    if (ForceRegen || TextureSizeChanged) {
-      obj.ForceRegen();
-      SetupMaterial.Refresh();
-    }
-    TextureSizeChanged = false;
-    ForceRegen = false;
+    if (SetMapMode.ForceRegen || SetMapMode.TextureSizeChanged)
+      __instance.GenerateWorldMap();
   }
 }
 
@@ -78,5 +69,5 @@ public class InitializeWhenDimensionsChange {
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
 public class WaitForConfigSync {
-  static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.FirstSync;
+  static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 }
