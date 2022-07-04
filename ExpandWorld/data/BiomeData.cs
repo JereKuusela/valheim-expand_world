@@ -24,14 +24,14 @@ public class BiomeEnvironment {
 }
 
 [Serializable]
-public class Biome {
+public class BiomeData {
   public string biome = "";
   public List<BiomeEnvironment> environments = new();
   public string musicMorning = "morning";
   public string musicEvening = "evening";
   public string musicDay = "";
   public string musicNight = "";
-  public static BiomeEnvSetup Deserialize(Biome data) {
+  public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(new string[] { data.biome });
     biome.m_environments = data.environments.Select(BiomeEnvironment.Deserialize).ToList();
@@ -41,8 +41,8 @@ public class Biome {
     biome.m_musicNight = data.musicNight;
     return biome;
   }
-  public static Biome Serialize(BiomeEnvSetup biome) {
-    Biome data = new();
+  public static BiomeData ToData(BiomeEnvSetup biome) {
+    BiomeData data = new();
     data.biome = Data.FromBiomes(biome.m_biome).FirstOrDefault();
     data.environments = biome.m_environments.Select(BiomeEnvironment.Serialize).ToList();
     data.musicMorning = biome.m_musicMorning;
@@ -51,11 +51,10 @@ public class Biome {
     data.musicNight = biome.m_musicNight;
     return data;
   }
-}
-public class BiomeData {
+
   public static void Save(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(Biome.Serialize).ToList());
+    var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
   public static void Load(string fileName) {
@@ -65,8 +64,8 @@ public class BiomeData {
 
   public static void Set(string raw) {
     if (raw == "" || !Configuration.DataBiome) return;
-    var data = Data.Deserializer().Deserialize<List<Biome>>(raw)
-      .Select(Biome.Deserialize).ToList();
+    var data = Data.Deserializer().Deserialize<List<BiomeData>>(raw)
+      .Select(FromData).ToList();
     if (data.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} biome data.");
     foreach (var list in LocationList.m_allLocationLists)

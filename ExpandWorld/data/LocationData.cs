@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ExpandWorld;
 
 [Serializable]
-public class LocationEntry {
+public class LocationData {
   public string prefab = "";
   public bool enabled = true;
   public string[] biome = new string[0];
@@ -32,7 +32,7 @@ public class LocationEntry {
   public float minAltitude = 0f;
   public float maxAltitude = 1000f;
 
-  public static ZoneSystem.ZoneLocation Deserialize(LocationEntry data) {
+  public static ZoneSystem.ZoneLocation FromData(LocationData data) {
     var loc = new ZoneSystem.ZoneLocation();
     loc.m_prefabName = data.prefab;
     loc.m_enable = data.enabled;
@@ -60,8 +60,8 @@ public class LocationEntry {
     loc.m_maxAltitude = data.maxAltitude;
     return loc;
   }
-  public static LocationEntry Serialize(ZoneSystem.ZoneLocation loc) {
-    LocationEntry data = new();
+  public static LocationData ToData(ZoneSystem.ZoneLocation loc) {
+    LocationData data = new();
     data.prefab = loc.m_prefab.name;
     data.enabled = loc.m_enable;
     data.biome = Data.FromBiomes(loc.m_biome);
@@ -90,21 +90,16 @@ public class LocationEntry {
   }
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
 
-}
-
-public class LocationData {
-
-
   public static void Save(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
-    var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(LocationEntry.IsValid).Select(LocationEntry.Serialize).ToList());
+    var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
   public static void Load(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
     var raw = File.ReadAllText(fileName);
-    var data = Data.Deserializer().Deserialize<List<LocationEntry>>(raw)
-      .Select(LocationEntry.Deserialize).ToList();
+    var data = Data.Deserializer().Deserialize<List<LocationData>>(raw)
+      .Select(FromData).ToList();
     if (data.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
     foreach (var list in LocationList.m_allLocationLists)

@@ -31,12 +31,16 @@ public class ExpandWorld : BaseUnityPlugin {
     BiomeData.SetupWatcher();
     LocationData.SetupWatcher();
     VegetationData.SetupWatcher();
+    EventData.SetupWatcher();
+    SpawnData.SetupWatcher();
   }
 
   private void OnDestroy() {
     // Should prevent sending the cleared values.
     ServerSync.ConfigSync.ProcessingServerUpdate = true;
     Configuration.configInternalDataBiome.Value = "";
+    Configuration.configInternalDataEvents.Value = "";
+    Configuration.configInternalDataSpawns.Value = "";
     Config.Save();
   }
 

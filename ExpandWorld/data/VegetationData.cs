@@ -5,7 +5,7 @@ using System.Linq;
 namespace ExpandWorld;
 
 [Serializable]
-public class Vegetation {
+public class VegetationData {
   public string prefab = "";
   public bool enabled = true;
   public float min = 1f;
@@ -35,10 +35,7 @@ public class Vegetation {
   public bool inForest = false;
   public float forestTresholdMin = 0f;
   public float forestTresholdMax = 0f;
-}
-
-public class VegetationData {
-  public static ZoneSystem.ZoneVegetation Deserialize(Vegetation data) {
+  public static ZoneSystem.ZoneVegetation FromData(VegetationData data) {
     var veg = new ZoneSystem.ZoneVegetation();
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(data.prefab.GetStableHashCode(), out var obj))
       veg.m_prefab = obj;
@@ -75,8 +72,8 @@ public class VegetationData {
     return veg;
   }
   public static bool IsValid(ZoneSystem.ZoneVegetation veg) => veg.m_prefab && veg.m_prefab.GetComponent<ZNetView>() != null;
-  public static Vegetation Serialize(ZoneSystem.ZoneVegetation veg) {
-    Vegetation data = new();
+  public static VegetationData ToData(ZoneSystem.ZoneVegetation veg) {
+    VegetationData data = new();
     data.enabled = veg.m_enable;
     data.prefab = veg.m_prefab.name;
     data.min = veg.m_min;
@@ -111,14 +108,14 @@ public class VegetationData {
 
   public static void Save(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
-    var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(VegetationData.IsValid).Select(VegetationData.Serialize).ToList());
+    var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
   public static void Load(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
     var raw = File.ReadAllText(fileName);
-    var data = Data.Deserializer().Deserialize<List<Vegetation>>(raw)
-    .Select(VegetationData.Deserialize).ToList();
+    var data = Data.Deserializer().Deserialize<List<VegetationData>>(raw)
+    .Select(FromData).ToList();
     if (data.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} vegetation data.");
     foreach (var list in LocationList.m_allLocationLists)

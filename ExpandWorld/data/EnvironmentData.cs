@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ExpandWorld;
 
 [Serializable]
-public class Environment {
+public class EnvironmentData {
   public string name = "";
   public bool isDefault = false;
   public bool isWet = false;
@@ -45,20 +45,17 @@ public class Environment {
   public string musicEvening = "";
   public string musicDay = "";
   public string musicNight = "";
-}
-
-public class EnvironmentData {
-  public static EnvSetup Deserialize(Environment data) {
+  public static EnvSetup FromData(EnvironmentData data) {
     var env = new EnvSetup();
     return env;
   }
-  public static Environment Serialize(EnvSetup env) {
-    Environment data = new();
+  public static EnvironmentData ToData(EnvSetup env) {
+    EnvironmentData data = new();
     return data;
   }
 
   public static void Save(string fileName) {
-    var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(EnvironmentData.Serialize).ToList());
+    var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
   public static void Load(string fileName) {
@@ -66,8 +63,8 @@ public class EnvironmentData {
   }
   public static void Set(string raw) {
     if (raw == "") return;
-    var data = Data.Deserializer().Deserialize<List<Environment>>(raw)
-      .Select(EnvironmentData.Deserialize).ToList();
+    var data = Data.Deserializer().Deserialize<List<EnvironmentData>>(raw)
+      .Select(FromData).ToList();
     if (data.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} environment data.");
     foreach (var list in LocationList.m_allLocationLists)

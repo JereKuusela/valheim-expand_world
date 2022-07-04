@@ -21,6 +21,10 @@ public class LoadData {
       LocationData.Load(Data.LocFile);
     if (File.Exists(Data.BiomeFile))
       BiomeData.Load(Data.BiomeFile);
+    if (File.Exists(Data.EventFile))
+      EventData.Load(Data.EventFile);
+    if (File.Exists(Data.SpawnFile))
+      SpawnData.Load(Data.SpawnFile);
     IsLoading = false;
   }
 }
@@ -35,14 +39,38 @@ public class SaveData {
       LocationData.Save(Data.LocFile);
     if (!File.Exists(Data.BiomeFile))
       BiomeData.Save(Data.BiomeFile);
+    if (!File.Exists(Data.EventFile))
+      EventData.Save(Data.EventFile);
   }
+}
+[HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]
+public class HandleSpawnData {
+  // File exist check might be bit too slow for constant checking.
+  static bool Done = false;
+  public static List<SpawnSystem.SpawnData>? Override = null;
+  static void Postfix(SpawnSystem __instance) {
+    if (ZNet.instance.IsServer() && !Done) {
+      if (!File.Exists(Data.SpawnFile))
+        SpawnData.Save(Data.SpawnFile);
+      Done = true;
+    }
+    if (Override != null) {
+      __instance.m_spawnLists.Clear();
+      __instance.m_spawnLists.Add(new() { m_spawners = Override });
+    }
+  }
+}
 
-
+[HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.UpdateSpawning))]
+public class Spawn_WaitForConfigSync {
+  static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 }
 public static class Data {
+  public static string SpawnFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_spawns.yaml");
   public static string VegFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_vegetation.yaml");
   public static string LocFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_locations.yaml");
   public static string BiomeFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_biomes.yaml");
+  public static string EventFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_events.yaml");
 
   public static void SetupWatcher(string file, Action<string> action) {
     FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
@@ -52,7 +80,7 @@ public static class Data {
     watcher.EnableRaisingEvents = true;
   }
   public static IDeserializer Deserializer() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
-  public static ISerializer Serializer() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+  public static ISerializer Serializer() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).DisableAliases().Build();
 
   public static string[] FromBiomes(Heightmap.Biome biome) {
     List<string> biomes = new();
