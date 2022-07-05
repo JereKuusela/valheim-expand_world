@@ -22,11 +22,26 @@ public class BiomeEnvironment {
 
 public class BiomeData {
   public string biome = "";
+  public string name = "";
   public List<BiomeEnvironment> environments = new();
   public string musicMorning = "morning";
   public string musicEvening = "evening";
   public string musicDay = "";
   public string musicNight = "";
+  private static Dictionary<string, Heightmap.Biome> DefaultNameToBiome = new() {
+    { "none", Heightmap.Biome.None},
+    { "meadows", Heightmap.Biome.Meadows},
+    { "swamp", Heightmap.Biome.Swamp},
+    { "mountain", Heightmap.Biome.Mountain},
+    { "blackforest", Heightmap.Biome.BlackForest},
+    { "plains", Heightmap.Biome.Plains},
+    { "ashlands", Heightmap.Biome.AshLands},
+    { "deepnorth", Heightmap.Biome.DeepNorth},
+    { "ocean", Heightmap.Biome.Ocean},
+    { "mistlands", Heightmap.Biome.Mistlands},
+  };
+  public static Dictionary<string, Heightmap.Biome> NameToBiome = DefaultNameToBiome;
+  public static Dictionary<Heightmap.Biome, string> BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(new string[] { data.biome });
@@ -57,13 +72,26 @@ public class BiomeData {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     Configuration.configInternalDataBiome.Value = File.ReadAllText(fileName);
   }
-
   public static void Set(string raw) {
     if (raw == "" || !Configuration.DataBiome) return;
-    var data = Data.Deserializer().Deserialize<List<BiomeData>>(raw)
-      .Select(FromData).ToList();
-    if (data.Count == 0) return;
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} biome data.");
+    var rawData = Data.Deserializer().Deserialize<List<BiomeData>>(raw);
+    if (rawData.Count == 0) return;
+    ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
+    NameToBiome = DefaultNameToBiome.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
+    foreach (var biome in rawData) {
+      if (biome.name != "") {
+        var key = "biome_" + ((Heightmap.Biome)biomeNumber).ToString().ToLower();
+        ExpandWorld.Log.LogInfo("Translate: " + biome.name + " to " + key);
+        Localization.instance.m_translations[key] = biome.name;
+      }
+      if (NameToBiome.ContainsKey(biome.biome.ToLower())) continue;
+      NameToBiome.Add(biome.biome.ToLower(), (Heightmap.Biome)biomeNumber);
+      biomeNumber *= 2;
+    }
+    BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+    Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
+    var data = rawData.Select(FromData).ToList();
     foreach (var list in LocationList.m_allLocationLists)
       list.m_biomeEnvironments.Clear();
     EnvMan.instance.m_biomes.Clear();

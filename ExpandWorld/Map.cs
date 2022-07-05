@@ -66,7 +66,36 @@ public class InitializeWhenDimensionsChange {
   }
 }
 
+/*
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdateBiome))]
+public class UpdateBiome {
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+    return new CodeMatcher(instructions)
+                    .MatchForward(
+                         useEnd: false,
+                         new CodeMatch(OpCodes.Ldstr, "$biome_"))
+                    .Advance(1)
+                    .SetOpcodeAndAdvance(OpCodes.Ldloc_1)
+                    .SetAndAdvance(
+                        OpCodes.Call,
+                        Transpilers.EmitDelegate<Func<Heightmap.Biome, string>>(
+                            (Heightmap.Biome biome) => BiomeData.BiomeToName[biome]).operand)
+                    .SetOpcodeAndAdvance(OpCodes.Nop)
+                    .MatchForward(
+                         useEnd: false,
+                         new CodeMatch(OpCodes.Ldstr, "$biome_"))
+                    .Advance(1)
+                    .SetOpcodeAndAdvance(OpCodes.Ldloc_3)
+                    .SetAndAdvance(
+                        OpCodes.Call,
+                        Transpilers.EmitDelegate<Func<Heightmap.Biome, string>>(
+                            (Heightmap.Biome biome) => BiomeData.BiomeToName[biome]).operand)
+                    .SetOpcodeAndAdvance(OpCodes.Nop)
+                    .InstructionEnumeration();
+  }
+}
 
+*/
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
 public class Map_WaitForConfigSync {
   static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;

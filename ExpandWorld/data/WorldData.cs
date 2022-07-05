@@ -93,13 +93,14 @@ public class WorldData {
   public static WorldData ToData(WorldData biome) => biome;
 
   public static void Save(string fileName) {
-    if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
+    if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
   public static void Load(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     Configuration.configInternalDataWorld.Value = File.ReadAllText(fileName);
+    Set(File.ReadAllText(fileName));
   }
 
   public static void Set(string raw) {
