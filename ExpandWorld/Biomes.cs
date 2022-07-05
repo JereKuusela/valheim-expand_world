@@ -11,6 +11,17 @@ public class WorldAngle {
   }
 }
 
+[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiomeColor), new[] { typeof(Heightmap.Biome) })]
+public class GetBiomeColor {
+  static bool Prefix(Heightmap.Biome biome, ref Color32 __result) {
+    if (BiomeData.BiomeToData.TryGetValue(biome, out var data)) {
+      __result = data.color;
+      return false;
+    }
+    return true;
+  }
+}
+
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
 public class GetBiome {
   public static List<WorldData> Data = WorldData.GetDefault();

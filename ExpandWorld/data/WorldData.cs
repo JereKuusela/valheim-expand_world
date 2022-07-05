@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using Service;
 using YamlDotNet.Serialization;
 namespace ExpandWorld;
 
@@ -122,6 +123,7 @@ public class WorldData {
     if (data.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
     GetBiome.Data = data;
+    ConfigWrapper.ForceRegen();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Data.WorldFile, Load);

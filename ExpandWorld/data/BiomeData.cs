@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using Service;
+using UnityEngine;
 namespace ExpandWorld;
 
 public class BiomeEnvironment {
@@ -33,6 +35,8 @@ public class BiomeData {
   [DefaultValue(0f)]
   public float altitudeDelta = 0f;
   public BiomeEnvironment[] environments = new BiomeEnvironment[0];
+  public Color32 color = new Color32(0, 0, 0, 0);
+  public Color32 mapColor = new Color32(0, 0, 0, 0);
   [DefaultValue("")]
   public string musicMorning = "morning";
   [DefaultValue("")]
@@ -74,6 +78,8 @@ public class BiomeData {
     data.musicEvening = biome.m_musicEvening;
     data.musicDay = biome.m_musicDay;
     data.musicNight = biome.m_musicNight;
+    data.color = Heightmap.GetBiomeColor(biome.m_biome);
+    data.mapColor = MinimapAsync.GetPixelColor32(biome.m_biome);
     return data;
   }
 
@@ -97,7 +103,6 @@ public class BiomeData {
     foreach (var biome in rawData) {
       if (biome.name != "") {
         var key = "biome_" + ((Heightmap.Biome)biomeNumber).ToString().ToLower();
-        ExpandWorld.Log.LogInfo("Translate: " + biome.name + " to " + key);
         Localization.instance.m_translations[key] = biome.name;
       }
       if (NameToBiome.ContainsKey(biome.biome.ToLower())) {
@@ -116,6 +121,7 @@ public class BiomeData {
     EnvMan.instance.m_biomes.Clear();
     foreach (var biome in data)
       EnvMan.instance.AppendBiomeSetup(biome);
+    ConfigWrapper.ForceRegen();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Data.BiomeFile, Load);

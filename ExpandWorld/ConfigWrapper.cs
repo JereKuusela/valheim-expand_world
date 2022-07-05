@@ -43,9 +43,10 @@ public class ConfigWrapper {
     return configEntry;
   }
   public ConfigEntry<bool> BindLocking(string group, string name, bool value, string description) => BindLocking(group, name, value, new ConfigDescription(description));
-  public ConfigEntry<T> Bind<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true) {
+  public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, ConfigDescription description, bool synchronizedSetting = true) {
     var configEntry = ConfigFile.Bind(group, name, value, description);
-    configEntry.SettingChanged += ForceRegen;
+    if (forceRegen)
+      configEntry.SettingChanged += ForceRegen;
     if (configEntry is ConfigEntry<bool> boolEntry)
       Register(boolEntry);
     else if (configEntry is ConfigEntry<string> stringEntry)
@@ -55,9 +56,9 @@ public class ConfigWrapper {
     syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
     return configEntry;
   }
-  public ConfigEntry<T> Bind<T>(string group, string name, T value, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, new ConfigDescription(description), synchronizedSetting);
+  public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, forceRegen, new ConfigDescription(description), synchronizedSetting);
   private static void ForceRegen(object e, System.EventArgs s) => ForceRegen();
-  private static void ForceRegen() {
+  public static void ForceRegen() {
     if (ZoneSystem.instance != null) {
       foreach (var heightmap in Heightmap.m_heightmaps) {
         heightmap.m_buildData = null;
@@ -71,14 +72,14 @@ public class ConfigWrapper {
   public static Dictionary<ConfigEntry<string>, int> Ints = new();
   public static Dictionary<ConfigEntry<int>, float> Amounts = new();
 
-  public ConfigEntry<string> BindFloat(string group, string name, float value, string description = "", bool synchronizedSetting = true) {
-    var entry = Bind(group, name, value.ToString(), description, synchronizedSetting);
+  public ConfigEntry<string> BindFloat(string group, string name, float value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
+    var entry = Bind(group, name, value.ToString(), forceRegen, description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry);
     Floats[entry] = TryParseFloat(entry);
     return entry;
   }
-  public ConfigEntry<string> BindInt(string group, string name, int value, string description = "", bool synchronizedSetting = true) {
-    var entry = Bind(group, name, value.ToString(), description, synchronizedSetting);
+  public ConfigEntry<string> BindInt(string group, string name, int value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
+    var entry = Bind(group, name, value.ToString(), forceRegen, description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Ints[entry] = TryParseInt(entry);
     Ints[entry] = TryParseInt(entry);
     return entry;
