@@ -42,6 +42,13 @@ public class Heights {
     __result = waterLevel + (__result - waterLevel) * Configuration.BaseAltitudeMultiplier;
     __result += Configuration.BaseAltitudeDelta / 200f;
   }
+  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight)), HarmonyPrefix]
+  static void BiomeReplace(WorldGenerator __instance, ref Heightmap.Biome biome) {
+    if (__instance.m_world.m_menu) return;
+    if (BiomeData.BiomeToData.TryGetValue(biome, out var data)) {
+      BiomeData.NameToBiome.TryGetValue(data.terrain, out biome);
+    }
+  }
   [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight)), HarmonyPostfix]
   static void Biome(WorldGenerator __instance, ref float __result) {
     if (__instance.m_world.m_menu) return;

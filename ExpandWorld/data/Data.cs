@@ -71,12 +71,12 @@ public class Spawn_WaitForConfigSync {
   static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 }
 public static class Data {
-  public static string SpawnFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_spawns.yaml");
-  public static string VegFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_vegetation.yaml");
-  public static string LocFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_locations.yaml");
-  public static string BiomeFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_biomes.yaml");
-  public static string WorldFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_world.yaml");
-  public static string EventFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_events.yaml");
+  public static string SpawnFile = Path.Combine(ExpandWorld.ConfigPath, "expand_spawns.yaml");
+  public static string VegFile = Path.Combine(ExpandWorld.ConfigPath, "expand_vegetation.yaml");
+  public static string LocFile = Path.Combine(ExpandWorld.ConfigPath, "expand_locations.yaml");
+  public static string BiomeFile = Path.Combine(ExpandWorld.ConfigPath, "expand_biomes.yaml");
+  public static string WorldFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world.yaml");
+  public static string EventFile = Path.Combine(ExpandWorld.ConfigPath, "expand_events.yaml");
 
   public static void SetupWatcher(string file, Action<string> action) {
     FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
@@ -86,7 +86,7 @@ public static class Data {
     watcher.EnableRaisingEvents = true;
   }
   public static IDeserializer Deserializer() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
-  public static ISerializer Serializer() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).DisableAliases().Build();
+  public static ISerializer Serializer() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).DisableAliases().ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults).Build();
 
   public static string[] FromBiomes(Heightmap.Biome biome) {
     List<string> biomes = new();
