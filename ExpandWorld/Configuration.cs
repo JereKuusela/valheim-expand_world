@@ -7,8 +7,6 @@ public class Configuration {
 #nullable disable
   public static ConfigEntry<bool> configLocked;
   public static bool Locked => configLocked.Value;
-  public static ConfigEntry<bool> configModifyBiomes;
-  public static bool ModifyBiomes => configModifyBiomes.Value;
   public static ConfigEntry<string> configWorldRadius;
   public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius];
   public static ConfigEntry<string> configWorldEdgeSize;
@@ -56,13 +54,10 @@ public class Configuration {
   public static ConfigEntry<string> configWiggleWidth;
   public static float WiggleWidth => ConfigWrapper.Floats[configWiggleWidth];
 
-  public static ConfigEntry<string> configMountainsAltitudeMin;
-  public static float MountainsAltitudeMin => ConfigWrapper.Floats[configMountainsAltitudeMin];
-
-  public static ConfigEntry<string> configDefaultBiome;
-  public static string DefaultBiome => configDefaultBiome.Value;
-
   public static ConfigEntry<string> configInternalDataBiome;
+  public static ConfigEntry<string> configInternalDataWorld;
+  public static ConfigEntry<string> configInternalDataLocations;
+  public static ConfigEntry<string> configInternalDataVegetation;
   public static ConfigEntry<string> configInternalDataSpawns;
   public static ConfigEntry<string> configInternalDataEvents;
   public static ConfigEntry<bool> configDataEvents;
@@ -75,6 +70,8 @@ public class Configuration {
   public static bool DataLocation => configDataLocation.Value;
   public static ConfigEntry<bool> configDataBiome;
   public static bool DataBiome => configDataBiome.Value;
+  public static ConfigEntry<bool> configDataWorld;
+  public static bool DataWorld => configDataWorld.Value;
 
   public static ConfigEntry<string> configMeadowsAltitudeMultiplier;
   public static float MeadowsAltitudeMultiplier => ConfigWrapper.Floats[configMeadowsAltitudeMultiplier];
@@ -113,84 +110,6 @@ public class Configuration {
   public static ConfigEntry<string> configOceanAltitudeDelta;
   public static float OceanAltitudeDelta => ConfigWrapper.Floats[configOceanAltitudeDelta];
 
-
-  public static ConfigEntry<int> configBlackForestAmount;
-  public static float BlackForestAmount => ConfigWrapper.Amounts[configBlackForestAmount];
-  public static ConfigEntry<int> configSwampAmount;
-  public static float SwampAmount => ConfigWrapper.Amounts[configSwampAmount];
-  public static ConfigEntry<int> configPlainsAmount;
-  public static float PlainsAmount => ConfigWrapper.Amounts[configPlainsAmount];
-  public static ConfigEntry<int> configMistlandsAmount;
-  public static float MistlandsAmount => ConfigWrapper.Amounts[configMistlandsAmount];
-  public static ConfigEntry<int> configMeadowsMin;
-  private static int ConvertDist(ConfigEntry<int> entry) => (int)(entry.Value * WorldRadius / 100);
-  public static int MeadowsMin => ConvertDist(configMeadowsMin);
-  public static ConfigEntry<int> configMeadowsMax;
-  public static int MeadowsMax => ConvertDist(configMeadowsMax);
-  public static ConfigEntry<int> configMeadowsSectorMin;
-  public static int MeadowsSectorMin => configMeadowsSectorMin.Value;
-  public static ConfigEntry<int> configMeadowsSectorMax;
-  public static int MeadowsSectorMax => configMeadowsSectorMax.Value;
-  public static ConfigEntry<int> configBlackForestMin;
-  public static int BlackForestMin => ConvertDist(configBlackForestMin);
-  public static ConfigEntry<int> configBlackForestMax;
-  public static int BlackForestMax => ConvertDist(configBlackForestMax);
-  public static ConfigEntry<int> configBlackForestSectorMin;
-  public static int BlackForestSectorMin => ConvertDist(configBlackForestSectorMin);
-  public static ConfigEntry<int> configBlackForestSectorMax;
-  public static int BlackForestSectorMax => ConvertDist(configBlackForestSectorMax);
-  public static ConfigEntry<int> configSwampMin;
-  public static int SwampMin => ConvertDist(configSwampMin);
-  public static ConfigEntry<int> configSwampMax;
-  public static int SwampMax => ConvertDist(configSwampMax);
-  public static ConfigEntry<int> configSwampSectorMin;
-  public static int SwampSectorMin => configSwampSectorMin.Value;
-  public static ConfigEntry<int> configSwampSectorMax;
-  public static int SwampSectorMax => configSwampSectorMax.Value;
-  public static ConfigEntry<int> configMountainMin;
-  public static int MountainMin => ConvertDist(configMountainMin);
-  public static ConfigEntry<int> configMountainMax;
-  public static int MountainMax => ConvertDist(configMountainMax);
-  public static ConfigEntry<int> configMountainSectorMin;
-  public static int MountainSectorMin => configMountainSectorMin.Value;
-  public static ConfigEntry<int> configMountainSectorMax;
-  public static int MountainSectorMax => configMountainSectorMax.Value;
-  public static ConfigEntry<int> configPlainsMin;
-  public static int PlainsMin => ConvertDist(configPlainsMin);
-  public static ConfigEntry<int> configPlainsMax;
-  public static int PlainsMax => ConvertDist(configPlainsMax);
-  public static ConfigEntry<int> configPlainsSectorMin;
-  public static int PlainsSectorMin => configPlainsSectorMin.Value;
-  public static ConfigEntry<int> configPlainsSectorMax;
-  public static int PlainsSectorMax => configPlainsSectorMax.Value;
-  public static ConfigEntry<int> configMistlandsMin;
-  public static int MistlandsMin => ConvertDist(configMistlandsMin);
-  public static ConfigEntry<int> configMistlandsMax;
-  public static int MistlandsMax => ConvertDist(configMistlandsMax);
-  public static ConfigEntry<int> configMistlandsSectorMin;
-  public static int MistlandsSectorMin => configMistlandsSectorMin.Value;
-  public static ConfigEntry<int> configMistlandsSectorMax;
-  public static int MistlandsSectorMax => configMistlandsSectorMax.Value;
-  public static ConfigEntry<int> configDeepNorthMin;
-  public static int DeepNorthMin => ConvertDist(configDeepNorthMin);
-  public static ConfigEntry<int> configDeepNorthMax;
-  public static int DeepNorthMax => ConvertDist(configDeepNorthMax);
-  public static ConfigEntry<int> configDeepNorthCurvature;
-  public static int DeepNorthCurvature => ConvertDist(configDeepNorthCurvature);
-  public static ConfigEntry<int> configDeepNorthSectorMin;
-  public static int DeepNorthSectorMin => configDeepNorthSectorMin.Value;
-  public static ConfigEntry<int> configDeepNorthSectorMax;
-  public static int DeepNorthSectorMax => configDeepNorthSectorMax.Value;
-  public static ConfigEntry<int> configAshlandsMin;
-  public static int AshlandsMin => ConvertDist(configAshlandsMin);
-  public static ConfigEntry<int> configAshlandsMax;
-  public static int AshlandsMax => ConvertDist(configAshlandsMax);
-  public static ConfigEntry<int> configAshlandsCurvature;
-  public static int AshlandsCurvature => ConvertDist(configAshlandsCurvature);
-  public static ConfigEntry<int> configAshlandsSectorMin;
-  public static int AshlandsSectorMin => configAshlandsSectorMin.Value;
-  public static ConfigEntry<int> configAshlandsSectorMax;
-  public static int AshlandsSectorMax => configAshlandsSectorMax.Value;
   public static ConfigEntry<bool> configUseOffsetX;
   public static bool UseOffsetX => configUseOffsetX.Value;
   public static ConfigEntry<string> configOffsetX;
@@ -203,22 +122,6 @@ public class Configuration {
   public static bool UseHeightSeed => configUseHeightSeed.Value;
   public static ConfigEntry<string> configHeightSeed;
   public static int HeightSeed => ConfigWrapper.Ints[configHeightSeed];
-  public static ConfigEntry<bool> configUseBlackForestSeed;
-  public static bool UseBlackForestSeed => configUseBlackForestSeed.Value;
-  public static ConfigEntry<string> configBlackForestSeed;
-  public static int BlackForestSeed => ConfigWrapper.Ints[configBlackForestSeed];
-  public static ConfigEntry<bool> configUseSwampSeed;
-  public static bool UseSwampSeed => configUseSwampSeed.Value;
-  public static ConfigEntry<string> configSwampSeed;
-  public static int SwampSeed => ConfigWrapper.Ints[configSwampSeed];
-  public static ConfigEntry<bool> configUsePlainsSeed;
-  public static bool UsePlainsSeed => configUsePlainsSeed.Value;
-  public static ConfigEntry<string> configPlainsSeed;
-  public static int PlainsSeed => ConfigWrapper.Ints[configPlainsSeed];
-  public static ConfigEntry<bool> configUseMistlandsSeed;
-  public static bool UseMistlandSeed => configUseMistlandsSeed.Value;
-  public static ConfigEntry<string> configMistlandsSeed;
-  public static int MistlandsSeed => ConfigWrapper.Ints[configMistlandsSeed];
   public static ConfigEntry<bool> configUseStreamSeed;
   public static bool UseStreamSeed => configUseStreamSeed.Value;
   public static ConfigEntry<string> configStreamSeed;
@@ -231,7 +134,6 @@ public class Configuration {
   public static void Init(ConfigWrapper wrapper) {
     var section = "1. General";
     configLocked = wrapper.BindLocking(section, "Locked", false, "If locked on the server, the config can't be edited by clients.");
-    configModifyBiomes = wrapper.Bind(section, "Modify biomes", true, "If disabled, most biome related settings won't work. Intended for compatibility.");
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, "Radius of the world in meters (excluding the edge).");
     configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, "Size of the edge area in meters (added to the radius for the total size).");
     configMapSize = wrapper.BindFloat(section, "Minimap size", 1f, "Increases the minimap size, but also significantly increases the generation time.");
@@ -293,6 +195,7 @@ public class Configuration {
     };
 
     section = "3. Data";
+    configDataWorld = wrapper.Bind(section, "World data", true, "Use world data");
     configDataBiome = wrapper.Bind(section, "Biome data", true, "Use biome data");
     configDataLocation = wrapper.Bind(section, "Location data", true, "Use location data");
     configDataVegetation = wrapper.Bind(section, "Vegetation data", true, "Use vegetation data");
@@ -304,6 +207,12 @@ public class Configuration {
     configInternalDataSpawns.SettingChanged += (s, e) => SpawnData.Set(configInternalDataSpawns.Value);
     configInternalDataEvents = wrapper.Bind(section, "Internal events data", "", "Internal field for data sync.");
     configInternalDataEvents.SettingChanged += (s, e) => EventData.Set(configInternalDataEvents.Value);
+    configInternalDataWorld = wrapper.Bind(section, "Internal world data", "", "Internal field for data sync.");
+    configInternalDataWorld.SettingChanged += (s, e) => WorldData.Set(configInternalDataWorld.Value);
+    configInternalDataLocations = wrapper.Bind(section, "Internal locations data", "", "Internal field for data sync.");
+    configInternalDataLocations.SettingChanged += (s, e) => LocationData.Set(configInternalDataLocations.Value);
+    configInternalDataVegetation = wrapper.Bind(section, "Internal vegetation data", "", "Internal field for data sync.");
+    configInternalDataVegetation.SettingChanged += (s, e) => VegetationData.Set(configInternalDataVegetation.Value);
     section = "4. Biomes";
     List<string> biomes = new() {
       Heightmap.Biome.AshLands.ToString(),
@@ -318,51 +227,10 @@ public class Configuration {
       Heightmap.Biome.None.ToString()
     };
     biomes.Sort();
-    configDefaultBiome = wrapper.Bind(section, "Default biome", Heightmap.Biome.BlackForest.ToString(), new ConfigDescription("", new AcceptableValueList<string>(biomes.ToArray())));
-    configMountainsAltitudeMin = wrapper.BindFloat(section, "Mountain minimum altitude", 80f);
     configDistanceWiggleLength = wrapper.BindFloat(section, "Distance wiggle length", 500f);
     configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 1f);
     configWiggleFrequency = wrapper.BindFloat(section, "Wiggle frequency", 20f, "How many wiggles are per each circle.");
     configWiggleWidth = wrapper.BindFloat(section, "Wiggle width", 100f, "How many meters are the wiggles.");
-    configMeadowsMin = wrapper.BindRange(section, "Meadows begin percentage", 0);
-    configMeadowsMax = wrapper.BindRange(section, "Meadows end percentage", 50);
-    configMeadowsSectorMin = wrapper.BindRange(section, "Meadows sector begin percentage", 0);
-    configMeadowsSectorMax = wrapper.BindRange(section, "Meadows sector end percentage", 100);
-    configBlackForestMin = wrapper.BindRange(section, "Black forest begin percentage", 6);
-    configBlackForestMax = wrapper.BindRange(section, "Black forest end percentage", 60);
-    configBlackForestSectorMin = wrapper.BindRange(section, "Black forest sector begin percentage", 0);
-    configBlackForestSectorMax = wrapper.BindRange(section, "Black forest sector end percentage", 100);
-    configSwampMin = wrapper.BindRange(section, "Swamp begin percentage", 20);
-    configSwampMax = wrapper.BindRange(section, "Swamp end percentage", 80);
-    configSwampSectorMin = wrapper.BindRange(section, "Swamp sector begin percentage", 0);
-    configSwampSectorMax = wrapper.BindRange(section, "Swamp sector end percentage", 100);
-    configMountainMin = wrapper.BindRange(section, "Mountain begin percentage", 0);
-    configMountainMax = wrapper.BindRange(section, "Mountain end percentage", 0);
-    configMountainSectorMin = wrapper.BindRange(section, "Mountain sector begin percentage", 0);
-    configMountainSectorMax = wrapper.BindRange(section, "Mountain sector end percentage", 0);
-    configPlainsMin = wrapper.BindRange(section, "Plains begin percentage", 30);
-    configPlainsMax = wrapper.BindRange(section, "Plains end percentage", 80);
-    configPlainsSectorMin = wrapper.BindRange(section, "Plains sector begin percentage", 0);
-    configPlainsSectorMax = wrapper.BindRange(section, "Plains sector end percentage", 100);
-    configMistlandsMin = wrapper.BindRange(section, "Mistlands begin percentage", 60);
-    configMistlandsMax = wrapper.BindRange(section, "Mistlands end percentage", 100);
-    configMistlandsSectorMin = wrapper.BindRange(section, "Mistlands sector begin percentage", 0);
-    configMistlandsSectorMax = wrapper.BindRange(section, "Mistlands sector end percentage", 100);
-    configAshlandsMin = wrapper.BindRange(section, "Ashlands begin percentage", 80);
-    configAshlandsMax = wrapper.BindRange(section, "Ashlands end percentage", 100);
-    configAshlandsCurvature = wrapper.BindRange(section, "Ashlands curvature percentage", 40);
-    configAshlandsSectorMin = wrapper.BindRange(section, "Ashlands sector begin percentage", 75);
-    configAshlandsSectorMax = wrapper.BindRange(section, "Ashlands sector end percentage", 25);
-    configDeepNorthMin = wrapper.BindRange(section, "Deep north begin percentage", 80);
-    configDeepNorthMax = wrapper.BindRange(section, "Deep north end percentage", 100);
-    configDeepNorthCurvature = wrapper.BindRange(section, "Deep north curvature percentage", 40);
-    configDeepNorthSectorMin = wrapper.BindRange(section, "Deep north sector begin percentage", 25);
-    configDeepNorthSectorMax = wrapper.BindRange(section, "Deep north sector end percentage", 75);
-
-    configBlackForestAmount = wrapper.BindAmount(section, "Black forest amount", 60);
-    configSwampAmount = wrapper.BindAmount(section, "Swamp amount", 40);
-    configPlainsAmount = wrapper.BindAmount(section, "Plains amount", 60);
-    configMistlandsAmount = wrapper.BindAmount(section, "Mistlands amount", 50);
 
     configMeadowsAltitudeDelta = wrapper.BindFloat(section, "Meadows altitude delta", 0f);
     configMeadowsAltitudeMultiplier = wrapper.BindFloat(section, "Meadows altitude multiplier", 1f);
@@ -390,16 +258,6 @@ public class Configuration {
     configOffsetY = wrapper.BindInt(section, "Offset Y", 0);
     configUseHeightSeed = wrapper.Bind(section, "Use height variation seed", false, "Determines the height variation of most biomes.");
     configHeightSeed = wrapper.BindInt(section, "Height variation seed", 0);
-
-    configUseBlackForestSeed = wrapper.Bind(section, "Use Black forest seed", false, "Determines location of Black forests.");
-    configBlackForestSeed = wrapper.BindInt(section, "Black forest seed", 0);
-    configUseSwampSeed = wrapper.Bind(section, "Use Swamp seed", false, "Determines location of Swamps.");
-    configSwampSeed = wrapper.BindInt(section, "Swamp seed", 0);
-    configUsePlainsSeed = wrapper.Bind(section, "Use Plains seed", false, "Determines location of Plains.");
-    configPlainsSeed = wrapper.BindInt(section, "Plains seed", 0);
-    configUseMistlandsSeed = wrapper.Bind(section, "Use Mistlands seed", false, "Determines location of Mistlands.");
-    configMistlandsSeed = wrapper.BindInt(section, "Mistlands seed", 0);
-
     configUseStreamSeed = wrapper.Bind(section, "Use stream seed", false, "Determines stream generation");
     configStreamSeed = wrapper.BindInt(section, "Stream seed", 0);
     configUseRiverSeed = wrapper.Bind(section, "Use river seed", false, "Determines river generation");

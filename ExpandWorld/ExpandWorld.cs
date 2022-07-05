@@ -33,6 +33,7 @@ public class ExpandWorld : BaseUnityPlugin {
     VegetationData.SetupWatcher();
     EventData.SetupWatcher();
     SpawnData.SetupWatcher();
+    WorldData.SetupWatcher();
   }
 
   private void OnDestroy() {
@@ -41,6 +42,8 @@ public class ExpandWorld : BaseUnityPlugin {
     Configuration.configInternalDataBiome.Value = "";
     Configuration.configInternalDataEvents.Value = "";
     Configuration.configInternalDataSpawns.Value = "";
+    Configuration.configInternalDataLocations.Value = "";
+    Configuration.configInternalDataVegetation.Value = "";
     Config.Save();
   }
 

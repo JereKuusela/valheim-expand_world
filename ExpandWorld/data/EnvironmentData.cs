@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 namespace ExpandWorld;
 
-[Serializable]
 public class EnvironmentData {
   public string name = "";
   public bool isDefault = false;

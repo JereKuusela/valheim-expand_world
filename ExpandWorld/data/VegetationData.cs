@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
-[Serializable]
 public class VegetationData {
   public string prefab = "";
   public bool enabled = true;
@@ -113,7 +111,10 @@ public class VegetationData {
   }
   public static void Load(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
-    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataVegetation.Value = File.ReadAllText(fileName);
+  }
+  public static void Set(string raw) {
+    if (raw == "" || !Configuration.DataVegetation) return;
     var data = Data.Deserializer().Deserialize<List<VegetationData>>(raw)
     .Select(FromData).ToList();
     if (data.Count == 0) return;

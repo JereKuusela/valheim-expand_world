@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
-[Serializable]
 public class SpawnData {
   public string prefab = "";
   public bool enabled = true;

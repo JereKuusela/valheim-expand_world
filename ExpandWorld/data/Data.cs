@@ -25,6 +25,8 @@ public class LoadData {
       EventData.Load(Data.EventFile);
     if (File.Exists(Data.SpawnFile))
       SpawnData.Load(Data.SpawnFile);
+    if (File.Exists(Data.WorldFile))
+      WorldData.Load(Data.WorldFile);
     IsLoading = false;
   }
 }
@@ -41,6 +43,8 @@ public class SaveData {
       BiomeData.Save(Data.BiomeFile);
     if (!File.Exists(Data.EventFile))
       EventData.Save(Data.EventFile);
+    if (!File.Exists(Data.WorldFile))
+      WorldData.Save(Data.WorldFile);
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]
@@ -70,6 +74,7 @@ public static class Data {
   public static string VegFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_vegetation.yaml");
   public static string LocFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_locations.yaml");
   public static string BiomeFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_biomes.yaml");
+  public static string WorldFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_world.yaml");
   public static string EventFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world_events.yaml");
 
   public static void SetupWatcher(string file, Action<string> action) {

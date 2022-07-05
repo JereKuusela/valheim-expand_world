@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 namespace ExpandWorld;
 
-[Serializable]
 public class LocationData {
   public string prefab = "";
   public bool enabled = true;
@@ -97,7 +95,10 @@ public class LocationData {
   }
   public static void Load(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
-    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataLocations.Value = File.ReadAllText(fileName);
+  }
+  public static void Set(string raw) {
+    if (raw == "" || !Configuration.DataLocation) return;
     var data = Data.Deserializer().Deserialize<List<LocationData>>(raw)
       .Select(FromData).ToList();
     if (data.Count == 0) return;

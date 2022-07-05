@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BepInEx;
 namespace ExpandWorld;
 
-[Serializable]
 public class BiomeEnvironment {
   public string environment = "";
   public float weight = 1f;
@@ -23,7 +20,6 @@ public class BiomeEnvironment {
   }
 }
 
-[Serializable]
 public class BiomeData {
   public string biome = "";
   public List<BiomeEnvironment> environments = new();
@@ -75,10 +71,6 @@ public class BiomeData {
       EnvMan.instance.AppendBiomeSetup(biome);
   }
   public static void SetupWatcher() {
-    FileSystemWatcher watcher = new(Path.GetDirectoryName(Data.BiomeFile), Path.GetFileName(Data.BiomeFile));
-    watcher.Changed += (s, e) => Load(Data.BiomeFile);
-    watcher.IncludeSubdirectories = true;
-    watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
-    watcher.EnableRaisingEvents = true;
+    Data.SetupWatcher(Data.BiomeFile, Load);
   }
 }
