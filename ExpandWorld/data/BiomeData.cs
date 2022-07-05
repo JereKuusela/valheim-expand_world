@@ -28,6 +28,10 @@ public class BiomeData {
   public string name = "";
   [DefaultValue("")]
   public string terrain = "";
+  [DefaultValue(1f)]
+  public float altitudeMultiplier = 1f;
+  [DefaultValue(0f)]
+  public float altitudeDelta = 0f;
   public BiomeEnvironment[] environments = new BiomeEnvironment[0];
   [DefaultValue("")]
   public string musicMorning = "morning";
