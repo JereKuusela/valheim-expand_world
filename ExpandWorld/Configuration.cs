@@ -212,7 +212,7 @@ public class Configuration {
     };
     biomes.Sort();
     configDistanceWiggleLength = wrapper.BindFloat(section, "Distance wiggle length", 500f, true);
-    configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 1f, true);
+    configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 0.01f, true);
     configWiggleFrequency = wrapper.BindFloat(section, "Wiggle frequency", 20f, true, "How many wiggles are per each circle.");
     configWiggleWidth = wrapper.BindFloat(section, "Wiggle width", 100f, true, "How many meters are the wiggles.");
 
