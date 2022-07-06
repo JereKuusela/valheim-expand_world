@@ -13,6 +13,7 @@ namespace ExpandWorld;
 public class LoadData {
   public static bool IsLoading = false;
   static void Prefix() {
+    EnvironmentData.Originals.Clear();
     if (!ZNet.instance.IsServer()) return;
     IsLoading = true;
     if (File.Exists(Data.EnvironmentFile))
@@ -29,6 +30,7 @@ public class LoadData {
       EventData.FromFile(Data.EventFile);
     if (File.Exists(Data.SpawnFile))
       SpawnData.FromFile(Data.SpawnFile);
+    ClutterManager.FromFile();
     IsLoading = false;
   }
 }
@@ -49,6 +51,7 @@ public class SaveData {
       EventData.ToFile(Data.EventFile);
     if (!File.Exists(Data.EnvironmentFile))
       EnvironmentData.ToFile(Data.EnvironmentFile);
+    ClutterManager.ToFile();
     // Spawn data handle elsewhere.
   }
 }
@@ -86,6 +89,13 @@ public static class Data {
   public static void SetupWatcher(string file, Action<string> action) {
     FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
     watcher.Changed += (s, e) => action(file);
+    watcher.IncludeSubdirectories = true;
+    watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+    watcher.EnableRaisingEvents = true;
+  }
+  public static void SetupWatcher(string file, Action action) {
+    FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
+    watcher.Changed += (s, e) => action();
     watcher.IncludeSubdirectories = true;
     watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
     watcher.EnableRaisingEvents = true;

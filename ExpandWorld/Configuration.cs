@@ -58,6 +58,7 @@ public class Configuration {
   public static ConfigEntry<string> configInternalDataWorld;
   public static ConfigEntry<string> configInternalDataLocations;
   public static ConfigEntry<string> configInternalDataVegetation;
+  public static ConfigEntry<string> configInternalDataClutter;
   public static ConfigEntry<string> configInternalDataSpawns;
   public static ConfigEntry<string> configInternalDataEvents;
   public static ConfigEntry<string> configInternalDataEnvironments;
@@ -69,6 +70,8 @@ public class Configuration {
   public static bool DataSpawns => configDataSpawns.Value;
   public static ConfigEntry<bool> configDataVegetation;
   public static bool DataVegetation => configDataVegetation.Value;
+  public static ConfigEntry<bool> configDataClutter;
+  public static bool DataClutter => configDataClutter.Value;
   public static ConfigEntry<bool> configDataLocation;
   public static bool DataLocation => configDataLocation.Value;
   public static ConfigEntry<bool> configDataBiome;
@@ -161,6 +164,8 @@ public class Configuration {
     };
 
     section = "3. Data";
+    configDataClutter = wrapper.Bind(section, "Clutter data", true, false, "Use clutter data");
+    configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(configInternalDataClutter.Value);
     configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
     configDataWorld.SettingChanged += (s, e) => WorldData.FromSetting(configInternalDataWorld.Value);
     configDataBiome = wrapper.Bind(section, "Biome data", true, false, "Use biome data");
@@ -176,6 +181,8 @@ public class Configuration {
     configDataSpawns = wrapper.Bind(section, "Spawn data", true, false, "Use spawn data");
     configDataSpawns.SettingChanged += (s, e) => SpawnData.FromSetting(configInternalDataSpawns.Value);
 
+    configInternalDataClutter = wrapper.Bind(section, "Internal clutter data", "", false, "Internal field for data sync.");
+    configInternalDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(configInternalDataClutter.Value);
     configInternalDataBiome = wrapper.Bind(section, "Internal biome data", "", false, "Internal field for data sync.");
     configInternalDataBiome.SettingChanged += (s, e) => BiomeData.FromSetting(configInternalDataBiome.Value);
     configInternalDataSpawns = wrapper.Bind(section, "Internal spawns data", "", false, "Internal field for data sync.");

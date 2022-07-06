@@ -100,7 +100,10 @@ public class BiomeData {
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataBiome) return;
     var rawData = Data.Deserializer().Deserialize<List<BiomeData>>(raw);
-    if (rawData.Count == 0) return;
+    if (rawData.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
     BiomeToData.Clear();
     NameToBiome = DefaultNameToBiome.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);

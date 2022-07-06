@@ -93,7 +93,7 @@ public class EnvironmentData {
   [DefaultValue(60f)]
   public float sunAngle = 60f;
   [DefaultValue(0f)]
-  private static Dictionary<string, EnvSetup> Originals = new();
+  public static Dictionary<string, EnvSetup> Originals = new();
   public static EnvSetup FromData(EnvironmentData data) {
     var env = new EnvSetup();
     if (Originals.TryGetValue(data.particles, out var setup))
@@ -209,7 +209,10 @@ public class EnvironmentData {
     if (Originals.Count == 0) SetOriginals();
     var data = Data.Deserializer().Deserialize<List<EnvironmentData>>(raw)
       .Select(FromData).ToList();
-    if (data.Count == 0) return;
+    if (data.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any environment data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} environment data.");
     foreach (var list in LocationList.m_allLocationLists)
       list.m_environments.Clear();

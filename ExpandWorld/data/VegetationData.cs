@@ -149,7 +149,10 @@ public class VegetationData {
     if (raw == "" || !Configuration.DataVegetation) return;
     var data = Data.Deserializer().Deserialize<List<VegetationData>>(raw)
     .Select(FromData).ToList();
-    if (data.Count == 0) return;
+    if (data.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any vegetation data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} vegetation data.");
     foreach (var list in LocationList.m_allLocationLists)
       list.m_vegetation.Clear();

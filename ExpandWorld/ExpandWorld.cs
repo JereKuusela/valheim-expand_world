@@ -34,6 +34,7 @@ public class ExpandWorld : BaseUnityPlugin {
     EventData.SetupWatcher();
     SpawnData.SetupWatcher();
     WorldData.SetupWatcher();
+    ClutterManager.SetupWatcher();
     EnvironmentData.SetupWatcher();
   }
 
@@ -46,6 +47,7 @@ public class ExpandWorld : BaseUnityPlugin {
     Configuration.configInternalDataSpawns.Value = "";
     Configuration.configInternalDataLocations.Value = "";
     Configuration.configInternalDataVegetation.Value = "";
+    Configuration.configInternalDataClutter.Value = "";
     Config.Save();
   }
 

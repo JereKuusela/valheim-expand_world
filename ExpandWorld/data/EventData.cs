@@ -86,7 +86,10 @@ public class EventData {
     if (raw == "" || !Configuration.DataEvents) return;
     var data = Data.Deserializer().Deserialize<List<EventData>>(raw)
     .Select(FromData).ToList();
-    if (data.Count == 0) return;
+    if (data.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any event data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} event data.");
     foreach (var list in LocationList.m_allLocationLists)
       list.m_events.Clear();

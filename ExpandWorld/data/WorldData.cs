@@ -123,7 +123,10 @@ public class WorldData {
     if (raw == "" || !Configuration.DataWorld) return;
     var data = Data.Deserializer().Deserialize<List<WorldData>>(raw)
       .Select(FromData).ToList();
-    if (data.Count == 0) return;
+    if (data.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any world data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
     GetBiome.Data = data;
     ConfigWrapper.ForceRegen();

@@ -127,7 +127,10 @@ public class LocationData {
     if (raw == "" || !Configuration.DataLocation) return;
     var data = Data.Deserializer().Deserialize<List<LocationData>>(raw)
       .Select(FromData).ToList();
-    if (data.Count == 0) return;
+    if (data.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any location data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
     foreach (var list in LocationList.m_allLocationLists)
       list.m_locations.Clear();

@@ -145,7 +145,10 @@ public class SpawnData {
     if (raw == "" || !Configuration.DataSpawns) return;
     var data = Data.Deserializer().Deserialize<List<SpawnData>>(raw)
       .Select(FromData).ToList();
-    if (data.Count == 0) return;
+    if (data.Count == 0) {
+      ExpandWorld.Log.LogWarning($"Failed to load any spawn data.");
+      return;
+    }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} spawn data.");
     HandleSpawnData.Override = data;
     foreach (var system in SpawnSystem.m_instances) {
