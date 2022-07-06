@@ -131,16 +131,21 @@ public class VegetationData {
     return data;
   }
 
-  public static void Save(string fileName) {
+  public static void ToFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
-  public static void Load(string fileName) {
+  public static void FromFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
-    Configuration.configInternalDataVegetation.Value = File.ReadAllText(fileName);
+    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataVegetation.Value = raw;
+    if (LoadData.IsLoading) Set(raw);
   }
-  public static void Set(string raw) {
+  public static void FromSetting(string raw) {
+    if (!LoadData.IsLoading) Set(raw);
+  }
+  private static void Set(string raw) {
     if (raw == "" || !Configuration.DataVegetation) return;
     var data = Data.Deserializer().Deserialize<List<VegetationData>>(raw)
     .Select(FromData).ToList();
@@ -153,6 +158,6 @@ public class VegetationData {
       ZoneSystem.instance.ValidateVegetation();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(Data.VegFile, Load);
+    Data.SetupWatcher(Data.VegFile, FromFile);
   }
 }

@@ -105,18 +105,21 @@ public class WorldData {
   }
   public static WorldData ToData(WorldData biome) => biome;
 
-  public static void Save(string fileName) {
+  public static void ToFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
-  public static void Load(string fileName) {
+  public static void FromFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
-    Configuration.configInternalDataWorld.Value = File.ReadAllText(fileName);
-    Set(File.ReadAllText(fileName));
+    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataWorld.Value = raw;
+    if (LoadData.IsLoading) Set(raw);
   }
-
-  public static void Set(string raw) {
+  public static void FromSetting(string raw) {
+    if (!LoadData.IsLoading) Set(raw);
+  }
+  private static void Set(string raw) {
     if (raw == "" || !Configuration.DataWorld) return;
     var data = Data.Deserializer().Deserialize<List<WorldData>>(raw)
       .Select(FromData).ToList();
@@ -126,6 +129,6 @@ public class WorldData {
     ConfigWrapper.ForceRegen();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(Data.WorldFile, Load);
+    Data.SetupWatcher(Data.WorldFile, FromFile);
   }
 }

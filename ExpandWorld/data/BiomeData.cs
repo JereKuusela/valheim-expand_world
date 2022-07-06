@@ -83,16 +83,21 @@ public class BiomeData {
     return data;
   }
 
-  public static void Save(string fileName) {
+  public static void ToFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
-  public static void Load(string fileName) {
+  public static void FromFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    Configuration.configInternalDataBiome.Value = File.ReadAllText(fileName);
+    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataBiome.Value = raw;
+    if (LoadData.IsLoading) Set(raw);
   }
-  public static void Set(string raw) {
+  public static void FromSetting(string raw) {
+    if (!LoadData.IsLoading) Set(raw);
+  }
+  private static void Set(string raw) {
     if (raw == "" || !Configuration.DataBiome) return;
     var rawData = Data.Deserializer().Deserialize<List<BiomeData>>(raw);
     if (rawData.Count == 0) return;
@@ -121,9 +126,11 @@ public class BiomeData {
     EnvMan.instance.m_biomes.Clear();
     foreach (var biome in data)
       EnvMan.instance.AppendBiomeSetup(biome);
+    EnvMan.instance.m_environmentPeriod = -1;
+    EnvMan.instance.m_firstEnv = true;
     ConfigWrapper.ForceRegen();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(Data.BiomeFile, Load);
+    Data.SetupWatcher(Data.BiomeFile, FromFile);
   }
 }

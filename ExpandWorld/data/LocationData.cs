@@ -109,16 +109,21 @@ public class LocationData {
   }
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
 
-  public static void Save(string fileName) {
+  public static void ToFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
-  public static void Load(string fileName) {
+  public static void FromFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
-    Configuration.configInternalDataLocations.Value = File.ReadAllText(fileName);
+    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataLocations.Value = raw;
+    if (LoadData.IsLoading) Set(raw);
   }
-  public static void Set(string raw) {
+  public static void FromSetting(string raw) {
+    if (!LoadData.IsLoading) Set(raw);
+  }
+  private static void Set(string raw) {
     if (raw == "" || !Configuration.DataLocation) return;
     var data = Data.Deserializer().Deserialize<List<LocationData>>(raw)
       .Select(FromData).ToList();
@@ -171,6 +176,6 @@ public class LocationData {
     }
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(Data.LocFile, Load);
+    Data.SetupWatcher(Data.LocFile, FromFile);
   }
 }

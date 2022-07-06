@@ -15,18 +15,20 @@ public class LoadData {
   static void Prefix() {
     if (!ZNet.instance.IsServer()) return;
     IsLoading = true;
+    if (File.Exists(Data.EnvironmentFile))
+      EnvironmentData.FromFile(Data.EnvironmentFile);
     if (File.Exists(Data.BiomeFile))
-      BiomeData.Load(Data.BiomeFile);
+      BiomeData.FromFile(Data.BiomeFile);
     if (File.Exists(Data.WorldFile))
-      WorldData.Load(Data.WorldFile);
+      WorldData.FromFile(Data.WorldFile);
     if (File.Exists(Data.VegFile))
-      VegetationData.Load(Data.VegFile);
+      VegetationData.FromFile(Data.VegFile);
     if (File.Exists(Data.LocFile))
-      LocationData.Load(Data.LocFile);
+      LocationData.FromFile(Data.LocFile);
     if (File.Exists(Data.EventFile))
-      EventData.Load(Data.EventFile);
+      EventData.FromFile(Data.EventFile);
     if (File.Exists(Data.SpawnFile))
-      SpawnData.Load(Data.SpawnFile);
+      SpawnData.FromFile(Data.SpawnFile);
     IsLoading = false;
   }
 }
@@ -36,15 +38,17 @@ public class SaveData {
   static void Postfix() {
     if (!ZNet.instance.IsServer()) return;
     if (!File.Exists(Data.BiomeFile))
-      BiomeData.Save(Data.BiomeFile);
+      BiomeData.ToFile(Data.BiomeFile);
     if (!File.Exists(Data.WorldFile))
-      WorldData.Save(Data.WorldFile);
+      WorldData.ToFile(Data.WorldFile);
     if (!File.Exists(Data.VegFile))
-      VegetationData.Save(Data.VegFile);
+      VegetationData.ToFile(Data.VegFile);
     if (!File.Exists(Data.LocFile))
-      LocationData.Save(Data.LocFile);
+      LocationData.ToFile(Data.LocFile);
     if (!File.Exists(Data.EventFile))
-      EventData.Save(Data.EventFile);
+      EventData.ToFile(Data.EventFile);
+    if (!File.Exists(Data.EnvironmentFile))
+      EnvironmentData.ToFile(Data.EnvironmentFile);
     // Spawn data handle elsewhere.
   }
 }
@@ -56,7 +60,7 @@ public class HandleSpawnData {
   static void Postfix(SpawnSystem __instance) {
     if (ZNet.instance.IsServer() && !Done) {
       if (!File.Exists(Data.SpawnFile))
-        SpawnData.Save(Data.SpawnFile);
+        SpawnData.ToFile(Data.SpawnFile);
       Done = true;
     }
     if (Override != null) {
@@ -77,6 +81,7 @@ public static class Data {
   public static string BiomeFile = Path.Combine(ExpandWorld.ConfigPath, "expand_biomes.yaml");
   public static string WorldFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world.yaml");
   public static string EventFile = Path.Combine(ExpandWorld.ConfigPath, "expand_events.yaml");
+  public static string EnvironmentFile = Path.Combine(ExpandWorld.ConfigPath, "expand_environments.yaml");
 
   public static void SetupWatcher(string file, Action<string> action) {
     FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));

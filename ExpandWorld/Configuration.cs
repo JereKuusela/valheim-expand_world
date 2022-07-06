@@ -60,6 +60,9 @@ public class Configuration {
   public static ConfigEntry<string> configInternalDataVegetation;
   public static ConfigEntry<string> configInternalDataSpawns;
   public static ConfigEntry<string> configInternalDataEvents;
+  public static ConfigEntry<string> configInternalDataEnvironments;
+  public static ConfigEntry<bool> configDataEnvironments;
+  public static bool DataEnvironments => configDataEnvironments.Value;
   public static ConfigEntry<bool> configDataEvents;
   public static bool DataEvents => configDataEvents.Value;
   public static ConfigEntry<bool> configDataSpawns;
@@ -159,30 +162,34 @@ public class Configuration {
 
     section = "3. Data";
     configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
-    configDataWorld.SettingChanged += (s, e) => WorldData.Set(configInternalDataWorld.Value);
+    configDataWorld.SettingChanged += (s, e) => WorldData.FromSetting(configInternalDataWorld.Value);
     configDataBiome = wrapper.Bind(section, "Biome data", true, false, "Use biome data");
-    configDataBiome.SettingChanged += (s, e) => BiomeData.Set(configInternalDataBiome.Value);
+    configDataBiome.SettingChanged += (s, e) => BiomeData.FromSetting(configInternalDataBiome.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");
-    configDataLocation.SettingChanged += (s, e) => LocationData.Set(configInternalDataLocations.Value);
+    configDataLocation.SettingChanged += (s, e) => LocationData.FromSetting(configInternalDataLocations.Value);
     configDataVegetation = wrapper.Bind(section, "Vegetation data", true, false, "Use vegetation data");
-    configDataVegetation.SettingChanged += (s, e) => VegetationData.Set(configInternalDataVegetation.Value);
+    configDataVegetation.SettingChanged += (s, e) => VegetationData.FromSetting(configInternalDataVegetation.Value);
     configDataEvents = wrapper.Bind(section, "Event data", true, false, "Use event data");
-    configDataEvents.SettingChanged += (s, e) => EventData.Set(configInternalDataEvents.Value);
+    configDataEvents.SettingChanged += (s, e) => EventData.FromSetting(configInternalDataEvents.Value);
+    configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
+    configDataEnvironments.SettingChanged += (s, e) => EnvironmentData.FromSetting(configInternalDataEnvironments.Value);
     configDataSpawns = wrapper.Bind(section, "Spawn data", true, false, "Use spawn data");
-    configDataSpawns.SettingChanged += (s, e) => SpawnData.Set(configInternalDataSpawns.Value);
+    configDataSpawns.SettingChanged += (s, e) => SpawnData.FromSetting(configInternalDataSpawns.Value);
 
     configInternalDataBiome = wrapper.Bind(section, "Internal biome data", "", false, "Internal field for data sync.");
-    configInternalDataBiome.SettingChanged += (s, e) => BiomeData.Set(configInternalDataBiome.Value);
+    configInternalDataBiome.SettingChanged += (s, e) => BiomeData.FromSetting(configInternalDataBiome.Value);
     configInternalDataSpawns = wrapper.Bind(section, "Internal spawns data", "", false, "Internal field for data sync.");
-    configInternalDataSpawns.SettingChanged += (s, e) => SpawnData.Set(configInternalDataSpawns.Value);
+    configInternalDataSpawns.SettingChanged += (s, e) => SpawnData.FromSetting(configInternalDataSpawns.Value);
     configInternalDataEvents = wrapper.Bind(section, "Internal events data", "", false, "Internal field for data sync.");
-    configInternalDataEvents.SettingChanged += (s, e) => EventData.Set(configInternalDataEvents.Value);
+    configInternalDataEvents.SettingChanged += (s, e) => EventData.FromSetting(configInternalDataEvents.Value);
+    configInternalDataEnvironments = wrapper.Bind(section, "Internal environment data", "", false, "Internal field for data sync.");
+    configInternalDataEnvironments.SettingChanged += (s, e) => EnvironmentData.FromSetting(configInternalDataEnvironments.Value);
     configInternalDataWorld = wrapper.Bind(section, "Internal world data", "", false, "Internal field for data sync.");
-    configInternalDataWorld.SettingChanged += (s, e) => WorldData.Set(configInternalDataWorld.Value);
+    configInternalDataWorld.SettingChanged += (s, e) => WorldData.FromSetting(configInternalDataWorld.Value);
     configInternalDataLocations = wrapper.Bind(section, "Internal locations data", "", false, "Internal field for data sync.");
-    configInternalDataLocations.SettingChanged += (s, e) => LocationData.Set(configInternalDataLocations.Value);
+    configInternalDataLocations.SettingChanged += (s, e) => LocationData.FromSetting(configInternalDataLocations.Value);
     configInternalDataVegetation = wrapper.Bind(section, "Internal vegetation data", "", false, "Internal field for data sync.");
-    configInternalDataVegetation.SettingChanged += (s, e) => VegetationData.Set(configInternalDataVegetation.Value);
+    configInternalDataVegetation.SettingChanged += (s, e) => VegetationData.FromSetting(configInternalDataVegetation.Value);
     section = "4. Biomes";
     List<string> biomes = new() {
       Heightmap.Biome.AshLands.ToString(),

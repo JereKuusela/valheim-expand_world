@@ -124,7 +124,7 @@ public class SpawnData {
     return data;
   }
 
-  public static void Save(string fileName) {
+  public static void ToFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataSpawns) return;
     var spawnSystem = SpawnSystem.m_instances.FirstOrDefault();
     if (spawnSystem == null) return;
@@ -132,12 +132,16 @@ public class SpawnData {
     var yaml = Data.Serializer().Serialize(spawns.Select(ToData).ToList());
     File.WriteAllText(fileName, yaml);
   }
-  public static void Load(string fileName) {
+  public static void FromFile(string fileName) {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    Configuration.configInternalDataSpawns.Value = File.ReadAllText(fileName);
+    var raw = File.ReadAllText(fileName);
+    Configuration.configInternalDataSpawns.Value = raw;
+    if (LoadData.IsLoading) Set(raw);
   }
-
-  public static void Set(string raw) {
+  public static void FromSetting(string raw) {
+    if (!LoadData.IsLoading) Set(raw);
+  }
+  private static void Set(string raw) {
     if (raw == "" || !Configuration.DataSpawns) return;
     var data = Data.Deserializer().Deserialize<List<SpawnData>>(raw)
       .Select(FromData).ToList();
@@ -150,6 +154,6 @@ public class SpawnData {
     }
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(Data.SpawnFile, Load);
+    Data.SetupWatcher(Data.SpawnFile, FromFile);
   }
 }
