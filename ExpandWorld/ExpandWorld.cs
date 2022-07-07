@@ -17,7 +17,8 @@ public class ExpandWorld : BaseUnityPlugin {
   {
     DisplayName = NAME,
     CurrentVersion = VERSION,
-    MinimumRequiredVersion = VERSION
+    MinimumRequiredVersion = VERSION,
+    IsLocked = true
   };
   public static string ConfigPath = "";
   public void Awake() {

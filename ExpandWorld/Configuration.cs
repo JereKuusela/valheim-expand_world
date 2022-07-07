@@ -5,8 +5,6 @@ using Service;
 namespace ExpandWorld;
 public class Configuration {
 #nullable disable
-  public static ConfigEntry<bool> configLocked;
-  public static bool Locked => configLocked.Value;
   public static ConfigEntry<string> configWorldRadius;
   public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius];
   public static ConfigEntry<string> configWorldEdgeSize;
@@ -102,7 +100,6 @@ public class Configuration {
 #nullable enable
   public static void Init(ConfigWrapper wrapper) {
     var section = "1. General";
-    configLocked = wrapper.BindLocking(section, "Locked", false, "If locked on the server, the config can't be edited by clients.");
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, true, "Radius of the world in meters (excluding the edge).");
     configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, true, "Size of the edge area in meters (added to the radius for the total size).");
     configMapSize = wrapper.BindFloat(section, "Minimap size", 1f, false, "Increases the minimap size, but also significantly increases the generation time.");

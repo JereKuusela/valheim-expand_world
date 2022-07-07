@@ -129,6 +129,52 @@ Similarly for rivers and streams there are `River seed` and `Stream seed` settin
 
 Since number 0 is a valid seed, each setting also a has setting whether to use the custom seed.
 
+# Rivers and streams
+
+Lakes are needed to generate rivers. The code searches for points with enough water and then merges them to lake objects.
+
+Note: Lake object is an abstract concept, not a real thing.
+
+- Lake search interval: How often a point is checked (meters)
+- Lake point depth: 10 altitude by default (20 meter depth)
+- Lake merge radius: 800 meters, groups found lake spots to lakes.
+
+Rivers are generated between lakes that have terrain higher than `Lake point depth` between them.
+
+- Max distance 1: Maximum distance to search for other lakes.
+- Max distance 2: Maximum distance to search for other lakes.
+- River max height: Maximum terrain altitude between the lakes.
+- River precision: Precision used for altitude checks (interval in meters).
+
+Rivers have params:
+
+- River seed: Seed for randomness.
+- Minimum width: 60
+- Maximum width: 100
+- Curve width: 1/15
+- Curve wave length: 1/20
+
+Streams are gemerated by trying to find random points within an altitude range. 
+
+- Stream seed:  Seed for randomness.
+- Max streams: 3000
+- Start min height: 26
+- Start max height: 31
+- Start iterations: 100, how many times tries to find a random point within height range.
+- End min height: 36
+- End max height: 44
+- End iterations: 100, how many times tries to find a random point within height range.
+
+Streams have params:
+
+- River seed: Seed for randomness.
+- Minimum width: 20
+- Maximum width: 20
+- Curve width: 1/15
+- Curve wave length: 1/20
+
+
+
 # Changelog
 
 - v1.1
@@ -137,6 +183,7 @@ Since number 0 is a valid seed, each setting also a has setting whether to use t
 	- Adds an automatic fail-safe if some locations can't be placed (like Moder altar).
 	- Adds data editing for biome weathers, events, locations, spawns, vegetation, weathers and world.
 	- Removes most biome settings as obsolete.
+	- Removes the `Locked` setting as obsolete (you never want this mod unsynced).
 	- Changes the name of setting `World strech` to `Stretch world` (remember to update existing configs).
 	- Fixes wrong default values for settings `Black forest amount` (from 40 to 60), `Swamp amount` (from 60 to 40) and `Plains amount` (from 40 to 60).
 	- Fixes the setting `Distance wiggle width` causing a minor anomaly.
