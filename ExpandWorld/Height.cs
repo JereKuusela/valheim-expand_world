@@ -48,15 +48,15 @@ public class BiomeHeight {
   static void Prefix(WorldGenerator __instance, ref Heightmap.Biome biome, ref Heightmap.Biome __state) {
     if (__instance.m_world.m_menu) return;
     __state = biome;
-    if (BiomeData.BiomeToData.TryGetValue(biome, out var data)) {
-      if (BiomeData.NameToBiome.TryGetValue(data.terrain, out var terrain))
+    if (BiomeManager.TryGetData(biome, out var data)) {
+      if (BiomeManager.TryGetBiome(data.terrain, out var terrain))
         biome = terrain;
     }
   }
   static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result) {
     if (__instance.m_world.m_menu) return;
     var waterLevel = Configuration.WaterLevel;
-    if (BiomeData.BiomeToData.TryGetValue(__state, out var data)) {
+    if (BiomeManager.TryGetData(__state, out var data)) {
       __result = waterLevel + (__result - waterLevel) * data.altitudeMultiplier;
       __result += data.altitudeDelta;
     }

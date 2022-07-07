@@ -28,14 +28,14 @@ public class ExpandWorld : BaseUnityPlugin {
     Harmony harmony = new(GUID);
     harmony.PatchAll();
     SetupWatcher();
-    BiomeData.SetupWatcher();
-    LocationData.SetupWatcher();
-    VegetationData.SetupWatcher();
-    EventData.SetupWatcher();
-    SpawnData.SetupWatcher();
-    WorldData.SetupWatcher();
+    BiomeManager.SetupWatcher();
+    LocationManager.SetupWatcher();
+    VegetationManager.SetupWatcher();
+    EventManager.SetupWatcher();
+    SpawnManager.SetupWatcher();
+    WorldManager.SetupWatcher();
     ClutterManager.SetupWatcher();
-    EnvironmentData.SetupWatcher();
+    EnvironmentManager.SetupWatcher();
   }
 
   private void OnDestroy() {

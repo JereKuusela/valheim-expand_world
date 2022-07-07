@@ -87,10 +87,10 @@ public class ClutterManager {
     if (!File.Exists(FileName)) return;
     var raw = System.IO.File.ReadAllText(FileName);
     Configuration.configInternalDataClutter.Value = raw;
-    if (LoadData.IsLoading) Set(raw);
+    if (Data.IsLoading) Set(raw);
   }
   public static void FromSetting(string raw) {
-    if (!LoadData.IsLoading) Set(raw);
+    if (!Data.IsLoading) Set(raw);
   }
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataClutter) return;

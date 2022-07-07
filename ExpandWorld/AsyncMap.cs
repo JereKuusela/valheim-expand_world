@@ -138,7 +138,7 @@ public class MinimapAsync {
   static readonly Color32 WhiteColor32 = Color.white;
 
   public static Color32 GetPixelColor32(Heightmap.Biome biome) {
-    if (BiomeData.BiomeToData.TryGetValue(biome, out var data))
+    if (BiomeManager.TryGetData(biome, out var data))
       return data.mapColor;
     return biome switch
     {

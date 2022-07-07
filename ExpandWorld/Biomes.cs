@@ -14,7 +14,7 @@ public class WorldAngle {
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiomeColor), new[] { typeof(Heightmap.Biome) })]
 public class GetBiomeColor {
   static bool Prefix(Heightmap.Biome biome, ref Color32 __result) {
-    if (BiomeData.BiomeToData.TryGetValue(biome, out var data)) {
+    if (BiomeManager.TryGetData(biome, out var data)) {
       __result = data.color;
       return false;
     }
@@ -24,7 +24,7 @@ public class GetBiomeColor {
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
 public class GetBiome {
-  public static List<WorldData> Data = WorldData.GetDefault();
+  public static List<WorldData> Data = WorldManager.GetDefault();
 
   private static float GetOffset(WorldGenerator obj, Heightmap.Biome biome) {
     if (biome == Heightmap.Biome.Mistlands) return obj.m_offset4;

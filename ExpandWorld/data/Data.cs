@@ -11,27 +11,19 @@ namespace ExpandWorld;
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SetupLocations))]
 public class LoadData {
-  public static bool IsLoading = false;
   static void Prefix() {
-    EnvironmentData.Originals.Clear();
+    EnvironmentManager.Originals.Clear();
     if (!ZNet.instance.IsServer()) return;
-    IsLoading = true;
-    if (File.Exists(Data.EnvironmentFile))
-      EnvironmentData.FromFile(Data.EnvironmentFile);
-    if (File.Exists(Data.BiomeFile))
-      BiomeData.FromFile(Data.BiomeFile);
-    if (File.Exists(Data.WorldFile))
-      WorldData.FromFile(Data.WorldFile);
-    if (File.Exists(Data.VegFile))
-      VegetationData.FromFile(Data.VegFile);
-    if (File.Exists(Data.LocFile))
-      LocationData.FromFile(Data.LocFile);
-    if (File.Exists(Data.EventFile))
-      EventData.FromFile(Data.EventFile);
-    if (File.Exists(Data.SpawnFile))
-      SpawnData.FromFile(Data.SpawnFile);
+    Data.IsLoading = true;
+    EnvironmentManager.FromFile();
+    BiomeManager.FromFile();
+    WorldManager.FromFile();
+    VegetationManager.FromFile();
+    LocationManager.FromFile();
+    EventManager.FromFile();
+    SpawnManager.FromFile();
     ClutterManager.FromFile();
-    IsLoading = false;
+    Data.IsLoading = false;
   }
 }
 
@@ -39,18 +31,12 @@ public class LoadData {
 public class SaveData {
   static void Postfix() {
     if (!ZNet.instance.IsServer()) return;
-    if (!File.Exists(Data.BiomeFile))
-      BiomeData.ToFile(Data.BiomeFile);
-    if (!File.Exists(Data.WorldFile))
-      WorldData.ToFile(Data.WorldFile);
-    if (!File.Exists(Data.VegFile))
-      VegetationData.ToFile(Data.VegFile);
-    if (!File.Exists(Data.LocFile))
-      LocationData.ToFile(Data.LocFile);
-    if (!File.Exists(Data.EventFile))
-      EventData.ToFile(Data.EventFile);
-    if (!File.Exists(Data.EnvironmentFile))
-      EnvironmentData.ToFile(Data.EnvironmentFile);
+    BiomeManager.ToFile();
+    WorldManager.ToFile();
+    VegetationManager.ToFile();
+    LocationManager.ToFile();
+    EventManager.ToFile();
+    EnvironmentManager.ToFile();
     ClutterManager.ToFile();
     // Spawn data handle elsewhere.
   }
@@ -62,8 +48,7 @@ public class HandleSpawnData {
   public static List<SpawnSystem.SpawnData>? Override = null;
   static void Postfix(SpawnSystem __instance) {
     if (ZNet.instance.IsServer() && !Done) {
-      if (!File.Exists(Data.SpawnFile))
-        SpawnData.ToFile(Data.SpawnFile);
+      SpawnManager.ToFile();
       Done = true;
     }
     if (Override != null) {
@@ -78,21 +63,7 @@ public class Spawn_WaitForConfigSync {
   static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 }
 public static class Data {
-  public static string SpawnFile = Path.Combine(ExpandWorld.ConfigPath, "expand_spawns.yaml");
-  public static string VegFile = Path.Combine(ExpandWorld.ConfigPath, "expand_vegetation.yaml");
-  public static string LocFile = Path.Combine(ExpandWorld.ConfigPath, "expand_locations.yaml");
-  public static string BiomeFile = Path.Combine(ExpandWorld.ConfigPath, "expand_biomes.yaml");
-  public static string WorldFile = Path.Combine(ExpandWorld.ConfigPath, "expand_world.yaml");
-  public static string EventFile = Path.Combine(ExpandWorld.ConfigPath, "expand_events.yaml");
-  public static string EnvironmentFile = Path.Combine(ExpandWorld.ConfigPath, "expand_environments.yaml");
-
-  public static void SetupWatcher(string file, Action<string> action) {
-    FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
-    watcher.Changed += (s, e) => action(file);
-    watcher.IncludeSubdirectories = true;
-    watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
-    watcher.EnableRaisingEvents = true;
-  }
+  public static bool IsLoading = false;
   public static void SetupWatcher(string file, Action action) {
     FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
     watcher.Changed += (s, e) => action();
@@ -109,7 +80,7 @@ public static class Data {
     var biomeNumber = (int)biome;
     while (number <= biomeNumber) {
       if ((number & biomeNumber) > 0) {
-        if (BiomeData.BiomeToName.TryGetValue((Heightmap.Biome)number, out var name))
+        if (BiomeManager.TryGetName(number, out var name))
           biomes.Add(name);
         else
           biomes.Add(number.ToString());
@@ -134,7 +105,7 @@ public static class Data {
   public static Heightmap.Biome ToBiomes(string[] m_biome) {
     Heightmap.Biome result = 0;
     foreach (var biome in m_biome) {
-      if (BiomeData.NameToBiome.TryGetValue(biome.ToLower(), out var number))
+      if (BiomeManager.TryGetBiome(biome, out var number))
         result += (int)number;
       else {
         if (int.TryParse(biome, out var value)) result += value;
