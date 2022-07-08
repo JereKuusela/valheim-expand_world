@@ -84,14 +84,15 @@ public class WorldManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
+    Configuration.valueWorldData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataWorld.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueWorldData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);
@@ -106,7 +107,7 @@ public class WorldManager {
     }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
     GetBiome.Data = data;
-    ConfigWrapper.ForceRegen();
+    Data.Regenerate();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(FileName, FromFile);

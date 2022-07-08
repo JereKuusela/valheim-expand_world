@@ -23,6 +23,7 @@ public class MinimapAsync {
       _lastCancellationTokenSource = null;
     }
   }
+  public static int TextureSize;
   public static bool Generating => _lastCancellationTokenSource != null;
   static CancellationTokenSource? _lastCancellationTokenSource = null;
   static IEnumerator GenerateWorldMapCoroutine(Minimap minimap) {
@@ -32,16 +33,12 @@ public class MinimapAsync {
     ZLog.Log($"Starting GenerateWorldMapAsync...");
     Stopwatch stopwatch = Stopwatch.StartNew();
     var obj = minimap;
-    if (SetMapMode.TextureSizeChanged) {
+    if (obj.m_textureSize != TextureSize) {
       obj.m_explored = new bool[obj.m_textureSize * obj.m_textureSize];
       obj.m_exploredOthers = new bool[obj.m_textureSize * obj.m_textureSize];
       obj.Start();
+      TextureSize = obj.m_textureSize;
     }
-    // Some water stuff probably.
-    SetupMaterial.Refresh();
-    SetMapMode.TextureSizeChanged = false;
-    SetMapMode.ForceRegen = false;
-
 
     int size = minimap.m_textureSize * minimap.m_textureSize;
     ZLog.Log($"Task {taskIndex}: Populating texture arrays of size: {size:G}");

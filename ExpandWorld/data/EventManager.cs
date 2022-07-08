@@ -47,14 +47,15 @@ public class EventManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
+    Configuration.valueEventData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataEvents.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueEventData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);

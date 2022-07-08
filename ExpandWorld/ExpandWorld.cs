@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using Service;
@@ -12,6 +13,7 @@ public class ExpandWorld : BaseUnityPlugin {
   const string VERSION = "1.1";
 #nullable disable
   public static ManualLogSource Log;
+  public new static ConfigFile Config;
 #nullable enable
   public static ServerSync.ConfigSync ConfigSync = new(GUID)
   {
@@ -20,11 +22,15 @@ public class ExpandWorld : BaseUnityPlugin {
     MinimumRequiredVersion = VERSION,
     IsLocked = true
   };
+  public static string ConfigName = "";
   public static string ConfigPath = "";
   public void Awake() {
     Log = Logger;
+    ConfigName = $"{GUID}.cfg";
+    ConfigPath = Paths.ConfigPath;
+    ConfigPath = Path.Combine(ConfigPath, GUID);
+    Config = new ConfigFile(Path.Combine(ConfigPath, ConfigName), true);
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
-    ConfigPath = Path.GetDirectoryName(Config.ConfigFilePath);
     Configuration.Init(wrapper);
     Harmony harmony = new(GUID);
     harmony.PatchAll();
@@ -40,20 +46,11 @@ public class ExpandWorld : BaseUnityPlugin {
   }
 
   private void OnDestroy() {
-    // Should prevent sending the cleared values.
-    ServerSync.ConfigSync.ProcessingServerUpdate = true;
-    Configuration.configInternalDataBiome.Value = "";
-    Configuration.configInternalDataEnvironments.Value = "";
-    Configuration.configInternalDataEvents.Value = "";
-    Configuration.configInternalDataSpawns.Value = "";
-    Configuration.configInternalDataLocations.Value = "";
-    Configuration.configInternalDataVegetation.Value = "";
-    Configuration.configInternalDataClutter.Value = "";
     Config.Save();
   }
 
   private void SetupWatcher() {
-    FileSystemWatcher watcher = new(ConfigPath, Path.GetFileName(Config.ConfigFilePath));
+    FileSystemWatcher watcher = new(ConfigPath, ConfigName);
     watcher.Changed += ReadConfigValues;
     watcher.Created += ReadConfigValues;
     watcher.Renamed += ReadConfigValues;

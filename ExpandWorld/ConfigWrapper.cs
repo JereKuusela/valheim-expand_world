@@ -35,6 +35,7 @@ public class ConfigWrapper {
         handler(args.Context, string.Join(" ", args.Args.Skip(2)));
     }, optionsFetcher: () => SettingHandlers.Keys.ToList());
   }
+  public CustomSyncedValue<string> AddValue(string identifier) => new CustomSyncedValue<string>(ConfigSync, identifier);
   public ConfigEntry<bool> BindLocking(string group, string name, bool value, ConfigDescription description) {
     var configEntry = ConfigFile.Bind(group, name, value, description);
     Register(configEntry);
@@ -57,17 +58,8 @@ public class ConfigWrapper {
     return configEntry;
   }
   public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, forceRegen, new ConfigDescription(description), synchronizedSetting);
-  private static void ForceRegen(object e, System.EventArgs s) => ForceRegen();
-  public static void ForceRegen() {
-    if (ZoneSystem.instance != null) {
-      foreach (var heightmap in Heightmap.m_heightmaps) {
-        heightmap.m_buildData = null;
-        heightmap.Regenerate();
-      }
-    }
-    if (ClutterSystem.instance != null) ClutterSystem.instance.m_forceRebuild = true;
-    SetMapMode.ForceRegen = true;
-  }
+  private static void ForceRegen(object e, System.EventArgs s) => Data.Regenerate();
+
   public static Dictionary<ConfigEntry<string>, float> Floats = new();
   public static Dictionary<ConfigEntry<string>, int> Ints = new();
   public static Dictionary<ConfigEntry<int>, float> Amounts = new();

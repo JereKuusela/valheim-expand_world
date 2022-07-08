@@ -12,7 +12,7 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SetupLocations))]
 public class LoadData {
   static void Prefix() {
-    EnvironmentManager.Originals.Clear();
+    EnvironmentManager.SetOriginals();
     if (!ZNet.instance.IsServer()) return;
     Data.IsLoading = true;
     EnvironmentManager.FromFile();
@@ -126,5 +126,18 @@ public static class Data {
       }
     }
     return result;
+  }
+    public static void Regenerate() {
+    if (ZoneSystem.instance != null) {
+      foreach (var heightmap in Heightmap.m_heightmaps) {
+        heightmap.m_buildData = null;
+        heightmap.Regenerate();
+      }
+    }
+    if (ClutterSystem.instance != null) ClutterSystem.instance.m_forceRebuild = true;
+    // Some water stuff probably.
+    SetupMaterial.Refresh();
+    if (Minimap.instance && Minimap.instance.m_hasGenerated)
+      Minimap.instance.GenerateWorldMap();
   }
 }

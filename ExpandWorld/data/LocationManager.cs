@@ -69,14 +69,15 @@ public class LocationManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
+    Configuration.valueLocationData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataLocations.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueLocationData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);

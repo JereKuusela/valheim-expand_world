@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using ServerSync;
 using Service;
 
 namespace ExpandWorld;
@@ -52,14 +53,14 @@ public class Configuration {
   public static ConfigEntry<string> configWiggleWidth;
   public static float WiggleWidth => ConfigWrapper.Floats[configWiggleWidth];
 
-  public static ConfigEntry<string> configInternalDataBiome;
-  public static ConfigEntry<string> configInternalDataWorld;
-  public static ConfigEntry<string> configInternalDataLocations;
-  public static ConfigEntry<string> configInternalDataVegetation;
-  public static ConfigEntry<string> configInternalDataClutter;
-  public static ConfigEntry<string> configInternalDataSpawns;
-  public static ConfigEntry<string> configInternalDataEvents;
-  public static ConfigEntry<string> configInternalDataEnvironments;
+  public static CustomSyncedValue<string> valueBiomeData;
+  public static CustomSyncedValue<string> valueWorldData;
+  public static CustomSyncedValue<string> valueLocationData;
+  public static CustomSyncedValue<string> valueVegetationData;
+  public static CustomSyncedValue<string> valueClutterData;
+  public static CustomSyncedValue<string> valueSpawnData;
+  public static CustomSyncedValue<string> valueEventData;
+  public static CustomSyncedValue<string> valueEnvironmentData;
   public static ConfigEntry<bool> configDataEnvironments;
   public static bool DataEnvironments => configDataEnvironments.Value;
   public static ConfigEntry<bool> configDataEvents;
@@ -107,17 +108,17 @@ public class Configuration {
       if (!Minimap.instance) return;
       var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
       if (newValue == Minimap.instance.m_textureSize) return;
-      SetMapMode.TextureSizeChanged = true;
       Minimap.instance.m_textureSize = newValue;
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
+      Data.Regenerate();
     };
     configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, false, "Decreases the minimap detail, but doesn't affect the generation time.");
     configMapPixelSize.SettingChanged += (e, s) => {
       if (!Minimap.instance) return;
       var newValue = MinimapAwake.OriginalPixelSize * MapPixelSize;
       if (newValue == Minimap.instance.m_pixelSize) return;
-      SetMapMode.ForceRegen = true;
       Minimap.instance.m_pixelSize = newValue;
+      Data.Regenerate();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
@@ -162,38 +163,38 @@ public class Configuration {
 
     section = "3. Data";
     configDataClutter = wrapper.Bind(section, "Clutter data", true, false, "Use clutter data");
-    configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(configInternalDataClutter.Value);
+    configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(valueClutterData.Value);
     configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
-    configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(configInternalDataWorld.Value);
+    configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(valueWorldData.Value);
     configDataBiome = wrapper.Bind(section, "Biome data", true, false, "Use biome data");
-    configDataBiome.SettingChanged += (s, e) => BiomeManager.FromSetting(configInternalDataBiome.Value);
+    configDataBiome.SettingChanged += (s, e) => BiomeManager.FromSetting(valueBiomeData.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");
-    configDataLocation.SettingChanged += (s, e) => LocationManager.FromSetting(configInternalDataLocations.Value);
+    configDataLocation.SettingChanged += (s, e) => LocationManager.FromSetting(valueLocationData.Value);
     configDataVegetation = wrapper.Bind(section, "Vegetation data", true, false, "Use vegetation data");
-    configDataVegetation.SettingChanged += (s, e) => VegetationManager.FromSetting(configInternalDataVegetation.Value);
+    configDataVegetation.SettingChanged += (s, e) => VegetationManager.FromSetting(valueVegetationData.Value);
     configDataEvents = wrapper.Bind(section, "Event data", true, false, "Use event data");
-    configDataEvents.SettingChanged += (s, e) => EventManager.FromSetting(configInternalDataEvents.Value);
+    configDataEvents.SettingChanged += (s, e) => EventManager.FromSetting(valueEventData.Value);
     configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
-    configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(configInternalDataEnvironments.Value);
+    configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     configDataSpawns = wrapper.Bind(section, "Spawn data", true, false, "Use spawn data");
-    configDataSpawns.SettingChanged += (s, e) => SpawnManager.FromSetting(configInternalDataSpawns.Value);
+    configDataSpawns.SettingChanged += (s, e) => SpawnManager.FromSetting(valueSpawnData.Value);
 
-    configInternalDataClutter = wrapper.Bind(section, "Internal clutter data", "", false, "Internal field for data sync.");
-    configInternalDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(configInternalDataClutter.Value);
-    configInternalDataBiome = wrapper.Bind(section, "Internal biome data", "", false, "Internal field for data sync.");
-    configInternalDataBiome.SettingChanged += (s, e) => BiomeManager.FromSetting(configInternalDataBiome.Value);
-    configInternalDataSpawns = wrapper.Bind(section, "Internal spawns data", "", false, "Internal field for data sync.");
-    configInternalDataSpawns.SettingChanged += (s, e) => SpawnManager.FromSetting(configInternalDataSpawns.Value);
-    configInternalDataEvents = wrapper.Bind(section, "Internal events data", "", false, "Internal field for data sync.");
-    configInternalDataEvents.SettingChanged += (s, e) => EventManager.FromSetting(configInternalDataEvents.Value);
-    configInternalDataEnvironments = wrapper.Bind(section, "Internal environment data", "", false, "Internal field for data sync.");
-    configInternalDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(configInternalDataEnvironments.Value);
-    configInternalDataWorld = wrapper.Bind(section, "Internal world data", "", false, "Internal field for data sync.");
-    configInternalDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(configInternalDataWorld.Value);
-    configInternalDataLocations = wrapper.Bind(section, "Internal locations data", "", false, "Internal field for data sync.");
-    configInternalDataLocations.SettingChanged += (s, e) => LocationManager.FromSetting(configInternalDataLocations.Value);
-    configInternalDataVegetation = wrapper.Bind(section, "Internal vegetation data", "", false, "Internal field for data sync.");
-    configInternalDataVegetation.SettingChanged += (s, e) => VegetationManager.FromSetting(configInternalDataVegetation.Value);
+    valueClutterData = wrapper.AddValue("clutter_data");
+    valueClutterData.ValueChanged += () => ClutterManager.FromSetting(valueClutterData.Value);
+    valueBiomeData = wrapper.AddValue("biome_data");
+    valueBiomeData.ValueChanged += () => BiomeManager.FromSetting(valueBiomeData.Value);
+    valueSpawnData = wrapper.AddValue("spawn_data");
+    valueSpawnData.ValueChanged += () => SpawnManager.FromSetting(valueSpawnData.Value);
+    valueEventData = wrapper.AddValue("event_data");
+    valueEventData.ValueChanged += () => EventManager.FromSetting(valueEventData.Value);
+    valueEnvironmentData = wrapper.AddValue("environment_data");
+    valueEnvironmentData.ValueChanged += () => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
+    valueWorldData = wrapper.AddValue("world_data");
+    valueWorldData.ValueChanged += () => WorldManager.FromSetting(valueWorldData.Value);
+    valueLocationData = wrapper.AddValue("location_data");
+    valueLocationData.ValueChanged += () => LocationManager.FromSetting(valueLocationData.Value);
+    valueVegetationData = wrapper.AddValue("vegetation_data");
+    valueVegetationData.ValueChanged += () => VegetationManager.FromSetting(valueVegetationData.Value);
     section = "4. Biomes";
     List<string> biomes = new() {
       Heightmap.Biome.AshLands.ToString(),

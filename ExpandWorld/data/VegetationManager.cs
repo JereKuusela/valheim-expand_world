@@ -81,14 +81,15 @@ public class VegetationManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
+    Configuration.valueVegetationData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataVegetation.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueVegetationData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);

@@ -68,14 +68,15 @@ public class BiomeManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
+    Configuration.valueBiomeData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataBiome.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueBiomeData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);
@@ -114,7 +115,7 @@ public class BiomeManager {
       EnvMan.instance.AppendBiomeSetup(biome);
     EnvMan.instance.m_environmentPeriod = -1;
     EnvMan.instance.m_firstEnv = true;
-    ConfigWrapper.ForceRegen();
+    Data.Regenerate();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(FileName, FromFile);

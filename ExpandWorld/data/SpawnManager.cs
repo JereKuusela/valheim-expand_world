@@ -82,14 +82,15 @@ public class SpawnManager {
     if (spawnSystem == null) return;
     var spawns = spawnSystem.m_spawnLists.SelectMany(s => s.m_spawners);
     var yaml = Data.Serializer().Serialize(spawns.Select(ToData).ToList());
+    Configuration.valueSpawnData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataSpawns.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueSpawnData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);

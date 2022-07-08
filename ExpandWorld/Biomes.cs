@@ -51,7 +51,9 @@ public class GetBiome {
     foreach (var item in Data) {
       if (item.minAltitude > height || item.maxAltitude < height) continue;
       var mag = magnitude;
-      var min = ConvertDist(item.minDistance) + (item.wiggle ? num : 0f);
+      var min = ConvertDist(item.minDistance);
+      if (min > 0 )
+        min += (item.wiggle ? num : 0f);
       var max = ConvertDist(item.maxDistance);
       if (item.curveX != 0f || item.curveY != 0f) {
         var curveX = ConvertDist(item.curveX);

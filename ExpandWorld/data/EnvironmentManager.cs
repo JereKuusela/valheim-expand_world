@@ -102,17 +102,18 @@ public class EnvironmentManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataEnvironments) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
+    Configuration.valueEnvironmentData.Value = yaml;
     File.WriteAllText(FileName, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEnvironments) return;
     if (!File.Exists(FileName)) return;
-    var raw = File.ReadAllText(FileName);
-    Configuration.configInternalDataEnvironments.Value = raw;
-    if (Data.IsLoading) Set(raw);
+    var yaml = File.ReadAllText(FileName);
+    Configuration.valueEnvironmentData.Value = yaml;
+    if (Data.IsLoading) Set(yaml);
   }
 
-  private static void SetOriginals() {
+  public static void SetOriginals() {
     Originals = LocationList.m_allLocationLists
       .Select(list => list.m_environments)
       .Append(EnvMan.instance.m_environments)

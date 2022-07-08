@@ -14,38 +14,6 @@ public class MinimapAwake {
     OriginalPixelSize = __instance.m_pixelSize;
     __instance.m_pixelSize *= Configuration.MapPixelSize;
     __instance.m_mapImageLarge.rectTransform.localScale = new(Configuration.MapSize, Configuration.MapSize, Configuration.MapSize);
-    // Already generated.
-    SetMapMode.ForceRegen = false;
-    SetMapMode.TextureSizeChanged = false;
-  }
-}
-
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new[] { typeof(int), typeof(int) })]
-public class PreventExploreWhenDirty1 {
-  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
-}
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new[] { typeof(Vector3), typeof(float) })]
-public class PreventExploreWhenDirty2 {
-  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
-}
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.ExploreOthers))]
-public class PreventExploreOthersWhenDirty {
-  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
-}
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.ExploreAll))]
-public class PreventExploreAllWhenDirty {
-  static bool Prefix() => !SetMapMode.ForceRegen && !SetMapMode.TextureSizeChanged;
-}
-
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapMode))]
-public class SetMapMode {
-  public static bool ForceRegen = false;
-  public static bool TextureSizeChanged = false;
-  static void Prefix(Minimap __instance, Minimap.MapMode mode) {
-    var obj = __instance;
-    if (mode == obj.m_mode || mode != Minimap.MapMode.Large) return;
-    if (SetMapMode.ForceRegen || SetMapMode.TextureSizeChanged)
-      __instance.GenerateWorldMap();
   }
 }
 
@@ -57,6 +25,7 @@ public class InitializeWhenDimensionsChange {
     var num = zpackage.ReadInt();
     if (num >= 7) zpackage = zpackage.ReadCompressedPackage();
     int num2 = zpackage.ReadInt();
+    MinimapAsync.TextureSize = obj.m_textureSize;
     if (obj.m_textureSize == num2) return true;
     // Base game code would stop initializxing.
     obj.Reset();
@@ -66,36 +35,6 @@ public class InitializeWhenDimensionsChange {
   }
 }
 
-/*
-[HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdateBiome))]
-public class UpdateBiome {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-                    .MatchForward(
-                         useEnd: false,
-                         new CodeMatch(OpCodes.Ldstr, "$biome_"))
-                    .Advance(1)
-                    .SetOpcodeAndAdvance(OpCodes.Ldloc_1)
-                    .SetAndAdvance(
-                        OpCodes.Call,
-                        Transpilers.EmitDelegate<Func<Heightmap.Biome, string>>(
-                            (Heightmap.Biome biome) => BiomeData.BiomeToName[biome]).operand)
-                    .SetOpcodeAndAdvance(OpCodes.Nop)
-                    .MatchForward(
-                         useEnd: false,
-                         new CodeMatch(OpCodes.Ldstr, "$biome_"))
-                    .Advance(1)
-                    .SetOpcodeAndAdvance(OpCodes.Ldloc_3)
-                    .SetAndAdvance(
-                        OpCodes.Call,
-                        Transpilers.EmitDelegate<Func<Heightmap.Biome, string>>(
-                            (Heightmap.Biome biome) => BiomeData.BiomeToName[biome]).operand)
-                    .SetOpcodeAndAdvance(OpCodes.Nop)
-                    .InstructionEnumeration();
-  }
-}
-
-*/
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
 public class Map_WaitForConfigSync {
   static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
