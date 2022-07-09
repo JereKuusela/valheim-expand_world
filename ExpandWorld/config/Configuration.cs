@@ -4,7 +4,7 @@ using ServerSync;
 using Service;
 
 namespace ExpandWorld;
-public class Configuration {
+public partial class Configuration {
 #nullable disable
   public static ConfigEntry<string> configWorldRadius;
   public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius];
@@ -17,12 +17,7 @@ public class Configuration {
   public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize];
 
 
-  public static ConfigEntry<bool> configRivers;
-  public static bool Rivers => configRivers.Value;
-  public static ConfigEntry<bool> configStreams;
-  public static bool Streams => configStreams.Value;
-  public static ConfigEntry<string> configWaterLevel;
-  public static float WaterLevel => ConfigWrapper.Floats[configWaterLevel];
+  
   public static ConfigEntry<string> configBaseAltitudeMultiplier;
   public static float BaseAltitudeMultiplier => ConfigWrapper.Floats[configBaseAltitudeMultiplier];
   public static ConfigEntry<string> configAltitudeMultiplier;
@@ -31,12 +26,10 @@ public class Configuration {
   public static float BaseAltitudeDelta => ConfigWrapper.Floats[configBaseAltitudeDelta];
   public static ConfigEntry<string> configAltitudeDelta;
   public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta];
-  public static ConfigEntry<string> configWaveMultiplier;
-  public static float WaveMultiplier => ConfigWrapper.Floats[configWaveMultiplier];
+
   public static ConfigEntry<string> configLocationsMultiplier;
   public static float LocationsMultiplier => ConfigWrapper.Floats[configLocationsMultiplier];
-  public static ConfigEntry<bool> configWaveOnlyHeight;
-  public static bool WaveOnlyHeight => configWaveOnlyHeight.Value;
+
   public static ConfigEntry<string> configForestMultiplier;
   public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier];
   public static ConfigEntry<string> configWorldStretch;
@@ -78,27 +71,14 @@ public class Configuration {
   public static ConfigEntry<bool> configDataWorld;
   public static bool DataWorld => configDataWorld.Value;
 
-  public static ConfigEntry<bool> configUseOffsetX;
-  public static bool UseOffsetX => configUseOffsetX.Value;
   public static ConfigEntry<string> configOffsetX;
-  public static int OffsetX => ConfigWrapper.Ints[configOffsetX];
-  public static ConfigEntry<bool> configUseOffsetY;
-  public static bool UseOffsetY => configUseOffsetY.Value;
+  public static int? OffsetX => ConfigWrapper.Ints[configOffsetX];
   public static ConfigEntry<string> configOffsetY;
-  public static int OffsetY => ConfigWrapper.Ints[configOffsetY];
-  public static ConfigEntry<bool> configUseHeightSeed;
-  public static bool UseHeightSeed => configUseHeightSeed.Value;
+  public static int? OffsetY => ConfigWrapper.Ints[configOffsetY];
   public static ConfigEntry<string> configHeightSeed;
-  public static int HeightSeed => ConfigWrapper.Ints[configHeightSeed];
-  public static ConfigEntry<bool> configUseStreamSeed;
-  public static bool UseStreamSeed => configUseStreamSeed.Value;
-  public static ConfigEntry<string> configStreamSeed;
-  public static int StreamSeed => ConfigWrapper.Ints[configStreamSeed];
-  public static ConfigEntry<bool> configUseRiverSeed;
-  public static bool UseRiverSeed => configUseRiverSeed.Value;
-  public static ConfigEntry<string> configRiverSeed;
-  public static int RiverSeed => ConfigWrapper.Ints[configRiverSeed];
-#nullable enable
+  public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
+
+  #nullable enable
   public static void Init(ConfigWrapper wrapper) {
     var section = "1. General";
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, true, "Radius of the world in meters (excluding the edge).");
@@ -124,44 +104,24 @@ public class Configuration {
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
 
     section = "2. Features";
-    configRivers = wrapper.Bind(section, "Rivers", true, true, "Enables rivers.");
-    configRivers.SettingChanged += (s, e) => {
-      if (WorldGenerator.instance != null) {
-        WorldGenerator.instance.m_riverPoints.Clear();
-        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceStreams();
-        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceRivers();
-      }
-    };
-    configStreams = wrapper.Bind(section, "Streams", true, true, "Enables streams.");
-    configStreams.SettingChanged += (s, e) => {
-      if (WorldGenerator.instance != null) {
-        WorldGenerator.instance.m_riverPoints.Clear();
-        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceStreams();
-        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceRivers();
-      }
-    };
-    configWaterLevel = wrapper.BindFloat(section, "Water level", 30f, true, "Sets the altitude of the water.");
-    configWaterLevel.SettingChanged += (s, e) => {
-      WaterHelper.SetLevel(ZoneSystem.instance);
-      WaterHelper.SetLevel(ClutterSystem.instance);
-      foreach (var obj in WaterHelper.Get()) WaterHelper.SetLevel(obj);
-    };
+    
     configForestMultiplier = wrapper.BindFloat(section, "Forest multiplier", 1f, true, "Multiplies the amount of forest.");
     configBaseAltitudeMultiplier = wrapper.BindFloat(section, "Base altitude multiplier", 1f, true, "Multiplies the base altitude.");
     configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, true, "Multiplies the biome altitude.");
     configBaseAltitudeDelta = wrapper.BindFloat(section, "Base altitude delta", 0f, true, "Adds to the base altitude.");
     configAltitudeDelta = wrapper.BindFloat(section, "Altitude delta", 0f, true, "Adds to the biome altitude.");
     configLocationsMultiplier = wrapper.BindFloat(section, "Locations", 1f, true, "Multiplies the max amount of locations.");
-    configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, true, "Multiplies the wave size.");
-    configWaveMultiplier.SettingChanged += (s, e) => {
-      foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
-    };
-    configWaveOnlyHeight = wrapper.Bind(section, "Wave only height", false, false, "Multiplier only affects the height.");
-    configWaveOnlyHeight.SettingChanged += (s, e) => {
-      foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
-    };
+    configDistanceWiggleLength = wrapper.BindFloat(section, "Distance wiggle length", 500f, true);
+    configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 0.01f, true);
+    configWiggleFrequency = wrapper.BindFloat(section, "Wiggle frequency", 20f, true, "How many wiggles are per each circle.");
+    configWiggleWidth = wrapper.BindFloat(section, "Wiggle width", 100f, true, "How many meters are the wiggles.");
+    configOffsetX = wrapper.BindInt(section, "Offset X", null, true);
+    configOffsetY = wrapper.BindInt(section, "Offset Y", null, true);
+    configHeightSeed = wrapper.BindInt(section, "Height variation seed", null, true);
 
-    section = "3. Data";
+    InitWater(wrapper);
+
+    section = "4. Data";
     configDataClutter = wrapper.Bind(section, "Clutter data", true, false, "Use clutter data");
     configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(valueClutterData.Value);
     configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
@@ -195,35 +155,6 @@ public class Configuration {
     valueLocationData.ValueChanged += () => LocationManager.FromSetting(valueLocationData.Value);
     valueVegetationData = wrapper.AddValue("vegetation_data");
     valueVegetationData.ValueChanged += () => VegetationManager.FromSetting(valueVegetationData.Value);
-    section = "4. Biomes";
-    List<string> biomes = new() {
-      Heightmap.Biome.AshLands.ToString(),
-      Heightmap.Biome.BlackForest.ToString(),
-      Heightmap.Biome.DeepNorth.ToString(),
-      Heightmap.Biome.Meadows.ToString(),
-      Heightmap.Biome.Mistlands.ToString(),
-      Heightmap.Biome.Mountain.ToString(),
-      Heightmap.Biome.Ocean.ToString(),
-      Heightmap.Biome.Plains.ToString(),
-      Heightmap.Biome.Swamp.ToString(),
-      Heightmap.Biome.None.ToString()
-    };
-    biomes.Sort();
-    configDistanceWiggleLength = wrapper.BindFloat(section, "Distance wiggle length", 500f, true);
-    configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 0.01f, true);
-    configWiggleFrequency = wrapper.BindFloat(section, "Wiggle frequency", 20f, true, "How many wiggles are per each circle.");
-    configWiggleWidth = wrapper.BindFloat(section, "Wiggle width", 100f, true, "How many meters are the wiggles.");
 
-    section = "5. Seed";
-    configUseOffsetX = wrapper.Bind(section, "Use custom offset X", false, true, "Determines x coordinate on the base height map.");
-    configOffsetX = wrapper.BindInt(section, "Offset X", 0, true);
-    configUseOffsetY = wrapper.Bind(section, "Use custom offset Y", false, true, "Determines y coordinate on the base height map.");
-    configOffsetY = wrapper.BindInt(section, "Offset Y", 0, true);
-    configUseHeightSeed = wrapper.Bind(section, "Use height variation seed", false, true, "Determines the height variation of most biomes.");
-    configHeightSeed = wrapper.BindInt(section, "Height variation seed", 0, true);
-    configUseStreamSeed = wrapper.Bind(section, "Use stream seed", false, true, "Determines stream generation");
-    configStreamSeed = wrapper.BindInt(section, "Stream seed", 0, true);
-    configUseRiverSeed = wrapper.Bind(section, "Use river seed", false, true, "Determines river generation");
-    configRiverSeed = wrapper.BindInt(section, "River seed", 0, true);
   }
 }

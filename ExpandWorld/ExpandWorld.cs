@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using BepInEx;
-using BepInEx.Configuration;
+using UnityEngine;
 using BepInEx.Logging;
 using HarmonyLib;
 using Service;
@@ -13,7 +13,6 @@ public class ExpandWorld : BaseUnityPlugin {
   const string VERSION = "1.1";
 #nullable disable
   public static ManualLogSource Log;
-  public new static ConfigFile Config;
 #nullable enable
   public static ServerSync.ConfigSync ConfigSync = new(GUID)
   {
@@ -27,9 +26,9 @@ public class ExpandWorld : BaseUnityPlugin {
   public void Awake() {
     Log = Logger;
     ConfigName = $"{GUID}.cfg";
-    ConfigPath = Paths.ConfigPath;
-    ConfigPath = Path.Combine(ConfigPath, GUID);
-    Config = new ConfigFile(Path.Combine(ConfigPath, ConfigName), true);
+    ConfigPath = Path.Combine(Paths.ConfigPath, GUID);
+    if (!Directory.Exists(ConfigPath))
+      Directory.CreateDirectory(ConfigPath);
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
     Configuration.Init(wrapper);
     Harmony harmony = new(GUID);
@@ -44,7 +43,9 @@ public class ExpandWorld : BaseUnityPlugin {
     ClutterManager.SetupWatcher();
     EnvironmentManager.SetupWatcher();
   }
-
+  public void LateUpdate() {
+    Data.CheckRegen(Time.deltaTime);
+  }
   private void OnDestroy() {
     Config.Save();
   }

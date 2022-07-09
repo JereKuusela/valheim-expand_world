@@ -61,7 +61,7 @@ public class ConfigWrapper {
   private static void ForceRegen(object e, System.EventArgs s) => Data.Regenerate();
 
   public static Dictionary<ConfigEntry<string>, float> Floats = new();
-  public static Dictionary<ConfigEntry<string>, int> Ints = new();
+  public static Dictionary<ConfigEntry<string>, int?> Ints = new();
   public static Dictionary<ConfigEntry<int>, float> Amounts = new();
 
   public ConfigEntry<string> BindFloat(string group, string name, float value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
@@ -70,8 +70,8 @@ public class ConfigWrapper {
     Floats[entry] = TryParseFloat(entry);
     return entry;
   }
-  public ConfigEntry<string> BindInt(string group, string name, int value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
-    var entry = Bind(group, name, value.ToString(), forceRegen, description, synchronizedSetting);
+  public ConfigEntry<string> BindInt(string group, string name, int? value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
+    var entry = Bind(group, name, value.HasValue ? value.ToString() : "", forceRegen, description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Ints[entry] = TryParseInt(entry);
     Ints[entry] = TryParseInt(entry);
     return entry;
@@ -119,9 +119,9 @@ public class ConfigWrapper {
     if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)) return result;
     return defaultValue;
   }
-  private static int TryParseInt(ConfigEntry<string> setting) {
+  private static int? TryParseInt(ConfigEntry<string> setting) {
     if (int.TryParse(setting.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)) return result;
-    return TryParseInt((string)setting.DefaultValue, 0);
+    return null;
   }
   private static float TryParseFloat(string value, float defaultValue) {
     if (float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result)) return result;

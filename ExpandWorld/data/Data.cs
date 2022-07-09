@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx;
+using UnityEngine;
 using HarmonyLib;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Dynamic;
 
 namespace ExpandWorld;
 
@@ -62,7 +64,7 @@ public class HandleSpawnData {
 public class Spawn_WaitForConfigSync {
   static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 }
-public static class Data {
+public class Data : MonoBehaviour {
   public static bool IsLoading = false;
   public static void SetupWatcher(string file, Action action) {
     FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
@@ -127,7 +129,23 @@ public static class Data {
     }
     return result;
   }
-    public static void Regenerate() {
+
+  private static float Debouncer = 0f;
+  public static void Regenerate() {
+    Debouncer = 0f;
+  }
+  public static void CheckRegen(float dt) {
+    if (Debouncer > 2f) return;
+    Debouncer += dt;
+    if (Debouncer > 2f) RegenerateTask();
+  }
+  private static void RegenerateTask() {
+    if (WorldGenerator.instance != null) {
+        WorldGenerator.instance.m_riverPoints.Clear();
+        WorldGenerator.instance.FindLakes();
+        WorldGenerator.instance.m_rivers = WorldGenerator.instance.PlaceRivers();
+        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceStreams();
+    }
     if (ZoneSystem.instance != null) {
       foreach (var heightmap in Heightmap.m_heightmaps) {
         heightmap.m_buildData = null;

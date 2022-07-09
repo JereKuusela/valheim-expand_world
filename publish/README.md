@@ -135,7 +135,7 @@ Lakes are needed to generate rivers. The code searches for points with enough wa
 
 Note: Lake object is an abstract concept, not a real thing.
 
-- Lake search interval: How often a point is checked (meters)
+- Lake search interval: How often a point is checked for lakes (meters).
 - Lake point depth: 10 altitude by default (20 meter depth)
 - Lake merge radius: 800 meters, groups found lake spots to lakes.
 

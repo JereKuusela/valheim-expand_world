@@ -16,7 +16,7 @@ public class HeightSeed {
            .SetAndAdvance(
              OpCodes.Call,
              Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                 (WorldGenerator instance) => Configuration.UseHeightSeed ? Configuration.HeightSeed : instance.m_offset3).operand)
+                 (WorldGenerator instance) => Configuration.HeightSeed ?? instance.m_offset3).operand)
          )
          .InstructionEnumeration();
   }

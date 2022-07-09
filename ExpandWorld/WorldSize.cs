@@ -55,7 +55,7 @@ public class GetBaseHeight {
         .SetAndAdvance( // Replace the m_offset0 value with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                (WorldGenerator instance) => Configuration.UseOffsetX ? Configuration.OffsetX : instance.m_offset0).operand)
+                (WorldGenerator instance) => Configuration.OffsetX ?? instance.m_offset0).operand)
         .MatchForward(
              useEnd: false,
              new CodeMatch(OpCodes.Ldc_R4, 100000f))
@@ -63,7 +63,7 @@ public class GetBaseHeight {
         .SetAndAdvance( // Replace the m_offset1 value with a custom function.
             OpCodes.Call,
             Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                (WorldGenerator instance) => Configuration.UseOffsetY ? Configuration.OffsetY : instance.m_offset1).operand)
+                (WorldGenerator instance) => Configuration.OffsetY ?? instance.m_offset1).operand)
         .MatchForward(
              useEnd: false,
              new CodeMatch(OpCodes.Ldc_R4, 10000f))
@@ -179,22 +179,5 @@ public class UpdateWind {
             Transpilers.EmitDelegate<Func<float>>(
                 () => Configuration.WorldTotalRadius).operand)
         .InstructionEnumeration();
-  }
-}
-
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.PlaceRivers))]
-public class PlaceRivers {
-  static bool Prefix(ref List<WorldGenerator.River> __result) {
-    if (Configuration.Rivers) return true;
-    __result = new();
-    return false;
-  }
-}
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.PlaceStreams))]
-public class PlaceStreams {
-  static bool Prefix(ref List<WorldGenerator.River> __result) {
-    if (Configuration.Streams) return true;
-    __result = new();
-    return false;
   }
 }
