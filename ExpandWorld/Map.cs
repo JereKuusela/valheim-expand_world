@@ -25,7 +25,7 @@ public class InitializeWhenDimensionsChange {
     var num = zpackage.ReadInt();
     if (num >= 7) zpackage = zpackage.ReadCompressedPackage();
     int num2 = zpackage.ReadInt();
-    MinimapAsync.TextureSize = obj.m_textureSize;
+    MapGeneration.TextureSize = obj.m_textureSize;
     if (obj.m_textureSize == num2) return true;
     // Base game code would stop initializxing.
     obj.Reset();

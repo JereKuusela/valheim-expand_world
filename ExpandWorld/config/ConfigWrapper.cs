@@ -58,14 +58,14 @@ public class ConfigWrapper {
     return configEntry;
   }
   public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, forceRegen, new ConfigDescription(description), synchronizedSetting);
-  private static void ForceRegen(object e, System.EventArgs s) => Data.Regenerate();
+  private static void ForceRegen(object e, System.EventArgs s) => Generate.World();
 
   public static Dictionary<ConfigEntry<string>, float> Floats = new();
   public static Dictionary<ConfigEntry<string>, int?> Ints = new();
   public static Dictionary<ConfigEntry<int>, float> Amounts = new();
 
   public ConfigEntry<string> BindFloat(string group, string name, float value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
-    var entry = Bind(group, name, value.ToString(), forceRegen, description, synchronizedSetting);
+    var entry = Bind(group, name, value.ToString(CultureInfo.InvariantCulture), forceRegen, description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry);
     Floats[entry] = TryParseFloat(entry);
     return entry;

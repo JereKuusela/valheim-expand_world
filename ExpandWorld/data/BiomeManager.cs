@@ -60,7 +60,7 @@ public class BiomeManager {
     data.musicDay = biome.m_musicDay;
     data.musicNight = biome.m_musicNight;
     data.color = Heightmap.GetBiomeColor(biome.m_biome);
-    data.mapColor = MinimapAsync.GetPixelColor32(biome.m_biome);
+    data.mapColor = MapGeneration.GetPixelColor32(biome.m_biome);
     return data;
   }
 
@@ -115,7 +115,7 @@ public class BiomeManager {
       EnvMan.instance.AppendBiomeSetup(biome);
     EnvMan.instance.m_environmentPeriod = -1;
     EnvMan.instance.m_firstEnv = true;
-    Data.Regenerate();
+    Generate.World();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(FileName, FromFile);

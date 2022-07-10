@@ -34,12 +34,12 @@ public class Minimap_ShowPos {
       CleanUp(__instance.m_biomeNameLarge, PreviousLargeText);
       PreviousLargeText = "";
     }
-    if (mode == Minimap.MapMode.Small && MinimapAsync.Generating) {
+    if (mode == Minimap.MapMode.Small && Generate.Generating) {
       var text = GetText();
       AddText(__instance.m_biomeNameSmall, text);
       PreviousSmallText = text;
     }
-    if (mode == Minimap.MapMode.Large && MinimapAsync.Generating) {
+    if (mode == Minimap.MapMode.Large && Generate.Generating) {
       var text = GetText();
       AddText(__instance.m_biomeNameLarge, text);
       PreviousLargeText = text;

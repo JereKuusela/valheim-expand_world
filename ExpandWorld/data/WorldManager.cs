@@ -107,7 +107,7 @@ public class WorldManager {
     }
     ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
     GetBiome.Data = data;
-    Data.Regenerate();
+    Generate.World();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(FileName, FromFile);

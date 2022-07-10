@@ -129,33 +129,4 @@ public class Data : MonoBehaviour {
     }
     return result;
   }
-
-  private static float Debouncer = 0f;
-  public static void Regenerate() {
-    Debouncer = 0f;
-  }
-  public static void CheckRegen(float dt) {
-    if (Debouncer > 2f) return;
-    Debouncer += dt;
-    if (Debouncer > 2f) RegenerateTask();
-  }
-  private static void RegenerateTask() {
-    if (WorldGenerator.instance != null) {
-        WorldGenerator.instance.m_riverPoints.Clear();
-        WorldGenerator.instance.FindLakes();
-        WorldGenerator.instance.m_rivers = WorldGenerator.instance.PlaceRivers();
-        WorldGenerator.instance.m_streams = WorldGenerator.instance.PlaceStreams();
-    }
-    if (ZoneSystem.instance != null) {
-      foreach (var heightmap in Heightmap.m_heightmaps) {
-        heightmap.m_buildData = null;
-        heightmap.Regenerate();
-      }
-    }
-    if (ClutterSystem.instance != null) ClutterSystem.instance.m_forceRebuild = true;
-    // Some water stuff probably.
-    SetupMaterial.Refresh();
-    if (Minimap.instance && Minimap.instance.m_hasGenerated)
-      Minimap.instance.GenerateWorldMap();
-  }
 }

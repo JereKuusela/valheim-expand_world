@@ -44,14 +44,14 @@ public class ExpandWorld : BaseUnityPlugin {
     EnvironmentManager.SetupWatcher();
   }
   public void LateUpdate() {
-    Data.CheckRegen(Time.deltaTime);
+    Generate.CheckRegen(Time.deltaTime);
   }
   private void OnDestroy() {
     Config.Save();
   }
 
   private void SetupWatcher() {
-    FileSystemWatcher watcher = new(ConfigPath, ConfigName);
+    FileSystemWatcher watcher = new(Paths.ConfigPath, ConfigName);
     watcher.Changed += ReadConfigValues;
     watcher.Created += ReadConfigValues;
     watcher.Renamed += ReadConfigValues;
@@ -71,4 +71,11 @@ public class ExpandWorld : BaseUnityPlugin {
     }
   }
 
+}
+
+[HarmonyPatch(typeof(Terminal), nameof(Terminal.InitTerminal))]
+public class SetCommands {
+  static void Postfix() {
+    new DebugCommands();
+  }
 }

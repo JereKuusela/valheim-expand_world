@@ -90,7 +90,7 @@ public partial class Configuration {
       if (newValue == Minimap.instance.m_textureSize) return;
       Minimap.instance.m_textureSize = newValue;
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
-      Data.Regenerate();
+      Generate.Map();
     };
     configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, false, "Decreases the minimap detail, but doesn't affect the generation time.");
     configMapPixelSize.SettingChanged += (e, s) => {
@@ -98,7 +98,7 @@ public partial class Configuration {
       var newValue = MinimapAwake.OriginalPixelSize * MapPixelSize;
       if (newValue == Minimap.instance.m_pixelSize) return;
       Minimap.instance.m_pixelSize = newValue;
-      Data.Regenerate();
+      Generate.Map();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
