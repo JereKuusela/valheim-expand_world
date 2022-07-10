@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -31,5 +32,7 @@ public class WorldData {
   [DefaultValue(null)]
   public int? seed = null;
   [DefaultValue(true)]
-  public bool wiggle = true;
+  public bool wiggleDistance = true;
+  [DefaultValue(true)]
+  public bool wiggleSector = true;
 }

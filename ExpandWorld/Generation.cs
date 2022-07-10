@@ -131,9 +131,25 @@ public class MapGeneration {
     ZLog.Log($"Starting map generation.");
     Stopwatch stopwatch = Stopwatch.StartNew();
     if (map.m_textureSize != TextureSize) {
+      map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
+		  map.m_mapTexture.wrapMode = TextureWrapMode.Clamp;
+		  map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
+		  map.m_forestMaskTexture.wrapMode = TextureWrapMode.Clamp;
+		  map.m_heightTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false);
+		  map.m_heightTexture.wrapMode = TextureWrapMode.Clamp;
+		  map.m_fogTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
+			map.m_fogTexture.wrapMode = TextureWrapMode.Clamp;
       map.m_explored = new bool[map.m_textureSize * map.m_textureSize];
-      map.m_exploredOthers = new bool[map.m_textureSize * map.m_textureSize];
-      map.Start();
+		  map.m_exploredOthers = new bool[map.m_textureSize * map.m_textureSize];
+      map.m_mapImageLarge.material.SetTexture("_MainTex", map.m_mapTexture);
+		  map.m_mapImageLarge.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
+		  map.m_mapImageLarge.material.SetTexture("_HeightTex", map.m_heightTexture);
+		  map.m_mapImageLarge.material.SetTexture("_FogTex", map.m_fogTexture);
+		  map.m_mapImageSmall.material.SetTexture("_MainTex", map.m_mapTexture);
+		  map.m_mapImageSmall.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
+		  map.m_mapImageSmall.material.SetTexture("_HeightTex", map.m_heightTexture);
+		  map.m_mapImageSmall.material.SetTexture("_FogTex", map.m_fogTexture);
+      map.Reset();
       TextureSize = map.m_textureSize;
     }
 

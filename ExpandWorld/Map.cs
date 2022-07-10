@@ -39,3 +39,24 @@ public class InitializeWhenDimensionsChange {
 public class Map_WaitForConfigSync {
   static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 }
+
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new[] { typeof(int), typeof(int) })]
+public class PreventExploreWhenDirty1 {
+  static bool Prefix(Minimap __instance) => __instance.m_textureSize == MapGeneration.TextureSize;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), new[] { typeof(Vector3), typeof(float) })]
+public class PreventExploreWhenDirty2 {
+  static bool Prefix(Minimap __instance) => __instance.m_textureSize == MapGeneration.TextureSize;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.ExploreOthers))]
+public class PreventExploreOthersWhenDirty {
+  static bool Prefix(Minimap __instance) => __instance.m_textureSize == MapGeneration.TextureSize;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.ExploreAll))]
+public class PreventExploreAllWhenDirty {
+  static bool Prefix(Minimap __instance) => __instance.m_textureSize == MapGeneration.TextureSize;
+}
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.IsExplored))]
+public class PreventIsExploredWhenDirty {
+  static bool Prefix(Minimap __instance) => __instance.m_textureSize == MapGeneration.TextureSize;
+}

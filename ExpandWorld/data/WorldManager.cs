@@ -35,7 +35,7 @@ public class WorldManager {
       new() {
         biome = "swamp",
         _biome = Heightmap.Biome.Swamp,
-        wiggle = false,
+        wiggleDistance = false,
         minDistance = 0.2f,
         maxDistance = 0.8f,
         minAltitude = 10f,

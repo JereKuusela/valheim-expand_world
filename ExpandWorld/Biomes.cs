@@ -40,10 +40,10 @@ public class GetBiome {
       return Heightmap.Biome.Ocean;
     var height = obj.GetBaseHeight(wx, wy, false) * 200f;
     var num = obj.WorldAngle(wx, wy) * Configuration.WiggleWidth;
-    var angle = (Mathf.Atan2(wx, wy) + Mathf.PI) / 2f / Mathf.PI;
-    angle += Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
-    if (angle < 0f) angle += 1f;
-    if (angle >= 1f) angle -= 1f;
+    var baseAngle = (Mathf.Atan2(wx, wy) + Mathf.PI) / 2f / Mathf.PI;
+    var wiggledAngle = baseAngle + Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
+    if (wiggledAngle < 0f) wiggledAngle += 1f;
+    if (wiggledAngle >= 1f) wiggledAngle -= 1f;
     var radius = Configuration.WorldRadius;
     var bx = wx / Configuration.BiomeStretch;
     var by = wy / Configuration.BiomeStretch;
@@ -53,7 +53,7 @@ public class GetBiome {
       var mag = magnitude;
       var min = ConvertDist(item.minDistance);
       if (min > 0 )
-        min += (item.wiggle ? num : 0f);
+        min += (item.wiggleDistance ? num : 0f);
       var max = ConvertDist(item.maxDistance);
       if (item.curveX != 0f || item.curveY != 0f) {
         var curveX = ConvertDist(item.curveX);
@@ -65,6 +65,7 @@ public class GetBiome {
       if (!distOk) continue;
       min = item.minSector;
       max = item.maxSector;
+      var angle = item.wiggleSector ? wiggledAngle : baseAngle;
       var angleOk = min > max ? (angle >= min || angle < max) : angle >= min && angle < max;
       if (!angleOk) continue;
       var seed = item.seed ?? GetOffset(obj, item._biome);
