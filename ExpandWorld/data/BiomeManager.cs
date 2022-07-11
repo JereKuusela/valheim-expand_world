@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using Service;
-using UnityEngine;
 namespace ExpandWorld;
 
 public class BiomeManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_biomes.yaml");
+  public static string Pattern = "expand_biomes*.yaml";
   
   public static EnvEntry FromData(BiomeEnvironment data) {
     EnvEntry env = new();
@@ -74,8 +72,7 @@ public class BiomeManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
-    Configuration.valueBiomeData.Value = yaml;
+    var yaml = Data.Read(Pattern);
     if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {
@@ -118,6 +115,6 @@ public class BiomeManager {
     Generate.World();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }

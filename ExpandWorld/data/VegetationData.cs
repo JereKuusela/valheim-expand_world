@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 namespace ExpandWorld;
 
 public class VegetationData {
@@ -40,10 +37,10 @@ public class VegetationData {
   public float maxTilt = 90f;
   [DefaultValue(0f)]
   public float terrainDeltaRadius = 0f;
-  [DefaultValue(10f)]
-  public float maxTerrainDelta = 10f;
   [DefaultValue(0f)]
   public float minTerrainDelta = 0f;
+  [DefaultValue(10f)]
+  public float maxTerrainDelta = 10f;
   [DefaultValue(false)]
   public bool snapToWater = false;
   [DefaultValue(0f)]

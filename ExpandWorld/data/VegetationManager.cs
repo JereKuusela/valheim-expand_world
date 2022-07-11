@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
 public class VegetationManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_vegetation.yaml");
+  public static string Pattern = "expand_vegetation*.yaml";
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data) {
     var veg = new ZoneSystem.ZoneVegetation();
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(data.prefab.GetStableHashCode(), out var obj))
@@ -87,7 +87,7 @@ public class VegetationManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
+    var yaml = Data.Read(Pattern);
     Configuration.valueVegetationData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
@@ -110,6 +110,6 @@ public class VegetationManager {
       ZoneSystem.instance.ValidateVegetation();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }

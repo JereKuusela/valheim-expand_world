@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -7,6 +6,7 @@ namespace ExpandWorld;
 
 public class LocationManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_locations.yaml");
+  public static string Pattern = "expand_locations*.yaml";
   public static ZoneSystem.ZoneLocation FromData(LocationData data) {
     var loc = new ZoneSystem.ZoneLocation();
     loc.m_prefabName = data.prefab;
@@ -58,7 +58,11 @@ public class LocationManager {
     data.forestTresholdMin = loc.m_forestTresholdMin;
     data.forestTresholdMax = loc.m_forestTresholdMax;
     data.minDistance = loc.m_minDistance;
+    if (data.minDistance > 1f)
+      data.minDistance /= 10000f;
     data.maxDistance = loc.m_maxDistance;
+    if (data.maxDistance > 1f)
+      data.maxDistance /= 10000f;
     data.minAltitude = loc.m_minAltitude;
     data.maxAltitude = loc.m_maxAltitude;
     return data;
@@ -75,7 +79,7 @@ public class LocationManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
+    var yaml = Data.Read(Pattern);
     Configuration.valueLocationData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
@@ -138,6 +142,6 @@ public class LocationManager {
     }
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }

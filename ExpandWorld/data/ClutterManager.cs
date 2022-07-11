@@ -8,6 +8,7 @@ namespace ExpandWorld;
 [HarmonyPatch]
 public class ClutterManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_clutter.yaml");
+  public static string Pattern = "expand_clutter*.yaml";
   private static Dictionary<string, GameObject> Prefabs = new();
   [HarmonyPatch(typeof(ClutterSystem), nameof(ClutterSystem.Awake)), HarmonyPriority(Priority.VeryLow), HarmonyFinalizer]
   public static void LoadPrefabs() {
@@ -86,7 +87,7 @@ public class ClutterManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataClutter) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
+    var yaml = Data.Read(Pattern);
     Configuration.valueClutterData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
@@ -108,6 +109,6 @@ public class ClutterManager {
     ClutterSystem.instance.ClearAll();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }

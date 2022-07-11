@@ -7,7 +7,7 @@ using UnityEngine;
 using HarmonyLib;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using System.Dynamic;
+using System.Linq;
 
 namespace ExpandWorld;
 
@@ -66,9 +66,12 @@ public class Spawn_WaitForConfigSync {
 }
 public class Data : MonoBehaviour {
   public static bool IsLoading = false;
-  public static void SetupWatcher(string file, Action action) {
-    FileSystemWatcher watcher = new(Path.GetDirectoryName(file), Path.GetFileName(file));
+  public static void SetupWatcher(string pattern, Action action) {
+    FileSystemWatcher watcher = new(ExpandWorld.ConfigPath, pattern);
+    watcher.Created += (s, e) => action();
     watcher.Changed += (s, e) => action();
+    watcher.Renamed += (s, e) => action();
+    watcher.Deleted += (s, e) => action();
     watcher.IncludeSubdirectories = true;
     watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
     watcher.EnableRaisingEvents = true;
@@ -128,5 +131,9 @@ public class Data : MonoBehaviour {
       }
     }
     return result;
+  }
+  public static string Read(string pattern) {
+    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name => File.ReadAllText(name));
+    return string.Join("\n", data);
   }
 }

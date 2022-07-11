@@ -8,17 +8,9 @@ namespace ExpandWorld;
 [HarmonyPatch]
 public class HeightSeed {
   static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-         .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset3))))
-         .Repeat(matcher => matcher
-           .SetAndAdvance(
-             OpCodes.Call,
-             Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                 (WorldGenerator instance) => Configuration.HeightSeed ?? instance.m_offset3).operand)
-         )
-         .InstructionEnumeration();
+    var matcher = new CodeMatcher(instructions);
+    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset3), (WorldGenerator instance) => Configuration.HeightSeed ?? instance.m_offset3);
+    return matcher.InstructionEnumeration();
   }
   [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsHeight)), HarmonyTranspiler]
   static IEnumerable<CodeInstruction> Ashlands(IEnumerable<CodeInstruction> instructions) => Transpile(instructions);
@@ -38,9 +30,9 @@ public class HeightSeed {
 public class BaseHeight {
   static void Postfix(WorldGenerator __instance, ref float __result) {
     if (__instance.m_world.m_menu) return;
-    var waterLevel = Configuration.WaterLevel / 200f;
+    var waterLevel = Helper.HeightToBaseHeight(Configuration.WaterLevel);
     __result = waterLevel + (__result - waterLevel) * Configuration.BaseAltitudeMultiplier;
-    __result += Configuration.BaseAltitudeDelta / 200f;
+    __result += Helper.HeightToBaseHeight(Configuration.BaseAltitudeDelta);
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight))]

@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 namespace ExpandWorld;
 public class ColorF {
@@ -47,6 +44,7 @@ public class EnvironmentData {
   public bool isColdAtNight = false;
   [DefaultValue(false)]
   public bool alwaysDark = false;
+  [DefaultValue(0f)]
   public float windMin = 0f;
   [DefaultValue(1f)]
   public float windMax = 1f;
@@ -64,28 +62,28 @@ public class EnvironmentData {
   public string musicDay = "";
   [DefaultValue("")]
   public string musicNight = "";
-  public ColorF ambColorNight = ColorF.white;
   public ColorF ambColorDay = ColorF.white;
-  public ColorF fogColorNight = ColorF.white;
+  public ColorF ambColorNight = ColorF.white;
+  public ColorF sunColorMorning = ColorF.white;
+  public ColorF sunColorDay = ColorF.white;
+  public ColorF sunColorEvening = ColorF.white;
+  public ColorF sunColorNight = ColorF.white;
   public ColorF fogColorMorning = ColorF.white;
   public ColorF fogColorDay = ColorF.white;
   public ColorF fogColorEvening = ColorF.white;
-  public ColorF fogColorSunNight = ColorF.white;
+  public ColorF fogColorNight = ColorF.white;
   public ColorF fogColorSunMorning = ColorF.white;
   public ColorF fogColorSunDay = ColorF.white;
   public ColorF fogColorSunEvening = ColorF.white;
-  [DefaultValue(0.01f)]
-  public float fogDensityNight = 0.01f;
+  public ColorF fogColorSunNight = ColorF.white;
   [DefaultValue(0.01f)]
   public float fogDensityMorning = 0.01f;
   [DefaultValue(0.01f)]
   public float fogDensityDay = 0.01f;
   [DefaultValue(0.01f)]
   public float fogDensityEvening = 0.01f;
-  public ColorF sunColorNight = ColorF.white;
-  public ColorF sunColorMorning = ColorF.white;
-  public ColorF sunColorDay = ColorF.white;
-  public ColorF sunColorEvening = ColorF.white;
+  [DefaultValue(0.01f)]
+  public float fogDensityNight = 0.01f;
   [DefaultValue(1.2f)]
   public float lightIntensityDay = 1.2f;
   [DefaultValue(0f)]

@@ -62,14 +62,8 @@ public class CalcWave {
 [HarmonyPatch(typeof(WaterVolume), nameof(WaterVolume.GetWaterSurface))]
 public class GetWaterSurface {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius).operand)
-        .InstructionEnumeration();
+    var matcher = new CodeMatcher(instructions);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius);
+    return matcher.InstructionEnumeration();
   }
 }

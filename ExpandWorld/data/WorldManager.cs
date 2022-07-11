@@ -1,19 +1,17 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using Service;
-using YamlDotNet.Serialization;
 namespace ExpandWorld;
 
 public class WorldManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_world.yaml");
+  public static string Pattern = "expand_world*.yaml";
   public static List<WorldData> GetDefault() {
     return new() {
       new() {
         biome = "ocean",
         _biome = Heightmap.Biome.Ocean,
-        maxAltitude = 4f
+        maxAltitude = -26f
       },
       new() {
         biome = "ashlands",
@@ -24,7 +22,7 @@ public class WorldManager {
       new() {
         biome = "mountain",
         _biome = Heightmap.Biome.Mountain,
-        minAltitude = 80f,
+        minAltitude = 50f,
       },
       new() {
         biome = "deepnorth",
@@ -38,8 +36,8 @@ public class WorldManager {
         wiggleDistance = false,
         minDistance = 0.2f,
         maxDistance = 0.8f,
-        minAltitude = 10f,
-        maxAltitude = 50f,
+        minAltitude = -20f,
+        maxAltitude = 20f,
         amount = 0.4f,
       },
       new() {
@@ -90,7 +88,7 @@ public class WorldManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
+    var yaml = Data.Read(Pattern);
     Configuration.valueWorldData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
@@ -110,6 +108,6 @@ public class WorldManager {
     Generate.World();
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }

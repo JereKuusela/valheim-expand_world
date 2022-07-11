@@ -38,7 +38,7 @@ public class GetBiome {
     var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     if (magnitude > Configuration.WorldTotalRadius)
       return Heightmap.Biome.Ocean;
-    var height = obj.GetBaseHeight(wx, wy, false) * 200f;
+    var altitude = Helper.BaseHeightToAltitude(obj.GetBaseHeight(wx, wy, false));
     var num = obj.WorldAngle(wx, wy) * Configuration.WiggleWidth;
     var baseAngle = (Mathf.Atan2(wx, wy) + Mathf.PI) / 2f / Mathf.PI;
     var wiggledAngle = baseAngle + Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
@@ -49,7 +49,7 @@ public class GetBiome {
     var by = wy / Configuration.BiomeStretch;
 
     foreach (var item in Data) {
-      if (item.minAltitude > height || item.maxAltitude < height) continue;
+      if (item.minAltitude > altitude || item.maxAltitude < altitude) continue;
       var mag = magnitude;
       var min = ConvertDist(item.minDistance);
       if (min > 0 )
@@ -69,7 +69,7 @@ public class GetBiome {
       var angleOk = min > max ? (angle >= min || angle < max) : angle >= min && angle < max;
       if (!angleOk) continue;
       var seed = item.seed ?? GetOffset(obj, item._biome);
-      if (Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < 1 - item.amount) continue;
+      if (item.amount < 1f && Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < 1 - item.amount) continue;
       return item._biome;
     }
     return Heightmap.Biome.Ocean;

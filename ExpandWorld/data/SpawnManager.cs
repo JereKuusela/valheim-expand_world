@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
 public class SpawnManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_spawns.yaml");
-  
+  public static string Pattern = "expand_spawns*.yaml";
   public static SpawnSystem.SpawnData FromData(SpawnData data) {
     var spawn = new SpawnSystem.SpawnData();
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(data.prefab.GetStableHashCode(), out var obj))
@@ -88,7 +87,7 @@ public class SpawnManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
+    var yaml = Data.Read(Pattern);
     Configuration.valueSpawnData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
@@ -111,6 +110,6 @@ public class SpawnManager {
     }
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }

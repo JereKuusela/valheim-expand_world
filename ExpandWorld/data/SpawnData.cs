@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 namespace ExpandWorld;
 
 public class SpawnData {
@@ -10,6 +7,7 @@ public class SpawnData {
   public bool enabled = true;
   public string[] biome = new string[0];
   public string[] biomeArea = new string[0];
+  [DefaultValue(100f)]
   public float spawnChance = 100f;
   public int maxSpawned = 1;
   public float spawnInterval = 0f;
@@ -17,6 +15,10 @@ public class SpawnData {
   public int maxLevel = 1;
   [DefaultValue(1)]
   public int minLevel = 1;
+  [DefaultValue(-1000f)]
+  public float minAltitude = -1000f;
+  [DefaultValue(1000f)]
+  public float maxAltitude = 1000f;
   [DefaultValue("")]
   public string requiredGlobalKey = "";
   [DefaultValue(new string[0])]
@@ -32,10 +34,6 @@ public class SpawnData {
   public int groupSizeMax = 1;
   [DefaultValue(0f)]
   public float groupRadius = 3f;
-  [DefaultValue(-1000f)]
-  public float minAltitude = -1000f;
-  [DefaultValue(1000f)]
-  public float maxAltitude = 1000f;
   [DefaultValue(0f)]
   public float minTilt = 0f;
   [DefaultValue(35f)]

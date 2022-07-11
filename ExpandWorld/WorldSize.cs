@@ -6,22 +6,10 @@ namespace ExpandWorld;
 
 public class WorldSizeHelper {
   public static IEnumerable<CodeInstruction> EdgeCheck(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-                .MatchForward(
-                     useEnd: false,
-                     new CodeMatch(OpCodes.Ldc_R4, 10420f))
-                .SetAndAdvance( // Replace the fixed meters with a custom function.
-                    OpCodes.Call,
-                    Transpilers.EmitDelegate<Func<float>>(
-                        () => Configuration.WorldTotalRadius - 80).operand)
-                .MatchForward(
-                     useEnd: false,
-                     new CodeMatch(OpCodes.Ldc_R4, 10500f))
-                .SetAndAdvance( // Replace the fixed meters with a custom function.
-                    OpCodes.Call,
-                    Transpilers.EmitDelegate<Func<float>>(
-                        () => Configuration.WorldTotalRadius).operand)
-                .InstructionEnumeration();
+    var matcher = new CodeMatcher(instructions);
+    matcher = Helper.Replace(matcher, 10420f, () => Configuration.WorldTotalRadius - 80);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius);
+    return matcher.InstructionEnumeration();
   }
 }
 
@@ -47,88 +35,26 @@ public class GetForestFactor {
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 100000f))
-        .Advance(2)
-        .SetAndAdvance( // Replace the m_offset0 value with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                (WorldGenerator instance) => Configuration.OffsetX ?? instance.m_offset0).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 100000f))
-        .Advance(2)
-        .SetAndAdvance( // Replace the m_offset1 value with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<WorldGenerator, float>>(
-                (WorldGenerator instance) => Configuration.OffsetY ?? instance.m_offset1).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10000f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius / Configuration.WorldStretch).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10000f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius / Configuration.WorldStretch).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius / Configuration.WorldStretch).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius / Configuration.WorldStretch).operand)
-        .InstructionEnumeration();
+    var matcher = new CodeMatcher(instructions);
+    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset0), (WorldGenerator instance) => Configuration.OffsetX ?? instance.m_offset0);
+    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset1), (WorldGenerator instance) => Configuration.OffsetY ?? instance.m_offset0);
+    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius / Configuration.WorldStretch);
+    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius / Configuration.WorldStretch);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius / Configuration.WorldStretch);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius / Configuration.WorldStretch);
+    return matcher.InstructionEnumeration();
   }
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetEdgeHeight))]
 public class GetEdgeHeight {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10490f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius - 10f).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10000f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius).operand)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10100f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius + 100f).operand)
-        .InstructionEnumeration();
+    var matcher = new CodeMatcher(instructions);
+    matcher = Helper.Replace(matcher, 10490f, () => Configuration.WorldTotalRadius - 10);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius);
+    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10100f, () => Configuration.WorldRadius + 100f);
+    return matcher.InstructionEnumeration();
   }
 }
 
@@ -148,36 +74,20 @@ public class SetupMaterial {
 [HarmonyPatch(typeof(EnvMan), nameof(EnvMan.UpdateWind))]
 public class UpdateWind {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    return new CodeMatcher(instructions)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius).operand)
-        // Removes the subtraction of m_edgeOfWorldWidth (already applied above).
-        .SetOpcodeAndAdvance(OpCodes.Nop)
-        .SetOpcodeAndAdvance(OpCodes.Nop)
-        .SetOpcodeAndAdvance(OpCodes.Nop)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldRadius).operand)
-        // Removes the subtraction of m_edgeOfWorldWidth (already applied above).
-        .SetOpcodeAndAdvance(OpCodes.Nop)
-        .SetOpcodeAndAdvance(OpCodes.Nop)
-        .SetOpcodeAndAdvance(OpCodes.Nop)
-        .MatchForward(
-             useEnd: false,
-             new CodeMatch(OpCodes.Ldc_R4, 10500f))
-        .SetAndAdvance( // Replace the fixed meters with a custom function.
-            OpCodes.Call,
-            Transpilers.EmitDelegate<Func<float>>(
-                () => Configuration.WorldTotalRadius).operand)
-        .InstructionEnumeration();
+    var matcher = new CodeMatcher(instructions);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldRadius);
+    // Removes the subtraction of m_edgeOfWorldWidth (already applied above).
+    matcher = matcher
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldRadius);
+    // Removes the subtraction of m_edgeOfWorldWidth (already applied above).
+    matcher = matcher
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop);
+    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius);
+    return matcher.InstructionEnumeration();
   }
 }

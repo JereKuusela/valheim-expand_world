@@ -27,26 +27,15 @@ public static class Helper {
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
-
-  private  static CancellationTokenSource? cancelTokenSource = null;
-  public static Action Debounce(Action func, int milliseconds = 300)
-  {
-    return () =>
-    {
-      cancelTokenSource?.Cancel();
-      cancelTokenSource = new CancellationTokenSource();
-
-      Task.Delay(milliseconds, cancelTokenSource.Token)
-        .ContinueWith(t =>
-        {
-            if (t.IsCompleted)
-              func();
-        });
-    };
-}
+  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, float> call) {
+    return instructions
+      .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
+      .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
+  }
 
   public static float HeightToBaseHeight(float altitude) => altitude / 200f;
   public static float AltitudeToHeight(float altitude) => Configuration.WaterLevel + altitude;
   public static float AltitudeToBaseHeight(float altitude) => HeightToBaseHeight(AltitudeToHeight(altitude));
+  public static float BaseHeightToAltitude(float baseHeight) => baseHeight * 200f - Configuration.WaterLevel;
 }
 

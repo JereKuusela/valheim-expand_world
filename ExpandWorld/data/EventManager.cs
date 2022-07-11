@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
 public class EventManager {
   public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_events.yaml");
+  public static string Pattern = "expand_events*.yaml";
   public static RandomEvent FromData(EventData data) {
     var random = new RandomEvent();
     random.m_name = data.name;
@@ -53,7 +53,7 @@ public class EventManager {
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
     if (!File.Exists(FileName)) return;
-    var yaml = File.ReadAllText(FileName);
+    var yaml = Data.Read(Pattern);
     Configuration.valueEventData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
@@ -74,6 +74,6 @@ public class EventManager {
     RandEventSystem.instance.m_events = data;
   }
   public static void SetupWatcher() {
-    Data.SetupWatcher(FileName, FromFile);
+    Data.SetupWatcher(Pattern, FromFile);
   }
 }
