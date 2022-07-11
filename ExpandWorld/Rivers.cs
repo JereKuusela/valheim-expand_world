@@ -38,8 +38,8 @@ public class PlaceRivers {
     matcher = Helper.Replace(matcher, 60f,  () => Configuration.RiverMinWidth);
     matcher = Helper.Replace(matcher, 100f,  () => Configuration.RiverMaxWidth);
     matcher = Helper.Replace(matcher, 60f,  () => Configuration.RiverMinWidth);
-    matcher = Helper.Replace(matcher, 15f,  () => 1f / Configuration.RiverCurveWidth);
-    matcher = Helper.Replace(matcher, 20f,  () => 1f / Configuration.RiverCurveWaveLength);
+    matcher = Helper.Replace(matcher, 15f,  () => Configuration.RiverCurveWidth);
+    matcher = Helper.Replace(matcher, 20f,  () => Configuration.RiverCurveWaveLength);
     return matcher.InstructionEnumeration();
   }
 }
@@ -76,8 +76,8 @@ public class PlaceStreams {
     matcher = Helper.Replace(matcher, 44f,  () => Helper.AltitudeToHeight(Configuration.StreamEndMaxAltitude));
     matcher = Helper.Replace(matcher, 20f,  () => Configuration.StreamMinWidth);
     matcher = Helper.Replace(matcher, 20f,  () => Configuration.StreamMaxWidth);
-    matcher = Helper.Replace(matcher, 15f,  () => 1f / Configuration.StreamCurveWidth);
-    matcher = Helper.Replace(matcher, 20f,  () => 1f / Configuration.StreamCurveWaveLength);
+    matcher = Helper.Replace(matcher, 15f,  () => Configuration.StreamCurveWidth);
+    matcher = Helper.Replace(matcher, 20f,  () => Configuration.StreamCurveWaveLength);
     matcher = Helper.Replace(matcher, 3000,  () => Configuration.StreamMaxAmount ?? 3000);
     return matcher.InstructionEnumeration();
   }

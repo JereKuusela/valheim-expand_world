@@ -91,8 +91,8 @@ public static ConfigEntry<bool> configRivers;
     configLakeMaxDistance1 = wrapper.BindFloat(section, "Lake max distance 1", 2000f, true, "How deep the lake.");
     configLakeMaxDistance2 = wrapper.BindFloat(section, "Lake max distance 2", 5000f, true, "How deep the lake.");
     configRiverCheckInterval = wrapper.BindFloat(section, "River check interval", 128f, true, "How deep the lake.");
-    configRiverCurveWaveLength = wrapper.BindFloat(section, "River curve wave length", 1f/20f, true, "How deep the lake.");
-    configRiverCurveWidth = wrapper.BindFloat(section, "River curve width", 1f/15f, true, "How deep the lake.");
+    configRiverCurveWaveLength = wrapper.BindFloat(section, "River curve wave length", 20f, true, "How deep the lake.");
+    configRiverCurveWidth = wrapper.BindFloat(section, "River curve width", 15f, true, "How deep the lake.");
     configRiverMaxAltitude = wrapper.BindFloat(section, "River max altitude", 50f, true, "How deep the lake.");
     configRiverMinWidth = wrapper.BindFloat(section, "River min width", 60f, true, "How deep the lake.");
     configRiverMaxWidth = wrapper.BindFloat(section, "River max width", 100f, true, "How deep the lake.");
@@ -100,19 +100,17 @@ public static ConfigEntry<bool> configRivers;
     
     configStreams = wrapper.Bind(section, "Streams", true, true, "Enables streams.");
     configStreamSeed = wrapper.BindInt(section, "Stream seed", null, true);
-    configStreamCurveWaveLength = wrapper.BindFloat(section, "Stream curve wave length", 1f/20f, true);
-    configStreamCurveWidth = wrapper.BindFloat(section, "Stream curve width", 1f/15f, true);
-    configStreamEndMaxAltitude = wrapper.BindFloat(section, "Stream end max altitude", 14f, true);
-    configStreamEndMinAltitude = wrapper.BindFloat(section, "Stream end min altitude", 6f, true);
     configStreamMaxAmount = wrapper.BindInt(section, "Stream max amount", 3000, true);
-    configStreamMaxWidth = wrapper.BindFloat(section, "Stream max width", 20f, true);
-    configStreamMinWidth = wrapper.BindFloat(section, "Stream min width", 20f, true);
-    configStreamMaxLength = wrapper.BindFloat(section, "Stream max length", 200f, true);
-    configStreamMinLength = wrapper.BindFloat(section, "Stream min length", 80f, true);
     configStreamSearchIterations = wrapper.BindInt(section, "Stream search iterations", 100, true);
     configStreamStartMaxAltitude = wrapper.BindFloat(section, "Stream start max altitude", 1f, true);
     configStreamStartMinAltitude = wrapper.BindFloat(section, "Stream start min altitude", -4f, true);
-    
-    
+    configStreamEndMinAltitude = wrapper.BindFloat(section, "Stream end min altitude", 6f, true);
+    configStreamEndMaxAltitude = wrapper.BindFloat(section, "Stream end max altitude", 14f, true);
+    configStreamMaxWidth = wrapper.BindFloat(section, "Stream max width", 20f, true);
+    configStreamMinWidth = wrapper.BindFloat(section, "Stream min width", 20f, true);
+    configStreamMinLength = wrapper.BindFloat(section, "Stream min length", 80f, true);
+    configStreamMaxLength = wrapper.BindFloat(section, "Stream max length", 200f, true);
+    configStreamCurveWaveLength = wrapper.BindFloat(section, "Stream curve wave length", 20f, true);
+    configStreamCurveWidth = wrapper.BindFloat(section, "Stream curve width", 15f, true);
   }
 }

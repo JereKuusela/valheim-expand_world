@@ -41,7 +41,7 @@ public class SpawnData {
   [DefaultValue(true)]
   public bool inForest = true;
   [DefaultValue(true)]
-  public bool outsideForest = true;
+public bool outsideForest = true;
   [DefaultValue(0f)]
   public float minOceanDepth = 0f;
   [DefaultValue(0f)]

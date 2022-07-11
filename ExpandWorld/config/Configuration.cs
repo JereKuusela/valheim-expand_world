@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BepInEx.Configuration;
 using ServerSync;
 using Service;
@@ -15,9 +14,9 @@ public partial class Configuration {
   public static float MapSize => ConfigWrapper.Floats[configMapSize];
   public static ConfigEntry<string> configMapPixelSize;
   public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize];
+  public static ConfigEntry<bool> configServerOnly;
+  public static bool ServerOnly => configServerOnly.Value;
 
-
-  
   public static ConfigEntry<string> configBaseAltitudeMultiplier;
   public static float BaseAltitudeMultiplier => ConfigWrapper.Floats[configBaseAltitudeMultiplier];
   public static ConfigEntry<string> configAltitudeMultiplier;
@@ -92,6 +91,7 @@ public partial class Configuration {
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
       Generate.Map();
     };
+    configServerOnly = wrapper.Bind(section, "Server only", false, false, "If true, enables server side only mode.");
     configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, false, "Decreases the minimap detail, but doesn't affect the generation time.");
     configMapPixelSize.SettingChanged += (e, s) => {
       if (!Minimap.instance) return;

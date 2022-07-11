@@ -74,6 +74,8 @@ public class WorldManager {
 
   public static WorldData FromData(WorldData data) {
     data._biome = Data.ToBiomes(new string[] { data.biome });
+    if (data.minSector < 0f) data.minSector += 1f;
+    if (data.maxSector > 1f) data.maxSector -= 1f;
     return data;
   }
   public static WorldData ToData(WorldData biome) => biome;

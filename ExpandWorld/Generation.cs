@@ -102,7 +102,7 @@ public class WorldGeneration {
 
     if (CTS == cts)
       CTS = null;
-    if (Minimap.instance)
+    if (Minimap.instance && ZNet.instance && !ZNet.instance.IsDedicated())
       Minimap.instance.GenerateWorldMap();
   }
 }

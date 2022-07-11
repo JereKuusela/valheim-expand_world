@@ -8,9 +8,9 @@ using Service;
 namespace ExpandWorld;
 [BepInPlugin(GUID, NAME, VERSION)]
 public class ExpandWorld : BaseUnityPlugin {
-  const string GUID = "expand_world";
-  const string NAME = "Expand World";
-  const string VERSION = "1.1";
+  public const string GUID = "expand_world";
+  public const string NAME = "Expand World";
+  public const string VERSION = "1.1";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -77,5 +77,16 @@ public class ExpandWorld : BaseUnityPlugin {
 public class SetCommands {
   static void Postfix() {
     new DebugCommands();
+  }
+}
+
+
+
+[HarmonyPatch(typeof(Version), nameof(Version.GetVersionString))]
+public class GetVersionString {
+  static void Postfix(ref string __result) {
+    if (ZNet.instance && ZNet.instance.IsDedicated() && Configuration.ServerOnly)
+      return;
+    __result += $"\n{ExpandWorld.NAME}: {ExpandWorld.VERSION}";
   }
 }
