@@ -73,6 +73,7 @@ public class BiomeManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (!File.Exists(FileName)) return;
     var yaml = Data.Read(Pattern);
+    Configuration.valueBiomeData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
   }
   public static void FromSetting(string raw) {

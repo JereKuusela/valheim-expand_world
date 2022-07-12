@@ -7,10 +7,12 @@ public class MinimapAwake {
   // Applies the map parameter changes.
   public static float OriginalPixelSize;
   public static int OriginalTextureSize;
+  public static float OriginalMinZoom;
   static void Postfix(Minimap __instance) {
     OriginalTextureSize = __instance.m_textureSize;
     __instance.m_textureSize = (int)(__instance.m_textureSize * Configuration.MapSize);
-    __instance.m_minZoom /= Configuration.MapSize;
+    OriginalMinZoom = __instance.m_maxZoom;
+    __instance.m_maxZoom = MinimapAwake.OriginalMinZoom * Configuration.MapSize;
     OriginalPixelSize = __instance.m_pixelSize;
     __instance.m_pixelSize *= Configuration.MapPixelSize;
     __instance.m_mapImageLarge.rectTransform.localScale = new(Configuration.MapSize, Configuration.MapSize, Configuration.MapSize);
@@ -25,11 +27,9 @@ public class InitializeWhenDimensionsChange {
     var num = zpackage.ReadInt();
     if (num >= 7) zpackage = zpackage.ReadCompressedPackage();
     int num2 = zpackage.ReadInt();
-    MapGeneration.TextureSize = obj.m_textureSize;
     if (obj.m_textureSize == num2) return true;
     // Base game code would stop initializxing.
     obj.Reset();
-    obj.ClearPins();
     obj.m_fogTexture.Apply();
     return false;
   }

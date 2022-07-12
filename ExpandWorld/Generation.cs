@@ -43,6 +43,7 @@ public class Generate {
 public class WorldGeneration {
   public static bool HasLoaded = false;
   static bool Prefix(WorldGenerator __instance) {
+    if (__instance.m_world.m_menu) return true;
     Game.m_instance.StartCoroutine(Coroutine(__instance));
     return false;
   }
@@ -110,7 +111,14 @@ public class WorldGeneration {
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.GenerateWorldMap))]
 public class MapGeneration {
+  // Some map mods may do stuff after generation which won't work with async.
+  // So do one "fake" generate call to trigger those.
+  static bool DoFakeGenerate = false;
   static bool Prefix(Minimap __instance) {
+    if (DoFakeGenerate) {
+      DoFakeGenerate = false;
+      return false;
+    }
     if (!WorldGeneration.HasLoaded || WorldGeneration.Generating) return false;
     Game.instance.StartCoroutine(Coroutine(__instance));
     return false;
@@ -122,6 +130,29 @@ public class MapGeneration {
       CTS = null;
     }
   }
+  public static void UpdateTextureSize(Minimap map) {
+    if (map.m_textureSize == TextureSize) return;
+    map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
+    map.m_mapTexture.wrapMode = TextureWrapMode.Clamp;
+    map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
+    map.m_forestMaskTexture.wrapMode = TextureWrapMode.Clamp;
+    map.m_heightTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false);
+    map.m_heightTexture.wrapMode = TextureWrapMode.Clamp;
+    map.m_fogTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
+    map.m_fogTexture.wrapMode = TextureWrapMode.Clamp;
+    map.m_explored = new bool[map.m_textureSize * map.m_textureSize];
+    map.m_exploredOthers = new bool[map.m_textureSize * map.m_textureSize];
+    map.m_mapImageLarge.material.SetTexture("_MainTex", map.m_mapTexture);
+    map.m_mapImageLarge.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
+    map.m_mapImageLarge.material.SetTexture("_HeightTex", map.m_heightTexture);
+    map.m_mapImageLarge.material.SetTexture("_FogTex", map.m_fogTexture);
+    map.m_mapImageSmall.material.SetTexture("_MainTex", map.m_mapTexture);
+    map.m_mapImageSmall.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
+    map.m_mapImageSmall.material.SetTexture("_HeightTex", map.m_heightTexture);
+    map.m_mapImageSmall.material.SetTexture("_FogTex", map.m_fogTexture);
+    map.Reset();
+    TextureSize = map.m_textureSize;
+  }
   public static int TextureSize;
   public static bool Generating => CTS != null;
   static CancellationTokenSource? CTS = null;
@@ -130,28 +161,7 @@ public class MapGeneration {
 
     ZLog.Log($"Starting map generation.");
     Stopwatch stopwatch = Stopwatch.StartNew();
-    if (map.m_textureSize != TextureSize) {
-      map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
-		  map.m_mapTexture.wrapMode = TextureWrapMode.Clamp;
-		  map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
-		  map.m_forestMaskTexture.wrapMode = TextureWrapMode.Clamp;
-		  map.m_heightTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false);
-		  map.m_heightTexture.wrapMode = TextureWrapMode.Clamp;
-		  map.m_fogTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
-			map.m_fogTexture.wrapMode = TextureWrapMode.Clamp;
-      map.m_explored = new bool[map.m_textureSize * map.m_textureSize];
-		  map.m_exploredOthers = new bool[map.m_textureSize * map.m_textureSize];
-      map.m_mapImageLarge.material.SetTexture("_MainTex", map.m_mapTexture);
-		  map.m_mapImageLarge.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
-		  map.m_mapImageLarge.material.SetTexture("_HeightTex", map.m_heightTexture);
-		  map.m_mapImageLarge.material.SetTexture("_FogTex", map.m_fogTexture);
-		  map.m_mapImageSmall.material.SetTexture("_MainTex", map.m_mapTexture);
-		  map.m_mapImageSmall.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
-		  map.m_mapImageSmall.material.SetTexture("_HeightTex", map.m_heightTexture);
-		  map.m_mapImageSmall.material.SetTexture("_FogTex", map.m_fogTexture);
-      map.Reset();
-      TextureSize = map.m_textureSize;
-    }
+    UpdateTextureSize(map);
 
     int size = map.m_textureSize * map.m_textureSize;
     var mapTexture = new Color32[size];
@@ -182,7 +192,11 @@ public class MapGeneration {
       map.m_heightTexture.SetPixels(heightTexture);
       yield return null;
       map.m_heightTexture.Apply();
-      yield return null;
+      yield return null; 
+      // Some map mods may do stuff after generation which won't work with async.
+      // So do one "fake" generate call to trigger those.
+      DoFakeGenerate = true;
+      map.GenerateWorldMap();
       ZLog.Log($"Map generation finished ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
     }
     stopwatch.Stop();

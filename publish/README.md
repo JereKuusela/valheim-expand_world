@@ -85,7 +85,7 @@ Amount of forest can be changed with `Forest multiplier`.
 
 # Seeds
 
-The layout of the world is pre-determined, and each world is just a snapshot of it. The world can be manually moved in this layout with `Offset X` and `Offset Y` settings.
+The layout of the world is pre-determined, and each world is just a snapshot of it. The world can be manually moved in this layout with `Offset X` (to west) and `Offset Y` (to south) settings.
 
 Each biome adds some height variation on top of the base altitude. This can be controlled with `Height variation seed` setting.
 
@@ -232,6 +232,8 @@ The file `expand_clutter.yaml` sets the small visual objects.
 
 The file `expand_locations.yaml` sets the available locations and their placement.
 
+See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.
+
 Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored aresa, you need to use Upgrade World mod.
 
 - prefab: Identifier of the location object. Check wiki for available locations. Hidden ones work too.
@@ -298,6 +300,8 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 
 The file `expand_spawns.yaml` sets the spawned creatures.
 
+See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
+
 - prefab: Identifier of the object. Any [object](https://valheim.fandom.com/wiki/Item_IDs) is valid, not just creatures.
 - enabled (default: `false`): Quick way to disable this entry.
 - biome: List of possible biomes.
@@ -309,6 +313,8 @@ The file `expand_spawns.yaml` sets the spawned creatures.
 - maxLevel (default: `1`): Maximum creature level.
 - minAltitude (default: `-1000` meters): Minimum terrain altitude.
 - maxAltitude (default: `1000` meters): Maximum terrain altitude.
+- spawnAtDay (default: `true`): Enabled during the day time.
+- spawnAtNight (default: `true`): Enabled during the night time.
 - requiredGlobalKey: Which [global keys](https://valheim.fandom.com/wiki/Global_Keys) must be set to enable this entry.
 - requiredEnvironments: List of possible environments/weathers.
 - spawnDistance (default: `10` meters): Distance to suppress similar spawns.

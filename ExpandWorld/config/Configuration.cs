@@ -1,5 +1,6 @@
 using BepInEx.Configuration;
 using ServerSync;
+using UnityEngine;
 using Service;
 
 namespace ExpandWorld;
@@ -88,6 +89,8 @@ public partial class Configuration {
       var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
       if (newValue == Minimap.instance.m_textureSize) return;
       Minimap.instance.m_textureSize = newValue;
+      Minimap.instance.m_maxZoom = MinimapAwake.OriginalMinZoom * MapSize;
+      MapGeneration.UpdateTextureSize(Minimap.instance);
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
       Generate.Map();
     };
@@ -122,33 +125,33 @@ public partial class Configuration {
     InitWater(wrapper);
 
     section = "4. Data";
+    configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
+    configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
+    configDataBiome = wrapper.Bind(section, "Biome data", true, false, "Use biome data");
+    configDataBiome.SettingChanged += (s, e) => BiomeManager.FromSetting(valueBiomeData.Value);
     configDataClutter = wrapper.Bind(section, "Clutter data", true, false, "Use clutter data");
     configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(valueClutterData.Value);
     configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
     configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(valueWorldData.Value);
-    configDataBiome = wrapper.Bind(section, "Biome data", true, false, "Use biome data");
-    configDataBiome.SettingChanged += (s, e) => BiomeManager.FromSetting(valueBiomeData.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");
     configDataLocation.SettingChanged += (s, e) => LocationManager.FromSetting(valueLocationData.Value);
     configDataVegetation = wrapper.Bind(section, "Vegetation data", true, false, "Use vegetation data");
     configDataVegetation.SettingChanged += (s, e) => VegetationManager.FromSetting(valueVegetationData.Value);
     configDataEvents = wrapper.Bind(section, "Event data", true, false, "Use event data");
     configDataEvents.SettingChanged += (s, e) => EventManager.FromSetting(valueEventData.Value);
-    configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
-    configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     configDataSpawns = wrapper.Bind(section, "Spawn data", true, false, "Use spawn data");
     configDataSpawns.SettingChanged += (s, e) => SpawnManager.FromSetting(valueSpawnData.Value);
 
-    valueClutterData = wrapper.AddValue("clutter_data");
-    valueClutterData.ValueChanged += () => ClutterManager.FromSetting(valueClutterData.Value);
+    valueEnvironmentData = wrapper.AddValue("environment_data");
+    valueEnvironmentData.ValueChanged += () => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     valueBiomeData = wrapper.AddValue("biome_data");
     valueBiomeData.ValueChanged += () => BiomeManager.FromSetting(valueBiomeData.Value);
+    valueClutterData = wrapper.AddValue("clutter_data");
+    valueClutterData.ValueChanged += () => ClutterManager.FromSetting(valueClutterData.Value);
     valueSpawnData = wrapper.AddValue("spawn_data");
     valueSpawnData.ValueChanged += () => SpawnManager.FromSetting(valueSpawnData.Value);
     valueEventData = wrapper.AddValue("event_data");
     valueEventData.ValueChanged += () => EventManager.FromSetting(valueEventData.Value);
-    valueEnvironmentData = wrapper.AddValue("environment_data");
-    valueEnvironmentData.ValueChanged += () => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     valueWorldData = wrapper.AddValue("world_data");
     valueWorldData.ValueChanged += () => WorldManager.FromSetting(valueWorldData.Value);
     valueLocationData = wrapper.AddValue("location_data");

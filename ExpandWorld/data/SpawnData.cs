@@ -19,6 +19,10 @@ public class SpawnData {
   public float minAltitude = -1000f;
   [DefaultValue(1000f)]
   public float maxAltitude = 1000f;
+  [DefaultValue(true)]
+  public bool spawnAtDay = true;
+  [DefaultValue(true)]
+  public bool spawnAtNight = true;
   [DefaultValue("")]
   public string requiredGlobalKey = "";
   [DefaultValue(new string[0])]
@@ -41,7 +45,7 @@ public class SpawnData {
   [DefaultValue(true)]
   public bool inForest = true;
   [DefaultValue(true)]
-public bool outsideForest = true;
+  public bool outsideForest = true;
   [DefaultValue(0f)]
   public float minOceanDepth = 0f;
   [DefaultValue(0f)]

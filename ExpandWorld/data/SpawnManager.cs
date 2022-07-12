@@ -25,6 +25,8 @@ public class SpawnManager {
     spawn.m_requiredEnvironments = data.requiredEnvironments.ToList();
     spawn.m_groupSizeMin = data.groupSizeMin;
     spawn.m_groupSizeMax = data.groupSizeMax;
+    spawn.m_spawnAtDay= data.spawnAtDay;
+    spawn.m_spawnAtNight = data.spawnAtNight;
     spawn.m_groupRadius = data.groupRadius;
     spawn.m_minAltitude = data.minAltitude;
     spawn.m_maxAltitude = data.maxAltitude;
@@ -55,6 +57,8 @@ public class SpawnManager {
     data.spawnRadiusMax = spawn.m_spawnRadiusMax;
     data.requiredGlobalKey = spawn.m_requiredGlobalKey;
     data.requiredEnvironments = spawn.m_requiredEnvironments.ToArray();
+    data.spawnAtDay = spawn.m_spawnAtDay;
+    data.spawnAtNight = spawn.m_spawnAtNight;
     data.groupSizeMin = spawn.m_groupSizeMin;
     data.groupSizeMax = spawn.m_groupSizeMax;
     data.groupRadius = spawn.m_groupRadius;

@@ -21,6 +21,9 @@ public class ApplyEdgeForce {
 [HarmonyPatch(typeof(Player), nameof(Player.EdgeOfWorldKill))]
 public class EdgeOfWorldKill {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => WorldSizeHelper.EdgeCheck(instructions);
+
+  // Safer to simply skip when in dungeons.
+  static bool Prefix(Player __instance) => __instance.transform.position.y < 4000f;
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetForestFactor))]
@@ -36,8 +39,10 @@ public class GetForestFactor {
 public class GetBaseHeight {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
     var matcher = new CodeMatcher(instructions);
+    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset0), (WorldGenerator instance) => instance.m_offset0);
+    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset1), (WorldGenerator instance) => instance.m_offset1);
     matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset0), (WorldGenerator instance) => Configuration.OffsetX ?? instance.m_offset0);
-    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset1), (WorldGenerator instance) => Configuration.OffsetY ?? instance.m_offset0);
+    matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset1), (WorldGenerator instance) => Configuration.OffsetY ?? instance.m_offset1);
     matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius / Configuration.WorldStretch);
     matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius / Configuration.WorldStretch);
     matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius / Configuration.WorldStretch);
