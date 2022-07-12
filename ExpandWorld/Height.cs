@@ -40,10 +40,7 @@ public class BiomeHeight {
   static void Prefix(WorldGenerator __instance, ref Heightmap.Biome biome, ref Heightmap.Biome __state) {
     if (__instance.m_world.m_menu) return;
     __state = biome;
-    if (BiomeManager.TryGetData(biome, out var data)) {
-      if (BiomeManager.TryGetBiome(data.terrain, out var terrain))
-        biome = terrain;
-    }
+    biome = BiomeManager.GetTerrain(biome);
   }
   static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result) {
     if (__instance.m_world.m_menu) return;

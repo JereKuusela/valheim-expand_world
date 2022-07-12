@@ -33,12 +33,14 @@ public class BiomeManager {
   };
   private static Dictionary<string, Heightmap.Biome> NameToBiome = DefaultNameToBiome;
   private static Dictionary<Heightmap.Biome, string> BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+  private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
   public static bool TryGetData(int biome, out BiomeData data) => BiomeToData.TryGetValue((Heightmap.Biome)biome, out data);
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
   public static bool TryGetName(Heightmap.Biome biome, out string name) => BiomeToName.TryGetValue(biome, out name);
   public static bool TryGetName(int biome, out string name) => BiomeToName.TryGetValue((Heightmap.Biome)biome, out name);
+  public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain[biome];
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(new string[] { data.biome });
@@ -79,6 +81,7 @@ public class BiomeManager {
   public static void FromSetting(string raw) {
     if (!Data.IsLoading) Set(raw);
   }
+  public static bool BiomeForestMultiplier = false;
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataBiome) return;
     var rawData = Data.Deserializer().Deserialize<List<BiomeData>>(raw);
@@ -104,7 +107,13 @@ public class BiomeManager {
       biomeNumber *= 2;
     }
     BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+    BiomeToTerrain =rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+      if (NameToBiome.TryGetValue(data.terrain, out var terrain))
+        return terrain;
+      return NameToBiome[data.biome];
+    });
     Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
+    BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
     var data = rawData.Select(FromData).ToList();
     foreach (var list in LocationList.m_allLocationLists)
       list.m_biomeEnvironments.Clear();

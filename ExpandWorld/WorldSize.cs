@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using UnityEngine;
 using HarmonyLib;
 namespace ExpandWorld;
 
@@ -28,11 +29,18 @@ public class EdgeOfWorldKill {
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetForestFactor))]
 public class GetForestFactor {
-  static void Postfix(ref float __result) {
-    if (Configuration.ForestMultiplier == 0f)
+  static void Postfix(WorldGenerator __instance, Vector3 pos, ref float __result) {
+    var multiplier = Configuration.ForestMultiplier;
+    if (__instance != null && BiomeManager.BiomeForestMultiplier) {
+      var biome = __instance.GetBiome(pos);
+      if (BiomeManager.TryGetData(biome, out var data)) {
+        multiplier *= data.forestMultiplier;
+      }
+    }
+    if (multiplier == 0f)
       __result = 100f;
     else
-      __result /= Configuration.ForestMultiplier;
+      __result /= multiplier;
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]

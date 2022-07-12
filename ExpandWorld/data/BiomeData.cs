@@ -16,6 +16,8 @@ public class BiomeData {
   public string terrain = "";
   [DefaultValue(1f)]
   public float altitudeMultiplier = 1f;
+  [DefaultValue(1f)]
+  public float forestMultiplier = 1f;
   [DefaultValue(0f)]
   public float altitudeDelta = 0f;
   public BiomeEnvironment[] environments = new BiomeEnvironment[0];

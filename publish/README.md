@@ -35,6 +35,18 @@ This mod can be used only on the server. However only following files can be con
 - `expand_vegetation.yaml`: All fields.
 - `expand_world.cfg`: Only setting Location multiplier.
 
+## Migration from version 1.0
+
+- Back up your world.
+- Copy your existing config to a safe place and then remove the original.
+- Start the game and load a test world, to generate default configs.
+- Try to migrate your old config:
+  - Most biome related settings were moved from config to `expand_biomes.yaml`.
+  - Most values are now scaled from 0.0 to 1.0 instead of from 0 to 100.
+  - Some config values have been renamed, but should be easy to find.
+  - Some default values might be different so try to remember what you have actually changed.
+- Load the world and hope for the best.
+
 # World size
 
 The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 10500 meters). Usually there is no need to change the edge size.
@@ -44,8 +56,6 @@ The world can be stretched with `Stretch world` setting. This can be used to kee
 The amount of locations (like boss altars) can be changed with `Locations` setting. This can significantly increase the initial world generation time (especially when the game fails to place most locations). If changing this on existing worlds, use `genloc` command to distribute unplaced locations.
 
 Note: 2x world radius means 4x world area. So for 20000 radius you would need 4x locations and for 40000 radius you would need 16x locations.
-
-Note: The location minimum and maximum distances are automatically scaled with world radius.
 
 Note: If the game fails to place the spawn altar (for example if no Meadows), then it is forcefully placed at the middle of the map. With bad luck, this can be underwater.
 
@@ -85,7 +95,7 @@ Amount of forest can be changed with `Forest multiplier`.
 
 # Seeds
 
-The layout of the world is pre-determined, and each world is just a snapshot of it. The world can be manually moved in this layout with `Offset X` (to west) and `Offset Y` (to south) settings.
+The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it. The world can be manually moved in this layout with `Offset X` (to west) and `Offset Y` (to south) settings.
 
 Each biome adds some height variation on top of the base altitude. This can be controlled with `Height variation seed` setting.
 
@@ -110,6 +120,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - terrain: Identifier of a default biome. Determines which terrain algorithm to use. Required for new biomes.
 - altitudeDelta: Flat increase/decrease to the terrain altitude. See Altitude section for more info.
 - altitudeMultiplier: Multiplier to the terrain altitude (relative to the water level).
+- forestMultiplier: Multiplier to the global forest multiplier. Using this requires an extra biome check which will lower the performance.
 - environments: List of available environments (weathers) and their relative chances.
 - color: Terrain style. Not fully sure how this works but the color value somehow determines which default biome terrain style to use.
 - mapColor: Color in the minimap (red, green, blue, alpha).
@@ -422,23 +433,12 @@ Streams have params:
 
 - v1.1
 	- WARNING: Contains breaking changes for existing configs.
-	- Adds a new setting `Stretch biomes`.
-	- Adds an automatic fail-safe if some locations can't be placed (like Moder altar).
-	- Adds data editing for biome weathers, events, locations, spawns, vegetation, weathers and world.
-	- Adds lots of new settings for rivers.
-	- Removes most biome settings as obsolete.
-	- Removes the `Locked` setting as obsolete (you never want this mod unsynced).
-	- Changes the name of setting `World strech` to `Stretch world` (remember to update existing configs).
-	- Fixes wrong default values for settings `Black forest amount` (from 40 to 60), `Swamp amount` (from 60 to 40) and `Plains amount` (from 40 to 60).
-	- Fixes the setting `Distance wiggle width` causing a minor anomaly.
-	- Fixes the setting `Location` affecting the amount of start temples.
-	- Fixes map data being some reset when joining dedicated servers.
-	- Fixes map dragging sometimes causing map icons to appear.
-	- Fixes possible terrain desync from rivers.
 
 - v1.0
 	- Initial release.
 
 Thanks for Azumatt for creating the mod icon!
+
+Thanks for blaxxun for creating the server sync!
 
 Thanks for redseiko for the asynchronous minimap generating!

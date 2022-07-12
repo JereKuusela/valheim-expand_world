@@ -130,8 +130,9 @@ public class MapGeneration {
       CTS = null;
     }
   }
-  public static void UpdateTextureSize(Minimap map) {
-    if (map.m_textureSize == TextureSize) return;
+  public static void UpdateTextureSize(Minimap map, int textureSize) {
+    if (map.m_textureSize == textureSize) return;
+    map.m_textureSize = textureSize;
     map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
     map.m_mapTexture.wrapMode = TextureWrapMode.Clamp;
     map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
@@ -151,9 +152,7 @@ public class MapGeneration {
     map.m_mapImageSmall.material.SetTexture("_HeightTex", map.m_heightTexture);
     map.m_mapImageSmall.material.SetTexture("_FogTex", map.m_fogTexture);
     map.Reset();
-    TextureSize = map.m_textureSize;
   }
-  public static int TextureSize;
   public static bool Generating => CTS != null;
   static CancellationTokenSource? CTS = null;
   static IEnumerator Coroutine(Minimap map) {
@@ -161,7 +160,6 @@ public class MapGeneration {
 
     ZLog.Log($"Starting map generation.");
     Stopwatch stopwatch = Stopwatch.StartNew();
-    UpdateTextureSize(map);
 
     int size = map.m_textureSize * map.m_textureSize;
     var mapTexture = new Color32[size];
@@ -215,27 +213,27 @@ public class MapGeneration {
               ct.ThrowIfCancellationRequested();
 
             var wg = WorldGenerator.m_instance;
-            int textureSize = map.m_textureSize; // default 2048
-            int halfTextureSize = textureSize / 2;
-            float pixelSize = map.m_pixelSize;   // default 12
-            float halfPixelSize = pixelSize / 2f;
+            var textureSize = map.m_textureSize; // default 2048
+            var halfTextureSize = textureSize / 2;
+            var pixelSize = map.m_pixelSize;   // default 12
+            var halfPixelSize = pixelSize / 2f;
 
-            for (int i = 0; i < textureSize; i++) {
-              for (int j = 0; j < textureSize; j++) {
-                float wx = (j - halfTextureSize) * pixelSize + halfPixelSize;
-                float wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
+            for (var i = 0; i < textureSize; i++) {
+              for (var j = 0; j < textureSize; j++) {
+                var wx = (j - halfTextureSize) * pixelSize + halfPixelSize;
+                var wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
 
-                Heightmap.Biome biome = wg.GetBiome(wx, wy);
-                float biomeHeight = wg.GetBiomeHeight(biome, wx, wy);
-                if (biome != Heightmap.Biome.Mountain && biome != Heightmap.Biome.DeepNorth && biomeHeight > 70f)
+                var biome = wg.GetBiome(wx, wy);
+                var terrain = BiomeManager.GetTerrain(biome);
+                var biomeHeight = wg.GetBiomeHeight(biome, wx, wy);
+                if (terrain != Heightmap.Biome.Mountain && terrain != Heightmap.Biome.DeepNorth && biomeHeight > 70f)
                   biomeHeight = Mathf.Min(85f, 70f + Mathf.Sqrt(biomeHeight - 70f));
 
                 mapTexture[i * textureSize + j] = GetPixelColor32(biome);
-                forestMaskTexture[i * textureSize + j] = GetMaskColor32(wx, wy, biomeHeight, biome);
+                forestMaskTexture[i * textureSize + j] = GetMaskColor32(wx, wy, biomeHeight, biome, terrain);
                 heightTexture[i * textureSize + j] = new Color(biomeHeight, 0f, 0f);
-                if (ct.IsCancellationRequested) {
+                if (ct.IsCancellationRequested)
                   ct.ThrowIfCancellationRequested();
-                }
               }
             }
           })
@@ -274,24 +272,28 @@ public class MapGeneration {
   static readonly Color32 ForestColor = new Color(1f, 0f, 0f, 0f);
   static readonly Color32 NoForestColor = new Color(0f, 0f, 0f, 0f);
 
-  static Color32 GetMaskColor32(float wx, float wy, float height, Heightmap.Biome biome) {
+  static Color32 GetMaskColor32(float wx, float wy, float height, Heightmap.Biome biome, Heightmap.Biome terrain) {
     if (height < Configuration.WaterLevel) {
       return NoForestColor;
     }
-
-    return biome switch
+    
+    return terrain switch
     {
-      Heightmap.Biome.Meadows => GetForestFactor(wx, wy) < 1.15f ? ForestColor : NoForestColor,
-      Heightmap.Biome.Plains => GetForestFactor(wx, wy) < 0.8f ? ForestColor : NoForestColor,
+      Heightmap.Biome.Meadows => GetForestFactor(biome, wx, wy) < 1.15f ? ForestColor : NoForestColor,
+      Heightmap.Biome.Plains => GetForestFactor(biome, wx, wy) < 0.8f ? ForestColor : NoForestColor,
       Heightmap.Biome.BlackForest => ForestColor,
       Heightmap.Biome.Mistlands => ForestColor,
       _ => NoForestColor,
     };
   }
 
-  static float GetForestFactor(float vx, float vz) {
-    if (Configuration.ForestMultiplier == 0f) return 10f;
-    return Fbm(vx * 0.004f, vz * 0.004f, 3, 1.6f, 0.7f) / Configuration.ForestMultiplier;
+  static float GetForestFactor(Heightmap.Biome biome, float vx, float vz) {
+    var multiplier = Configuration.ForestMultiplier;
+    if (BiomeManager.TryGetData(biome, out var data)) {
+      multiplier *= data.forestMultiplier;
+    }
+    if (multiplier == 0f) return 10f;
+    return Fbm(vx * 0.004f, vz * 0.004f, 3, 1.6f, 0.7f) / multiplier;
   }
 
   static float Fbm(float vx, float vz, int octaves, float lacunarity, float gain) {

@@ -88,9 +88,8 @@ public partial class Configuration {
       if (!Minimap.instance) return;
       var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
       if (newValue == Minimap.instance.m_textureSize) return;
-      Minimap.instance.m_textureSize = newValue;
-      Minimap.instance.m_maxZoom = MinimapAwake.OriginalMinZoom * MapSize;
-      MapGeneration.UpdateTextureSize(Minimap.instance);
+      Minimap.instance.m_maxZoom = MinimapAwake.OriginalMinZoom * Mathf.Max(1f, MapSize);
+      MapGeneration.UpdateTextureSize(Minimap.instance, newValue);
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
       Generate.Map();
     };
