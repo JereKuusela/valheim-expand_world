@@ -129,14 +129,6 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - musicEvening: Music override for the evening time.
 - musicNight: Music override for the night time.
 
-Adding a new biome:
-
-1. Copy-paste an existing entry.
-2. Change `biome` field.
-3. Add `name` and `terrain` fields.
-4. Add/modify other fields.
-5. Use the biome identifier in other files.
-
 ## World
 
 The file `expand_world.yaml` sets the biome distribution.
@@ -172,12 +164,6 @@ Sectors start at the south and increase towards clock-wise direction. So that:
 Note: Of course any number is valid for sectors. Like from 0.37 to 0.62.
 
 Note: The world edge is always ocean. This is currently hardcoded.
-
-Adding a new biome:
-
-1. Look at the default world file until the rules start to make sense.
-2. Determine how you want the new biome to appear on the world.
-3. Make changes until you succeed.
 
 ## Environments
 
@@ -428,6 +414,46 @@ Streams have params:
 - Stream max length (default: `299` meters): Maximum length for streams.
 - Stream curve width (default: `15`): How wide the curves are.
 - Stream curve wave length (default: `20`): How often the stream changes direction.
+
+# Examples
+
+## Adding a new location
+
+1. Open `expand_locations.yaml`.
+2. Copy paste existing entry.
+3. Change `prefab`, for example to XMasTree (check [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI) for ids).
+4. Change other fields.
+
+## Bosses spawning enemies
+
+1. Open `expand_events.yaml`.
+2. Find boss_eikthyr or other boss event.
+3. Copy `spawns` field from another entry like army_eikthyr.
+
+## Adding a new biome
+
+1. Open `expand_biomes.yaml`.
+2. Copy-paste existing entry.
+3. Change `biome`, add `name` and add `terrain`.
+4. Add/modify other fields.
+5. Open `expand_world.yaml`.
+6. Look at it until the rules start to make sense.
+7. Determine how you want the new biome to appear on the world.
+8. Make changes until you succeed.
+9. Edit other files to make spawns, locations and vegetation to work.
+
+Example:
+
+Copy-paste ashlands entry and change:
+- biome: desert
+  name: Desert
+  terrain: ashlands
+  environments:
+  - environment: Clear
+
+Copy-paste plains entry and change the top one:
+- biome: desert
+  amount: 0.5
 
 # Changelog
 
