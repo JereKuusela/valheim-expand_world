@@ -1,7 +1,5 @@
 using System;
 using System.Reflection.Emit;
-using System.Threading;
-using System.Threading.Tasks;
 using HarmonyLib;
 namespace ExpandWorld;
 
@@ -32,6 +30,14 @@ public static class Helper {
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
+  public static CodeMatcher ReplaceStretch(CodeMatcher instructions, OpCode code) {
+    return instructions
+      .MatchForward(false, new CodeMatch(code))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(Configuration), nameof(Configuration.WorldStretch))))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div));
+  }
+
 
   public static float HeightToBaseHeight(float altitude) => altitude / 200f;
   public static float AltitudeToHeight(float altitude) => Configuration.WaterLevel + altitude;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
+using System.Reflection.Emit;
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.FindLakes))]
@@ -9,6 +10,8 @@ public class FindLakes {
     matcher = Helper.Replace(matcher, -10000f,  () => -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, -10000f,  () => -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f,  () => Configuration.WorldRadius);
+    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldloc_3);
+    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldloc_2);
     matcher = Helper.Replace(matcher, 0.05f,  () => Helper.AltitudeToBaseHeight(Configuration.LakeDepth));
     matcher = Helper.Replace(matcher, 128f,  () => Configuration.LakeSearchInterval);
     matcher = Helper.Replace(matcher, 10000f,  () => Configuration.WorldRadius);
@@ -49,6 +52,8 @@ public class PlaceRivers {
 public class IsRiverAllowed {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
     var matcher = new CodeMatcher(instructions);
+    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldfld);
+    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldfld);
     matcher = Helper.Replace(matcher, 0.05f,  () => Helper.AltitudeToBaseHeight(Configuration.LakeDepth));
     return matcher.InstructionEnumeration();
   }
@@ -92,5 +97,13 @@ public class FindStreamStartPoint {
     matcher = Helper.Replace(matcher, -10000f,  () => -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f,  () => Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
+  }
+}
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.AddRivers))]
+public class AddRivers {
+  // Rivers are placed at unstretched positions.
+  static void Prefix(ref float wx, ref float wy) {
+    wx *= Configuration.WorldStretch;
+    wy *= Configuration.WorldStretch;
   }
 }

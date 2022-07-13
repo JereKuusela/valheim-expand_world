@@ -33,7 +33,8 @@ public partial class Configuration {
   public static ConfigEntry<string> configForestMultiplier;
   public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier];
   public static ConfigEntry<string> configWorldStretch;
-  public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
+  // Special treatment for easier transpiling and performance.
+  public static float WorldStretch = 1f;
   public static ConfigEntry<string> configBiomeStretch;
   public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
 
@@ -103,6 +104,10 @@ public partial class Configuration {
       Generate.Map();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
+    configWorldStretch.SettingChanged += (s,e) => {
+      WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
+    };
+    WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
 
     section = "2. Features";

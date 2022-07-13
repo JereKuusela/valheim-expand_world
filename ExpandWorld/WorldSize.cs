@@ -54,19 +54,8 @@ public class GetBaseHeight {
     matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius / Configuration.WorldStretch);
     matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius / Configuration.WorldStretch);
     matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius / Configuration.WorldStretch);
+    matcher = Helper.Replace(matcher, 10490f, () => (Configuration.WorldTotalRadius - 10f) / Configuration.WorldStretch);
     matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius / Configuration.WorldStretch);
-    return matcher.InstructionEnumeration();
-  }
-}
-
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetEdgeHeight))]
-public class GetEdgeHeight {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
-    var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, 10490f, () => Configuration.WorldTotalRadius - 10);
-    matcher = Helper.Replace(matcher, 10500f, () => Configuration.WorldTotalRadius);
-    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
-    matcher = Helper.Replace(matcher, 10100f, () => Configuration.WorldRadius + 100f);
     return matcher.InstructionEnumeration();
   }
 }

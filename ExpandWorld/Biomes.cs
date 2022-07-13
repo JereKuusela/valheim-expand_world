@@ -75,12 +75,11 @@ public class GetBiome {
     return Heightmap.Biome.Ocean;
   }
   static bool Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome __result) {
-    var obj = __instance;
-    if (obj.m_world.m_menu) return true;
+    if (__instance.m_world.m_menu) return true;
     wx /= Configuration.WorldStretch;
     wy /= Configuration.WorldStretch;
     if (!Configuration.DataWorld) return true;
-    __result = Get(obj, wx, wy);
+    __result = Get(__instance, wx, wy);
     return false;
   }
 }

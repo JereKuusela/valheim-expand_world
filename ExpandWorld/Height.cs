@@ -37,8 +37,10 @@ public class BaseHeight {
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight))]
 public class BiomeHeight {
-  static void Prefix(WorldGenerator __instance, ref Heightmap.Biome biome, ref Heightmap.Biome __state) {
+  static void Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome biome, ref Heightmap.Biome __state) {
     if (__instance.m_world.m_menu) return;
+    wx /= Configuration.WorldStretch;
+    wy /= Configuration.WorldStretch;
     __state = biome;
     biome = BiomeManager.GetTerrain(biome);
   }

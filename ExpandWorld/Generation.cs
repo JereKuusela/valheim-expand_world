@@ -1,6 +1,7 @@
 
 using System.Collections;
 using System.Diagnostics;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using HarmonyLib;
@@ -36,6 +37,30 @@ public class Generate {
         WorldGenerator.instance?.Pregenerate();
       MapOnly = true;
     } 
+  }
+}
+
+
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), new Type[0])]
+public class LocationGeneration {
+  static void Prefix() {
+    if (!WorldGeneration.HasLoaded) {
+      Generate.Cancel();
+      ZLog.Log($"Started world generation.");
+      var stopwatch = Stopwatch.StartNew();
+      var wg = WorldGenerator.instance;
+      wg.m_riverPoints.Clear();
+      wg.m_cachedRiverGrid = new Vector2i(-999999, -999999);
+      wg.m_cachedRiverPoints = null;
+      wg.FindLakes();
+      wg.m_rivers = wg.PlaceRivers();
+      wg.m_streams = wg.PlaceStreams();
+      ZLog.Log($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+      stopwatch.Stop();
+      WorldGeneration.HasLoaded = true;
+      if (Minimap.instance && ZNet.instance && !ZNet.instance.IsDedicated())
+        Minimap.instance.GenerateWorldMap();
+    }
   }
 }
 
