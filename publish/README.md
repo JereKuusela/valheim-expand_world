@@ -1,6 +1,6 @@
 # Expand world
 
-This mod allows creating bigger or radically different worlds.
+This mod allows adding new biomes and changing most of the world generation.
 
 Always back up your world before making any changes!
 
@@ -11,8 +11,7 @@ Check any modding [guide](https://youtu.be/WfvA5a5tNHo) if you don't know how.
 # Features
 
 - Add new biomes.
-- Make the world bigger (or smaller).
-- Change world height, globally or per biome.
+- Make the world bigger or taller.
 - Change biome distribution.
 - Change data like events, spawners and weather.
 - The minimap is generated in the background, lowering loading times.
@@ -34,6 +33,8 @@ This mod can be used only on the server. However only following files can be con
 - `expand_locations.yaml`: Only normally available or disabled [prefabs](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) can be used.
 - `expand_vegetation.yaml`: All fields.
 - `expand_world.cfg`: Only setting Location multiplier.
+
+When doing this, enable `Server only` on the config to remove version check.
 
 ## Migration from version 1.0
 
@@ -421,7 +422,7 @@ Streams have params:
 
 1. Open `expand_locations.yaml`.
 2. Copy paste existing entry.
-3. Change `prefab`, for example to XMasTree (check [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI) for ids).
+3. Change `prefab`, for example to XMasTree (check [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for ids).
 4. Change other fields.
 
 ## Bosses spawning enemies
