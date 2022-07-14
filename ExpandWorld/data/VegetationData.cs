@@ -5,9 +5,7 @@ public class VegetationData {
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;
-  [DefaultValue(1f)]
   public float min = 1f;
-  [DefaultValue(1f)]
   public float max = 1f;
   [DefaultValue(false)]
   public bool forcePlacement = false;
@@ -55,6 +53,6 @@ public class VegetationData {
   public bool inForest = false;
   [DefaultValue(0f)]
   public float forestTresholdMin = 0f;
-  [DefaultValue(0f)]
-  public float forestTresholdMax = 0f;
+  [DefaultValue(1f)]
+  public float forestTresholdMax = 1f;
 }

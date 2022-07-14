@@ -44,6 +44,6 @@ public class LocationData {
   public bool inForest = false;
   [DefaultValue(0f)]
   public float forestTresholdMin = 0f;
-  [DefaultValue(0f)]
-  public float forestTresholdMax = 0f;
+  [DefaultValue(1f)]
+  public float forestTresholdMax = 1f;
 }
