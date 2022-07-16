@@ -69,8 +69,8 @@ public class BiomeManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
-    Configuration.valueBiomeData.Value = yaml;
     File.WriteAllText(FilePath, yaml);
+    Configuration.valueBiomeData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;

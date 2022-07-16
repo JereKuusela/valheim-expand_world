@@ -83,7 +83,12 @@ public class Data : MonoBehaviour {
   public static IDeserializer DeserializerUnSafe() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance)
   .WithTypeConverter(new FloatConverter()).IgnoreUnmatchedProperties().Build();
   public static ISerializer Serializer() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).DisableAliases()
-    .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults).WithTypeConverter(new FloatConverter()).Build();
+    .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults).WithTypeConverter(new FloatConverter())
+      .WithAttributeOverride<Color>(c => c.gamma, new YamlIgnoreAttribute())
+      .WithAttributeOverride<Color>(c => c.grayscale, new YamlIgnoreAttribute())
+      .WithAttributeOverride<Color>(c => c.linear, new YamlIgnoreAttribute())
+      .WithAttributeOverride<Color>(c => c.maxColorComponent, new YamlIgnoreAttribute())
+      .Build();
 
   public static List<T> Deserialize<T>(string raw, string fileName) {
     try {

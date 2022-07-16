@@ -123,6 +123,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - altitudeMultiplier: Multiplier to the terrain altitude (relative to the water level).
 - forestMultiplier: Multiplier to the global forest multiplier. Using this requires an extra biome check which will lower the performance.
 - environments: List of available environments (weathers) and their relative chances.
+- paint: Default terrain paint. r = dirt, g = cultivated, b = paved, a = does nothing.
 - color: Terrain style. Not fully sure how this works but the color value somehow determines which default biome terrain style to use.
 - mapColor: Color in the minimap (red, green, blue, alpha).
 - musicMorning: Music override for the morning time.
@@ -461,6 +462,8 @@ Copy-paste plains entry and change the top one:
 - v1.2
 	- WARNING: May contain breaking changes.
   - Adds some error handling to allow partially loading the data.
+  - Adds a new field `terrain` to the `expand_biomes.yaml` to set the default terrain paint.
+  - Changes the color format of `expand_biomes.yaml` to be from 0.0 to 1.0 (instead of from 0 to 255). Regenerate the file or fix colors manually.
 	- Fixes `Altitude multiplier` multiplying biome specific `Altitude delta`. If you have used both, multiply the biome specific delta in the yaml file.
 
 - v1.1

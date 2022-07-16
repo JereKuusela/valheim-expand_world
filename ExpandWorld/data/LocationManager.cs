@@ -74,8 +74,8 @@ public class LocationManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
-    Configuration.valueLocationData.Value = yaml;
     File.WriteAllText(FilePath, yaml);
+    Configuration.valueLocationData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;

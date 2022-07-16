@@ -82,8 +82,8 @@ public class ClutterManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataClutter) return;
     if (File.Exists(FileName)) return;
     var yaml = Data.Serializer().Serialize(ClutterSystem.instance.m_clutter.Select(ToData).ToList());
-    Configuration.valueClutterData.Value = yaml;
     File.WriteAllText(FileName, yaml);
+    Configuration.valueClutterData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataClutter) return;

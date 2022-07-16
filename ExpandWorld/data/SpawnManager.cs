@@ -85,8 +85,8 @@ public class SpawnManager {
     if (spawnSystem == null) return;
     var spawns = spawnSystem.m_spawnLists.SelectMany(s => s.m_spawners);
     var yaml = Data.Serializer().Serialize(spawns.Select(ToData).ToList());
-    Configuration.valueSpawnData.Value = yaml;
     File.WriteAllText(FilePath, yaml);
+    Configuration.valueSpawnData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;

@@ -1,31 +1,8 @@
 using System.ComponentModel;
 using UnityEngine;
+
 namespace ExpandWorld;
-public class ColorF {
-  [DefaultValue(0f)]
-  public float r = 0f;
-  [DefaultValue(0f)]
-  public float g = 0f;
-  [DefaultValue(0f)]
-  public float b = 0f;
-  [DefaultValue(0f)]
-  public float a = 0f;
-  public static ColorF ToData(Color color) => new ColorF()
-  {
-    r = color.r,
-    g = color.g,
-    b = color.b,
-    a = color.a
-  };
-  public static Color FromData(ColorF color) => new Color()
-  {
-    r = color.r,
-    g = color.g,
-    b = color.b,
-    a = color.a
-  };
-  public static ColorF white = new ColorF() { r = 1f, g = 1f, b = 1f, a = 1f };
-}
+
 public class EnvironmentData {
   public string name = "";
   [DefaultValue("")]
@@ -62,20 +39,20 @@ public class EnvironmentData {
   public string musicDay = "";
   [DefaultValue("")]
   public string musicNight = "";
-  public ColorF ambColorDay = ColorF.white;
-  public ColorF ambColorNight = ColorF.white;
-  public ColorF sunColorMorning = ColorF.white;
-  public ColorF sunColorDay = ColorF.white;
-  public ColorF sunColorEvening = ColorF.white;
-  public ColorF sunColorNight = ColorF.white;
-  public ColorF fogColorMorning = ColorF.white;
-  public ColorF fogColorDay = ColorF.white;
-  public ColorF fogColorEvening = ColorF.white;
-  public ColorF fogColorNight = ColorF.white;
-  public ColorF fogColorSunMorning = ColorF.white;
-  public ColorF fogColorSunDay = ColorF.white;
-  public ColorF fogColorSunEvening = ColorF.white;
-  public ColorF fogColorSunNight = ColorF.white;
+  public Color ambColorDay = Color.white;
+  public Color ambColorNight = Color.white;
+  public Color sunColorMorning = Color.white;
+  public Color sunColorDay = Color.white;
+  public Color sunColorEvening = Color.white;
+  public Color sunColorNight = Color.white;
+  public Color fogColorMorning = Color.white;
+  public Color fogColorDay = Color.white;
+  public Color fogColorEvening = Color.white;
+  public Color fogColorNight = Color.white;
+  public Color fogColorSunMorning = Color.white;
+  public Color fogColorSunDay = Color.white;
+  public Color fogColorSunEvening = Color.white;
+  public Color fogColorSunNight = Color.white;
   [DefaultValue(0.01f)]
   public float fogDensityMorning = 0.01f;
   [DefaultValue(0.01f)]

@@ -85,8 +85,8 @@ public class WorldManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
-    Configuration.valueWorldData.Value = yaml;
     File.WriteAllText(FilePath, yaml);
+    Configuration.valueWorldData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;

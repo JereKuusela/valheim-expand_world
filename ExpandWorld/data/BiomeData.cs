@@ -21,8 +21,9 @@ public class BiomeData {
   [DefaultValue(0f)]
   public float altitudeDelta = 0f;
   public BiomeEnvironment[] environments = new BiomeEnvironment[0];
-  public Color32 color = new Color32(0, 0, 0, 0);
-  public Color32 mapColor = new Color32(0, 0, 0, 0);
+  public Color paint = new Color(0, 0, 0, 0);
+  public Color color = new Color(0, 0, 0, 0);
+  public Color mapColor = new Color(0, 0, 0, 0);
   [DefaultValue("")]
   public string musicMorning = "morning";
   [DefaultValue("")]

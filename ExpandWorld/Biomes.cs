@@ -14,11 +14,9 @@ public class WorldAngle {
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiomeColor), new[] { typeof(Heightmap.Biome) })]
 public class GetBiomeColor {
   static bool Prefix(Heightmap.Biome biome, ref Color32 __result) {
-    if (BiomeManager.TryGetData(biome, out var data)) {
-      __result = data.color;
-      return false;
-    }
-    return true;
+    if (!BiomeManager.TryGetData(biome, out var data)) return true;
+    __result = data.color;
+    return false;
   }
 }
 
@@ -52,7 +50,7 @@ public class GetBiome {
       if (item.minAltitude > altitude || item.maxAltitude < altitude) continue;
       var mag = magnitude;
       var min = ConvertDist(item.minDistance);
-      if (min > 0 )
+      if (min > 0)
         min += (item.wiggleDistance ? num : 0f);
       var max = ConvertDist(item.maxDistance);
       if (item.curveX != 0f || item.curveY != 0f) {
@@ -82,4 +80,56 @@ public class GetBiome {
     __result = Get(__instance, wx, wy);
     return false;
   }
+}
+
+[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.ApplyModifiers))]
+public class ApplyModifiers {
+
+  static Heightmap.Biome Get(Heightmap __instance, float x, float z) {
+    for (int i = 1; i < Heightmap.tempBiomeWeights.Length; i++) {
+      Heightmap.tempBiomeWeights[i] = 0f;
+    }
+    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[0]] += __instance.Distance(x, z, 0f, 0f);
+    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[1]] += __instance.Distance(x, z, 1f, 0f);
+    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[2]] += __instance.Distance(x, z, 0f, 1f);
+    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[3]] += __instance.Distance(x, z, 1f, 1f);
+    int result = 0;
+    float num = -99999f;
+    for (int j = 1; j < Heightmap.tempBiomeWeights.Length; j++) {
+      if (Heightmap.tempBiomeWeights[j] > num) {
+        result = j;
+        num = Heightmap.tempBiomeWeights[j];
+      }
+    }
+    return (Heightmap.Biome)result;
+  }
+  static void Prefix(Heightmap __instance) {
+    if (__instance.m_isDistantLod) return;
+    var paint = __instance.m_paintMask;
+    var biomes = __instance.m_cornerBiomes;
+    if (biomes[0] == biomes[1] && biomes[0] == biomes[2] && biomes[0] == biomes[3]) {
+      if (!BiomeManager.TryGetData(biomes[0], out var data))
+        return;
+      if (data.paint.Equals(new Color()))
+        return;
+      var pixels = new Color[paint.width * paint.height];
+      for (var i = 0; i < pixels.Length; i++)
+        pixels[i] = data.paint;
+      paint.SetPixels(pixels);
+    } else {
+      var pixels = new Color[paint.width * paint.height];
+      for (var z = 0; z < paint.height; z++) {
+        for (var x = 0; x < paint.width; x++) {
+          var biome = Get(__instance, x, z);
+          if (!BiomeManager.TryGetData(biome, out var data))
+            continue;
+          if (data.paint.Equals(new Color()))
+            continue;
+          pixels[x + z * paint.height] = data.paint;
+        }
+      }
+      paint.SetPixels(pixels);
+    }
+  }
+
 }

@@ -47,8 +47,8 @@ public class EventManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
-    Configuration.valueEventData.Value = yaml;
     File.WriteAllText(FilePath, yaml);
+    Configuration.valueEventData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;

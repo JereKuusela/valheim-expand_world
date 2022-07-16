@@ -81,8 +81,8 @@ public class VegetationManager {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
-    Configuration.valueVegetationData.Value = yaml;
     File.WriteAllText(FilePath, yaml);
+    Configuration.valueVegetationData.Value = yaml;
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
