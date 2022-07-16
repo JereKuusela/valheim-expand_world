@@ -4,7 +4,8 @@ using System.Linq;
 namespace ExpandWorld;
 
 public class EnvironmentManager {
-  public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_environments.yaml");
+  public static string FileName = "expand_environments.yaml";
+  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_environments*.yaml";
   public static Dictionary<string, EnvSetup> Originals = new();
   public static EnvSetup FromData(EnvironmentData data) {
@@ -98,14 +99,14 @@ public class EnvironmentManager {
 
   public static void ToFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEnvironments) return;
-    if (File.Exists(FileName)) return;
+    if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     Configuration.valueEnvironmentData.Value = yaml;
-    File.WriteAllText(FileName, yaml);
+    File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEnvironments) return;
-    if (!File.Exists(FileName)) return;
+    if (!File.Exists(FilePath)) return;
     var yaml = Data.Read(Pattern);
     Configuration.valueEnvironmentData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
@@ -123,7 +124,7 @@ public class EnvironmentManager {
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataEnvironments) return;
     if (Originals.Count == 0) SetOriginals();
-    var data = Data.Deserializer().Deserialize<List<EnvironmentData>>(raw)
+    var data = Data.Deserialize<EnvironmentData>(raw, FileName)
       .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any environment data.");

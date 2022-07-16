@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
 public class SpawnManager {
-  public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_spawns.yaml");
+  public static string FileName = "expand_spawns.yaml";
+  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_spawns*.yaml";
   public static SpawnSystem.SpawnData FromData(SpawnData data) {
     var spawn = new SpawnSystem.SpawnData();
@@ -25,7 +25,7 @@ public class SpawnManager {
     spawn.m_requiredEnvironments = data.requiredEnvironments.ToList();
     spawn.m_groupSizeMin = data.groupSizeMin;
     spawn.m_groupSizeMax = data.groupSizeMax;
-    spawn.m_spawnAtDay= data.spawnAtDay;
+    spawn.m_spawnAtDay = data.spawnAtDay;
     spawn.m_spawnAtNight = data.spawnAtNight;
     spawn.m_groupRadius = data.groupRadius;
     spawn.m_minAltitude = data.minAltitude;
@@ -80,17 +80,17 @@ public class SpawnManager {
 
   public static void ToFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataSpawns) return;
-    if (File.Exists(FileName)) return;
+    if (File.Exists(FilePath)) return;
     var spawnSystem = SpawnSystem.m_instances.FirstOrDefault();
     if (spawnSystem == null) return;
     var spawns = spawnSystem.m_spawnLists.SelectMany(s => s.m_spawners);
     var yaml = Data.Serializer().Serialize(spawns.Select(ToData).ToList());
     Configuration.valueSpawnData.Value = yaml;
-    File.WriteAllText(FileName, yaml);
+    File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    if (!File.Exists(FileName)) return;
+    if (!File.Exists(FilePath)) return;
     var yaml = Data.Read(Pattern);
     Configuration.valueSpawnData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
@@ -100,7 +100,7 @@ public class SpawnManager {
   }
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataSpawns) return;
-    var data = Data.Deserializer().Deserialize<List<SpawnData>>(raw)
+    var data = Data.Deserialize<SpawnData>(raw, FileName)
       .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any spawn data.");

@@ -4,9 +4,10 @@ using System.Linq;
 namespace ExpandWorld;
 
 public class BiomeManager {
-  public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_biomes.yaml");
+  public static string FileName = "expand_biomes.yaml";
+  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_biomes*.yaml";
-  
+
   public static EnvEntry FromData(BiomeEnvironment data) {
     EnvEntry env = new();
     env.m_environment = data.environment;
@@ -66,14 +67,14 @@ public class BiomeManager {
 
   public static void ToFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    if (File.Exists(FileName)) return;
+    if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     Configuration.valueBiomeData.Value = yaml;
-    File.WriteAllText(FileName, yaml);
+    File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    if (!File.Exists(FileName)) return;
+    if (!File.Exists(FilePath)) return;
     var yaml = Data.Read(Pattern);
     Configuration.valueBiomeData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
@@ -84,7 +85,7 @@ public class BiomeManager {
   public static bool BiomeForestMultiplier = false;
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataBiome) return;
-    var rawData = Data.Deserializer().Deserialize<List<BiomeData>>(raw);
+    var rawData = Data.Deserialize<BiomeData>(raw, FileName);
     if (rawData.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
       return;
@@ -107,7 +108,7 @@ public class BiomeManager {
       biomeNumber *= 2;
     }
     BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
-    BiomeToTerrain =rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+    BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
       if (NameToBiome.TryGetValue(data.terrain, out var terrain))
         return terrain;
       return NameToBiome[data.biome];

@@ -80,8 +80,23 @@ public class Data : MonoBehaviour {
   }
   public static IDeserializer Deserializer() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance)
     .WithTypeConverter(new FloatConverter()).Build();
+  public static IDeserializer DeserializerUnSafe() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance)
+  .WithTypeConverter(new FloatConverter()).IgnoreUnmatchedProperties().Build();
   public static ISerializer Serializer() => new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).DisableAliases()
     .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults).WithTypeConverter(new FloatConverter()).Build();
+
+  public static List<T> Deserialize<T>(string raw, string fileName) {
+    try {
+      return Deserializer().Deserialize<List<T>>(raw);
+    } catch (Exception ex1) {
+      ExpandWorld.Log.LogError($"{fileName}: {ex1.Message}");
+      try {
+        return DeserializerUnSafe().Deserialize<List<T>>(raw);
+      } catch (Exception) {
+        return new();
+      }
+    }
+  }
 
   public static string[] FromBiomes(Heightmap.Biome biome) {
     List<string> biomes = new();

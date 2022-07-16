@@ -458,6 +458,11 @@ Copy-paste plains entry and change the top one:
 
 # Changelog
 
+- v1.2
+	- WARNING: May contain breaking changes.
+  - Adds some error handling to allow partially loading the data.
+	- Fixes `Altitude multiplier` multiplying biome specific `Altitude delta`. If you have used both, multiply the biome specific delta in the yaml file.
+
 - v1.1
 	- WARNING: Contains breaking changes for existing configs.
 

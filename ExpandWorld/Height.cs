@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
 using HarmonyLib;
 
 namespace ExpandWorld;
@@ -47,11 +45,11 @@ public class BiomeHeight {
   static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result) {
     if (__instance.m_world.m_menu) return;
     var waterLevel = Configuration.WaterLevel;
-    if (BiomeManager.TryGetData(__state, out var data)) {
+    if (BiomeManager.TryGetData(__state, out var data))
       __result = waterLevel + (__result - waterLevel) * data.altitudeMultiplier;
-      __result += data.altitudeDelta;
-    }
     __result = waterLevel + (__result - waterLevel) * Configuration.AltitudeMultiplier;
     __result += Configuration.AltitudeDelta;
+    if (data != null)
+      __result += data.altitudeDelta;
   }
 }

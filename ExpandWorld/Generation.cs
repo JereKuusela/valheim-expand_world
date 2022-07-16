@@ -1,7 +1,7 @@
 
+using System;
 using System.Collections;
 using System.Diagnostics;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using HarmonyLib;
@@ -36,7 +36,7 @@ public class Generate {
       else
         WorldGenerator.instance?.Pregenerate();
       MapOnly = true;
-    } 
+    }
   }
 }
 
@@ -46,7 +46,7 @@ public class LocationGeneration {
   static void Prefix() {
     if (!WorldGeneration.HasLoaded) {
       Generate.Cancel();
-      ZLog.Log($"Started world generation.");
+      ExpandWorld.Log.LogInfo("Started world generation.");
       var stopwatch = Stopwatch.StartNew();
       var wg = WorldGenerator.instance;
       wg.m_riverPoints.Clear();
@@ -55,7 +55,7 @@ public class LocationGeneration {
       wg.FindLakes();
       wg.m_rivers = wg.PlaceRivers();
       wg.m_streams = wg.PlaceStreams();
-      ZLog.Log($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+      ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
       stopwatch.Stop();
       WorldGeneration.HasLoaded = true;
       if (Minimap.instance && ZNet.instance && !ZNet.instance.IsDedicated())
@@ -74,7 +74,7 @@ public class WorldGeneration {
   }
   public static void Cancel() {
     if (CTS != null) {
-      ZLog.Log("Cancelling previous world generation.");
+      ExpandWorld.Log.LogInfo("Cancelling previous world generation.");
       CTS.Cancel();
       CTS = null;
     }
@@ -86,7 +86,7 @@ public class WorldGeneration {
     Cancel();
     MapGeneration.Cancel();
 
-    ZLog.Log($"Started world generation.");
+    ExpandWorld.Log.LogInfo($"Started world generation.");
     var stopwatch = Stopwatch.StartNew();
 
     CancellationTokenSource cts = new();
@@ -95,7 +95,7 @@ public class WorldGeneration {
     CTS = cts;
     wg.m_riverPoints.Clear();
     wg.m_cachedRiverGrid = new Vector2i(-999999, -999999);
-		wg.m_cachedRiverPoints = null;
+    wg.m_cachedRiverPoints = null;
     wg.FindLakes();
     if (ct.IsCancellationRequested)
       yield break;
@@ -122,7 +122,7 @@ public class WorldGeneration {
       yield break;
     yield return null;
     HasLoaded = true;
-    ZLog.Log($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+    ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
     stopwatch.Stop();
     cts.Dispose();
 
@@ -150,7 +150,7 @@ public class MapGeneration {
   }
   public static void Cancel() {
     if (CTS != null) {
-      ZLog.Log($"Cancelling previous map generation.");
+      ExpandWorld.Log.LogInfo($"Cancelling previous map generation.");
       CTS.Cancel();
       CTS = null;
     }
@@ -183,7 +183,7 @@ public class MapGeneration {
   static IEnumerator Coroutine(Minimap map) {
     Cancel();
 
-    ZLog.Log($"Starting map generation.");
+    ExpandWorld.Log.LogInfo($"Starting map generation.");
     Stopwatch stopwatch = Stopwatch.StartNew();
 
     int size = map.m_textureSize * map.m_textureSize;
@@ -198,9 +198,9 @@ public class MapGeneration {
     CTS = cts;
     while (!task.IsCompleted)
       yield return null;
-    
+
     if (task.IsFaulted)
-      ZLog.LogError($"Map generation failed!\n{task.Exception}");
+      ExpandWorld.Log.LogError($"Map generation failed!\n{task.Exception}");
     else if (!ct.IsCancellationRequested) {
       map.m_mapTexture.SetPixels32(mapTexture);
       yield return null;
@@ -215,12 +215,12 @@ public class MapGeneration {
       map.m_heightTexture.SetPixels(heightTexture);
       yield return null;
       map.m_heightTexture.Apply();
-      yield return null; 
+      yield return null;
       // Some map mods may do stuff after generation which won't work with async.
       // So do one "fake" generate call to trigger those.
       DoFakeGenerate = true;
       map.GenerateWorldMap();
-      ZLog.Log($"Map generation finished ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+      ExpandWorld.Log.LogInfo($"Map generation finished ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
     }
     stopwatch.Stop();
     cts.Dispose();
@@ -301,7 +301,7 @@ public class MapGeneration {
     if (height < Configuration.WaterLevel) {
       return NoForestColor;
     }
-    
+
     return terrain switch
     {
       Heightmap.Biome.Meadows => GetForestFactor(biome, wx, wy) < 1.15f ? ForestColor : NoForestColor,

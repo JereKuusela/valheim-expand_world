@@ -4,7 +4,8 @@ using System.Linq;
 namespace ExpandWorld;
 
 public class WorldManager {
-  public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_world.yaml");
+  public static string FileName = "expand_world.yaml";
+  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_world*.yaml";
   public static List<WorldData> GetDefault() {
     return new() {
@@ -82,14 +83,14 @@ public class WorldManager {
 
   public static void ToFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
-    if (File.Exists(FileName)) return;
+    if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
     Configuration.valueWorldData.Value = yaml;
-    File.WriteAllText(FileName, yaml);
+    File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
-    if (!File.Exists(FileName)) return;
+    if (!File.Exists(FilePath)) return;
     var yaml = Data.Read(Pattern);
     Configuration.valueWorldData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
@@ -99,7 +100,7 @@ public class WorldManager {
   }
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataWorld) return;
-    var data = Data.Deserializer().Deserialize<List<WorldData>>(raw)
+    var data = Data.Deserialize<WorldData>(raw, FileName)
       .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any world data.");

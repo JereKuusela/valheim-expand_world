@@ -7,7 +7,8 @@ namespace ExpandWorld;
 
 [HarmonyPatch]
 public class ClutterManager {
-  public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_clutter.yaml");
+  public static string FileName = "expand_clutter.yaml";
+  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_clutter*.yaml";
   private static Dictionary<string, GameObject> Prefabs = new();
   [HarmonyPatch(typeof(ClutterSystem), nameof(ClutterSystem.Awake)), HarmonyPriority(Priority.VeryLow), HarmonyFinalizer]
@@ -96,7 +97,7 @@ public class ClutterManager {
   }
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataClutter) return;
-    var data = Data.Deserializer().Deserialize<List<ClutterData>>(raw)
+    var data = Data.Deserialize<ClutterData>(raw, FileName)
       .Select(FromData).Where(clutter => clutter.m_prefab).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any clutter data.");

@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
 public class EventManager {
-  public static string FileName = Path.Combine(ExpandWorld.ConfigPath, "expand_events.yaml");
+  public static string FileName = "expand_events.yaml";
+  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_events*.yaml";
   public static RandomEvent FromData(EventData data) {
     var random = new RandomEvent();
@@ -45,14 +45,14 @@ public class EventManager {
 
   public static void ToFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
-    if (File.Exists(FileName)) return;
+    if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
     Configuration.valueEventData.Value = yaml;
-    File.WriteAllText(FileName, yaml);
+    File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile() {
     if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
-    if (!File.Exists(FileName)) return;
+    if (!File.Exists(FilePath)) return;
     var yaml = Data.Read(Pattern);
     Configuration.valueEventData.Value = yaml;
     if (Data.IsLoading) Set(yaml);
@@ -62,7 +62,7 @@ public class EventManager {
   }
   private static void Set(string raw) {
     if (raw == "" || !Configuration.DataEvents) return;
-    var data = Data.Deserializer().Deserialize<List<EventData>>(raw)
+    var data = Data.Deserialize<EventData>(raw, FileName)
     .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any event data.");
