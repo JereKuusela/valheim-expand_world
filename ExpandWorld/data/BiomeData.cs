@@ -23,6 +23,8 @@ public class BiomeData {
   public BiomeEnvironment[] environments = new BiomeEnvironment[0];
   public Color paint = new Color(0, 0, 0, 0);
   public Color color = new Color(0, 0, 0, 0);
+  [DefaultValue(1f)]
+  public float mapColorMultiplier = 1f;
   public Color mapColor = new Color(0, 0, 0, 0);
   [DefaultValue("")]
   public string musicMorning = "morning";

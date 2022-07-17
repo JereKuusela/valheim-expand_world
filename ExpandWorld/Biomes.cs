@@ -67,7 +67,7 @@ public class GetBiome {
       var angleOk = min > max ? (angle >= min || angle < max) : angle >= min && angle < max;
       if (!angleOk) continue;
       var seed = item.seed ?? GetOffset(obj, item._biome);
-      if (item.amount < 1f && Mathf.PerlinNoise((seed + bx) * 0.001f, (seed + by) * 0.001f) < 1 - item.amount) continue;
+      if (item.amount < 1f && Mathf.PerlinNoise((seed + bx / item.stretch) * 0.001f, (seed + by / item.stretch) * 0.001f) < 1 - item.amount) continue;
       return item._biome;
     }
     return Heightmap.Biome.Ocean;

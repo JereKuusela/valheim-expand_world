@@ -24,6 +24,8 @@ public class WorldData {
   public float curveY = 0f;
   [DefaultValue(1f)]
   public float amount = 1f;
+  [DefaultValue(1f)]
+  public float stretch = 1f;
   [DefaultValue(null)]
   public int? seed = null;
   [DefaultValue(true)]

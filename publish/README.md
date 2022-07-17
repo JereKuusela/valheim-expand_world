@@ -123,8 +123,9 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - altitudeMultiplier: Multiplier to the terrain altitude (relative to the water level).
 - forestMultiplier: Multiplier to the global forest multiplier. Using this requires an extra biome check which will lower the performance.
 - environments: List of available environments (weathers) and their relative chances.
-- paint: Default terrain paint. r = dirt, g = cultivated, b = paved, a = does nothing.
+- paint: Default terrain paint. r = dirt, g = cultivated, b = paved, a = does nothing. Values from 0.0 to 1.0.
 - color: Terrain style. Not fully sure how this works but the color value somehow determines which default biome terrain style to use.
+- mapColorMultiplier (default: `1.0`): Changes how quickly the terrain altitude affects the map color. Increasing the value can be useful for low altitude biomes to show the altitude differences better. Lowering the value can be useful for high altitude biomes to reduce amount of white color (from mountain altitudes). Negative value can be useful for underwater biomes to show the map color (normally all underwater areas get blueish color).
 - mapColor: Color in the minimap (red, green, blue, alpha).
 - musicMorning: Music override for the morning time.
 - musicDay: Music override for the day time.
@@ -147,6 +148,7 @@ Each entry in the file adds a new rule. When determing the biome, the rules are 
 - curveX (default: `0.0` of world radius): Moves the distance center point away from the world center.
 - curveY (default: `0.0` of world radius): Moves the distance center point away from the world center.
 - amount (default: `1.0` of total area): How much of the valid area is randomly filled with this biome.
+- stretch (default: `1.0`): Same as the `Stretch biomes` setting but applied just to a single entry. Multiplies the size of biome areas (average total area stays the same). 
 - seed (default: ` `): Overrides the random outcome of `amount`. By default derived from the world seed.
 - wiggleDistance (default: `true`): Applies "wiggle" to the `minDistance`.
 - wiggleSector (default: `true`): Applies "wiggle" to the `maxSector` and `minSector`.
@@ -460,9 +462,11 @@ Copy-paste plains entry and change the top one:
 # Changelog
 
 - v1.2
-	- WARNING: May contain breaking changes.
+	- WARNING: Breaking changes.
   - Adds some error handling to allow partially loading the data.
-  - Adds a new field `terrain` to the `expand_biomes.yaml` to set the default terrain paint.
+  - Adds a new field `paint` to the `expand_biomes.yaml` to set the default terrain paint.
+  - Adds a new field `mapColorMultiplier` to the `expand_biomes.yaml` to allow tweaking the height color.
+  - Adds a new field `stretch` to the `expand_world.yaml` to stretch individual biomes.
   - Changes the color format of `expand_biomes.yaml` to be from 0.0 to 1.0 (instead of from 0 to 255). Regenerate the file or fix colors manually.
 	- Fixes `Altitude multiplier` multiplying biome specific `Altitude delta`. If you have used both, multiply the biome specific delta in the yaml file.
 

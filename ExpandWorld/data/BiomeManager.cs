@@ -62,6 +62,8 @@ public class BiomeManager {
     data.musicNight = biome.m_musicNight;
     data.color = Heightmap.GetBiomeColor(biome.m_biome);
     data.mapColor = MapGeneration.GetPixelColor32(biome.m_biome);
+    // Reduces the mountains on the map.
+    data.mapColorMultiplier = biome.m_biome == Heightmap.Biome.AshLands ? 0.5f : 1f;
     return data;
   }
 
