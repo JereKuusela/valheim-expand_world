@@ -64,10 +64,13 @@ public class HandleSpawnData {
 
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.UpdateSpawning))]
 public class Spawn_WaitForConfigSync {
-  static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
+  static bool Prefix() => Data.IsReady;
 }
 public class Data : MonoBehaviour {
   public static bool IsLoading = false;
+  public static bool IsReady => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
+  public static bool BiomesLoaded = false;
+
   public static void SetupWatcher(string pattern, Action action) {
     FileSystemWatcher watcher = new(ExpandWorld.ConfigPath, pattern);
     watcher.Created += (s, e) => action();
@@ -160,6 +163,20 @@ public class Data : MonoBehaviour {
     var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name => File.ReadAllText(name));
     return string.Join("\n", data);
   }
+  public static void Sanity(ref Color color) {
+    if (color.r > 1.0f) color.r /= 255f;
+    if (color.g > 1.0f) color.g /= 255f;
+    if (color.b > 1.0f) color.b /= 255f;
+    if (color.a > 1.0f) color.a /= 255f;
+  }
+  public static Color Sanity(Color color) {
+    if (color.r > 1.0f) color.r /= 255f;
+    if (color.g > 1.0f) color.g /= 255f;
+    if (color.b > 1.0f) color.b /= 255f;
+    if (color.a > 1.0f) color.a /= 255f;
+    return color;
+  }
+
 }
 #nullable disable
 public class FloatConverter : IYamlTypeConverter {

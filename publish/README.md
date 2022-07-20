@@ -4,7 +4,7 @@ This mod allows adding new biomes and changing most of the world generation.
 
 Always back up your world before making any changes!
 
-Must be installed on all clients and on the server.
+Install on all clients and on the server.
 
 Check any modding [guide](https://youtu.be/WfvA5a5tNHo) if you don't know how.
 
@@ -469,6 +469,7 @@ Copy-paste plains entry and change the top one:
   - Adds a new field `stretch` to the `expand_world.yaml` to stretch individual biomes.
   - Changes the color format of `expand_biomes.yaml` to be from 0.0 to 1.0 (instead of from 0 to 255). Regenerate the file or fix colors manually.
 	- Fixes `Altitude multiplier` multiplying biome specific `Altitude delta`. If you have used both, multiply the biome specific delta in the yaml file.
+	- Fixes wrong water level for the clutter system.
 
 - v1.1
 	- WARNING: Contains breaking changes for existing configs.

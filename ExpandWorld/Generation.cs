@@ -12,7 +12,6 @@ namespace ExpandWorld;
 public class Generate {
   public static int LastTaskIndex = 0;
   public static bool Generating => WorldGeneration.Generating || MapGeneration.Generating;
-
   private static float Debouncer = 10f;
   public static void World() {
     Debouncer = 0f;
@@ -343,6 +342,7 @@ public class FindSpawnPoint {
 public class CancelOnLogout {
   static void Prefix() {
     Generate.Cancel();
+    Data.BiomesLoaded = false;
     WorldGeneration.HasLoaded = false;
   }
 }

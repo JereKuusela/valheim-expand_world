@@ -37,5 +37,5 @@ public class InitializeWhenDimensionsChange {
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
 public class Map_WaitForConfigSync {
-  static bool Prefix() => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
+  static bool Prefix() => Data.IsReady;
 }

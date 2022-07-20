@@ -6,11 +6,12 @@ using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
+[BepInDependency(SpawnThatPatcher.GUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(GUID, NAME, VERSION)]
 public class ExpandWorld : BaseUnityPlugin {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.2";
+  public const string VERSION = "1.1.1";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -42,6 +43,9 @@ public class ExpandWorld : BaseUnityPlugin {
     WorldManager.SetupWatcher();
     ClutterManager.SetupWatcher();
     EnvironmentManager.SetupWatcher();
+  }
+  public void Start() {
+    //SpawnThatPatcher.Run();
   }
   public void LateUpdate() {
     Generate.CheckRegen(Time.deltaTime);

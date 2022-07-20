@@ -1,12 +1,10 @@
-using System.Collections.Generic;
 using BepInEx.Configuration;
-using ServerSync;
 using Service;
 
 namespace ExpandWorld;
 public partial class Configuration {
 #nullable disable
-public static ConfigEntry<bool> configRivers;
+  public static ConfigEntry<bool> configRivers;
   public static bool Rivers => configRivers.Value;
   public static ConfigEntry<bool> configStreams;
   public static bool Streams => configStreams.Value;
@@ -40,7 +38,7 @@ public static ConfigEntry<bool> configRivers;
   public static float RiverCurveWidth => ConfigWrapper.Floats[configRiverCurveWidth];
   public static ConfigEntry<string> configRiverCurveWaveLength;
   public static float RiverCurveWaveLength => ConfigWrapper.Floats[configRiverCurveWaveLength];
-  
+
   public static ConfigEntry<string> configStreamSeed;
   public static int? StreamSeed => ConfigWrapper.Ints[configStreamSeed];
   public static ConfigEntry<string> configStreamMaxAmount;
@@ -77,7 +75,7 @@ public static ConfigEntry<bool> configRivers;
       WaterHelper.SetLevel(ClutterSystem.instance);
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetLevel(obj);
     };
-        configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, true, "Multiplies the wave size.");
+    configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, true, "Multiplies the wave size.");
     configWaveMultiplier.SettingChanged += (s, e) => {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };
@@ -97,7 +95,7 @@ public static ConfigEntry<bool> configRivers;
     configRiverMinWidth = wrapper.BindFloat(section, "River min width", 60f, true, "How deep the lake.");
     configRiverMaxWidth = wrapper.BindFloat(section, "River max width", 100f, true, "How deep the lake.");
     configRiverSeed = wrapper.BindInt(section, "River seed", null, true);
-    
+
     configStreams = wrapper.Bind(section, "Streams", true, true, "Enables streams.");
     configStreamSeed = wrapper.BindInt(section, "Stream seed", null, true);
     configStreamMaxAmount = wrapper.BindInt(section, "Stream max amount", 3000, true);

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
@@ -25,7 +23,7 @@ public class WaterHelper {
     if (obj != null) obj.m_waterLevel = Configuration.WaterLevel;
   }
   public static void SetLevel(ClutterSystem obj) {
-    if (obj != null) obj.m_waterLevel = Configuration.WaterLevel - 3f;
+    if (obj != null) obj.m_waterLevel = Configuration.WaterLevel;
   }
   private static Vector3 OriginalScale = Vector3.zero;
   public static void SetWaveSize(WaterVolume obj) {

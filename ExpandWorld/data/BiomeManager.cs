@@ -97,15 +97,20 @@ public class BiomeManager {
     NameToBiome = DefaultNameToBiome.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
     foreach (var biome in rawData) {
+      biome.biome = biome.biome.ToLower();
+      biome.terrain = biome.terrain.ToLower();
+      Data.Sanity(ref biome.mapColor);
+      Data.Sanity(ref biome.color);
+      Data.Sanity(ref biome.paint);
       if (biome.name != "") {
         var key = "biome_" + ((Heightmap.Biome)biomeNumber).ToString().ToLower();
         Localization.instance.m_translations[key] = biome.name;
       }
-      if (NameToBiome.ContainsKey(biome.biome.ToLower())) {
-        BiomeToData[NameToBiome[biome.biome.ToLower()]] = biome;
+      if (NameToBiome.ContainsKey(biome.biome)) {
+        BiomeToData[NameToBiome[biome.biome]] = biome;
         continue;
       }
-      NameToBiome.Add(biome.biome.ToLower(), (Heightmap.Biome)biomeNumber);
+      NameToBiome.Add(biome.biome, (Heightmap.Biome)biomeNumber);
       BiomeToData[(Heightmap.Biome)biomeNumber] = biome;
       biomeNumber *= 2;
     }
@@ -126,6 +131,8 @@ public class BiomeManager {
     EnvMan.instance.m_environmentPeriod = -1;
     EnvMan.instance.m_firstEnv = true;
     Generate.World();
+    Data.BiomesLoaded = true;
+    //SpawnThatPatcher.InitConfiguration();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

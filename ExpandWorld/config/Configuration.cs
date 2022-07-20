@@ -1,7 +1,7 @@
 using BepInEx.Configuration;
 using ServerSync;
-using UnityEngine;
 using Service;
+using UnityEngine;
 
 namespace ExpandWorld;
 public partial class Configuration {
@@ -79,7 +79,7 @@ public partial class Configuration {
   public static ConfigEntry<string> configHeightSeed;
   public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
 
-  #nullable enable
+#nullable enable
   public static void Init(ConfigWrapper wrapper) {
     var section = "1. General";
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, true, "Radius of the world in meters (excluding the edge).");
@@ -104,14 +104,14 @@ public partial class Configuration {
       Generate.Map();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
-    configWorldStretch.SettingChanged += (s,e) => {
+    configWorldStretch.SettingChanged += (s, e) => {
       WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
     };
     WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
 
     section = "2. Features";
-    
+
     configForestMultiplier = wrapper.BindFloat(section, "Forest multiplier", 1f, true, "Multiplies the amount of forest.");
     configBaseAltitudeMultiplier = wrapper.BindFloat(section, "Base altitude multiplier", 1f, true, "Multiplies the base altitude.");
     configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, true, "Multiplies the biome altitude.");
