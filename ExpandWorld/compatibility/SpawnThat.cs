@@ -12,8 +12,6 @@ public class SpawnThatPatcher {
     var type = SpawnThat.GetType("SpawnThat.Lifecycle.LifecycleManager");
     if (IsSingleplayerDelayed)
       Call(type, "InitSingleplayer");
-    if (IsMultiplayerDelayed)
-      Call(type, "InitMultiplayer");
     if (IsDedicatedDelayed)
       Call(type, "InitDedicated");
   }
@@ -26,7 +24,6 @@ public class SpawnThatPatcher {
     Configuration.configDataSpawns.Value = false;
     Harmony harmony = new("expand_world.spawn_that");
     PatchSingleplayer(harmony, SpawnThat);
-    PatchMultiplayer(harmony, SpawnThat);
     PatchDedicated(harmony, SpawnThat);
   }
   private static void PatchSingleplayer(Harmony harmony, Assembly assembly) {
@@ -37,16 +34,6 @@ public class SpawnThatPatcher {
     }
     ExpandWorld.Log.LogInfo("\"Spawn That\" detected. Patching \"InitSingleplayer\" for biome compatibility.");
     var mPrefix = SymbolExtensions.GetMethodInfo(() => SingleplayerPrefix());
-    harmony.Patch(mOriginal, new(mPrefix));
-  }
-  private static void PatchMultiplayer(Harmony harmony, Assembly assembly) {
-    var mOriginal = AccessTools.Method(assembly.GetType("SpawnThat.Lifecycle.LifecycleManager"), "InitMultiplayer");
-    if (mOriginal == null) {
-      ExpandWorld.Log.LogWarning("\"Spawn That\" detected. Unable to patch \"InitMultiplayer\" for biome compatibility.");
-      return;
-    }
-    ExpandWorld.Log.LogInfo("\"Spawn That\" detected. Patching \"InitMultiplayer\" for biome compatibility.");
-    var mPrefix = SymbolExtensions.GetMethodInfo(() => MultiplayerPrefix());
     harmony.Patch(mOriginal, new(mPrefix));
   }
   private static void PatchDedicated(Harmony harmony, Assembly assembly) {
@@ -64,11 +51,6 @@ public class SpawnThatPatcher {
     IsSingleplayerDelayed = !Data.BiomesLoaded;
     return Data.BiomesLoaded;
   }
-  private static bool IsMultiplayerDelayed = false;
-  static bool MultiplayerPrefix() {
-    IsMultiplayerDelayed = !Data.BiomesLoaded;
-    return Data.BiomesLoaded;
-  }
   private static bool IsDedicatedDelayed = false;
   static bool DedicatedPrefix() {
     IsDedicatedDelayed = !Data.BiomesLoaded;
@@ -77,7 +59,6 @@ public class SpawnThatPatcher {
   [HarmonyPatch(typeof(Game), nameof(Game.Logout)), HarmonyPrefix]
   static void CleanUp() {
     IsSingleplayerDelayed = false;
-    IsMultiplayerDelayed = false;
     IsDedicatedDelayed = false;
   }
 }

@@ -467,6 +467,7 @@ Copy-paste plains entry and change the top one:
   - Adds a new field `paint` to the `expand_biomes.yaml` to set the default terrain paint.
   - Adds a new field `mapColorMultiplier` to the `expand_biomes.yaml` to allow tweaking the height color.
   - Adds a new field `stretch` to the `expand_world.yaml` to stretch individual biomes.
+  - Adds compatibility with Spawn That mod.
   - Changes the color format of `expand_biomes.yaml` to be from 0.0 to 1.0 (instead of from 0 to 255). Regenerate the file or fix colors manually.
 	- Fixes `Altitude multiplier` multiplying biome specific `Altitude delta`. If you have used both, multiply the biome specific delta in the yaml file.
 	- Fixes wrong water level for the clutter system.

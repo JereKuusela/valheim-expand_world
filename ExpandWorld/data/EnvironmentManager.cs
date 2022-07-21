@@ -105,11 +105,10 @@ public class EnvironmentManager {
     Configuration.valueEnvironmentData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataEnvironments) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataEnvironments ? Data.Read(Pattern) : "";
     Configuration.valueEnvironmentData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
 
   public static void SetOriginals() {
@@ -118,13 +117,13 @@ public class EnvironmentManager {
       .Append(EnvMan.instance.m_environments)
       .SelectMany(list => list).ToDictionary(env => env.m_name, env => env);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataEnvironments) return;
+  private static void Set(string yaml) {
+    if (yaml == "" || !Configuration.DataEnvironments) return;
     if (Originals.Count == 0) SetOriginals();
-    var data = Data.Deserialize<EnvironmentData>(raw, FileName)
+    var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
       .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any environment data.");

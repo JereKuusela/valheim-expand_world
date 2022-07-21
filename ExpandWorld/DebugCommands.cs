@@ -34,5 +34,8 @@ public class DebugCommands {
       }
       args.Context.AddString($"Found {WorldGenerator.instance.m_streams.Count} streams.");
     }, true);
+    new Terminal.ConsoleCommand("debug_spawns", "Forces spawn file creation.", (args) => {
+      SpawnManager.Save();
+    }, true);
   }
 }

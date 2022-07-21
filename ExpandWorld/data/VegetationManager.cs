@@ -85,18 +85,17 @@ public class VegetationManager {
     Configuration.valueVegetationData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataVegetation ? Data.Read(Pattern) : "";
     Configuration.valueVegetationData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataVegetation) return;
-    var data = Data.Deserialize<VegetationData>(raw, FileName)
+  private static void Set(string yaml) {
+    if (yaml == "" || !Configuration.DataVegetation) return;
+    var data = Data.Deserialize<VegetationData>(yaml, FileName)
     .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any vegetation data.");
@@ -106,8 +105,7 @@ public class VegetationManager {
     foreach (var list in LocationList.m_allLocationLists)
       list.m_vegetation.Clear();
     ZoneSystem.instance.m_vegetation = data;
-    if (!Data.IsLoading)
-      ZoneSystem.instance.ValidateVegetation();
+    ZoneSystem.instance.ValidateVegetation();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

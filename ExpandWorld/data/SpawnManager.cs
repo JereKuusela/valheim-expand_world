@@ -77,30 +77,32 @@ public class SpawnManager {
     data.levelUpMinCenterDistance = spawn.m_levelUpMinCenterDistance;
     return data;
   }
-
-  public static void ToFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataSpawns) return;
-    if (File.Exists(FilePath)) return;
+  public static string Save() {
     var spawnSystem = SpawnSystem.m_instances.FirstOrDefault();
-    if (spawnSystem == null) return;
+    if (spawnSystem == null) return "";
     var spawns = spawnSystem.m_spawnLists.SelectMany(s => s.m_spawners);
     var yaml = Data.Serializer().Serialize(spawns.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
+    return yaml;
+  }
+  public static void ToFile() {
+    if (!ZNet.instance.IsServer() || !Configuration.DataSpawns) return;
+    if (File.Exists(FilePath)) return;
+    var yaml = Save();
     Configuration.valueSpawnData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataBiome ? Data.Read(Pattern) : "";
     Configuration.valueSpawnData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataSpawns) return;
-    var data = Data.Deserialize<SpawnData>(raw, FileName)
+  private static void Set(string yaml) {
+    if (yaml == "" || !Configuration.DataSpawns) return;
+    var data = Data.Deserialize<SpawnData>(yaml, FileName)
       .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any spawn data.");

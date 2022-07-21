@@ -86,18 +86,17 @@ public class ClutterManager {
     Configuration.valueClutterData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataClutter) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataClutter ? Data.Read(Pattern) : "";
     Configuration.valueClutterData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataClutter) return;
-    var data = Data.Deserialize<ClutterData>(raw, FileName)
+  private static void Set(string yaml) {
+    if (yaml == "" || !Configuration.DataClutter) return;
+    var data = Data.Deserialize<ClutterData>(yaml, FileName)
       .Select(FromData).Where(clutter => clutter.m_prefab).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any clutter data.");

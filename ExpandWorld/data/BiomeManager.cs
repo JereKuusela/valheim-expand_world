@@ -33,7 +33,7 @@ public class BiomeManager {
     { "mistlands", Heightmap.Biome.Mistlands},
   };
   private static Dictionary<string, Heightmap.Biome> NameToBiome = DefaultNameToBiome;
-  private static Dictionary<Heightmap.Biome, string> BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+  public static Dictionary<Heightmap.Biome, string> BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
@@ -75,19 +75,18 @@ public class BiomeManager {
     Configuration.valueBiomeData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataBiome) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataBiome ? Data.Read(Pattern) : "";
     Configuration.valueBiomeData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
   public static bool BiomeForestMultiplier = false;
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataBiome) return;
-    var rawData = Data.Deserialize<BiomeData>(raw, FileName);
+  private static void Load(string yaml) {
+    if (yaml == "" || !Configuration.DataBiome) return;
+    var rawData = Data.Deserialize<BiomeData>(yaml, FileName);
     if (rawData.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
       return;
@@ -131,8 +130,12 @@ public class BiomeManager {
     EnvMan.instance.m_environmentPeriod = -1;
     EnvMan.instance.m_firstEnv = true;
     Generate.World();
+  }
+  private static void Set(string yaml) {
+    Load(yaml);
     Data.BiomesLoaded = true;
-    //SpawnThatPatcher.InitConfiguration();
+    SpawnThatPatcher.InitConfiguration();
+
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

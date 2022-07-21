@@ -45,7 +45,7 @@ public class ExpandWorld : BaseUnityPlugin {
     EnvironmentManager.SetupWatcher();
   }
   public void Start() {
-    //SpawnThatPatcher.Run();
+    SpawnThatPatcher.Run();
   }
   public void LateUpdate() {
     Generate.CheckRegen(Time.deltaTime);

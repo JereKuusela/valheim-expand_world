@@ -18,7 +18,6 @@ public class LoadData {
   static void Prefix() {
     EnvironmentManager.SetOriginals();
     if (!ZNet.instance.IsServer()) return;
-    Data.IsLoading = true;
     EnvironmentManager.FromFile();
     BiomeManager.FromFile();
     WorldManager.FromFile();
@@ -27,7 +26,6 @@ public class LoadData {
     EventManager.FromFile();
     SpawnManager.FromFile();
     ClutterManager.FromFile();
-    Data.IsLoading = false;
   }
 }
 
@@ -42,7 +40,7 @@ public class SaveData {
     EventManager.ToFile();
     EnvironmentManager.ToFile();
     ClutterManager.ToFile();
-    // Spawn data handle elsewhere.
+    // Spawn data handled elsewhere.
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]
@@ -67,7 +65,6 @@ public class Spawn_WaitForConfigSync {
   static bool Prefix() => Data.IsReady;
 }
 public class Data : MonoBehaviour {
-  public static bool IsLoading = false;
   public static bool IsReady => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
   public static bool BiomesLoaded = false;
 

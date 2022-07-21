@@ -89,18 +89,17 @@ public class WorldManager {
     Configuration.valueWorldData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataWorld) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataWorld ? Data.Read(Pattern) : "";
     Configuration.valueWorldData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataWorld) return;
-    var data = Data.Deserialize<WorldData>(raw, FileName)
+  private static void Set(string yaml) {
+    if (yaml == "" || !Configuration.DataWorld) return;
+    var data = Data.Deserialize<WorldData>(yaml, FileName)
       .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any world data.");

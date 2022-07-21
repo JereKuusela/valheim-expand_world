@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
@@ -135,32 +132,4 @@ public class ApplyModifiers {
     }
   }
 
-}
-
-
-[HarmonyPatch]
-public class TryParse {
-  static IEnumerable<MethodBase> TargetMethods() {
-    return typeof(Enum).GetMethods()
-        .Where(method => method.Name.StartsWith("TryParse"))
-        .Select(method => method.MakeGenericMethod(typeof(Heightmap.Biome)))
-        .Cast<MethodBase>();
-  }
-  static bool Prefixaa(object[] __args, MethodBase __originalMethod, ref bool __result) {
-    var type = __originalMethod.GetGenericArguments().First();
-    if (type == typeof(Heightmap.Biome))
-      ExpandWorld.Log.LogWarning("BIOME FOUND");
-    var parameters = __originalMethod.GetParameters();
-    return true;
-  }
-  static bool Prefix(string value, ref Heightmap.Biome result, ref bool __result) {
-    var biome = Heightmap.Biome.None;
-    __result = BiomeManager.TryGetBiome(value, out biome);
-    ExpandWorld.Log.LogWarning(value);
-    ExpandWorld.Log.LogWarning(__result);
-    ExpandWorld.Log.LogWarning(biome);
-    if (__result)
-      result = biome;
-    return false;
-  }
 }

@@ -51,18 +51,17 @@ public class EventManager {
     Configuration.valueEventData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
-    if (!File.Exists(FilePath)) return;
-    var yaml = Data.Read(Pattern);
+    if (!ZNet.instance.IsServer()) return;
+    var yaml = Configuration.DataEvents ? Data.Read(Pattern) : "";
     Configuration.valueEventData.Value = yaml;
-    if (Data.IsLoading) Set(yaml);
+    Set(yaml);
   }
-  public static void FromSetting(string raw) {
-    if (!Data.IsLoading) Set(raw);
+  public static void FromSetting(string yaml) {
+    if (!ZNet.instance.IsServer()) Set(yaml);
   }
-  private static void Set(string raw) {
-    if (raw == "" || !Configuration.DataEvents) return;
-    var data = Data.Deserialize<EventData>(raw, FileName)
+  private static void Set(string yaml) {
+    if (yaml == "" || !Configuration.DataEvents) return;
+    var data = Data.Deserialize<EventData>(yaml, FileName)
     .Select(FromData).ToList();
     if (data.Count == 0) {
       ExpandWorld.Log.LogWarning($"Failed to load any event data.");
