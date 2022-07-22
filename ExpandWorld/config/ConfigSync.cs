@@ -106,6 +106,7 @@ public class ConfigSync {
   public string? DisplayName;
   public string? CurrentVersion;
   public string? MinimumRequiredVersion;
+  public bool ModRequired = false;
 
   private bool? forceConfigLocking;
 
@@ -136,7 +137,6 @@ public class ConfigSync {
   private readonly HashSet<CustomSyncedValueBase> allCustomValues = new();
 
   private static bool isServer;
-  private static string? connectionError;
 
   private static bool lockExempt = false;
 
@@ -159,6 +159,7 @@ public class ConfigSync {
   public ConfigSync(string name) {
     Name = name;
     configSyncs.Add(this);
+    new VersionCheck(this);
   }
 
   public SyncedConfigEntry<T> AddConfigEntry<T>(ConfigEntry<T> configEntry) {
@@ -188,8 +189,8 @@ public class ConfigSync {
   }
 
   internal void AddCustomValue(CustomSyncedValueBase customValue) {
-    if (allCustomValues.Select(v => v.Identifier).Concat(new[] { "serverversion", "requiredversion" }).Contains(customValue.Identifier)) {
-      throw new Exception("Cannot have multiple settings with the same name or with a reserved name (serverversion or requiredversion)");
+    if (allCustomValues.Select(v => v.Identifier).Concat(new[] { "serverversion" }).Contains(customValue.Identifier)) {
+      throw new Exception("Cannot have multiple settings with the same name or with a reserved name (serverversion)");
     }
 
     allCustomValues.Add(customValue);
@@ -210,7 +211,6 @@ public class ConfigSync {
   [HarmonyPatch(typeof(ZNet), "Awake")]
   private static class RegisterRPCPatch {
     private static void Postfix(ZNet __instance) {
-      connectionError = null;
 
       isServer = __instance.IsServer();
       foreach (ConfigSync configSync in configSyncs) {
@@ -409,15 +409,6 @@ public class ConfigSync {
             if (value?.ToString() != CurrentVersion) {
               Debug.LogWarning($"Received server version is not equal: server version = {value?.ToString() ?? "null"}; local version = {CurrentVersion ?? "unknown"}");
             }
-          } else if (configName == "requiredversion") {
-            // ReSharper disable RedundantNameQualifier
-            if (CurrentVersion == null || new System.Version(value?.ToString() ?? "0.0.0") > new System.Version(CurrentVersion)) {
-              // ReSharper restore RedundantNameQualifier
-              Debug.LogError($"Received minimum version is higher than required version: minimum required version = {value?.ToString() ?? "0.0.0"}; local version = {CurrentVersion ?? "unknown"}");
-              Game.instance.Logout();
-              AccessTools.DeclaredField(typeof(ZNet), "m_connectionStatus").SetValue(null, ZNet.ConnectionStatus.ErrorVersion);
-              connectionError = $"Mod {DisplayName ?? Name} requires minimum {value}. Installed is version {CurrentVersion}.";
-            }
           } else if (configName == "lockexempt") {
             if (value is bool exempt) {
               lockExempt = exempt;
@@ -446,15 +437,6 @@ public class ConfigSync {
     }
 
     return configs;
-  }
-
-  [HarmonyPatch(typeof(FejdStartup), "ShowConnectError")]
-  private class ShowConnectionError {
-    private static void Postfix(FejdStartup __instance) {
-      if (__instance.m_connectionFailedPanel.activeSelf && connectionError != null) {
-        __instance.m_connectionFailedError.text += "\n" + connectionError;
-      }
-    }
   }
 
   [HarmonyPatch(typeof(ZNet), "Shutdown")]
@@ -681,11 +663,6 @@ public class ConfigSync {
           if (configSync.CurrentVersion != null) {
             entries.Add(new() { section = "Internal", key = "serverversion", type = typeof(string), value = configSync.CurrentVersion });
           }
-
-          if (configSync.MinimumRequiredVersion != null) {
-            entries.Add(new() { section = "Internal", key = "requiredversion", type = typeof(string), value = configSync.MinimumRequiredVersion });
-          }
-
           entries.Add(new() { section = "Internal", key = "lockexempt", type = typeof(bool), value = ((SyncedList)AccessTools.DeclaredField(typeof(ZNet), "m_adminList").GetValue(ZNet.instance)).Contains(rpc.GetSocket().GetHostName()) });
 
           ZPackage package = ConfigsToPackage(configSync.allConfigs.Select(c => c.BaseConfig), configSync.allCustomValues, entries, false);

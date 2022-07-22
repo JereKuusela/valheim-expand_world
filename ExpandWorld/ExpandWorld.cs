@@ -19,7 +19,7 @@ public class ExpandWorld : BaseUnityPlugin {
   {
     DisplayName = NAME,
     CurrentVersion = VERSION,
-    MinimumRequiredVersion = VERSION,
+    ModRequired = true,
     IsLocked = true
   };
   public static string ConfigName = "";
@@ -84,13 +84,3 @@ public class SetCommands {
   }
 }
 
-
-
-[HarmonyPatch(typeof(Version), nameof(Version.GetVersionString))]
-public class GetVersionString {
-  static void Postfix(ref string __result) {
-    if (ZNet.instance && ZNet.instance.IsDedicated() && Configuration.ServerOnly)
-      return;
-    __result += $"\n{ExpandWorld.NAME}: {ExpandWorld.VERSION}";
-  }
-}
