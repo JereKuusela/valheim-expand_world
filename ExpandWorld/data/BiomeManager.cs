@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
-
 public class BiomeManager {
   public static string FileName = "expand_biomes.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
@@ -21,7 +20,6 @@ public class BiomeManager {
     return data;
   }
   private static Dictionary<string, Heightmap.Biome> DefaultNameToBiome = new() {
-    { "none", Heightmap.Biome.None},
     { "meadows", Heightmap.Biome.Meadows},
     { "swamp", Heightmap.Biome.Swamp},
     { "mountain", Heightmap.Biome.Mountain},
@@ -41,6 +39,7 @@ public class BiomeManager {
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
   public static bool TryGetName(Heightmap.Biome biome, out string name) => BiomeToName.TryGetValue(biome, out name);
   public static bool TryGetName(int biome, out string name) => BiomeToName.TryGetValue((Heightmap.Biome)biome, out name);
+  public static Heightmap.Biome[] Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain[biome];
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
@@ -119,6 +118,7 @@ public class BiomeManager {
         return terrain;
       return NameToBiome[data.biome];
     });
+    Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
     Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
     var data = rawData.Select(FromData).ToList();
@@ -130,6 +130,7 @@ public class BiomeManager {
     EnvMan.instance.m_environmentPeriod = -1;
     EnvMan.instance.m_firstEnv = true;
     Generate.World();
+    CLLCWrapper.UpdateBiomes();
   }
   private static void Set(string yaml) {
     Load(yaml);

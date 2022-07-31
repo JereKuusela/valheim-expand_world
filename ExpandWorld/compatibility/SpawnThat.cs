@@ -6,10 +6,11 @@ namespace ExpandWorld;
 
 public class SpawnThatPatcher {
   public const string GUID = "asharppen.valheim.spawn_that";
-  private static void Call(Type type, string name) => type.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, new object[0]);
+  private static void Call(Type type, string name) => type.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic)?.Invoke(null, new object[0]);
   public static void InitConfiguration() {
     if (SpawnThat == null) return;
     var type = SpawnThat.GetType("SpawnThat.Lifecycle.LifecycleManager");
+    if (type == null) return;
     if (IsSingleplayerDelayed)
       Call(type, "InitSingleplayer");
     if (IsDedicatedDelayed)

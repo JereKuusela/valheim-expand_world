@@ -9,7 +9,9 @@ public class JotunnWrapper {
   public static bool IsCustomlocation(string name) {
     if (Jotunn == null) return false;
     var type = Jotunn.GetType("Jotunn.Entities.CustomLocation");
+    if (type == null) return false;
     var method = type.GetMethod("IsCustomLocation", BindingFlags.Static | BindingFlags.Public);
+    if (method == null) return false;
     return (bool)method.Invoke(null, new object[] { name });
   }
   private static Assembly? Jotunn;

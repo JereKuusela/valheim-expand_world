@@ -23,7 +23,7 @@ public class TryParse {
 public class GetValues {
   static bool Prefix(Type enumType, ref Array __result) {
     if (enumType != typeof(Heightmap.Biome)) return true;
-    __result = BiomeManager.BiomeToName.Keys.ToArray();
+    __result = BiomeManager.Biomes;
     return false;
   }
 }
