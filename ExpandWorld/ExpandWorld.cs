@@ -11,7 +11,7 @@ namespace ExpandWorld;
 public class ExpandWorld : BaseUnityPlugin {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.1.1";
+  public const string VERSION = "1.2";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable

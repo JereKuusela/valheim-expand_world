@@ -4,9 +4,7 @@ This mod allows adding new biomes and changing most of the world generation.
 
 Always back up your world before making any changes!
 
-Install on all clients and on the server.
-
-Check any modding [guide](https://youtu.be/WfvA5a5tNHo) if you don't know how.
+Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm2eKLrk)).
 
 # Features
 
@@ -35,6 +33,12 @@ This mod can be used only on the server. However only following files can be con
 - `expand_world.cfg`: Only setting Location multiplier.
 
 When doing this, enable `Server only` on the config to remove version check.
+
+## Migration from version 1.1
+
+- Back up your world.
+- If you have used both the general altitude multiplier (not the base altitude multiplier) and biome specific altitude deltas, then you need multiple biome specific deltas in the `expand_biomes.yaml`. If this makes no sense then you can most likely skip this step.
+- Divide color values in `expand_biomes.yaml` by 255 (range changed from 0-255 to 0.0-1.0). If you haven't changed biomes then you can just delete file to regenerate it. Old values still work so this step can be skipped.
 
 ## Migration from version 1.0
 
@@ -471,6 +475,7 @@ Copy-paste plains entry and change the top one:
   - Adds a new field `stretch` to the `expand_world.yaml` to stretch individual biomes.
   - Adds compatibility with Spawn That mod.
   - Adds compatibility with Jotunn locations.
+  - Improves the data loading and syncing.
 	- Fixes wrong water level for the clutter system.
   - Fixes visual glitches in the water areas.
 
