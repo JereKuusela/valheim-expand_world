@@ -98,31 +98,32 @@ public class LocationManager {
     foreach (var list in LocationList.m_allLocationLists)
       list.m_locations.Clear();
     ZoneSystem.instance.m_locations = data;
-    Setup();
+    // This call must be delayed because some mods add new locations after SetupLocations.
+    if (!LoadData.IsLoading)
+      Setup();
   }
-  private static void Setup() {
+  private static Dictionary<string, Location>? Locations = null;
+  private static Dictionary<string, Location> GetLocations() {
+    List<Location> locations = new();
     GameObject[] array = Resources.FindObjectsOfTypeAll<GameObject>();
-    List<Location> list = new List<Location>();
     foreach (GameObject gameObject in array) {
       if (gameObject.name == "_Locations") {
         Location[] componentsInChildren = gameObject.GetComponentsInChildren<Location>(true);
-        list.AddRange(componentsInChildren);
+        locations.AddRange(componentsInChildren);
       }
     }
+    return locations.ToDictionary(location => location.gameObject.name, location => location);
+  }
+  public static void Setup() {
+    if (Locations == null) Locations = GetLocations();
     var zs = ZoneSystem.instance;
     foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations) {
-      Transform? transform = null;
-      foreach (Location location in list) {
-        if (location.gameObject.name == zoneLocation.m_prefabName) {
-          transform = location.transform;
-          break;
-        }
-      }
-      if (transform == null) {
+      if (JotunnWrapper.IsCustomlocation(zoneLocation.m_prefabName)) continue;
+      if (!Locations.TryGetValue(zoneLocation.m_prefabName, out var location)) {
         ExpandWorld.Log.LogWarning($"Location prefab {zoneLocation.m_prefabName} not found!");
         continue;
       }
-      zoneLocation.m_prefab = transform.gameObject;
+      zoneLocation.m_prefab = location.gameObject;
       zoneLocation.m_hash = zoneLocation.m_prefab.name.GetStableHashCode();
       Location componentInChildren = zoneLocation.m_prefab.GetComponentInChildren<Location>();
       zoneLocation.m_location = componentInChildren;

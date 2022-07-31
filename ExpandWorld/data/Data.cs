@@ -15,9 +15,12 @@ namespace ExpandWorld;
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SetupLocations))]
 public class LoadData {
+  public static bool IsLoading = false;
+  static List<ZoneSystem.ZoneLocation> Locations = new();
   static void Prefix() {
     EnvironmentManager.SetOriginals();
     if (!ZNet.instance.IsServer()) return;
+    IsLoading = true;
     EnvironmentManager.FromFile();
     BiomeManager.FromFile();
     WorldManager.FromFile();
@@ -26,6 +29,18 @@ public class LoadData {
     EventManager.FromFile();
     SpawnManager.FromFile();
     ClutterManager.FromFile();
+    // Little hack to stop the default location setup since it won't work with custom locations.
+    Locations = ZoneSystem.instance.m_locations;
+    if (Configuration.valueLocationData.Value != "")
+      ZoneSystem.instance.m_locations = new();
+  }
+  [HarmonyPriority(Priority.Last)]
+  static void Postfix() {
+    if (!ZNet.instance.IsServer()) return;
+    IsLoading = false;
+    ZoneSystem.instance.m_locations = Locations;
+    // Delayed here since some mods add new locations after SetupLocations.
+    LocationManager.Setup();
   }
 }
 

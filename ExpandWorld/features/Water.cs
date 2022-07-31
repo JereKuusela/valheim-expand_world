@@ -24,7 +24,6 @@ public class WaterHelper {
   public static void SetWaveSize(WaterVolume obj) {
     if (!obj.m_useGlobalWind) return;
     if (OriginalScale == Vector3.zero) OriginalScale = obj.m_waterSurface.transform.localScale;
-    ExpandWorld.Log.LogWarning(obj.m_waterSurface.transform.localScale.ToString("F1"));
     var scale = OriginalScale;
     if (Configuration.WaveOnlyHeight) scale.y *= Configuration.WaveMultiplier;
     else scale *= Configuration.WaveMultiplier;

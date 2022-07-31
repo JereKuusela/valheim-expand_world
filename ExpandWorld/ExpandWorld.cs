@@ -46,6 +46,7 @@ public class ExpandWorld : BaseUnityPlugin {
   }
   public void Start() {
     SpawnThatPatcher.Run();
+    JotunnWrapper.Run();
   }
   public void LateUpdate() {
     Generate.CheckRegen(Time.deltaTime);
