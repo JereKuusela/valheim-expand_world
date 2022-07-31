@@ -75,11 +75,11 @@ public partial class Configuration {
       WaterHelper.SetLevel(ClutterSystem.instance);
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetLevel(obj);
     };
-    configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, true, "Multiplies the wave size.");
+    configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, false, "Multiplies the wave size.");
     configWaveMultiplier.SettingChanged += (s, e) => {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };
-    configWaveOnlyHeight = wrapper.Bind(section, "Wave only height", false, false, "Multiplier only affects the height.");
+    configWaveOnlyHeight = wrapper.Bind(section, "Wave only height", true, false, "Multiplier only affects the height.");
     configWaveOnlyHeight.SettingChanged += (s, e) => {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };

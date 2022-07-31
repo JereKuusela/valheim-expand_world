@@ -94,7 +94,7 @@ public sealed class CustomSyncedValue<T> : CustomSyncedValueBase {
 }
 
 internal class ConfigurationManagerAttributes {
-  public bool? ReadOnly = false;
+  [UsedImplicitly] public bool? ReadOnly = false;
 }
 
 [PublicAPI]
@@ -167,7 +167,7 @@ public class ConfigSync {
       syncedEntry = new(configEntry);
       AccessTools.DeclaredField(typeof(ConfigDescription), "<Tags>k__BackingField").SetValue(configEntry.Description, new[] { new ConfigurationManagerAttributes() }.Concat(configEntry.Description.Tags ?? Array.Empty<object>()).Concat(new[] { syncedEntry }).ToArray());
       configEntry.SettingChanged += (_, _) => {
-        if (!ProcessingServerUpdate) {
+        if (!ProcessingServerUpdate && syncedEntry.SynchronizedConfig) {
           Broadcast(ZRoutedRpc.Everybody, configEntry);
         }
       };
@@ -615,7 +615,7 @@ public class ConfigSync {
       public void Send(ZPackage pkg) {
         pkg.SetPos(0);
         int methodHash = pkg.ReadInt();
-        if ((methodHash == "PeerInfo".GetStableHashCode() || methodHash == "RoutedRPC".GetStableHashCode()) && !finished) {
+        if ((methodHash == "PeerInfo".GetStableHashCode() || methodHash == "RoutedRPC".GetStableHashCode() || methodHash == "ZDOData".GetStableHashCode()) && !finished) {
           Package.Add(new(pkg.GetArray())); // the original ZPackage gets reused, create a new one
         } else {
           Original.Send(pkg);

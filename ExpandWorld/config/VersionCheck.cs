@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
@@ -74,16 +73,14 @@ public class VersionCheck {
   private static readonly HashSet<VersionCheck> versionChecks = new();
   private static VersionCheck[] GetFailedClient() => versionChecks.Where(check => !check.IsVersionOk()).ToArray();
   private static VersionCheck[] GetFailedServer(ZRpc rpc) => versionChecks.Where(check => !check.ValidatedClients.Contains(rpc)).ToArray();
-  private static VersionCheck[] GetFailed(ZRpc? rpc = null) => rpc == null ? GetFailedClient() : GetFailedServer(rpc);
   private static void Logout() {
     Game.instance.Logout();
     AccessTools.DeclaredField(typeof(ZNet), "m_connectionStatus").SetValue(null, ZNet.ConnectionStatus.ErrorVersion);
   }
   private static void DisconnectClient(ZRpc rpc) => rpc.Invoke("Error", new object[] { (int)ZNet.ConnectionStatus.ErrorVersion });
-  private static void CheckVersion(ZRpc rpc, ZPackage pkg) {
+  private static void CheckVersion(string name, ZRpc rpc, ZPackage pkg) {
     foreach (var check in versionChecks) {
-      var guid = pkg.ReadString();
-      if (guid != check.Name)
+      if (name != check.Name)
         continue;
       var minimumRequiredVersion = pkg.ReadString();
       var currentVersion = pkg.ReadString();
@@ -99,7 +96,7 @@ public class VersionCheck {
   }
   private static bool VerifyServer(ZNet znet, ZRpc rpc) {
     if (znet.IsServer()) return true;
-    var failedChecks = GetFailed();
+    var failedChecks = GetFailedClient();
     if (failedChecks.Length == 0) return true;
     foreach (var check in failedChecks)
       Debug.LogWarning(check.Error());
@@ -108,7 +105,7 @@ public class VersionCheck {
   }
   private static bool VerifyClient(ZNet znet, ZRpc rpc) {
     if (!znet.IsServer()) return true;
-    var failedChecks = GetFailed(rpc);
+    var failedChecks = GetFailedServer(rpc);
     if (failedChecks.Length == 0) return true;
     foreach (var check in failedChecks)
       Debug.LogWarning(check.Error(rpc));
@@ -122,14 +119,14 @@ public class VersionCheck {
   private static void RegisterAndCheckVersion(ZNetPeer peer, ZNet __instance) {
     foreach (var check in versionChecks) {
       check.Initialize();
-      peer.m_rpc.Register<ZPackage>($"VersionCheck_{check.Name}", new Action<ZRpc, ZPackage>(VersionCheck.CheckVersion));
+      peer.m_rpc.Register<ZPackage>($"VersionCheck_{check.Name}", (ZRpc rpc, ZPackage pkg) => VersionCheck.CheckVersion(check.Name, rpc, pkg));
+      if (!check.ModRequired && !__instance.IsServer()) continue;
       if (__instance.IsServer())
         Debug.Log($"Sending {check.DisplayName} version {check.CurrentVersion} and minimum version {check.MinimumRequiredVersion} to the client");
       else
         Debug.Log($"Sending {check.DisplayName} version {check.CurrentVersion} and minimum version {check.MinimumRequiredVersion} to the server");
 
       ZPackage zpackage = new ZPackage();
-      zpackage.Write(check.Name);
       zpackage.Write(check.MinimumRequiredVersion);
       zpackage.Write(check.CurrentVersion);
       peer.m_rpc.Invoke($"VersionCheck_{check.Name}", new object[] { zpackage });
@@ -147,7 +144,7 @@ public class VersionCheck {
   [HarmonyPatch(typeof(FejdStartup), nameof(FejdStartup.ShowConnectError)), HarmonyPostfix]
   private static void ShowConnectionError(FejdStartup __instance) {
     if (!__instance.m_connectionFailedPanel.activeSelf) return;
-    var failedChecks = GetFailed();
+    var failedChecks = GetFailedClient();
     if (failedChecks.Length == 0) return;
     var error = string.Join("\n", failedChecks.Select(check => check.Error()));
     __instance.m_connectionFailedError.text += "\n" + error;

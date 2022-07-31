@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -107,10 +108,15 @@ public class WorldGeneration {
     if (ct.IsCancellationRequested)
       yield break;
     yield return null;
-    foreach (var heightmap in Heightmap.m_heightmaps) {
+    foreach (var heightmap in Heightmaps.All) {
+      heightmap.m_heights.Clear();
       heightmap.m_buildData = null;
       heightmap.Regenerate();
     }
+    if (ct.IsCancellationRequested)
+      yield break;
+    yield return null;
+    foreach (var obj in WaterHelper.Get()) obj.Start();
     if (ct.IsCancellationRequested)
       yield break;
     yield return null;
@@ -334,6 +340,18 @@ public class MapGeneration {
   }
 }
 
+[HarmonyPatch(typeof(Heightmap))]
+public class Heightmaps {
+  public static List<Heightmap> All = new();
+  [HarmonyPatch(nameof(Heightmap.Awake)), HarmonyPostfix]
+  static void Add(Heightmap __instance) {
+    All.Add(__instance);
+  }
+  [HarmonyPatch(nameof(Heightmap.OnDestroy)), HarmonyPostfix]
+  static void Remove(Heightmap __instance) {
+    All.Remove(__instance);
+  }
+}
 [HarmonyPatch(typeof(Game), nameof(Game.FindSpawnPoint))]
 public class FindSpawnPoint {
   static bool Prefix() => WorldGeneration.HasLoaded;
