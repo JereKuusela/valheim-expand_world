@@ -85,9 +85,9 @@ public class VersionCheck {
       var minimumRequiredVersion = pkg.ReadString();
       var currentVersion = pkg.ReadString();
       if (ZNet.instance.IsServer())
-        Debug.Log($"Received '{check.DisplayName} version {currentVersion} and minimum version {minimumRequiredVersion} from the client.");
+        Debug.Log($"Received {check.DisplayName} version {currentVersion} and minimum version {minimumRequiredVersion} from the client.");
       else
-        Debug.Log($"Received '{check.DisplayName} version {currentVersion} and minimum version {minimumRequiredVersion} from the server.");
+        Debug.Log($"Received {check.DisplayName} version {currentVersion} and minimum version {minimumRequiredVersion} from the server.");
       check.ReceivedMinimumRequiredVersion = minimumRequiredVersion;
       check.ReceivedCurrentVersion = currentVersion;
       if (ZNet.instance.IsServer() && check.IsVersionOk())
@@ -120,6 +120,7 @@ public class VersionCheck {
     foreach (var check in versionChecks) {
       check.Initialize();
       peer.m_rpc.Register<ZPackage>($"VersionCheck_{check.Name}", (ZRpc rpc, ZPackage pkg) => VersionCheck.CheckVersion(check.Name, rpc, pkg));
+      // If the mod is not required, then it's enough for only one side to do the check.
       if (!check.ModRequired && !__instance.IsServer()) continue;
       if (__instance.IsServer())
         Debug.Log($"Sending {check.DisplayName} version {check.CurrentVersion} and minimum version {check.MinimumRequiredVersion} to the client");

@@ -17,6 +17,7 @@ namespace ExpandWorld;
 public class LoadData {
   public static bool IsLoading = false;
   static List<ZoneSystem.ZoneLocation> Locations = new();
+  [HarmonyPriority(Priority.VeryLow)]
   static void Prefix() {
     EnvironmentManager.SetOriginals();
     if (!ZNet.instance.IsServer()) return;
@@ -34,7 +35,7 @@ public class LoadData {
     if (Configuration.valueLocationData.Value != "")
       ZoneSystem.instance.m_locations = new();
   }
-  [HarmonyPriority(Priority.Last)]
+  [HarmonyPriority(Priority.VeryLow)]
   static void Postfix() {
     if (!ZNet.instance.IsServer()) return;
     IsLoading = false;
