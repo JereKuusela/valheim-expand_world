@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
@@ -77,6 +78,7 @@ public class SpawnManager {
     data.levelUpMinCenterDistance = spawn.m_levelUpMinCenterDistance;
     return data;
   }
+  public static bool IsValid(SpawnSystem.SpawnData spawn) => spawn.m_prefab;
   public static string Save() {
     var spawnSystem = SpawnSystem.m_instances.FirstOrDefault();
     if (spawnSystem == null) return "";
@@ -102,17 +104,21 @@ public class SpawnManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataSpawns) return;
-    var data = Data.Deserialize<SpawnData>(yaml, FileName)
-      .Select(FromData).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any spawn data.");
-      return;
-    }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} spawn data.");
-    HandleSpawnData.Override = data;
-    foreach (var system in SpawnSystem.m_instances) {
-      system.m_spawnLists.Clear();
-      system.m_spawnLists.Add(new() { m_spawners = data });
+    try {
+      var data = Data.Deserialize<SpawnData>(yaml, FileName)
+        .Select(FromData).Where(IsValid).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any spawn data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} spawn data.");
+      HandleSpawnData.Override = data;
+      foreach (var system in SpawnSystem.m_instances) {
+        system.m_spawnLists.Clear();
+        system.m_spawnLists.Add(new() { m_spawners = data });
+      }
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
   public static void SetupWatcher() {

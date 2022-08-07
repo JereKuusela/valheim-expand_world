@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
@@ -61,16 +62,20 @@ public class EventManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataEvents) return;
-    var data = Data.Deserialize<EventData>(yaml, FileName)
-    .Select(FromData).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any event data.");
-      return;
+    try {
+      var data = Data.Deserialize<EventData>(yaml, FileName)
+      .Select(FromData).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any event data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} event data.");
+      foreach (var list in LocationList.m_allLocationLists)
+        list.m_events.Clear();
+      RandEventSystem.instance.m_events = data;
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} event data.");
-    foreach (var list in LocationList.m_allLocationLists)
-      list.m_events.Clear();
-    RandEventSystem.instance.m_events = data;
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

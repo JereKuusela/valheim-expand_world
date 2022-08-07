@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -96,17 +97,21 @@ public class ClutterManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataClutter) return;
-    var data = Data.Deserialize<ClutterData>(yaml, FileName)
-      .Select(FromData).Where(clutter => clutter.m_prefab).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any clutter data.");
-      return;
+    try {
+      var data = Data.Deserialize<ClutterData>(yaml, FileName)
+        .Select(FromData).Where(clutter => clutter.m_prefab).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any clutter data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} clutter data.");
+      ClutterSystem.instance.m_clutter.Clear();
+      foreach (var clutter in data)
+        ClutterSystem.instance.m_clutter.Add(clutter);
+      ClutterSystem.instance.ClearAll();
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} clutter data.");
-    ClutterSystem.instance.m_clutter.Clear();
-    foreach (var clutter in data)
-      ClutterSystem.instance.m_clutter.Add(clutter);
-    ClutterSystem.instance.ClearAll();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
@@ -95,17 +96,21 @@ public class VegetationManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataVegetation) return;
-    var data = Data.Deserialize<VegetationData>(yaml, FileName)
-    .Select(FromData).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any vegetation data.");
-      return;
+    try {
+      var data = Data.Deserialize<VegetationData>(yaml, FileName)
+      .Select(FromData).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any vegetation data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} vegetation data.");
+      foreach (var list in LocationList.m_allLocationLists)
+        list.m_vegetation.Clear();
+      ZoneSystem.instance.m_vegetation = data;
+      ZoneSystem.instance.ValidateVegetation();
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} vegetation data.");
-    foreach (var list in LocationList.m_allLocationLists)
-      list.m_vegetation.Clear();
-    ZoneSystem.instance.m_vegetation = data;
-    ZoneSystem.instance.ValidateVegetation();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

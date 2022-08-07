@@ -58,8 +58,8 @@ public class LocationGeneration {
       ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
       stopwatch.Stop();
       WorldGeneration.HasLoaded = true;
-      if (Minimap.instance && ZNet.instance && !ZNet.instance.IsDedicated())
-        Minimap.instance.GenerateWorldMap();
+      // This is called at ZNet.Start before Minimap.Start.
+      // So doing Minimap.instance.GenerateWorldMap() is pointless and may even cause issues with other mods.
     }
   }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -85,52 +86,56 @@ public class BiomeManager {
   public static bool BiomeForestMultiplier = false;
   private static void Load(string yaml) {
     if (yaml == "" || !Configuration.DataBiome) return;
-    var rawData = Data.Deserialize<BiomeData>(yaml, FileName);
-    if (rawData.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
-      return;
-    }
-    ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
-    BiomeToData.Clear();
-    NameToBiome = DefaultNameToBiome.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-    var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
-    foreach (var biome in rawData) {
-      biome.biome = biome.biome.ToLower();
-      biome.terrain = biome.terrain.ToLower();
-      Data.Sanity(ref biome.mapColor);
-      Data.Sanity(ref biome.color);
-      Data.Sanity(ref biome.paint);
-      if (biome.name != "") {
-        var key = "biome_" + ((Heightmap.Biome)biomeNumber).ToString().ToLower();
-        Localization.instance.m_translations[key] = biome.name;
+    try {
+      var rawData = Data.Deserialize<BiomeData>(yaml, FileName);
+      if (rawData.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
+        return;
       }
-      if (NameToBiome.ContainsKey(biome.biome)) {
-        BiomeToData[NameToBiome[biome.biome]] = biome;
-        continue;
+      ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
+      BiomeToData.Clear();
+      NameToBiome = DefaultNameToBiome.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+      var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
+      foreach (var biome in rawData) {
+        biome.biome = biome.biome.ToLower();
+        biome.terrain = biome.terrain.ToLower();
+        Data.Sanity(ref biome.mapColor);
+        Data.Sanity(ref biome.color);
+        Data.Sanity(ref biome.paint);
+        if (biome.name != "") {
+          var key = "biome_" + ((Heightmap.Biome)biomeNumber).ToString().ToLower();
+          Localization.instance.m_translations[key] = biome.name;
+        }
+        if (NameToBiome.ContainsKey(biome.biome)) {
+          BiomeToData[NameToBiome[biome.biome]] = biome;
+          continue;
+        }
+        NameToBiome.Add(biome.biome, (Heightmap.Biome)biomeNumber);
+        BiomeToData[(Heightmap.Biome)biomeNumber] = biome;
+        biomeNumber *= 2;
       }
-      NameToBiome.Add(biome.biome, (Heightmap.Biome)biomeNumber);
-      BiomeToData[(Heightmap.Biome)biomeNumber] = biome;
-      biomeNumber *= 2;
+      BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+      BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+        if (NameToBiome.TryGetValue(data.terrain, out var terrain))
+          return terrain;
+        return NameToBiome[data.biome];
+      });
+      Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
+      Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
+      BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
+      var data = rawData.Select(FromData).ToList();
+      foreach (var list in LocationList.m_allLocationLists)
+        list.m_biomeEnvironments.Clear();
+      EnvMan.instance.m_biomes.Clear();
+      foreach (var biome in data)
+        EnvMan.instance.AppendBiomeSetup(biome);
+      EnvMan.instance.m_environmentPeriod = -1;
+      EnvMan.instance.m_firstEnv = true;
+      Generate.World();
+      CLLCWrapper.UpdateBiomes();
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
-    BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
-      if (NameToBiome.TryGetValue(data.terrain, out var terrain))
-        return terrain;
-      return NameToBiome[data.biome];
-    });
-    Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
-    Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
-    BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
-    var data = rawData.Select(FromData).ToList();
-    foreach (var list in LocationList.m_allLocationLists)
-      list.m_biomeEnvironments.Clear();
-    EnvMan.instance.m_biomes.Clear();
-    foreach (var biome in data)
-      EnvMan.instance.AppendBiomeSetup(biome);
-    EnvMan.instance.m_environmentPeriod = -1;
-    EnvMan.instance.m_firstEnv = true;
-    Generate.World();
-    CLLCWrapper.UpdateBiomes();
   }
   private static void Set(string yaml) {
     Load(yaml);

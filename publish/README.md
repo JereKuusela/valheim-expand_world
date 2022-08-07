@@ -465,6 +465,12 @@ Copy-paste plains entry and change the top one:
 
 # Changelog
 
+- v1.3
+	- Improves general error handling.
+  - Adds error handling for missing spawn creatures.
+  - Fixes error when trying to load locations data.
+  - Fixes world generation error with CLLC mod.
+
 - v1.2
 	- WARNING: Breaking changes.
   - Changes the color format of `expand_biomes.yaml` to be from 0.0 to 1.0 (instead of from 0 to 255). Regenerate the file or fix colors manually.

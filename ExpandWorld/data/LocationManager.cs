@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,21 +89,25 @@ public class LocationManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataLocation) return;
-    var data = Data.Deserialize<LocationData>(yaml, FileName)
-      .Select(FromData).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any location data.");
-      return;
+    try {
+      var data = Data.Deserialize<LocationData>(yaml, FileName)
+        .Select(FromData).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any location data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
+      foreach (var list in LocationList.m_allLocationLists)
+        list.m_locations.Clear();
+      ZoneSystem.instance.m_locations = data;
+      // This call must be delayed because some mods add new locations after SetupLocations.
+      if (!LoadData.IsLoading)
+        Setup();
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
-    foreach (var list in LocationList.m_allLocationLists)
-      list.m_locations.Clear();
-    ZoneSystem.instance.m_locations = data;
-    // This call must be delayed because some mods add new locations after SetupLocations.
-    if (!LoadData.IsLoading)
-      Setup();
   }
-  private static Dictionary<string, Location>? Locations = null;
+  public static Dictionary<string, Location>? Locations = null;
   private static Dictionary<string, Location> GetLocations() {
     List<Location> locations = new();
     GameObject[] array = Resources.FindObjectsOfTypeAll<GameObject>();
@@ -140,7 +145,6 @@ public class LocationManager {
       if (!zs.m_locationsByHash.ContainsKey(zoneLocation.m_hash)) {
         zs.m_locationsByHash.Add(zoneLocation.m_hash, zoneLocation);
       }
-
     }
   }
   public static void SetupWatcher() {

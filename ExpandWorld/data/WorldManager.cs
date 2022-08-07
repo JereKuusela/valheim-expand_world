@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -99,15 +100,19 @@ public class WorldManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataWorld) return;
-    var data = Data.Deserialize<WorldData>(yaml, FileName)
-      .Select(FromData).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any world data.");
-      return;
+    try {
+      var data = Data.Deserialize<WorldData>(yaml, FileName)
+        .Select(FromData).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any world data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
+      GetBiome.Data = data;
+      Generate.World();
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
-    GetBiome.Data = data;
-    Generate.World();
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);

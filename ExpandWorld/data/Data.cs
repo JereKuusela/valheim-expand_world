@@ -20,6 +20,7 @@ public class LoadData {
   [HarmonyPriority(Priority.VeryLow)]
   static void Prefix() {
     EnvironmentManager.SetOriginals();
+    LocationManager.Locations = null;
     if (!ZNet.instance.IsServer()) return;
     IsLoading = true;
     EnvironmentManager.FromFile();
@@ -32,7 +33,7 @@ public class LoadData {
     ClutterManager.FromFile();
     // Little hack to stop the default location setup since it won't work with custom locations.
     Locations = ZoneSystem.instance.m_locations;
-    if (Configuration.valueLocationData.Value != "")
+    if (Configuration.valueLocationData.Value != "" || !Configuration.DataLocation)
       ZoneSystem.instance.m_locations = new();
   }
   [HarmonyPriority(Priority.VeryLow)]

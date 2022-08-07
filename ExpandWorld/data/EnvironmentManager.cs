@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -122,24 +123,28 @@ public class EnvironmentManager {
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataEnvironments) return;
-    if (Originals.Count == 0) SetOriginals();
-    var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
-      .Select(FromData).ToList();
-    if (data.Count == 0) {
-      ExpandWorld.Log.LogWarning($"Failed to load any environment data.");
-      return;
+    try {
+      if (Originals.Count == 0) SetOriginals();
+      var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
+        .Select(FromData).ToList();
+      if (data.Count == 0) {
+        ExpandWorld.Log.LogWarning($"Failed to load any environment data.");
+        return;
+      }
+      ExpandWorld.Log.LogInfo($"Reloading {data.Count} environment data.");
+      foreach (var list in LocationList.m_allLocationLists)
+        list.m_environments.Clear();
+      var em = EnvMan.instance;
+      em.m_environments.Clear();
+      foreach (var env in data)
+        em.AppendEnvironment(env);
+      em.m_environmentPeriod = -1;
+      em.m_firstEnv = true;
+      foreach (var biome in em.m_biomes)
+        em.InitializeBiomeEnvSetup(biome);
+    } catch (Exception e) {
+      ExpandWorld.Log.LogError(e.StackTrace);
     }
-    ExpandWorld.Log.LogInfo($"Reloading {data.Count} environment data.");
-    foreach (var list in LocationList.m_allLocationLists)
-      list.m_environments.Clear();
-    var em = EnvMan.instance;
-    em.m_environments.Clear();
-    foreach (var env in data)
-      em.AppendEnvironment(env);
-    em.m_environmentPeriod = -1;
-    em.m_firstEnv = true;
-    foreach (var biome in em.m_biomes)
-      em.InitializeBiomeEnvSetup(biome);
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);
