@@ -465,6 +465,10 @@ Copy-paste plains entry and change the top one:
 
 # Changelog
 
+- v1.4
+  - Improves loading time.
+  - Fixes terrain desync issue.
+
 - v1.3
 	- Improves general error handling.
   - Adds error handling for missing spawn creatures.

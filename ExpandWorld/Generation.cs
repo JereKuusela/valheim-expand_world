@@ -28,13 +28,16 @@ public class Generate {
     MapGeneration.Cancel();
   }
   public static void CheckRegen(float dt) {
-    if (Debouncer > 2f) return;
+    var limit = WorldGeneration.HasLoaded ? 2f : 0.1f;
+    if (Debouncer > limit) return;
     Debouncer += dt;
-    if (Debouncer > 2f) {
+    if (Debouncer > limit) {
+      var map = Minimap.instance;
+      var wg = WorldGenerator.instance;
       if (MapOnly)
-        Minimap.instance?.GenerateWorldMap();
-      else
-        WorldGenerator.instance?.Pregenerate();
+        map?.GenerateWorldMap();
+      else if (wg != null && !wg.m_world.m_menu)
+        wg.Pregenerate();
       MapOnly = true;
     }
   }
@@ -44,32 +47,37 @@ public class Generate {
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), new Type[0])]
 public class LocationGeneration {
   static void Prefix() {
-    if (!WorldGeneration.HasLoaded) {
-      Generate.Cancel();
-      ExpandWorld.Log.LogInfo("Started world generation.");
-      var stopwatch = Stopwatch.StartNew();
-      var wg = WorldGenerator.instance;
-      wg.m_riverPoints.Clear();
-      wg.m_cachedRiverGrid = new Vector2i(-999999, -999999);
-      wg.m_cachedRiverPoints = null;
-      wg.FindLakes();
-      wg.m_rivers = wg.PlaceRivers();
-      wg.m_streams = wg.PlaceStreams();
-      ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
-      stopwatch.Stop();
-      WorldGeneration.HasLoaded = true;
-      // This is called at ZNet.Start before Minimap.Start.
-      // So doing Minimap.instance.GenerateWorldMap() is pointless and may even cause issues with other mods.
-    }
+    if (WorldGeneration.HasLoaded) return;
+    WorldGeneration.GenerateSync(WorldGenerator.instance);
+    // This is called at ZNet.Start before Minimap.Start.
+    // So doing Minimap.instance.GenerateWorldMap() is pointless and may even cause issues with other mods.
   }
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
 public class WorldGeneration {
+  public static void GenerateSync(WorldGenerator wg) {
+    Generate.Cancel();
+    ExpandWorld.Log.LogInfo("Started world generation.");
+    var stopwatch = Stopwatch.StartNew();
+    wg.m_riverPoints.Clear();
+    wg.m_cachedRiverGrid = new Vector2i(-999999, -999999);
+    wg.m_cachedRiverPoints = null;
+    wg.FindLakes();
+    wg.m_rivers = wg.PlaceRivers();
+    wg.m_streams = wg.PlaceStreams();
+    ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+    stopwatch.Stop();
+    WorldGeneration.HasLoaded = true;
+  }
   public static bool HasLoaded = false;
   static bool Prefix(WorldGenerator __instance) {
     if (__instance.m_world.m_menu) return true;
-    Game.m_instance.StartCoroutine(Coroutine(__instance));
+    if (!Data.IsReady) return false;
+    if (HasLoaded)
+      Game.m_instance.StartCoroutine(Coroutine(__instance));
+    else
+      GenerateSync(__instance);
     return false;
   }
   public static void Cancel() {
@@ -109,7 +117,6 @@ public class WorldGeneration {
       yield break;
     yield return null;
     foreach (var heightmap in Heightmaps.All) {
-      heightmap.m_heights.Clear();
       heightmap.m_buildData = null;
       heightmap.Regenerate();
     }
@@ -121,7 +128,7 @@ public class WorldGeneration {
       yield break;
     yield return null;
     if (ClutterSystem.instance)
-      ClutterSystem.instance.m_forceRebuild = true;
+      ClutterSystem.instance.ClearAll();
     SetupMaterial.Refresh();
     if (ct.IsCancellationRequested)
       yield break;

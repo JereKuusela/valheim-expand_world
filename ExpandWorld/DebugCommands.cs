@@ -1,7 +1,6 @@
 using UnityEngine;
 
 namespace ExpandWorld;
-///<summary>New command for toggling HUD.</summary>
 public class DebugCommands {
   public DebugCommands() {
     new Terminal.ConsoleCommand("find_lakes", "Pings lakes", (args) => {

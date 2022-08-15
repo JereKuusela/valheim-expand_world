@@ -43,6 +43,8 @@ public class LoadData {
     ZoneSystem.instance.m_locations = Locations;
     // Delayed here since some mods add new locations after SetupLocations.
     LocationManager.Setup();
+    Generate.Cancel();
+    WorldGenerator.instance?.Pregenerate();
   }
 }
 
@@ -82,7 +84,7 @@ public class Spawn_WaitForConfigSync {
   static bool Prefix() => Data.IsReady;
 }
 public class Data : MonoBehaviour {
-  public static bool IsReady => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
+  public static bool IsReady => (ExpandWorld.ConfigSync.IsSourceOfTruth && BiomesLoaded) || ExpandWorld.ConfigSync.InitialSyncDone;
   public static bool BiomesLoaded = false;
 
   public static void SetupWatcher(string pattern, Action action) {
