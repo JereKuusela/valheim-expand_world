@@ -13,28 +13,33 @@ public class WorldManager {
       new() {
         biome = "ocean",
         _biome = Heightmap.Biome.Ocean,
+        _biomeSeed = Heightmap.Biome.Ocean,
         maxAltitude = -26f
       },
       new() {
         biome = "ashlands",
         _biome = Heightmap.Biome.AshLands,
+        _biomeSeed = Heightmap.Biome.AshLands,
         curveY = -0.4f,
         minDistance = 0.8f,
       },
       new() {
         biome = "mountain",
         _biome = Heightmap.Biome.Mountain,
+        _biomeSeed = Heightmap.Biome.Mountain,
         minAltitude = 50f,
       },
       new() {
         biome = "deepnorth",
         _biome = Heightmap.Biome.DeepNorth,
+        _biomeSeed = Heightmap.Biome.DeepNorth,
         curveY = 0.4f,
         minDistance = 0.8f,
       },
       new() {
         biome = "swamp",
         _biome = Heightmap.Biome.Swamp,
+        _biomeSeed = Heightmap.Biome.Swamp,
         wiggleDistance = false,
         minDistance = 0.2f,
         maxDistance = 0.8f,
@@ -45,12 +50,14 @@ public class WorldManager {
       new() {
         biome = "mistlands",
         _biome = Heightmap.Biome.Mistlands,
+        _biomeSeed = Heightmap.Biome.Mistlands,
         minDistance = 0.6f,
         amount = 0.5f,
       },
       new() {
         biome = "plains",
         _biome = Heightmap.Biome.Plains,
+        _biomeSeed = Heightmap.Biome.Plains,
         minDistance = 0.3f,
         maxDistance = 0.8f,
         amount = 0.6f,
@@ -58,6 +65,7 @@ public class WorldManager {
       new() {
         biome = "blackforest",
         _biome = Heightmap.Biome.BlackForest,
+        _biomeSeed = Heightmap.Biome.BlackForest,
         minDistance = 0.06f,
         maxDistance = 0.6f,
         amount = 0.6f,
@@ -65,17 +73,24 @@ public class WorldManager {
       new() {
         biome = "meadows",
         _biome = Heightmap.Biome.Meadows,
+        _biomeSeed = Heightmap.Biome.Meadows,
         maxDistance = 0.5f,
       },
       new() {
         biome = "blackforest",
         _biome = Heightmap.Biome.BlackForest,
+        _biomeSeed = Heightmap.Biome.BlackForest,
       },
     };
   }
 
   public static WorldData FromData(WorldData data) {
     data._biome = Data.ToBiomes(new string[] { data.biome });
+    data._biomeSeed = BiomeManager.GetTerrain(data._biome);
+    if (int.TryParse(data.seed, out var seed))
+      data._seed = seed;
+    else if (BiomeManager.TryGetBiome(data.seed, out var biome))
+      data._biomeSeed = biome;
     if (data.minSector < 0f) data.minSector += 1f;
     if (data.maxSector > 1f) data.maxSector -= 1f;
     return data;

@@ -26,8 +26,12 @@ public class WorldData {
   public float amount = 1f;
   [DefaultValue(1f)]
   public float stretch = 1f;
-  [DefaultValue(null)]
-  public int? seed = null;
+  [DefaultValue("")]
+  public string seed = "";
+  [YamlIgnore]
+  public Heightmap.Biome _biomeSeed = Heightmap.Biome.None;
+  [YamlIgnore]
+  public int? _seed = null;
   [DefaultValue(true)]
   public bool wiggleDistance = true;
   [DefaultValue(true)]

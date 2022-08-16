@@ -1,9 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
 namespace ExpandWorld;
 public class DebugCommands {
   public DebugCommands() {
-    new Terminal.ConsoleCommand("find_lakes", "Pings lakes", (args) => {
+    new Terminal.ConsoleCommand("find_lakes", "Pings lakes", args => {
       foreach (Minimap.PinData pin in args.Context.m_findPins)
         Minimap.instance.RemovePin(pin);
       args.Context.m_findPins.Clear();
@@ -13,7 +17,7 @@ public class DebugCommands {
       }
       args.Context.AddString($"Found {WorldGenerator.instance.m_lakes.Count} lakes.");
     }, true);
-    new Terminal.ConsoleCommand("find_rivers", "Pings rivers", (args) => {
+    new Terminal.ConsoleCommand("find_rivers", "Pings rivers", args => {
       foreach (Minimap.PinData pin in args.Context.m_findPins)
         Minimap.instance.RemovePin(pin);
       args.Context.m_findPins.Clear();
@@ -23,7 +27,7 @@ public class DebugCommands {
       }
       args.Context.AddString($"Found {WorldGenerator.instance.m_rivers.Count} rivers.");
     }, true);
-    new Terminal.ConsoleCommand("find_streams", "Pings streams", (args) => {
+    new Terminal.ConsoleCommand("find_streams", "Pings streams", args => {
       foreach (Minimap.PinData pin in args.Context.m_findPins)
         Minimap.instance.RemovePin(pin);
       args.Context.m_findPins.Clear();
@@ -35,6 +39,25 @@ public class DebugCommands {
     }, true);
     new Terminal.ConsoleCommand("debug_spawns", "Forces spawn file creation.", (args) => {
       SpawnManager.Save();
+    }, true);
+    new Terminal.ConsoleCommand("debug_biomes", "[precision] - Counts biomes by sampling points with a given precision (meters).", args => {
+      var precision = 100f;
+      if (args.Length > 1 && int.TryParse(args[1], out var value)) precision = (float)value;
+      var r = Configuration.WorldRadius;
+      var start = -(float)Math.Ceiling(r / precision) * precision;
+      Dictionary<Heightmap.Biome, int> biomes = new();
+      for (var x = start; x <= r; x += precision) {
+        for (var y = start; y <= r; y += precision) {
+          var distance = new Vector2(x, y).magnitude;
+          if (distance > r) continue;
+          var biome = WorldGenerator.instance.GetBiome(x, y);
+          if (!biomes.ContainsKey(biome)) biomes[biome] = 0;
+          biomes[biome]++;
+        }
+      }
+      float total = biomes.Values.Sum();
+      var text = biomes.OrderBy(kvp => BiomeManager.BiomeToName[kvp.Key]).Select(kvp => BiomeManager.BiomeToName[kvp.Key] + ": " + kvp.Value + "/" + total + " (" + (kvp.Value / total).ToString("P2", CultureInfo.InvariantCulture) + ")");
+      args.Context.AddString(string.Join("\n", text));
     }, true);
   }
 }

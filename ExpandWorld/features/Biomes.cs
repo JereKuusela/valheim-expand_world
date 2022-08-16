@@ -20,14 +20,36 @@ public class GetBiomeColor {
   }
 }
 
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Initialize))]
+public class ResetBiomeOffsets {
+  static void Prefix() {
+    GetBiome.Offsets.Clear();
+  }
+}
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
+public class SetBiomeOffsets {
+  [HarmonyPriority(Priority.VeryHigh)]
+  static void Prefix(WorldGenerator __instance) {
+    if (GetBiome.Offsets.Count > 0) return;
+    GetBiome.Offsets[Heightmap.Biome.Swamp] = __instance.m_offset0;
+    GetBiome.Offsets[Heightmap.Biome.Plains] = __instance.m_offset1;
+    GetBiome.Offsets[Heightmap.Biome.BlackForest] = __instance.m_offset2;
+    // Not used in the base game code but might as well reuse the value.
+    GetBiome.Offsets[Heightmap.Biome.Meadows] = __instance.m_offset3;
+    GetBiome.Offsets[Heightmap.Biome.Mistlands] = __instance.m_offset4;
+    GetBiome.Offsets[Heightmap.Biome.AshLands] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiome.Offsets[Heightmap.Biome.DeepNorth] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiome.Offsets[Heightmap.Biome.Mountain] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiome.Offsets[Heightmap.Biome.Ocean] = (float)UnityEngine.Random.Range(-10000, 10000);
+  }
+}
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
 public class GetBiome {
   public static List<WorldData> Data = WorldManager.GetDefault();
+  public static Dictionary<Heightmap.Biome, float> Offsets = new();
 
   private static float GetOffset(WorldGenerator obj, Heightmap.Biome biome) {
-    if (biome == Heightmap.Biome.Mistlands) return obj.m_offset4;
-    if (biome == Heightmap.Biome.BlackForest) return obj.m_offset2;
-    if (biome == Heightmap.Biome.Plains) return obj.m_offset1;
+    if (Offsets.TryGetValue(biome, out var value)) return value;
     return obj.m_offset0;
   }
   private static float ConvertDist(float percent) => percent * Configuration.WorldRadius;
@@ -66,7 +88,7 @@ public class GetBiome {
       var angle = item.wiggleSector ? wiggledAngle : baseAngle;
       var angleOk = min > max ? (angle >= min || angle < max) : angle >= min && angle < max;
       if (!angleOk) continue;
-      var seed = item.seed ?? GetOffset(obj, item._biome);
+      var seed = item._seed ?? GetOffset(obj, item._biomeSeed);
       if (item.amount < 1f && Mathf.PerlinNoise((seed + bx / item.stretch) * 0.001f, (seed + by / item.stretch) * 0.001f) < 1 - item.amount) continue;
       return item._biome;
     }

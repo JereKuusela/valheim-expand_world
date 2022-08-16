@@ -34,6 +34,11 @@ This mod can be used only on the server. However only following files can be con
 
 When doing this, enable `Server only` on the config to remove version check.
 
+## Migration from version 1.3
+
+- Back up your world.
+- If you have created custom biomes of Mistlands, Black Forest or Plains with `amount` parameter in `expand_world.yaml` then you need to add `seed: swamp` to the related world entries. 
+
 ## Migration from version 1.1
 
 - Back up your world.
@@ -122,7 +127,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 
 - biome: Identifier for this biome. This is used in the other files.
 - name: Display name. Required for new biomes.
-- terrain: Identifier of a default biome. Determines which terrain algorithm to use. Required for new biomes.
+- terrain: Identifier of the base biome. Determines which terrain algorithm to use. Required for new biomes.
 - altitudeDelta: Flat increase/decrease to the terrain altitude. See Altitude section for more info.
 - altitudeMultiplier: Multiplier to the terrain altitude (relative to the water level).
 - forestMultiplier: Multiplier to the global forest multiplier. Using this requires an extra biome check which will lower the performance.
@@ -151,13 +156,46 @@ Each entry in the file adds a new rule. When determing the biome, the rules are 
 - maxSector (default: `1.0` of world angle): End of the [circle sector](https://en.wikipedia.org/wiki/Circular_sector).
 - curveX (default: `0.0` of world radius): Moves the distance center point away from the world center.
 - curveY (default: `0.0` of world radius): Moves the distance center point away from the world center.
-- amount (default: `1.0` of total area): How much of the valid area is randomly filled with this biome.
+- amount (default: `1.0` of total area): How much of the valid area is randomly filled with this biome. Uses normal distribution, see values below.
 - stretch (default: `1.0`): Same as the `Stretch biomes` setting but applied just to a single entry. Multiplies the size of biome areas (average total area stays the same). 
-- seed (default: ` `): Overrides the random outcome of `amount`. By default derived from the world seed.
+- seed (default: ` `): Overrides the random outcome of `amount`. Numeric value fixes the outcome. Biome name uses a biome specific value derived from the world seed. No value uses biome from the `terrain` parameter.
 - wiggleDistance (default: `true`): Applies "wiggle" to the `minDistance`.
 - wiggleSector (default: `true`): Applies "wiggle" to the `maxSector` and `minSector`.
 
-"Wiggle" adds a sin wave pattern to the distance/sector borders for less artifical biome transitions. The strength can be globally configured in the main .cfg file.
+Note: The world edge is always ocean. This is currently hardcoded.
+
+### Amount
+
+Technically the amount is not a percentage but something closer to a normal distribution.
+
+Manual testing with `debug_biomes` command has given these rough values:
+- 0.1: 0.4 %
+- 0.2: 2.7 %
+- 0.25: 5.3 %
+- 0.3: 8.8 %
+- 0.35: 14 %
+- 0.4: 23 %
+- 0.45: 32 %
+- 0.5: 42 %
+- 0.535: 50 %
+- 0.55: 54 %
+- 0.6: 64 %
+- 0.65: 74 %
+- 0.7: 83 %
+- 0.75: 90 %
+- 0.8: 94 %
+- 0.85: 97 %
+- 0.9: 99 %
+
+For example if you want to replace 25% of Plains with a new biome you can calculate 0.6 -> 64 % -> 64 % / 4 = 16 % -> 0.35. So you would put 0.35 (or 0.36) to the amount of the new biome.
+
+Note: The amount is of the total world size, not of the remaining area. If two biomes have the same seed then their areas will overlap which can lead to unexpected results.
+
+For example if the new biome is a variant of Plains then there is no need to reduce the amount of Plains because the new biome only exists where they would have been Plains.
+
+If the seeds are different, then Plains amount can be calculated with 0.6 -> 64 % -> 64 % * (1 - 0.25) / (1 - 0.16) = 57 % -> 0.56.
+
+### Sectors
 
 Sectors start at the south and increase towards clock-wise direction. So that:
 - Bottom left part is between sectors 0 and 0.25.
@@ -171,7 +209,9 @@ Sectors start at the south and increase towards clock-wise direction. So that:
 
 Note: Of course any number is valid for sectors. Like from 0.37 to 0.62.
 
-Note: The world edge is always ocean. This is currently hardcoded.
+### Wiggle
+
+"Wiggle" adds a sin wave pattern to the distance/sector borders for less artifical biome transitions. The strength can be globally configured in the main .cfg file.
 
 ## Environments
 
@@ -467,6 +507,8 @@ Copy-paste plains entry and change the top one:
 
 - v1.4
   - Improves loading time.
+  - Adds support of default biome seeding to the `seed` parameter of `expand_biomes.yaml`.
+  - Changes the default biome seeding to use the `terrain` parameter of `expand_world.yaml`.
   - Fixes terrain desync issue.
 
 - v1.3
