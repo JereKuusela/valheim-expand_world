@@ -506,6 +506,7 @@ Copy-paste plains entry and change the top one:
 # Changelog
 
 - v1.4
+  - Adds compatibility with CLLC mod.
   - Improves loading time.
   - Adds support of default biome seeding to the `seed` parameter of `expand_biomes.yaml`.
   - Changes the default biome seeding to use the `terrain` parameter of `expand_world.yaml`.

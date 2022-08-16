@@ -132,7 +132,7 @@ public class BiomeManager {
       EnvMan.instance.m_environmentPeriod = -1;
       EnvMan.instance.m_firstEnv = true;
       Generate.World();
-      CLLCWrapper.UpdateBiomes();
+      CLLCPatcher.InitConfiguration();
     } catch (Exception e) {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
@@ -141,6 +141,7 @@ public class BiomeManager {
     Load(yaml);
     Data.BiomesLoaded = true;
     SpawnThatPatcher.InitConfiguration();
+    CLLCPatcher.InitConfiguration();
 
   }
   public static void SetupWatcher() {
