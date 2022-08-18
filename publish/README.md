@@ -101,6 +101,8 @@ For the total altitude there are three layers:
 - Biome altitudes only affect the altitude on that biome. This part of code also adds some elevation changes, even if the base altitude was made completely flat with 0 multiplier.
 - Altitude is the last step and affets the whole world. This can be used to make whole world flat, or to increase elevation without having more mountains to appear.
 
+The final water depth can be multiplied with `Water depth multiplier`.
+
 Amount of forest can be changed with `Forest multiplier`. 
 
 # Seeds
@@ -511,6 +513,7 @@ Copy-paste plains entry and change the top one:
   - Improves performance (especially with multiple custom biomes).
   - Adds support of default biome seeding to the `seed` parameter of `expand_biomes.yaml`.
   - Changes the default biome seeding to use the `terrain` parameter of `expand_world.yaml`.
+  - Adds a new setting `Water depth multiplier`.
   - Fixes terrain desync issue.
 
 - v1.3

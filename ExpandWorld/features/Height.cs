@@ -51,5 +51,7 @@ public class BiomeHeight {
     __result += Configuration.AltitudeDelta;
     if (data != null)
       __result += data.altitudeDelta;
+    if (Configuration.WaterDepthMultiplier != 1f && __result < waterLevel)
+      __result = waterLevel + (__result - waterLevel) * Configuration.WaterDepthMultiplier;
   }
 }
