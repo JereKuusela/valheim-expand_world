@@ -119,6 +119,11 @@ public class VersionCheck {
   private static void RegisterAndCheckVersion(ZNetPeer peer, ZNet __instance) {
     foreach (var check in versionChecks) {
       check.Initialize();
+      // Server only mode is same as not sending the version at all.
+      if (ExpandWorld.Configuration.ServerOnly && __instance.IsServer()) {
+        check.ModRequired = false;
+        return;
+      }
       peer.m_rpc.Register<ZPackage>($"VersionCheck_{check.Name}", (ZRpc rpc, ZPackage pkg) => VersionCheck.CheckVersion(check.Name, rpc, pkg));
       // If the mod is not required, then it's enough for only one side to do the check.
       if (!check.ModRequired && !__instance.IsServer()) continue;

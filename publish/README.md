@@ -515,6 +515,7 @@ Copy-paste plains entry and change the top one:
   - Changes the default biome seeding to use the `terrain` parameter of `expand_world.yaml`.
   - Adds a new setting `Water depth multiplier`.
   - Fixes terrain desync issue.
+  - Fixes the `Server only` mode not working.
 
 - v1.3
 	- Improves general error handling.

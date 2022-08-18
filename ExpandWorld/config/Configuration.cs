@@ -94,7 +94,7 @@ public partial class Configuration {
       Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
       Generate.Map();
     };
-    configServerOnly = wrapper.Bind(section, "Server only", false, false, "If true, enables server side only mode.");
+    configServerOnly = wrapper.Bind(section, "Server only", false, false, "If true, enables server side only mode and clients can't have the mod installed.");
     configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, false, "Decreases the minimap detail, but doesn't affect the generation time.");
     configMapPixelSize.SettingChanged += (e, s) => {
       if (!Minimap.instance) return;
