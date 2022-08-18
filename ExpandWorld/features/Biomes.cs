@@ -127,6 +127,7 @@ public class ApplyModifiers {
   }
   static void Prefix(Heightmap __instance) {
     if (__instance.m_isDistantLod) return;
+    if (!BiomeManager.BiomePaint) return;
     var paint = __instance.m_paintMask;
     var biomes = __instance.m_cornerBiomes;
     if (biomes[0] == biomes[1] && biomes[0] == biomes[2] && biomes[0] == biomes[3]) {

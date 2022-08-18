@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
+
 namespace ExpandWorld;
 public class BiomeManager {
   public static string FileName = "expand_biomes.yaml";
@@ -84,6 +86,7 @@ public class BiomeManager {
     if (!ZNet.instance.IsServer()) Set(yaml);
   }
   public static bool BiomeForestMultiplier = false;
+  public static bool BiomePaint = false;
   private static void Load(string yaml) {
     if (yaml == "" || !Configuration.DataBiome) return;
     try {
@@ -123,6 +126,7 @@ public class BiomeManager {
       Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
       Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
       BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
+      BiomePaint = rawData.Any(data => data.paint != new Color());
       var data = rawData.Select(FromData).ToList();
       foreach (var list in LocationList.m_allLocationLists)
         list.m_biomeEnvironments.Clear();
@@ -132,7 +136,6 @@ public class BiomeManager {
       EnvMan.instance.m_environmentPeriod = -1;
       EnvMan.instance.m_firstEnv = true;
       Generate.World();
-      CLLCPatcher.InitConfiguration();
     } catch (Exception e) {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
