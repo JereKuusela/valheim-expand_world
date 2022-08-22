@@ -163,7 +163,7 @@ Each entry in the file adds a new rule. When determing the biome, the rules are 
 - curveY (default: `0.0` of world radius): Moves the distance center point away from the world center.
 - amount (default: `1.0` of total area): How much of the valid area is randomly filled with this biome. Uses normal distribution, see values below.
 - stretch (default: `1.0`): Same as the `Stretch biomes` setting but applied just to a single entry. Multiplies the size of biome areas (average total area stays the same). 
-- seed (default: ` `): Overrides the random outcome of `amount`. Numeric value fixes the outcome. Biome name uses a biome specific value derived from the world seed. No value uses biome from the `terrain` parameter.
+- seed: Overrides the random outcome of `amount`. Numeric value fixes the outcome. Biome name uses a biome specific value derived from the world seed. No value uses biome from the `terrain` parameter.
 - wiggleDistance (default: `true`): Applies "wiggle" to the `minDistance`.
 - wiggleSector (default: `true`): Applies "wiggle" to the `maxSector` and `minSector`.
 
@@ -542,12 +542,6 @@ Copy-paste plains entry and change the top one:
   - Improves the data loading and syncing.
 	- Fixes wrong water level for the clutter system.
   - Fixes visual glitches in the water areas.
-
-- v1.1
-	- WARNING: Contains breaking changes for existing configs.
-
-- v1.0
-	- Initial release.
 
 Thanks for Azumatt for creating the mod icon!
 
