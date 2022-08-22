@@ -124,6 +124,8 @@ public class BiomeManager {
         return NameToBiome[data.biome];
       });
       Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
+      // This is not used because base game code is overriden (low performance).
+      // But better still set as a failsafe.
       Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
       BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
       BiomePaint = rawData.Any(data => data.paint != new Color());

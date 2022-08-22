@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
@@ -20,6 +21,42 @@ public class GetBiomeColor {
   }
 }
 
+[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiome))]
+public class HeightmapGetBiome {
+  private static Dictionary<Heightmap.Biome, float> Weights = new();
+
+  public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z) {
+    var values = Enum.GetValues(typeof(Heightmap.Biome)) as Heightmap.Biome[];
+    if (values == null) return Heightmap.Biome.None;
+    for (var i = 0; i < values.Length; i++)
+      Weights[values[i]] = 0f;
+    Weights[__instance.m_cornerBiomes[0]] += __instance.Distance(x, z, 0f, 0f);
+    Weights[__instance.m_cornerBiomes[1]] += __instance.Distance(x, z, 1f, 0f);
+    Weights[__instance.m_cornerBiomes[2]] += __instance.Distance(x, z, 0f, 1f);
+    Weights[__instance.m_cornerBiomes[3]] += __instance.Distance(x, z, 1f, 1f);
+    var result = Heightmap.Biome.None;
+    var num = -99999f;
+    foreach (var kvp in Weights) {
+      if (kvp.Value > num) {
+        result = kvp.Key;
+        num = kvp.Value;
+      }
+    }
+    return result;
+  }
+  static bool Prefix(Heightmap __instance, Vector3 point, ref Heightmap.Biome __result) {
+    if (__instance.m_isDistantLod) return true;
+    if (__instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[1] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[2] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[3]) {
+      __result = __instance.m_cornerBiomes[0];
+      return false;
+    }
+    var x = point.x;
+    var z = point.z;
+    __instance.WorldToNormalizedHM(point, out x, out z);
+    __result = GetBiome(__instance, x, z);
+    return false;
+  }
+}
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Initialize))]
 public class ResetBiomeOffsets {
   static void Prefix() {
@@ -106,25 +143,8 @@ public class GetBiome {
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.ApplyModifiers))]
 public class ApplyModifiers {
+  private static Dictionary<Heightmap.Biome, float> Weights = new();
 
-  static Heightmap.Biome Get(Heightmap __instance, float x, float z) {
-    for (int i = 1; i < Heightmap.tempBiomeWeights.Length; i++) {
-      Heightmap.tempBiomeWeights[i] = 0f;
-    }
-    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[0]] += __instance.Distance(x, z, 0f, 0f);
-    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[1]] += __instance.Distance(x, z, 1f, 0f);
-    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[2]] += __instance.Distance(x, z, 0f, 1f);
-    Heightmap.tempBiomeWeights[(int)__instance.m_cornerBiomes[3]] += __instance.Distance(x, z, 1f, 1f);
-    int result = 0;
-    float num = -99999f;
-    for (int j = 1; j < Heightmap.tempBiomeWeights.Length; j++) {
-      if (Heightmap.tempBiomeWeights[j] > num) {
-        result = j;
-        num = Heightmap.tempBiomeWeights[j];
-      }
-    }
-    return (Heightmap.Biome)result;
-  }
   static void Prefix(Heightmap __instance) {
     if (__instance.m_isDistantLod) return;
     if (!BiomeManager.BiomePaint) return;
@@ -143,7 +163,7 @@ public class ApplyModifiers {
       var pixels = new Color[paint.width * paint.height];
       for (var z = 0; z < paint.height; z++) {
         for (var x = 0; x < paint.width; x++) {
-          var biome = Get(__instance, x, z);
+          var biome = HeightmapGetBiome.GetBiome(__instance, x, z);
           if (!BiomeManager.TryGetData(biome, out var data))
             continue;
           if (data.paint.Equals(new Color()))
