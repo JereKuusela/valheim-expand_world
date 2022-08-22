@@ -18,12 +18,8 @@ public partial class Configuration {
   public static ConfigEntry<bool> configServerOnly;
   public static bool ServerOnly => configServerOnly.Value;
 
-  public static ConfigEntry<string> configBaseAltitudeMultiplier;
-  public static float BaseAltitudeMultiplier => ConfigWrapper.Floats[configBaseAltitudeMultiplier];
   public static ConfigEntry<string> configAltitudeMultiplier;
   public static float AltitudeMultiplier => ConfigWrapper.Floats[configAltitudeMultiplier];
-  public static ConfigEntry<string> configBaseAltitudeDelta;
-  public static float BaseAltitudeDelta => ConfigWrapper.Floats[configBaseAltitudeDelta];
   public static ConfigEntry<string> configAltitudeDelta;
   public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta];
 
@@ -113,10 +109,8 @@ public partial class Configuration {
     section = "2. Features";
 
     configForestMultiplier = wrapper.BindFloat(section, "Forest multiplier", 1f, true, "Multiplies the amount of forest.");
-    configBaseAltitudeMultiplier = wrapper.BindFloat(section, "Base altitude multiplier", 1f, true, "Multiplies the base altitude.");
-    configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, true, "Multiplies the biome altitude.");
-    configBaseAltitudeDelta = wrapper.BindFloat(section, "Base altitude delta", 0f, true, "Adds to the base altitude.");
-    configAltitudeDelta = wrapper.BindFloat(section, "Altitude delta", 0f, true, "Adds to the biome altitude.");
+    configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, true, "Multiplies the altitude.");
+    configAltitudeDelta = wrapper.BindFloat(section, "Altitude delta", 0f, true, "Adds to the altitude.");
     configLocationsMultiplier = wrapper.BindFloat(section, "Locations", 1f, true, "Multiplies the max amount of locations.");
     configDistanceWiggleLength = wrapper.BindFloat(section, "Distance wiggle length", 500f, true);
     configDistanceWiggleWidth = wrapper.BindFloat(section, "Distance wiggle width", 0.01f, true);

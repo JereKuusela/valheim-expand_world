@@ -37,6 +37,10 @@ When doing this, enable `Server only` on the config to remove version check.
 ## Migration from version 1.3
 
 - Back up your world.
+- If you have used `Altitude delta`, set it to 0.0 and add the value `altitudeDelta` to each entry in `expand_biomes.yaml` (add to any pre-existing value).
+- If you have used `Altitude multiplier`, set it to 1.0 and add the value `altitudeMultiplier` to each entry in `expand_biomes.yaml` (multiply any pre-existing value).
+- If you have used `Base altitude delta`, set its value to `Altitude delta`.
+- If you have used `Base altitude multiplier`, set its value to `Altitude multiplier`.
 - If you have created custom biomes of Mistlands, Black Forest or Plains with `amount` parameter in `expand_world.yaml` then you need to add `seed: swamp` to the related world entries. 
 
 ## Migration from version 1.1
@@ -92,14 +96,13 @@ Note: Changing `Minimap size` resets explored areas.
 
 # Altitude
 
-For the altitude, there are two types of settings: `* altitude delta` and `* altitude multiplier`. The multiplier multiplies the distance to the water level (by default at 30 meters). So increasing the multiplier will make water more deeper and other terrain higher. The delta directly affects the altitude. For example positive values will make the underwater terrain more shallow.
+For the altitude, there are two settings: `Altitude delta` and `Altitude multiplier`. The multiplier multiplies the distance to the water level (by default at 30 meters). So increasing the multiplier will make water more deeper and other terrain higher. The delta directly affects the altitude. For example positive values will make the underwater terrain more shallow.
 
 The formula is: `water level + (altitude - water level) * multiplier + delta`.
 
-For the total altitude there are three layers:
-- Base altitude affects biome distribution. For example increasing the altitude will cause more mountains.
-- Biome altitudes only affect the altitude on that biome. This part of code also adds some elevation changes, even if the base altitude was made completely flat with 0 multiplier.
-- Altitude is the last step and affets the whole world. This can be used to make whole world flat, or to increase elevation without having more mountains to appear.
+For the total altitude there are two layers:
+- Altitude affects biome distribution. For example increasing the altitude will cause more mountains.
+- Biome altitudes only affect the altitude on that biome. This part of code also adds some elevation changes, even if the altitude was made completely flat with 0 multiplier.
 
 The final water depth can be multiplied with `Water depth multiplier`.
 
@@ -508,14 +511,17 @@ Copy-paste plains entry and change the top one:
 # Changelog
 
 - v1.4
+	- WARNING: Contains breaking changes for existing configs.
+  - Adds a new setting `Water depth multiplier`.
   - Adds compatibility with CLLC mod.
-  - Improves loading time.
-  - Improves performance (especially with multiple custom biomes).
   - Adds support of default biome seeding to the `seed` parameter of `expand_biomes.yaml`.
   - Changes the default biome seeding to use the `terrain` parameter of `expand_world.yaml`.
-  - Adds a new setting `Water depth multiplier`.
   - Fixes terrain desync issue.
   - Fixes the `Server only` mode not working.
+  - Improves loading time.
+  - Improves performance (especially with multiple custom biomes).
+  - Removes the settings `Altitude delta` and `Altitude multiplier` as obsolete.
+  - Renames the settings `Base altitude delta` and `Base altitude multiplier` to `Altitude delta` and `Altitude multiplier`.
 
 - v1.3
 	- Improves general error handling.

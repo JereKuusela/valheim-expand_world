@@ -29,8 +29,8 @@ public class BaseHeight {
   static void Postfix(WorldGenerator __instance, ref float __result) {
     if (__instance.m_world.m_menu) return;
     var waterLevel = Helper.HeightToBaseHeight(Configuration.WaterLevel);
-    __result = waterLevel + (__result - waterLevel) * Configuration.BaseAltitudeMultiplier;
-    __result += Helper.HeightToBaseHeight(Configuration.BaseAltitudeDelta);
+    __result = waterLevel + (__result - waterLevel) * Configuration.AltitudeMultiplier;
+    __result += Helper.HeightToBaseHeight(Configuration.AltitudeDelta);
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight))]
@@ -46,11 +46,7 @@ public class BiomeHeight {
     if (__instance.m_world.m_menu) return;
     var waterLevel = Configuration.WaterLevel;
     if (BiomeManager.TryGetData(__state, out var data))
-      __result = waterLevel + (__result - waterLevel) * data.altitudeMultiplier;
-    __result = waterLevel + (__result - waterLevel) * Configuration.AltitudeMultiplier;
-    __result += Configuration.AltitudeDelta;
-    if (data != null)
-      __result += data.altitudeDelta;
+      __result = waterLevel + (__result - waterLevel) * data.altitudeMultiplier + data.altitudeDelta;
     if (Configuration.WaterDepthMultiplier != 1f && __result < waterLevel)
       __result = waterLevel + (__result - waterLevel) * Configuration.WaterDepthMultiplier;
   }
