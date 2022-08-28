@@ -56,7 +56,7 @@ public class DebugCommands {
         }
       }
       float total = biomes.Values.Sum();
-      var text = biomes.OrderBy(kvp => BiomeManager.BiomeToName[kvp.Key]).Select(kvp => BiomeManager.BiomeToName[kvp.Key] + ": " + kvp.Value + "/" + total + " (" + (kvp.Value / total).ToString("P2", CultureInfo.InvariantCulture) + ")");
+      var text = biomes.OrderBy(kvp => kvp.Key.ToString()).Select(kvp => kvp.Key.ToString() + ": " + kvp.Value + "/" + total + " (" + (kvp.Value / total).ToString("P2", CultureInfo.InvariantCulture) + ")");
       args.Context.AddString(string.Join("\n", text));
     }, true);
   }

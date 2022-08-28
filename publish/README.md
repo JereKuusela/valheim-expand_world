@@ -510,6 +510,10 @@ Copy-paste plains entry and change the top one:
 
 # Changelog
 
+- v1.5
+  - Improves compatibility with Upgrade World mod.
+  - Fixes errors on main menu with Spawn That mod.
+
 - v1.4
 	- WARNING: Contains breaking changes for existing configs.
   - Adds a new setting `Water depth multiplier`.

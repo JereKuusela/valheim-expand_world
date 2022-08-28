@@ -35,6 +35,14 @@ public class GetNames {
     return false;
   }
 }
+[HarmonyPatch(typeof(Enum), nameof(Enum.GetName))]
+public class GetName {
+  static bool Prefix(Type enumType, object value, ref string __result) {
+    if (enumType != typeof(Heightmap.Biome)) return true;
+    __result = BiomeManager.BiomeToName[(Heightmap.Biome)value];
+    return false;
+  }
+}
 [HarmonyPatch(typeof(Enum), nameof(Enum.Parse), typeof(Type), typeof(string))]
 public class Parse {
   static bool Prefix(Type enumType, string value, ref object __result) {

@@ -79,20 +79,20 @@ public class VegetationManager {
   }
 
   public static void ToFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataVegetation) return;
+    if (!Helper.IsServer() || !Configuration.DataVegetation) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueVegetationData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer()) return;
+    if (!Helper.IsServer()) return;
     var yaml = Configuration.DataVegetation ? Data.Read(Pattern) : "";
     Configuration.valueVegetationData.Value = yaml;
     Set(yaml);
   }
   public static void FromSetting(string yaml) {
-    if (!ZNet.instance.IsServer()) Set(yaml);
+    if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataVegetation) return;

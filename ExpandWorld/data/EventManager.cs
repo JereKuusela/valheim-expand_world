@@ -45,20 +45,20 @@ public class EventManager {
   }
 
   public static void ToFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataEvents) return;
+    if (!Helper.IsServer() || !Configuration.DataEvents) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueEventData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer()) return;
+    if (!Helper.IsServer()) return;
     var yaml = Configuration.DataEvents ? Data.Read(Pattern) : "";
     Configuration.valueEventData.Value = yaml;
     Set(yaml);
   }
   public static void FromSetting(string yaml) {
-    if (!ZNet.instance.IsServer()) Set(yaml);
+    if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataEvents) return;

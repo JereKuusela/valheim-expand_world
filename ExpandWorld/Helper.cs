@@ -43,5 +43,7 @@ public static class Helper {
   public static float AltitudeToHeight(float altitude) => Configuration.WaterLevel + altitude;
   public static float AltitudeToBaseHeight(float altitude) => HeightToBaseHeight(AltitudeToHeight(altitude));
   public static float BaseHeightToAltitude(float baseHeight) => baseHeight * 200f - Configuration.WaterLevel;
+  public static bool IsServer() => ZNet.instance && !ZNet.instance.IsServer();
+  public static bool IsClient() => ZNet.instance && ZNet.instance.IsServer();
 }
 

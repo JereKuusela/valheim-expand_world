@@ -99,14 +99,14 @@ public class EnvironmentManager {
   }
 
   public static void ToFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataEnvironments) return;
+    if (!Helper.IsServer() || !Configuration.DataEnvironments) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueEnvironmentData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer()) return;
+    if (!Helper.IsServer()) return;
     var yaml = Configuration.DataEnvironments ? Data.Read(Pattern) : "";
     Configuration.valueEnvironmentData.Value = yaml;
     Set(yaml);
@@ -119,7 +119,7 @@ public class EnvironmentManager {
       .SelectMany(list => list).ToDictionary(env => env.m_name, env => env);
   }
   public static void FromSetting(string yaml) {
-    if (!ZNet.instance.IsServer()) Set(yaml);
+    if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataEnvironments) return;

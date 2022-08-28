@@ -72,20 +72,20 @@ public class LocationManager {
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
 
   public static void ToFile() {
-    if (!ZNet.instance.IsServer() || !Configuration.DataLocation) return;
+    if (!Helper.IsServer() || !Configuration.DataLocation) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueLocationData.Value = yaml;
   }
   public static void FromFile() {
-    if (!ZNet.instance.IsServer()) return;
+    if (!Helper.IsServer()) return;
     var yaml = Configuration.DataLocation ? Data.Read(Pattern) : "";
     Configuration.valueLocationData.Value = yaml;
     Set(yaml);
   }
   public static void FromSetting(string yaml) {
-    if (!ZNet.instance.IsServer()) Set(yaml);
+    if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataLocation) return;
