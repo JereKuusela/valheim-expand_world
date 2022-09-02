@@ -116,7 +116,7 @@ public class EnvironmentManager {
     Originals = LocationList.m_allLocationLists
       .Select(list => list.m_environments)
       .Append(EnvMan.instance.m_environments)
-      .SelectMany(list => list).ToDictionary(env => env.m_name, env => env);
+      .SelectMany(list => list).ToLookup(env => env.m_name, env => env).ToDictionary(kvp => kvp.Key, kvp => kvp.First());
   }
   public static void FromSetting(string yaml) {
     if (Helper.IsClient()) Set(yaml);

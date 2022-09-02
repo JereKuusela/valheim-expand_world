@@ -1,6 +1,8 @@
 using System;
 using System.Reflection.Emit;
 using HarmonyLib;
+using UnityEngine;
+
 namespace ExpandWorld;
 
 public static class Helper {
@@ -43,7 +45,13 @@ public static class Helper {
   public static float AltitudeToHeight(float altitude) => Configuration.WaterLevel + altitude;
   public static float AltitudeToBaseHeight(float altitude) => HeightToBaseHeight(AltitudeToHeight(altitude));
   public static float BaseHeightToAltitude(float baseHeight) => baseHeight * 200f - Configuration.WaterLevel;
-  public static bool IsServer() => ZNet.instance && !ZNet.instance.IsServer();
-  public static bool IsClient() => ZNet.instance && ZNet.instance.IsServer();
+  public static bool IsServer() => ZNet.instance && ZNet.instance.IsServer();
+  public static bool IsClient() => ZNet.instance && !ZNet.instance.IsServer();
+  public static Vector3 RandomValue(Range<Vector3> range) {
+    var x = UnityEngine.Random.Range(range.Min.x, range.Max.x);
+    var y = UnityEngine.Random.Range(range.Min.y, range.Max.y);
+    var z = UnityEngine.Random.Range(range.Min.z, range.Max.z);
+    return new(x, y, z);
+  }
 }
 

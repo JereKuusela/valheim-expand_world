@@ -322,8 +322,8 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - min (default: `1`): Minimum amount (of groups) to be placed.
 - max (default: `1`): Maximum amount (of groups) to be placed. If less than 1, has only a chance to appear.
 - forcePlacement (default: `false`): ???.
-- scaleMin (default: `1`): Minimum scale.
-- scaleMax (default: `1`): Maximum scale.
+- scaleMin (default: `1`): Minimum scale. Number or x,z,y (with y being the height).  
+- scaleMax (default: `1`): Maximum scale. Number or x,z,y (with y being the height).
 - randTilt (default: `0` degrees): Random rotation.
 - chanceToUseGroundTilt (default: `0.0`): Chance to set rotation based on terrain angle.
 - biome: List of possible biomes.
@@ -511,6 +511,7 @@ Copy-paste plains entry and change the top one:
 # Changelog
 
 - v1.5
+  - Adds support for setting each axis on vegetation scale.
   - Improves compatibility with Upgrade World mod.
   - Fixes errors on main menu with Spawn That mod.
 

@@ -31,7 +31,7 @@ public class GetValues {
 public class GetNames {
   static bool Prefix(Type enumType, ref string[] __result) {
     if (enumType != typeof(Heightmap.Biome)) return true;
-    __result = BiomeManager.BiomeToName.Values.ToArray();
+    __result = BiomeManager.BiomeToDisplayName.Values.ToArray();
     return false;
   }
 }
@@ -39,12 +39,15 @@ public class GetNames {
 public class GetName {
   static bool Prefix(Type enumType, object value, ref string __result) {
     if (enumType != typeof(Heightmap.Biome)) return true;
-    __result = BiomeManager.BiomeToName[(Heightmap.Biome)value];
+    if (BiomeManager.TryGetDisplayName((Heightmap.Biome)value, out var result))
+      __result = result;
+    else
+      __result = "None";
     return false;
   }
 }
 [HarmonyPatch(typeof(Enum), nameof(Enum.Parse), typeof(Type), typeof(string))]
-public class Parse {
+public class EnumParse {
   static bool Prefix(Type enumType, string value, ref object __result) {
     if (enumType != typeof(Heightmap.Biome)) return true;
     if (BiomeManager.TryGetBiome(value, out var biome))

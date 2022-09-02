@@ -19,7 +19,7 @@ public class ExpandWorld : BaseUnityPlugin {
   {
     DisplayName = NAME,
     CurrentVersion = VERSION,
-    MinimumRequiredVersion = "1.4",
+    MinimumRequiredVersion = "1.5",
     ModRequired = true,
     IsLocked = true
   };

@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
+using HarmonyLib;
+using UnityEngine;
+
 namespace ExpandWorld;
 
 public class VegetationManager {
@@ -9,7 +14,9 @@ public class VegetationManager {
   public static string Pattern = "expand_vegetation*.yaml";
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data) {
     var veg = new ZoneSystem.ZoneVegetation();
-    if (ZNetScene.instance.m_namedPrefabs.TryGetValue(data.prefab.GetStableHashCode(), out var obj))
+    var hash = data.prefab.GetStableHashCode();
+    Scale[hash] = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
+    if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
       veg.m_prefab = obj;
     else
       ExpandWorld.Log.LogWarning($"Vegetation prefab {data.prefab} not found!");
@@ -17,8 +24,8 @@ public class VegetationManager {
     veg.m_min = data.min;
     veg.m_max = data.max;
     veg.m_forcePlacement = data.forcePlacement;
-    veg.m_scaleMin = data.scaleMin;
-    veg.m_scaleMax = data.scaleMax;
+    veg.m_scaleMin = Parse.Scale(data.scaleMin).x;
+    veg.m_scaleMax = Parse.Scale(data.scaleMax).x;
     veg.m_randTilt = data.randTilt;
     veg.m_chanceToUseGroundTilt = data.chanceToUseGroundTilt;
     veg.m_biome = Data.ToBiomes(data.biome);
@@ -51,8 +58,8 @@ public class VegetationManager {
     data.min = veg.m_min;
     data.max = veg.m_max;
     data.forcePlacement = veg.m_forcePlacement;
-    data.scaleMin = veg.m_scaleMin;
-    data.scaleMax = veg.m_scaleMax;
+    data.scaleMin = veg.m_scaleMin.ToString();
+    data.scaleMax = veg.m_scaleMax.ToString();
     data.randTilt = veg.m_randTilt;
     data.chanceToUseGroundTilt = veg.m_chanceToUseGroundTilt;
     data.biome = Data.FromBiomes(veg.m_biome);
@@ -94,9 +101,11 @@ public class VegetationManager {
   public static void FromSetting(string yaml) {
     if (Helper.IsClient()) Set(yaml);
   }
+  public static Dictionary<int, Range<Vector3>> Scale = new();
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataVegetation) return;
     try {
+      Scale.Clear();
       var data = Data.Deserialize<VegetationData>(yaml, FileName)
       .Select(FromData).ToList();
       if (data.Count == 0) {
@@ -114,5 +123,30 @@ public class VegetationManager {
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);
+  }
+}
+
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.PlaceVegetation))]
+public class VegetationScale {
+  static void SetScale(ZNetView view) {
+    if (VegetationManager.Scale.TryGetValue(view.GetZDO().GetPrefab(), out var scale))
+      view.SetLocalScale(Helper.RandomValue(scale));
+  }
+  static void SetScaleTr(Transform tr) {
+    var hash = Utils.GetPrefabName(tr.gameObject).GetStableHashCode();
+    if (VegetationManager.Scale.TryGetValue(hash, out var scale))
+      tr.localScale = Helper.RandomValue(scale);
+  }
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Dup))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetScale).operand))
+      .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.PropertySetter(typeof(Transform), nameof(Transform.localScale))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Dup))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetScaleTr).operand))
+      .InstructionEnumeration();
   }
 }

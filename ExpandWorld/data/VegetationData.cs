@@ -9,10 +9,10 @@ public class VegetationData {
   public float max = 1f;
   [DefaultValue(false)]
   public bool forcePlacement = false;
-  [DefaultValue(1f)]
-  public float scaleMin = 1f;
-  [DefaultValue(1f)]
-  public float scaleMax = 1f;
+  [DefaultValue("1")]
+  public string scaleMin = "1";
+  [DefaultValue("1")]
+  public string scaleMax = "1";
   [DefaultValue(0f)]
   public float randTilt = 0f;
   [DefaultValue(0f)]

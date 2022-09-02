@@ -128,7 +128,7 @@ public class Data : MonoBehaviour {
     var biomeNumber = (int)biome;
     while (number <= biomeNumber) {
       if ((number & biomeNumber) > 0) {
-        if (BiomeManager.TryGetName(number, out var name))
+        if (BiomeManager.TryGetDisplayName(number, out var name))
           biomes.Add(name);
         else
           biomes.Add(number.ToString());
