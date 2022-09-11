@@ -133,6 +133,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - biome: Identifier for this biome. This is used in the other files.
 - name: Display name. Required for new biomes.
 - terrain: Identifier of the base biome. Determines which terrain algorithm to use. Required for new biomes.
+- nature: Identifier of the base biome. Determines which plants can grow here, whether bees are happy and foot steps. If not given, uses the terrain value.
 - altitudeDelta: Flat increase/decrease to the terrain altitude. See Altitude section for more info.
 - altitudeMultiplier: Multiplier to the terrain altitude (relative to the water level).
 - forestMultiplier: Multiplier to the global forest multiplier. Using this requires an extra biome check which will lower the performance.
@@ -512,9 +513,11 @@ Copy-paste plains entry and change the top one:
 
 - v1.5
   - Adds support for setting each axis on vegetation scale.
+  - Adds a new parameter `nature` to `expand_biomes.yaml`.
   - Improves compatibility with Upgrade World mod.
   - Fixes errors on main menu with Spawn That mod.
   - Fixes incompatibility with MonsterLabz mod (and probably some other creature mods too).
+  - Fixes incompatibility with Jewelcrafting mod.
 
 - v1.4
 	- WARNING: Contains breaking changes for existing configs.
@@ -534,20 +537,6 @@ Copy-paste plains entry and change the top one:
   - Adds error handling for missing spawn creatures.
   - Fixes error when trying to load locations data.
   - Fixes world generation error with CLLC mod.
-
-- v1.2
-	- WARNING: Breaking changes.
-  - Changes the color format of `expand_biomes.yaml` to be from 0.0 to 1.0 (instead of from 0 to 255). Regenerate the file or fix colors manually.
-	- Fixes `Altitude multiplier` multiplying biome specific `Altitude delta`. If you have used both, multiply the biome specific delta in the yaml file.
-  - Adds some error handling to allow partially loading the data.
-  - Adds a new field `paint` to the `expand_biomes.yaml` to set the default terrain paint.
-  - Adds a new field `mapColorMultiplier` to the `expand_biomes.yaml` to allow tweaking the height color.
-  - Adds a new field `stretch` to the `expand_world.yaml` to stretch individual biomes.
-  - Adds compatibility with Spawn That mod.
-  - Adds compatibility with Jotunn locations.
-  - Improves the data loading and syncing.
-	- Fixes wrong water level for the clutter system.
-  - Fixes visual glitches in the water areas.
 
 Thanks for Azumatt for creating the mod icon!
 

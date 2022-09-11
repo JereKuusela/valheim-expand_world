@@ -14,6 +14,8 @@ public class BiomeData {
   public string name = "";
   [DefaultValue("")]
   public string terrain = "";
+  [DefaultValue("")]
+  public string nature = "";
   [DefaultValue(1f)]
   public float altitudeMultiplier = 1f;
   [DefaultValue(1f)]

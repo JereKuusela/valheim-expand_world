@@ -40,6 +40,7 @@ public class BiomeManager {
   ///<summary>Original biome names because some mods rely on Enum.GetName(s) returning uppercase values.</summary>
   public static Dictionary<Heightmap.Biome, string> BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
+  private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToNature = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
   public static bool TryGetData(int biome, out BiomeData data) => BiomeToData.TryGetValue((Heightmap.Biome)biome, out data);
@@ -48,6 +49,7 @@ public class BiomeManager {
   public static bool TryGetDisplayName(int biome, out string name) => BiomeToDisplayName.TryGetValue((Heightmap.Biome)biome, out name);
   public static Heightmap.Biome[] Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain[biome];
+  public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature[biome];
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(new string[] { data.biome });
@@ -107,6 +109,7 @@ public class BiomeManager {
       foreach (var item in rawData) {
         item.biome = item.biome.ToLower();
         item.terrain = item.terrain.ToLower();
+        item.nature = item.nature.ToLower();
         var biome = (Heightmap.Biome)biomeNumber;
         var isDefaultBiome = false;
         if (NameToBiome.TryGetValue(item.biome, out var defaultBiome)) {
@@ -133,6 +136,13 @@ public class BiomeManager {
       }
       BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
       BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+        if (NameToBiome.TryGetValue(data.terrain, out var terrain))
+          return terrain;
+        return NameToBiome[data.biome];
+      });
+      BiomeToNature = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+        if (NameToBiome.TryGetValue(data.nature, out var nature))
+          return nature;
         if (NameToBiome.TryGetValue(data.terrain, out var terrain))
           return terrain;
         return NameToBiome[data.biome];

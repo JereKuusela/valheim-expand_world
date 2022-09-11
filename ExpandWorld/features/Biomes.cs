@@ -23,6 +23,7 @@ public class GetBiomeColor {
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiome))]
 public class HeightmapGetBiome {
+  public static bool Nature = false;
   private static Dictionary<Heightmap.Biome, float> Weights = new();
 
   public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z) {
@@ -56,7 +57,22 @@ public class HeightmapGetBiome {
     __result = GetBiome(__instance, x, z);
     return false;
   }
+  static Heightmap.Biome Postfix(Heightmap.Biome biome) {
+    if (Nature) return BiomeManager.GetNature(biome);
+    return biome;
+  }
 }
+
+
+[HarmonyPatch(typeof(Heightmap), nameof(Heightmap.FindBiome))]
+public class HeightmapFindBiome {
+  public static bool Nature = false;
+  static Heightmap.Biome Postfix(Heightmap.Biome biome) {
+    if (Nature) return BiomeManager.GetNature(biome);
+    return biome;
+  }
+}
+
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Initialize))]
 public class ResetBiomeOffsets {
   static void Prefix() {
