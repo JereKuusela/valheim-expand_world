@@ -23,6 +23,7 @@ public class BiomeManager {
     return data;
   }
   private static Dictionary<string, Heightmap.Biome> OriginalBiomes = new() {
+    { "None", Heightmap.Biome.None},
     { "Meadows", Heightmap.Biome.Meadows},
     { "Swamp", Heightmap.Biome.Swamp},
     { "Mountain", Heightmap.Biome.Mountain},

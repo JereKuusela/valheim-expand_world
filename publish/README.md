@@ -514,6 +514,7 @@ Copy-paste plains entry and change the top one:
   - Adds support for setting each axis on vegetation scale.
   - Improves compatibility with Upgrade World mod.
   - Fixes errors on main menu with Spawn That mod.
+  - Fixes incompatibility with MonsterLabz mod (and probably some other creature mods too).
 
 - v1.4
 	- WARNING: Contains breaking changes for existing configs.
