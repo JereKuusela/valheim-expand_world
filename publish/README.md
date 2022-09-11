@@ -34,6 +34,10 @@ This mod can be used only on the server. However only following files can be con
 
 When doing this, enable `Server only` on the config to remove version check.
 
+## Migration from version 1.5
+
+- Verify that `expand_vegetation.yaml` uses `.` as the separate character for `scaleMin` and `scaleMax` instead of `,`. Fix manually or remove the file to regerenate it.
+
 ## Migration from version 1.3
 
 - Back up your world.
@@ -510,6 +514,9 @@ Copy-paste plains entry and change the top one:
   amount: 0.5
 
 # Changelog
+
+- v1.6
+  - Fixes default vegetation scale being wrong in `expand_vegetation.yaml` (for some users).
 
 - v1.5
   - Adds support for setting each axis on vegetation scale.

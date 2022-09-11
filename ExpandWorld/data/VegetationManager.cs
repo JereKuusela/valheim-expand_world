@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
@@ -58,8 +59,8 @@ public class VegetationManager {
     data.min = veg.m_min;
     data.max = veg.m_max;
     data.forcePlacement = veg.m_forcePlacement;
-    data.scaleMin = veg.m_scaleMin.ToString();
-    data.scaleMax = veg.m_scaleMax.ToString();
+    data.scaleMin = veg.m_scaleMin.ToString(CultureInfo.InvariantCulture);
+    data.scaleMax = veg.m_scaleMax.ToString(CultureInfo.InvariantCulture);
     data.randTilt = veg.m_randTilt;
     data.chanceToUseGroundTilt = veg.m_chanceToUseGroundTilt;
     data.biome = Data.FromBiomes(veg.m_biome);
