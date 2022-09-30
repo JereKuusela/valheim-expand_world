@@ -11,18 +11,11 @@ namespace ExpandWorld;
 public class ExpandWorld : BaseUnityPlugin {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.6";
+  public const string VERSION = "1.8";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
-  public static ServerSync.ConfigSync ConfigSync = new(GUID)
-  {
-    DisplayName = NAME,
-    CurrentVersion = VERSION,
-    MinimumRequiredVersion = "1.6",
-    ModRequired = true,
-    IsLocked = true
-  };
+  public static ServerSync.ConfigSync ConfigSync = new(GUID, NAME, VERSION);
   public static string ConfigName = "";
   public static string ConfigPath = "";
   public void Awake() {

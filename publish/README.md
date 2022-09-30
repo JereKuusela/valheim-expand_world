@@ -159,7 +159,7 @@ Each entry in the file adds a new rule. When determing the biome, the rules are 
 
 - biome: Identifier of the biome if this rule is valid.
 - maxAltitude (default: `1000` meters): Maximum terrain height relative to the water level.
-- minAltitude (default: `-1000` meters): Minimum terrain height relative to the water level.
+- minAltitude (default: `0` meters if maxAltitude is positive, otherwise `-1000` meters): Minimum terrain height relative to the water level.
 - maxDistance (default: `1.0` of world radius): Maximum distance from the world center.
 - minDistance (default: `0.0` of world radius): Minimum distance from the world center.
 - minSector (default: `0.0` of world angle): Start of the [circle sector](https://en.wikipedia.org/wiki/Circular_sector).
@@ -514,6 +514,11 @@ Copy-paste plains entry and change the top one:
   amount: 0.5
 
 # Changelog
+
+- v1.7
+  - Changes the default minimum altitude of `expand_spawns.yaml` to depend on maximum altitude (-1000 or 0).
+  - Improves compatibility with Spawn That mod.
+  - Fixes possible error when flying.
 
 - v1.6
   - Fixes default vegetation scale being wrong in `expand_vegetation.yaml` (for some users).

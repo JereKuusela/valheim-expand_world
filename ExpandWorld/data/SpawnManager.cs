@@ -31,6 +31,8 @@ public class SpawnManager {
     spawn.m_groupRadius = data.groupRadius;
     spawn.m_minAltitude = data.minAltitude;
     spawn.m_maxAltitude = data.maxAltitude;
+    if (spawn.m_minAltitude == -10000f)
+      spawn.m_minAltitude = spawn.m_maxAltitude > 0f ? 0f : -1000f;
     spawn.m_minTilt = data.minTilt;
     spawn.m_maxTilt = data.maxTilt;
     spawn.m_inForest = data.inForest;

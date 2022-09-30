@@ -15,7 +15,7 @@ public class SpawnData {
   public int maxLevel = 1;
   [DefaultValue(1)]
   public int minLevel = 1;
-  [DefaultValue(-1000f)]
+  [DefaultValue(-10000f)]
   public float minAltitude = -1000f;
   [DefaultValue(1000f)]
   public float maxAltitude = 1000f;

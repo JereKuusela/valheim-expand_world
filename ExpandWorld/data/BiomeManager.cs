@@ -49,7 +49,7 @@ public class BiomeManager {
   public static bool TryGetDisplayName(int biome, out string name) => BiomeToDisplayName.TryGetValue((Heightmap.Biome)biome, out name);
   public static Heightmap.Biome[] Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain[biome];
-  public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature[biome];
+  public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature.TryGetValue((Heightmap.Biome)biome, out var nature) ? nature : biome;
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(new string[] { data.biome });

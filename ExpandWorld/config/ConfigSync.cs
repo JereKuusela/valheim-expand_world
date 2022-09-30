@@ -103,9 +103,8 @@ public class ConfigSync {
   public bool InitialSyncDone = false;
 
   public readonly string Name;
-  public string? DisplayName;
-  public string? CurrentVersion;
-  public string? MinimumRequiredVersion;
+  public string DisplayName;
+  public string CurrentVersion;
   public bool ModRequired = false;
 
   private bool? forceConfigLocking;
@@ -156,8 +155,11 @@ public class ConfigSync {
     });
   }
 
-  public ConfigSync(string name) {
+  public ConfigSync(string name, string display, string version) {
     Name = name;
+    DisplayName = display;
+    CurrentVersion = version;
+    IsLocked = true;
     configSyncs.Add(this);
     new VersionCheck(this);
   }
