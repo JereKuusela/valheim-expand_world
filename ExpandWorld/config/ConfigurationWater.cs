@@ -8,8 +8,6 @@ public partial class Configuration {
   public static bool Rivers => configRivers.Value;
   public static ConfigEntry<bool> configStreams;
   public static bool Streams => configStreams.Value;
-  public static ConfigEntry<string> configWaterDepthMultiplier;
-  public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier];
   public static ConfigEntry<string> configWaterLevel;
   public static float WaterLevel => ConfigWrapper.Floats[configWaterLevel];
   public static ConfigEntry<string> configWaveMultiplier;
@@ -71,7 +69,6 @@ public partial class Configuration {
   public static void InitWater(ConfigWrapper wrapper) {
     var section = "3. Water";
     configRivers = wrapper.Bind(section, "Rivers", true, true, "Enables rivers.");
-    configWaterDepthMultiplier = wrapper.BindFloat(section, "Water depth multiplier", 1f, true, "Multplies the water depth.");
     configWaterLevel = wrapper.BindFloat(section, "Water level", 30f, true, "Sets the altitude of the water.");
     configWaterLevel.SettingChanged += (s, e) => {
       WaterHelper.SetLevel(ZoneSystem.instance);
