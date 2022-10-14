@@ -17,6 +17,10 @@ public partial class Configuration {
   public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize];
   public static ConfigEntry<bool> configServerOnly;
   public static bool ServerOnly => configServerOnly.Value;
+  public static ConfigEntry<string> configEventInterval;
+  public static float EventInterval => ConfigWrapper.Floats[configEventInterval];
+  public static ConfigEntry<string> configEventChance;
+  public static float EventChance => ConfigWrapper.Floats[configEventChance];
 
   public static ConfigEntry<string> configAltitudeMultiplier;
   public static float AltitudeMultiplier => ConfigWrapper.Floats[configAltitudeMultiplier];
@@ -119,6 +123,10 @@ public partial class Configuration {
     configOffsetX = wrapper.BindInt(section, "Offset X", null, true);
     configOffsetY = wrapper.BindInt(section, "Offset Y", null, true);
     configHeightSeed = wrapper.BindInt(section, "Height variation seed", null, true);
+    configEventChance = wrapper.BindFloat(section, "Random event chance", 20, false, "The chance to try starting a random event.");
+    configEventChance.SettingChanged += (s, e) => RandomEventSystem.Setup(RandEventSystem.instance);
+    configEventInterval = wrapper.BindFloat(section, "Random event interval", 45, false, "How often the random events are checked (minutes).");
+    configEventInterval.SettingChanged += (s, e) => RandomEventSystem.Setup(RandEventSystem.instance);
 
     InitWater(wrapper);
 

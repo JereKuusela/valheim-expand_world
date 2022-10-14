@@ -170,6 +170,7 @@ public class BiomeManager {
     Load(yaml);
     Data.BiomesLoaded = true;
     SpawnThatPatcher.InitConfiguration();
+    CustomRaidsPatcher.InitConfiguration();
     CLLCPatcher.InitConfiguration();
 
   }

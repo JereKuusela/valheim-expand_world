@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace ExpandWorld;
@@ -7,6 +8,8 @@ public class EventManager {
   public static string FileName = "expand_events.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_events*.yaml";
+  public static Dictionary<string, string[]> EventToRequirentEnvironment = new();
+
   public static RandomEvent FromData(EventData data) {
     var random = new RandomEvent();
     random.m_name = data.name;
@@ -23,6 +26,7 @@ public class EventManager {
     random.m_endMessage = data.endMessage;
     random.m_forceMusic = data.forceMusic;
     random.m_forceEnvironment = data.forceEnvironment;
+    EventToRequirentEnvironment[data.name] = data.requiredEnvironments.Select(s => s.ToLower()).ToArray();
     return random;
   }
   public static EventData ToData(RandomEvent random) {
@@ -63,12 +67,8 @@ public class EventManager {
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataEvents) return;
     try {
-      var data = Data.Deserialize<EventData>(yaml, FileName)
-      .Select(FromData).ToList();
-      if (data.Count == 0) {
-        ExpandWorld.Log.LogWarning($"Failed to load any event data.");
-        return;
-      }
+      EventToRequirentEnvironment.Clear();
+      var data = Data.Deserialize<EventData>(yaml, FileName).Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} event data.");
       foreach (var list in LocationList.m_allLocationLists)
         list.m_events.Clear();

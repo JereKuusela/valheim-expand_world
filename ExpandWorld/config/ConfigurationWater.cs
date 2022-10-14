@@ -83,32 +83,32 @@ public partial class Configuration {
     configWaveOnlyHeight.SettingChanged += (s, e) => {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };
-    configLakeSearchInterval = wrapper.BindFloat(section, "Lake search interval", 128f, true, "How often a point is checked for lakes (meters).");
-    configLakeDepth = wrapper.BindFloat(section, "Lake depth", -20f, true, "How deep the lake.");
-    configLakeMergeRadius = wrapper.BindFloat(section, "Lake merge radius", 800f, true, "How deep the lake.");
-    configLakeMaxDistance1 = wrapper.BindFloat(section, "Lake max distance 1", 2000f, true, "How deep the lake.");
-    configLakeMaxDistance2 = wrapper.BindFloat(section, "Lake max distance 2", 5000f, true, "How deep the lake.");
-    configRiverCheckInterval = wrapper.BindFloat(section, "River check interval", 128f, true, "How deep the lake.");
-    configRiverCurveWaveLength = wrapper.BindFloat(section, "River curve wave length", 20f, true, "How deep the lake.");
-    configRiverCurveWidth = wrapper.BindFloat(section, "River curve width", 15f, true, "How deep the lake.");
-    configRiverMaxAltitude = wrapper.BindFloat(section, "River max altitude", 50f, true, "How deep the lake.");
-    configRiverMinWidth = wrapper.BindFloat(section, "River min width", 60f, true, "How deep the lake.");
-    configRiverMaxWidth = wrapper.BindFloat(section, "River max width", 100f, true, "How deep the lake.");
-    configRiverSeed = wrapper.BindInt(section, "River seed", null, true);
+    configLakeSearchInterval = wrapper.BindFloat(section, "Lake search interval", 128f, true, "How often a point is checked for lakes (meters). Increase to find more smaller lakes.");
+    configLakeDepth = wrapper.BindFloat(section, "Lake depth", -20f, true, "How deep the point must be to be considered a lake. Increase to find more shallow lakes.");
+    configLakeMergeRadius = wrapper.BindFloat(section, "Lake merge radius", 800f, true, "How big area is merged to a single lake. Decrease to get more lakes.");
+    configLakeMaxDistance1 = wrapper.BindFloat(section, "Lake max distance 1", 2000f, true, "Lakes within this distance get a river between them. Increase to place more and longer rivers.");
+    configLakeMaxDistance2 = wrapper.BindFloat(section, "Lake max distance 2", 5000f, true, "Fallback. Lakes without a river do a longer search and place one river to a random lake. Increase to enable very long rivers without increasing the total amount that much. ");
+    configRiverCheckInterval = wrapper.BindFloat(section, "River check interval", 128f, true, "How often the river altitude is checked. Both `River max altitude` and `Lake point depth`.");
+    configRiverCurveWaveLength = wrapper.BindFloat(section, "River curve wave length", 20f, true, "How often the river changes direction.");
+    configRiverCurveWidth = wrapper.BindFloat(section, "River curve width", 15f, true, "How wide the curves are.");
+    configRiverMaxAltitude = wrapper.BindFloat(section, "River max altitude", 50f, true, "The river is not valid if this terrain altitude is found between the lakes.");
+    configRiverMinWidth = wrapper.BindFloat(section, "River min width", 60f, true, "or each river, the minimum width is randomly selected between this and selected maximum width. So the average width is closer to the `River minimum width` than the `River maximum width`.");
+    configRiverMaxWidth = wrapper.BindFloat(section, "River max width", 100f, true, "For each river, the maximum width is randomly selected between this and `River minimum width`.");
+    configRiverSeed = wrapper.BindInt(section, "River seed", null, true, "Seed which determines the random river widths. By default derived from the world seed.");
 
     configStreams = wrapper.Bind(section, "Streams", true, true, "Enables streams.");
-    configStreamSeed = wrapper.BindInt(section, "Stream seed", null, true);
-    configStreamMaxAmount = wrapper.BindInt(section, "Stream max amount", 3000, true);
-    configStreamSearchIterations = wrapper.BindInt(section, "Stream search iterations", 100, true);
-    configStreamStartMinAltitude = wrapper.BindFloat(section, "Stream start min altitude", -4f, true);
-    configStreamStartMaxAltitude = wrapper.BindFloat(section, "Stream start max altitude", 1f, true);
-    configStreamEndMinAltitude = wrapper.BindFloat(section, "Stream end min altitude", 6f, true);
-    configStreamEndMaxAltitude = wrapper.BindFloat(section, "Stream end max altitude", 14f, true);
-    configStreamMaxWidth = wrapper.BindFloat(section, "Stream max width", 20f, true);
-    configStreamMinWidth = wrapper.BindFloat(section, "Stream min width", 20f, true);
-    configStreamMinLength = wrapper.BindFloat(section, "Stream min length", 80f, true);
-    configStreamMaxLength = wrapper.BindFloat(section, "Stream max length", 200f, true);
-    configStreamCurveWaveLength = wrapper.BindFloat(section, "Stream curve wave length", 20f, true);
-    configStreamCurveWidth = wrapper.BindFloat(section, "Stream curve width", 15f, true);
+    configStreamSeed = wrapper.BindInt(section, "Stream seed", null, true, "Seed which determines the stream positions. By default derived from the world seed.");
+    configStreamMaxAmount = wrapper.BindInt(section, "Stream max amount", 3000, true, "How many times the code tries to place a stream. This is NOT scaled with the world radius.");
+    configStreamSearchIterations = wrapper.BindInt(section, "Stream search iterations", 100, true, "How many times the code tries to find a suitable start and end point.");
+    configStreamStartMinAltitude = wrapper.BindFloat(section, "Stream start min altitude", -4f, true, "Minimum terrain height for stream starts.");
+    configStreamStartMaxAltitude = wrapper.BindFloat(section, "Stream start max altitude", 1f, true, "Maximum terrain height for stream starts.");
+    configStreamEndMinAltitude = wrapper.BindFloat(section, "Stream end min altitude", 6f, true, "Minimum terrain height for stream ends.");
+    configStreamEndMaxAltitude = wrapper.BindFloat(section, "Stream end max altitude", 14f, true, "Maximum terrain height for stream ends.");
+    configStreamMaxWidth = wrapper.BindFloat(section, "Stream max width", 20f, true, "For each stream, the maximum width is randomly selected between this and `Stream minimum width`.");
+    configStreamMinWidth = wrapper.BindFloat(section, "Stream min width", 20f, true, "For each stream, the minimum width is randomly selected between this and selected maximum width. So the average width is closer to the `Stream minimum width` than the `Stream maximum width`");
+    configStreamMinLength = wrapper.BindFloat(section, "Stream min length", 80f, true, "Minimum length for streams.");
+    configStreamMaxLength = wrapper.BindFloat(section, "Stream max length", 200f, true, "Maximum length for streams.");
+    configStreamCurveWaveLength = wrapper.BindFloat(section, "Stream curve wave length", 20f, true, "How wide the curves are.");
+    configStreamCurveWidth = wrapper.BindFloat(section, "Stream curve width", 15f, true, "How often the stream changes direction.");
   }
 }

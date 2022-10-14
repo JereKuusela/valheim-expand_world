@@ -15,6 +15,8 @@ public class EventData {
   public string[] requiredGlobalKeys = new string[0];
   [DefaultValue(new string[0])]
   public string[] notRequiredGlobalKeys = new string[0];
+  [DefaultValue(new string[0])]
+  public string[] requiredEnvironments = new string[0];
   [DefaultValue("")]
   public string startMessage = "";
   [DefaultValue("")]

@@ -41,6 +41,7 @@ public class ExpandWorld : BaseUnityPlugin {
   public void Start() {
     SpawnThatPatcher.Run();
     CLLCPatcher.Run();
+    CustomRaidsPatcher.Run();
     JotunnWrapper.Run();
   }
   public void LateUpdate() {
