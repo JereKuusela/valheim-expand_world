@@ -50,6 +50,7 @@ public class BiomeManager {
   public static Heightmap.Biome[] Biomes = BiomeToName.Keys.OrderBy(s => s).ToArray();
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain[biome];
   public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature.TryGetValue((Heightmap.Biome)biome, out var nature) ? nature : biome;
+  public static Heightmap.Biome MaxBiome = (Heightmap.Biome)((2 * (int)Heightmap.Biome.Mistlands) - 1);
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(new string[] { data.biome });
@@ -134,6 +135,7 @@ public class BiomeManager {
         BiomeToData[biome] = item;
         biomeNumber *= 2;
       }
+      MaxBiome = (Heightmap.Biome)(biomeNumber - 1);
       BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
       BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
         if (NameToBiome.TryGetValue(data.terrain, out var terrain))
