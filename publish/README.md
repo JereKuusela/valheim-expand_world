@@ -142,6 +142,9 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - altitudeMultiplier: Multiplier to the terrain altitude (relative to the water level).
 - forestMultiplier: Multiplier to the global forest multiplier. Using this requires an extra biome check which will lower the performance.
 - environments: List of available environments (weathers) and their relative chances.
+- maximumAltitude (default: `1000` meters): Maximum altitude.
+- minimumAltitude (default: `-1000` meters): Minimum altitude.
+- excessFactor (default: `0.5`): How strongly the altitude is reduced if over the maximum or minimum limit. For example 0.5 square roots the excess altitude.
 - paint: Default terrain paint. r = dirt, g = cultivated, b = paved, a = does nothing. Values from 0.0 to 1.0. Using this will lower the performance.
 - color: Terrain style. Not fully sure how this works but the color value somehow determines which default biome terrain style to use.
 - mapColorMultiplier (default: `1.0`): Changes how quickly the terrain altitude affects the map color. Increasing the value can be useful for low altitude biomes to show the altitude differences better. Lowering the value can be useful for high altitude biomes to reduce amount of white color (from mountain altitudes). Negative value can be useful for underwater biomes to show the map color (normally all underwater areas get blueish color).
@@ -372,7 +375,7 @@ See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 - spawnAtDay (default: `true`): Enabled during the day time.
 - spawnAtNight (default: `true`): Enabled during the night time.
 - requiredGlobalKey: Which [global keys](https://valheim.fandom.com/wiki/Global_Keys) must be set to enable this entry.
-- requiredEnvironments: List of possible environments/weathers.
+- requiredEnvironments: List of valid environments/weathers.
 - spawnDistance (default: `10` meters): Distance to suppress similar spawns.
 - spawnRadiusMin (default: `40` meters): Minimum distance from every player.
 - spawnRadiusMax (default: `80` meters): Maximum distance from any player.
@@ -406,6 +409,7 @@ See the [wiki](https://valheim.fandom.com/wiki/Events) for more info.
 - endMessage: The end message.
 - forceMusic: Event music.
 - forceEnvironment: Event environment/weather.
+- requiredEnvironments: List of valid environments/weathers. Checked by the server so using `env` command in the client doesn't affect this.
 - spawns: List of spawned objects. See spawns section for more info. Usually these have lower spawn times and less restrictions compared to normal spawns.
 - pauseIfNoPlayerInArea (default: `true`): The event timer pauses if no player in the area.
 - random (default: `true`): The event can happen randomly (unlike boss events which happen when near a boss).
@@ -518,40 +522,16 @@ Copy-paste plains entry and change the top one:
 
 - v1.7
   - Adds a new field `waterDepthMultiplier` to the `expand_biomes.yaml`.
+  - Adds a new field `requiredEnvironments` to the `expand_events.yaml`.
+  - Adds new fields `maximumAltitude`, `minimumAltitude` and `excessFactor` to the `expand_biomes.yaml`.
+  - Adds a failsafe for missing locations or vegetations (so that the world loads at least).
   - Changes the default minimum altitude of `expand_spawns.yaml` to depend on maximum altitude (-1000 or 0).
   - Improves compatibility with Spawn That mod.
   - Fixes possible error when flying.
-  - Fixes incompatibility with Custom Raids mod.
+  - Fixes incompatibility with Custom Raids mod (+ event data is disabled).
 
 - v1.6
   - Fixes default vegetation scale being wrong in `expand_vegetation.yaml` (for some users).
-
-- v1.5
-  - Adds support for setting each axis on vegetation scale.
-  - Adds a new parameter `nature` to `expand_biomes.yaml`.
-  - Improves compatibility with Upgrade World mod.
-  - Fixes errors on main menu with Spawn That mod.
-  - Fixes incompatibility with MonsterLabz mod (and probably some other creature mods too).
-  - Fixes incompatibility with Jewelcrafting mod.
-
-- v1.4
-	- WARNING: Contains breaking changes for existing configs.
-  - Adds a new setting `Water depth multiplier`.
-  - Adds compatibility with CLLC mod.
-  - Adds support of default biome seeding to the `seed` parameter of `expand_biomes.yaml`.
-  - Changes the default biome seeding to use the `terrain` parameter of `expand_world.yaml`.
-  - Fixes terrain desync issue.
-  - Fixes the `Server only` mode not working.
-  - Improves loading time.
-  - Improves performance (especially with multiple custom biomes).
-  - Removes the settings `Altitude delta` and `Altitude multiplier` as obsolete.
-  - Renames the settings `Base altitude delta` and `Base altitude multiplier` to `Altitude delta` and `Altitude multiplier`.
-
-- v1.3
-	- Improves general error handling.
-  - Adds error handling for missing spawn creatures.
-  - Fixes error when trying to load locations data.
-  - Fixes world generation error with CLLC mod.
 
 Thanks for Azumatt for creating the mod icon!
 

@@ -108,7 +108,7 @@ public class VegetationManager {
     try {
       Scale.Clear();
       var data = Data.Deserialize<VegetationData>(yaml, FileName)
-      .Select(FromData).ToList();
+      .Select(FromData).Where(veg => veg.m_prefab).ToList();
       if (data.Count == 0) {
         ExpandWorld.Log.LogWarning($"Failed to load any vegetation data.");
         return;

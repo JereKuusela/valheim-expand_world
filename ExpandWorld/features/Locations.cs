@@ -89,3 +89,11 @@ public class GenerateLocations {
     return matcher.InstructionEnumeration();
   }
 }
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.PlaceLocations))]
+public class PlaceLocationsFailsafe {
+  static bool Prefix(ZoneSystem __instance, Vector2i zoneID) {
+    if (__instance.m_locationInstances.TryGetValue(zoneID, out var locationInstance))
+      return locationInstance.m_location != null && locationInstance.m_location.m_prefab;
+    return true;
+  }
+}
