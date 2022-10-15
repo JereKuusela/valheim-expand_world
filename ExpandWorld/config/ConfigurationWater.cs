@@ -65,9 +65,12 @@ public partial class Configuration {
   public static float StreamCurveWidth => ConfigWrapper.Floats[configStreamCurveWidth];
   public static ConfigEntry<string> configStreamCurveWaveLength;
   public static float StreamCurveWaveLength => ConfigWrapper.Floats[configStreamCurveWaveLength];
+  public static ConfigEntry<string> configWaterDepthMultiplier;
+  public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier];
 #nullable enable
   public static void InitWater(ConfigWrapper wrapper) {
     var section = "3. Water";
+    configWaterDepthMultiplier = wrapper.BindFloat(section, "Water depth multiplier", 1f, true, "Multplies the water depth.");
     configRivers = wrapper.Bind(section, "Rivers", true, true, "Enables rivers.");
     configWaterLevel = wrapper.BindFloat(section, "Water level", 30f, true, "Sets the altitude of the water.");
     configWaterLevel.SettingChanged += (s, e) => {

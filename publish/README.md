@@ -169,6 +169,7 @@ Each entry in the file adds a new rule. When determing the biome, the rules are 
 - amount (default: `1.0` of total area): How much of the valid area is randomly filled with this biome. Uses normal distribution, see values below.
 - stretch (default: `1.0`): Same as the `Stretch biomes` setting but applied just to a single entry. Multiplies the size of biome areas (average total area stays the same). 
 - seed: Overrides the random outcome of `amount`. Numeric value fixes the outcome. Biome name uses a biome specific value derived from the world seed. No value uses biome from the `terrain` parameter.
+- waterDepthMultiplier (default: `1.0`): Multiplies negative terrain altitude.
 - wiggleDistance (default: `true`): Applies "wiggle" to the `minDistance`.
 - wiggleSector (default: `true`): Applies "wiggle" to the `maxSector` and `minSector`.
 
@@ -516,6 +517,7 @@ Copy-paste plains entry and change the top one:
 # Changelog
 
 - v1.7
+  - Adds a new field `waterDepthMultiplier` to the `expand_biomes.yaml`.
   - Changes the default minimum altitude of `expand_spawns.yaml` to depend on maximum altitude (-1000 or 0).
   - Improves compatibility with Spawn That mod.
   - Fixes possible error when flying.

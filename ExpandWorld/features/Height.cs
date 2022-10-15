@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
@@ -46,17 +45,21 @@ public class BiomeHeight {
   }
   static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result) {
     if (__instance.m_world.m_menu) return;
-    var waterLevel = Configuration.WaterLevel;
+    __result -= Configuration.WaterLevel;
     if (BiomeManager.TryGetData(__state, out var data)) {
-      __result -= waterLevel;
       __result *= data.altitudeMultiplier + data.altitudeDelta;
-      if (data.waterDepthMultiplier != 1f && __result < 0f)
+      if (__result < 0f) {
         __result *= data.waterDepthMultiplier;
+        __result *= Configuration.WaterDepthMultiplier;
       }
       if (__result > data.maximumAltitude)
         __result = data.maximumAltitude + Mathf.Pow(__result - data.maximumAltitude, data.excessFactor);
       if (__result < data.minimumAltitude)
         __result = data.minimumAltitude - Mathf.Pow(data.minimumAltitude - __result, data.excessFactor);
-      __result += waterLevel;
+    } else {
+      if (__result < 0f)
+        __result *= Configuration.WaterDepthMultiplier;
     }
+    __result += Configuration.WaterLevel;
+  }
 }
