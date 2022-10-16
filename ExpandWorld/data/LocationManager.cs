@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
 
@@ -9,8 +10,15 @@ public class LocationManager {
   public static string FileName = "expand_locations.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_locations*.yaml";
+  public static Dictionary<string, ZDO> ZDO = new();
   public static ZoneSystem.ZoneLocation FromData(LocationData data) {
     var loc = new ZoneSystem.ZoneLocation();
+    if (data.data != "") {
+      ZPackage pkg = new(data.data);
+      ZDO zdo = new();
+      Data.Deserialize(zdo, pkg);
+      ZDO[data.prefab] = zdo;
+    }
     loc.m_prefabName = data.prefab;
     loc.m_enable = data.enabled;
     loc.m_biome = Data.ToBiomes(data.biome);
@@ -90,6 +98,7 @@ public class LocationManager {
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataLocation) return;
     try {
+      ZDO.Clear();
       var data = Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
       if (data.Count == 0) {
@@ -124,7 +133,7 @@ public class LocationManager {
     var zs = ZoneSystem.instance;
     foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations) {
       if (JotunnWrapper.IsCustomlocation(zoneLocation.m_prefabName)) continue;
-      if (!Locations.TryGetValue(zoneLocation.m_prefabName, out var location)) {
+      if (!Locations.TryGetValue(zoneLocation.m_prefabName.Split('#')[0], out var location)) {
         // Don't warn on the default data.
         if (Configuration.valueLocationData.Value != "")
           ExpandWorld.Log.LogWarning($"Location prefab {zoneLocation.m_prefabName} not found!");
@@ -149,5 +158,32 @@ public class LocationManager {
   }
   public static void SetupWatcher() {
     Data.SetupWatcher(Pattern, FromFile);
+  }
+}
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.CreateLocationProxy))]
+public class LocationZDO {
+  static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation, ZoneSystem.SpawnMode mode) {
+    if (!LocationManager.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
+    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(pos);
+    Data.CopyData(data.Clone(), ZNetView.m_initZDO);
+    ZNetView.m_initZDO.m_rotation = rotation;
+    if (__instance.m_locationProxyPrefab.GetComponent<ZNetView>() is { } view) {
+      ZNetView.m_initZDO.m_type = view.m_type;
+      ZNetView.m_initZDO.m_distant = view.m_distant;
+      ZNetView.m_initZDO.m_persistent = view.m_persistent;
+      ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
+    }
+    ZNetView.m_initZDO.m_dataRevision = 1;
+
+  }
+}
+[HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
+public class FixGhostInit {
+  static void Prefix(LocationProxy __instance, ref bool spawnNow) {
+    if (ZNetView.m_ghostInit) {
+      spawnNow = false;
+      __instance.m_nview.m_ghost = true;
+      ZNetScene.instance.m_instances.Remove(__instance.m_nview.GetZDO());
+    }
   }
 }

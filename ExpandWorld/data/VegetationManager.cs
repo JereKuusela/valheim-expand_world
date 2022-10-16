@@ -16,7 +16,13 @@ public class VegetationManager {
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data) {
     var veg = new ZoneSystem.ZoneVegetation();
     var hash = data.prefab.GetStableHashCode();
-    Scale[hash] = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
+    Scale[veg] = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
+    if (data.data != "") {
+      ZPackage pkg = new(data.data);
+      ZDO zdo = new();
+      Data.Deserialize(zdo, pkg);
+      ZDO[veg] = zdo;
+    }
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
       veg.m_prefab = obj;
     else
@@ -102,11 +108,13 @@ public class VegetationManager {
   public static void FromSetting(string yaml) {
     if (Helper.IsClient()) Set(yaml);
   }
-  public static Dictionary<int, Range<Vector3>> Scale = new();
+  public static Dictionary<ZoneSystem.ZoneVegetation, Range<Vector3>> Scale = new();
+  public static Dictionary<ZoneSystem.ZoneVegetation, ZDO> ZDO = new();
   private static void Set(string yaml) {
     if (yaml == "" || !Configuration.DataVegetation) return;
     try {
       Scale.Clear();
+      ZDO.Clear();
       var data = Data.Deserialize<VegetationData>(yaml, FileName)
       .Select(FromData).Where(veg => veg.m_prefab).ToList();
       if (data.Count == 0) {
@@ -129,17 +137,45 @@ public class VegetationManager {
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.PlaceVegetation))]
 public class VegetationScale {
+  private static ZoneSystem.ZoneVegetation Veg = new();
+  static ZoneSystem.ZoneVegetation SetVeg(ZoneSystem.ZoneVegetation veg) {
+    Veg = veg;
+    return veg;
+  }
+  static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
+    if (VegetationManager.ZDO.TryGetValue(Veg, out var data)) {
+      ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(position);
+      Data.CopyData(data.Clone(), ZNetView.m_initZDO);
+      ZNetView.m_initZDO.m_rotation = rotation;
+      if (prefab.GetComponent<ZNetView>() is { } view) {
+        ZNetView.m_initZDO.m_type = view.m_type;
+        ZNetView.m_initZDO.m_distant = view.m_distant;
+        ZNetView.m_initZDO.m_persistent = view.m_persistent;
+        ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
+      }
+      ZNetView.m_initZDO.m_dataRevision = 1;
+    }
+    return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+  }
   static void SetScale(ZNetView view) {
-    if (VegetationManager.Scale.TryGetValue(view.GetZDO().GetPrefab(), out var scale))
+    if (ZNetView.m_ghostInit) {
+      view.m_ghost = true;
+      ZNetScene.instance.m_instances.Remove(view.GetZDO());
+    }
+    if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
       view.SetLocalScale(Helper.RandomValue(scale));
   }
   static void SetScaleTr(Transform tr) {
-    var hash = Utils.GetPrefabName(tr.gameObject).GetStableHashCode();
-    if (VegetationManager.Scale.TryGetValue(hash, out var scale))
+    if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
       tr.localScale = Helper.RandomValue(scale);
   }
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
     return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ZoneSystem.ZoneVegetation), nameof(ZoneSystem.ZoneVegetation.m_enable))))
+      .Insert(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetVeg).operand))
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.StartGhostInit))))
+      .Advance(5)
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
       .Advance(1)
       .InsertAndAdvance(new CodeInstruction(OpCodes.Dup))

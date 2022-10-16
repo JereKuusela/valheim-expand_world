@@ -46,4 +46,6 @@ public class LocationData {
   public float forestTresholdMin = 0f;
   [DefaultValue(1f)]
   public float forestTresholdMax = 1f;
+  [DefaultValue("")]
+  public string data = "";
 }
