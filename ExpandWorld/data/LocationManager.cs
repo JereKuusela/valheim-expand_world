@@ -133,7 +133,7 @@ public class LocationManager {
     var zs = ZoneSystem.instance;
     foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations) {
       if (JotunnWrapper.IsCustomlocation(zoneLocation.m_prefabName)) continue;
-      if (!Locations.TryGetValue(zoneLocation.m_prefabName.Split('#')[0], out var location)) {
+      if (!Locations.TryGetValue(zoneLocation.m_prefabName.Split(':')[0], out var location)) {
         // Don't warn on the default data.
         if (Configuration.valueLocationData.Value != "")
           ExpandWorld.Log.LogWarning($"Location prefab {zoneLocation.m_prefabName} not found!");
