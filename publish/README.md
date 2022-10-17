@@ -38,33 +38,6 @@ When doing this, enable `Server only` on the config to remove version check.
 
 - Verify that `expand_vegetation.yaml` uses `.` as the separate character for `scaleMin` and `scaleMax` instead of `,`. Fix manually or remove the file to regerenate it.
 
-## Migration from version 1.3
-
-- Back up your world.
-- If you have used `Altitude delta`, set it to 0.0 and add the value `altitudeDelta` to each entry in `expand_biomes.yaml` (add to any pre-existing value).
-- If you have used `Altitude multiplier`, set it to 1.0 and add the value `altitudeMultiplier` to each entry in `expand_biomes.yaml` (multiply any pre-existing value).
-- If you have used `Base altitude delta`, set its value to `Altitude delta`.
-- If you have used `Base altitude multiplier`, set its value to `Altitude multiplier`.
-- If you have created custom biomes of Mistlands, Black Forest or Plains with `amount` parameter in `expand_world.yaml` then you need to add `seed: swamp` to the related world entries. 
-
-## Migration from version 1.1
-
-- Back up your world.
-- If you have used both the general altitude multiplier (not the base altitude multiplier) and biome specific altitude deltas, then you need multiple biome specific deltas in the `expand_biomes.yaml`. If this makes no sense then you can most likely skip this step.
-- Divide color values in `expand_biomes.yaml` by 255 (range changed from 0-255 to 0.0-1.0). If you haven't changed biomes then you can just delete file to regenerate it. Old values still work so this step can be skipped.
-
-## Migration from version 1.0
-
-- Back up your world.
-- Copy your existing config to a safe place and then remove the original.
-- Start the game and load a test world, to generate default configs.
-- Try to migrate your old config:
-  - Most biome related settings were moved from config to `expand_biomes.yaml`.
-  - Most values are now scaled from 0.0 to 1.0 instead of from 0 to 100.
-  - Some config values have been renamed, but should be easy to find.
-  - Some default values might be different so try to remember what you have actually changed.
-- Load the world and hope for the best.
-
 # World size
 
 The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 10500 meters). Usually there is no need to change the edge size.
@@ -319,6 +292,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
+- data: ZDO data override. For example to change altars with Spawner Tweaks mod. To create a variant of an existing location, add `:text` to the prefab. For example "Eikthyrnir:Wolf".
 
 ## Vegetation
 
@@ -354,6 +328,7 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
+- data: ZDO data override. For example to create hidden stashes with Spawner Tweaks mod.
 
 ## Spawns
 
@@ -487,6 +462,26 @@ Streams have params:
 3. Change `prefab`, for example to XMasTree (check [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for ids).
 4. Change other fields.
 
+## Adding a location variant with Spawner Tweaks mod
+
+1. Install Server Devcommands, World Edit Commands and Spawner Tweaks mods.
+2. Open `expand_locations.yaml`.
+3. Copy paste `Eikthyrnir` entry and change prefab to `Eikthyrnir:Wolf`.
+4. Add `data:` to the entry.
+5. Find existing Eikthyr altar in the world and use command `tweak_altar amount=0 spawn=Wolf`.
+6. Use command `data copy` and then paste (CTRL+V) to the `data` field.
+7. Create a new world or use `locations_add Eikthyrnir:Wolf` from Upgrade World mod.
+
+## Adding a vegetation variant with Spawner Tweaks mod
+
+1. Install Server Devcommands, World Edit Commands and Spawner Tweaks mods.
+2. Open `expand_vegetation.yaml`.
+3. Copy paste `stubbe` entry.
+4. Add `data:` to the entry.
+5. Use command `tweak_chest force maxamount=2 item=Torch item=Coins,1,10,20` on any object.
+6. Use command `data copy` and then paste (CTRL+V) to the `data` field.
+7. Create a new world or use `zones_reset start` from Upgrade World mod.
+
 ## Bosses spawning enemies
 
 1. Open `expand_events.yaml`.
@@ -519,6 +514,11 @@ Copy-paste plains entry and change the top one:
   amount: 0.5
 
 # Changelog
+
+- v1.8
+  - Adds a new field `data` to the `expand_locations.yaml`.
+  - Adds a new field `data` to the `expand_vegetation.yaml`.
+  - Fixes compatibility issue with Spawn That mod.
 
 - v1.7
   - Adds a new field `waterDepthMultiplier` to the `expand_biomes.yaml`.
