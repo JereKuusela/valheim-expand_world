@@ -47,7 +47,8 @@ public class BiomeHeight {
     if (__instance.m_world.m_menu) return;
     __result -= Configuration.WaterLevel;
     if (BiomeManager.TryGetData(__state, out var data)) {
-      __result *= data.altitudeMultiplier + data.altitudeDelta;
+      __result *= data.altitudeMultiplier;
+      __result += data.altitudeDelta;
       if (__result < 0f) {
         __result *= data.waterDepthMultiplier;
         __result *= Configuration.WaterDepthMultiplier;

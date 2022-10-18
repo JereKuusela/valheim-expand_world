@@ -515,6 +515,9 @@ Copy-paste plains entry and change the top one:
 
 # Changelog
 
+- v1.9
+  - Fixes the altitude delta having the same effect as the altiude multiplier.
+
 - v1.8
   - Adds a new field `data` to the `expand_locations.yaml`.
   - Adds a new field `data` to the `expand_vegetation.yaml`.
