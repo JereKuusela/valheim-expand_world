@@ -125,7 +125,7 @@ public partial class Configuration {
     configHeightSeed = wrapper.BindInt(section, "Height variation seed", null, true);
     configEventChance = wrapper.BindFloat(section, "Random event chance", 20, false, "The chance to try starting a random event.");
     configEventChance.SettingChanged += (s, e) => RandomEventSystem.Setup(RandEventSystem.instance);
-    configEventInterval = wrapper.BindFloat(section, "Random event interval", 45, false, "How often the random events are checked (minutes).");
+    configEventInterval = wrapper.BindFloat(section, "Random event interval", 46, false, "How often the random events are checked (minutes).");
     configEventInterval.SettingChanged += (s, e) => RandomEventSystem.Setup(RandEventSystem.instance);
 
     InitWater(wrapper);

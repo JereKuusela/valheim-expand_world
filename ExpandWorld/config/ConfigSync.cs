@@ -151,12 +151,8 @@ public class ConfigSync {
     RuntimeHelpers.RunClassConstructor(typeof(VersionCheck).TypeHandle);
   }
 
-  public ConfigSync(string name, string display, string version) {
+  public ConfigSync(string name) {
     Name = name;
-    DisplayName = display;
-    CurrentVersion = version;
-    ModRequired = true;
-    IsLocked = true;
     configSyncs.Add(this);
     _ = new VersionCheck(this);
   }
@@ -592,6 +588,7 @@ public class ConfigSync {
   private class SendConfigsAfterLogin {
     private class BufferingSocket : ISocket {
       public volatile bool finished = false;
+      public volatile int versionMatchQueued = -1;
       public readonly List<ZPackage> Package = new();
       public readonly ISocket Original;
 
@@ -615,6 +612,14 @@ public class ConfigSync {
       public bool Flush() => Original.Flush();
       public string GetHostName() => Original.GetHostName();
 
+      public void VersionMatch() {
+        if (finished) {
+          Original.VersionMatch();
+        } else {
+          versionMatchQueued = Package.Count;
+        }
+      }
+
       public void Send(ZPackage pkg) {
         int oldPos = pkg.GetPos();
         pkg.SetPos(0);
@@ -636,6 +641,10 @@ public class ConfigSync {
       if (__instance.IsServer()) {
         BufferingSocket bufferingSocket = new(rpc.GetSocket());
         AccessTools.DeclaredField(typeof(ZRpc), "m_socket").SetValue(rpc, bufferingSocket);
+        // Don't replace on steam sockets, RPC_PeerInfo does peer.m_socket as ZSteamSocket - which will cause a nullref when replaced
+        if (AccessTools.DeclaredMethod(typeof(ZNet), "GetPeer", new[] { typeof(ZRpc) }).Invoke(__instance, new object[] { rpc }) is ZNetPeer peer && ZNet.m_onlineBackend != OnlineBackendType.Steamworks) {
+          AccessTools.DeclaredField(typeof(ZNetPeer), "m_socket").SetValue(peer, bufferingSocket);
+        }
 
         __state ??= new Dictionary<Assembly, BufferingSocket>();
         __state[Assembly.GetExecutingAssembly()] = bufferingSocket;
@@ -651,13 +660,22 @@ public class ConfigSync {
       void SendBufferedData() {
         if (rpc.GetSocket() is BufferingSocket bufferingSocket) {
           AccessTools.DeclaredField(typeof(ZRpc), "m_socket").SetValue(rpc, bufferingSocket.Original);
+          if (AccessTools.DeclaredMethod(typeof(ZNet), "GetPeer", new[] { typeof(ZRpc) }).Invoke(__instance, new object[] { rpc }) is ZNetPeer peer) {
+            AccessTools.DeclaredField(typeof(ZNetPeer), "m_socket").SetValue(peer, bufferingSocket.Original);
+          }
         }
 
         bufferingSocket = __state[Assembly.GetExecutingAssembly()];
         bufferingSocket.finished = true;
 
-        foreach (ZPackage package in bufferingSocket.Package) {
-          bufferingSocket.Original.Send(package);
+        for (int i = 0; i < bufferingSocket.Package.Count; ++i) {
+          if (i == bufferingSocket.versionMatchQueued) {
+            bufferingSocket.Original.VersionMatch();
+          }
+          bufferingSocket.Original.Send(bufferingSocket.Package[i]);
+        }
+        if (bufferingSocket.Package.Count == bufferingSocket.versionMatchQueued) {
+          bufferingSocket.Original.VersionMatch();
         }
       }
 
@@ -986,6 +1004,7 @@ public class VersionCheck {
   }
 
   private static void CheckVersion(ZRpc rpc, ZPackage pkg) => CheckVersion(rpc, pkg, null);
+
   private static void CheckVersion(ZRpc rpc, ZPackage pkg, Action<ZRpc, ZPackage>? original) {
     string guid = pkg.ReadString();
     string minimumRequiredVersion = pkg.ReadString();
