@@ -30,13 +30,9 @@ This mod can be used only on the server. However only following files can be con
 - `expand_events.yaml`: Fields enabled, duration, nearBaseOnly, biome, requiredGlobalKeys, notRequiredGlobalKeys, pauseIfNoPlayerInArea, random. 
 - `expand_locations.yaml`: Only normally available or disabled [prefabs](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) can be used.
 - `expand_vegetation.yaml`: All fields.
-- `expand_world.cfg`: Only setting Location multiplier.
+- `expand_world.cfg`: Only settings Location multiplier, Random event chance and Random event interval.
 
 When doing this, enable `Server only` on the config to remove version check.
-
-## Migration from version 1.5
-
-- Verify that `expand_vegetation.yaml` uses `.` as the separate character for `scaleMin` and `scaleMax` instead of `,`. Fix manually or remove the file to regerenate it.
 
 # World size
 

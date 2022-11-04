@@ -28,6 +28,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.11
+  - Fixes the server only mode not working.
+
 - v1.10
   - Fixes the black screen.
 

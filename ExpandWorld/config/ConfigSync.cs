@@ -1041,6 +1041,9 @@ public class VersionCheck {
 
   [HarmonyPatch(typeof(ZNet), "RPC_PeerInfo"), HarmonyPrefix]
   private static bool RPC_PeerInfo(ZRpc rpc, ZNet __instance) {
+    // No need to do anything. Client will fail the check.
+    if (ZNet.instance.IsServer() && Configuration.ServerOnly) return true;
+
     VersionCheck[] failedChecks = __instance.IsServer() ? GetFailedServer(rpc) : GetFailedClient();
     if (failedChecks.Length == 0) {
       return true;
