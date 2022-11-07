@@ -6,13 +6,14 @@ public class LocationData {
   [DefaultValue(true)]
   public bool enabled = true;
   public string[] biome = new string[0];
-  public string[] biomeArea = new string[0];
+  [DefaultValue("")]
+  public string biomeArea = "";
   public int quantity = 0;
   [DefaultValue(0f)]
   public float minDistance = 0f;
   [DefaultValue(0f)]
   public float maxDistance = 0f;
-  [DefaultValue(0f)]
+  [DefaultValue(-1000f)]
   public float minAltitude = 0f;
   [DefaultValue(1000f)]
   public float maxAltitude = 1000f;

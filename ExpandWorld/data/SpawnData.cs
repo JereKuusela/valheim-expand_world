@@ -6,7 +6,8 @@ public class SpawnData {
   [DefaultValue(true)]
   public bool enabled = true;
   public string[] biome = new string[0];
-  public string[] biomeArea = new string[0];
+  [DefaultValue("")]
+  public string biomeArea = "";
   [DefaultValue(100f)]
   public float spawnChance = 100f;
   public int maxSpawned = 1;

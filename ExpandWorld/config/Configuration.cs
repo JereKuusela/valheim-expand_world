@@ -49,7 +49,6 @@ public partial class Configuration {
 
   public static CustomSyncedValue<string> valueBiomeData;
   public static CustomSyncedValue<string> valueWorldData;
-  public static CustomSyncedValue<string> valueLocationData;
   public static CustomSyncedValue<string> valueVegetationData;
   public static CustomSyncedValue<string> valueClutterData;
   public static CustomSyncedValue<string> valueSpawnData;
@@ -140,7 +139,7 @@ public partial class Configuration {
     configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
     configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(valueWorldData.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");
-    configDataLocation.SettingChanged += (s, e) => LocationManager.FromSetting(valueLocationData.Value);
+    configDataLocation.SettingChanged += (s, e) => LocationManager.Load();
     configDataVegetation = wrapper.Bind(section, "Vegetation data", true, false, "Use vegetation data");
     configDataVegetation.SettingChanged += (s, e) => VegetationManager.FromSetting(valueVegetationData.Value);
     configDataEvents = wrapper.Bind(section, "Event data", true, false, "Use event data");
@@ -160,8 +159,6 @@ public partial class Configuration {
     valueEventData.ValueChanged += () => EventManager.FromSetting(valueEventData.Value);
     valueWorldData = wrapper.AddValue("world_data");
     valueWorldData.ValueChanged += () => WorldManager.FromSetting(valueWorldData.Value);
-    valueLocationData = wrapper.AddValue("location_data");
-    valueLocationData.ValueChanged += () => LocationManager.FromSetting(valueLocationData.Value);
     valueVegetationData = wrapper.AddValue("vegetation_data");
     valueVegetationData.ValueChanged += () => VegetationManager.FromSetting(valueVegetationData.Value);
 

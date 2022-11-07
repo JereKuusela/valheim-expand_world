@@ -16,33 +16,32 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SetupLocations))]
 public class LoadData {
   public static bool IsLoading = false;
-  static List<ZoneSystem.ZoneLocation> Locations = new();
   [HarmonyPriority(Priority.VeryLow)]
   static void Prefix() {
     EnvironmentManager.SetOriginals();
-    LocationManager.Locations = null;
+    // Little hack to stop the default location setup since it won't work with custom locations.
+    LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
+    ZoneSystem.instance.m_locations = new();
     if (!ZNet.instance.IsServer()) return;
-    IsLoading = true;
     EnvironmentManager.FromFile();
     BiomeManager.FromFile();
     WorldManager.FromFile();
     VegetationManager.FromFile();
-    LocationManager.FromFile();
     EventManager.FromFile();
     SpawnManager.FromFile();
     ClutterManager.FromFile();
-    // Little hack to stop the default location setup since it won't work with custom locations.
-    Locations = ZoneSystem.instance.m_locations;
-    if (Configuration.valueLocationData.Value != "" || !Configuration.DataLocation)
-      ZoneSystem.instance.m_locations = new();
   }
   [HarmonyPriority(Priority.VeryLow)]
   static void Postfix() {
-    if (!ZNet.instance.IsServer()) return;
-    IsLoading = false;
-    ZoneSystem.instance.m_locations = Locations;
-    // Delayed here since some mods add new locations after SetupLocations.
-    LocationManager.Setup();
+    // Also include Jotunn locations in the default data.
+    LocationManager.DefaultItems.AddRange(ZoneSystem.instance.m_locations);
+    // Jotunn etc. has already initialized these.
+    LocationManager.SetupLocations(ZoneSystem.instance.m_locations);
+    if (Helper.IsServer())
+      LocationManager.Load();
+    else
+      // Client doesn't need any real data.
+      LocationManager.SetLocations(new());
     Generate.Cancel();
     WorldGenerator.instance?.Pregenerate();
   }
@@ -55,7 +54,6 @@ public class SaveData {
     BiomeManager.ToFile();
     WorldManager.ToFile();
     VegetationManager.ToFile();
-    LocationManager.ToFile();
     EventManager.ToFile();
     EnvironmentManager.ToFile();
     ClutterManager.ToFile();
@@ -137,18 +135,13 @@ public class Data : MonoBehaviour {
     }
     return biomes.ToArray();
   }
-  public static string[] FromBiomeAreas(Heightmap.BiomeArea biomeArea) {
-    List<string> biomesAreas = new();
-    if ((biomeArea & Heightmap.BiomeArea.Edge) > 0) {
-      biomesAreas.Add("edge");
-      biomeArea -= Heightmap.BiomeArea.Edge;
-    }
-    if ((biomeArea & Heightmap.BiomeArea.Median) > 0) {
-      biomesAreas.Add("median");
-      biomeArea -= Heightmap.BiomeArea.Median;
-    }
-    if (biomeArea > 0) biomesAreas.Add(biomeArea.ToString());
-    return biomesAreas.ToArray();
+  public static string FromBiomeAreas(Heightmap.BiomeArea biomeArea) {
+    var edge = (biomeArea & Heightmap.BiomeArea.Edge) > 0;
+    var median = (biomeArea & Heightmap.BiomeArea.Median) > 0;
+    if (edge && median) return "";
+    if (edge) return "edge";
+    if (median) return "median";
+    return "";
   }
   public static Heightmap.Biome ToBiomes(string[] m_biome) {
     Heightmap.Biome result = 0;
@@ -162,17 +155,12 @@ public class Data : MonoBehaviour {
     }
     return result;
   }
-  public static Heightmap.BiomeArea ToBiomeAreas(string[] m_biome) {
+  public static Heightmap.BiomeArea ToBiomeAreas(string m_biome) {
+    if (m_biome == "") return Heightmap.BiomeArea.Edge | Heightmap.BiomeArea.Median;
+    var biomes = m_biome.Split(',').Select(s => s.Trim()).ToArray();
+    var biomeAreas = biomes.Select(s => Enum.TryParse<Heightmap.BiomeArea>(s, true, out var area) ? area : 0);
     Heightmap.BiomeArea result = 0;
-    foreach (var biome in m_biome) {
-      var name = biome.ToLower();
-      if (name == "edge") result += (int)Heightmap.BiomeArea.Edge;
-      else if (name == "median") result += (int)Heightmap.BiomeArea.Median;
-      else {
-        if (int.TryParse(biome, out var value)) result += value;
-        else throw new InvalidOperationException($"Invalid biome area {biome}.");
-      }
-    }
+    foreach (var biome in biomeAreas) result |= biome;
     return result;
   }
   public static void CopyData(ZDO from, ZDO to) {
@@ -260,6 +248,8 @@ public class Data : MonoBehaviour {
   }
 
   public static string Read(string pattern) {
+    if (!Directory.Exists(ExpandWorld.ConfigPath))
+      Directory.CreateDirectory(ExpandWorld.ConfigPath);
     var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name => File.ReadAllText(name));
     return string.Join("\n", data);
   }

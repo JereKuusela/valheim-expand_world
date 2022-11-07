@@ -18,7 +18,9 @@ public class VegetationData {
   [DefaultValue(0f)]
   public float chanceToUseGroundTilt = 0f;
   public string[] biome = new string[0];
-  public string[] biomeArea = new string[0];
+
+  [DefaultValue("")]
+  public string biomeArea = "";
   [DefaultValue(true)]
   public bool blockCheck = true;
   [DefaultValue(0f)]
