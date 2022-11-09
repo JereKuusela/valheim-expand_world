@@ -9,14 +9,14 @@ public class EventData {
   public float duration = 60f;
   [DefaultValue(true)]
   public bool nearBaseOnly = true;
-  [DefaultValue(new string[0])]
-  public string[] biome = new string[0];
-  [DefaultValue(new string[0])]
-  public string[] requiredGlobalKeys = new string[0];
-  [DefaultValue(new string[0])]
-  public string[] notRequiredGlobalKeys = new string[0];
-  [DefaultValue(new string[0])]
-  public string[] requiredEnvironments = new string[0];
+  [DefaultValue("")]
+  public string biome = "";
+  [DefaultValue("")]
+  public string requiredGlobalKeys = "";
+  [DefaultValue("")]
+  public string notRequiredGlobalKeys = "";
+  [DefaultValue("")]
+  public string requiredEnvironments = "";
   [DefaultValue("")]
   public string startMessage = "";
   [DefaultValue("")]

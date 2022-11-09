@@ -5,7 +5,8 @@ public class LocationData {
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;
-  public string[] biome = new string[0];
+  [DefaultValue("")]
+  public string biome = "";
   [DefaultValue("")]
   public string biomeArea = "";
   public int quantity = 0;

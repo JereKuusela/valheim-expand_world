@@ -17,7 +17,9 @@ public class VegetationData {
   public float randTilt = 0f;
   [DefaultValue(0f)]
   public float chanceToUseGroundTilt = 0f;
-  public string[] biome = new string[0];
+
+  [DefaultValue("")]
+  public string biome = "";
 
   [DefaultValue("")]
   public string biomeArea = "";

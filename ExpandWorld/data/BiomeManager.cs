@@ -53,7 +53,7 @@ public class BiomeManager {
   public static Heightmap.Biome MaxBiome = (Heightmap.Biome)((2 * (int)Heightmap.Biome.Mistlands) - 1);
   public static BiomeEnvSetup FromData(BiomeData data) {
     var biome = new BiomeEnvSetup();
-    biome.m_biome = Data.ToBiomes(new string[] { data.biome });
+    biome.m_biome = Data.ToBiomes(data.biome);
     biome.m_environments = data.environments.Select(FromData).ToList();
     biome.m_musicMorning = data.musicMorning;
     biome.m_musicEvening = data.musicEvening;
@@ -63,7 +63,7 @@ public class BiomeManager {
   }
   public static BiomeData ToData(BiomeEnvSetup biome) {
     BiomeData data = new();
-    data.biome = Data.FromBiomes(biome.m_biome).FirstOrDefault();
+    data.biome = Data.FromBiomes(biome.m_biome);
     data.environments = biome.m_environments.Select(ToData).ToArray();
     data.musicMorning = biome.m_musicMorning;
     data.musicEvening = biome.m_musicEvening;

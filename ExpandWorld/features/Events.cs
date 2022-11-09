@@ -1,4 +1,3 @@
-using System.Linq;
 using HarmonyLib;
 namespace ExpandWorld;
 
@@ -7,7 +6,7 @@ public class RandomEventEnvironment {
   static bool Postfix(bool result, RandomEvent ev, ZDO zdo) {
     if (!result) return false;
     if (!EventManager.EventToRequirentEnvironment.TryGetValue(ev.m_name, out var required)) return true;
-    if (required.Length == 0) return true;
+    if (required.Count == 0) return true;
     var biome = WorldGenerator.instance.GetBiome(zdo.GetPosition());
     var em = EnvMan.instance;
     var availableEnvironments = em.GetAvailableEnvironments(biome);

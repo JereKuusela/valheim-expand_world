@@ -5,7 +5,8 @@ public class ClutterData {
   [DefaultValue(true)]
   public bool enabled = true;
   public int amount = 80;
-  public string[] biome = new string[0];
+  [DefaultValue("")]
+  public string biome = "";
   [DefaultValue(false)]
   public bool instanced = false;
   [DefaultValue(true)]

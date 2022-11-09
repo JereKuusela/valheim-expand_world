@@ -11,7 +11,7 @@ namespace ExpandWorld;
 public class ExpandWorld : BaseUnityPlugin {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.12.1";
+  public const string VERSION = "1.12";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -48,7 +48,6 @@ public class ExpandWorld : BaseUnityPlugin {
     SpawnThatPatcher.Run();
     CLLCPatcher.Run();
     CustomRaidsPatcher.Run();
-    JotunnWrapper.Run();
   }
   public void LateUpdate() {
     Generate.CheckRegen(Time.deltaTime);

@@ -5,7 +5,8 @@ public class SpawnData {
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;
-  public string[] biome = new string[0];
+  [DefaultValue("")]
+  public string biome = "";
   [DefaultValue("")]
   public string biomeArea = "";
   [DefaultValue(100f)]
@@ -26,8 +27,8 @@ public class SpawnData {
   public bool spawnAtNight = true;
   [DefaultValue("")]
   public string requiredGlobalKey = "";
-  [DefaultValue(new string[0])]
-  public string[] requiredEnvironments = new string[0];
+  [DefaultValue("")]
+  public string requiredEnvironments = "";
   public float spawnDistance = 10f;
   [DefaultValue(0f)]
   public float spawnRadiusMin = 0f;

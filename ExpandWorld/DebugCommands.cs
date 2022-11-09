@@ -59,5 +59,11 @@ public class DebugCommands {
       var text = biomes.OrderBy(kvp => kvp.Key.ToString()).Select(kvp => kvp.Key.ToString() + ": " + kvp.Value + "/" + total + " (" + (kvp.Value / total).ToString("P2", CultureInfo.InvariantCulture) + ")");
       args.Context.AddString(string.Join("\n", text));
     }, true);
+    new Terminal.ConsoleCommand("print_musics", "- Prints available musics.", args => {
+      var mm = MusicMan.instance;
+      if (!mm) return;
+      var names = mm.m_music.Where(music => music.m_enabled).Select(music => music.m_name);
+      args.Context.AddString(string.Join("\n", names));
+    }, true);
   }
 }

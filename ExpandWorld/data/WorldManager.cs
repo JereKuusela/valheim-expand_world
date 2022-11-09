@@ -85,7 +85,7 @@ public class WorldManager {
   }
 
   public static WorldData FromData(WorldData data) {
-    data._biome = Data.ToBiomes(new string[] { data.biome });
+    data._biome = Data.ToBiomes(data.biome);
     data._biomeSeed = BiomeManager.GetTerrain(data._biome);
     if (int.TryParse(data.seed, out var seed))
       data._seed = seed;

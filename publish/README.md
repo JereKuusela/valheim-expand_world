@@ -28,6 +28,12 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.12
+  - Adds a new command `print_musics` to print available musics to the console.
+  - Changes the format of `biome`, `biomeArea`, `requiredGlobalKeys`, `notRequiredGlobalKeys` and `requiredEnvironments` (old configs automatically converted).
+  - Reworks the location system so that all available locations are loaded.
+  - Fixes Jotunn locations not working.
+
 - v1.11
   - Fixes the server only mode not working.
 

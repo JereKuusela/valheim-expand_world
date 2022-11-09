@@ -198,7 +198,7 @@ Note: Of course any number is valid for sectors. Like from 0.37 to 0.62.
 
 ## Environments
 
-The file `expand_environments.yaml` sets the available weathers.
+The file `expand_environments.yaml` sets the available weathers. Command `print_musics` can be used to print available musics.
 
 - name: Identifier to be used in other files.
 - particles: Identifier of a default environment to set particles. Required for new environments.
@@ -262,12 +262,12 @@ The file `expand_locations.yaml` sets the available locations and their placemen
 
 See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.
 
-Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored aresa, you need to use Upgrade World mod.
+Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored areas, you need to use Upgrade World mod.
 
 - prefab: Identifier of the location object. Check wiki for available locations. Hidden ones work too.
 - enabled (default: `true`): Quick way to disable this entry.
 - biome: List of possible biomes.
-- biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome, 4 = unused, leftover from Valheim data).
+- biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome).
 - quantity: Maximum amount. Actual amount is determined if enough suitable positions are found. The base .cfg has a setting to multiply these.
 - minDistance (default: `0.0` of world radius): Minimum distance from the world center. Values higher than 1.0 are considered meters and are automatically scaled with the world radius.
 - maxDistance (default: `1.0` of world radius): Maximum distance from the world center. Values higher than 1.0 are considered meters and are automatically scaled with the world radius.

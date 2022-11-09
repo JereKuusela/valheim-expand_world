@@ -119,8 +119,17 @@ public class Data : MonoBehaviour {
       }
     }
   }
+  private static Heightmap.Biome DefaultMax =
+    Heightmap.Biome.AshLands | Heightmap.Biome.BlackForest | Heightmap.Biome.DeepNorth |
+    Heightmap.Biome.Meadows | Heightmap.Biome.Mistlands | Heightmap.Biome.Mountain |
+    Heightmap.Biome.Ocean | Heightmap.Biome.Plains | Heightmap.Biome.Swamp;
 
-  public static string[] FromBiomes(Heightmap.Biome biome) {
+  public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
+  public static List<string> ToList(string str) => str.Split(',').Select(s => s.Trim()).ToList();
+  public static string FromBiomes(Heightmap.Biome biome) {
+    // Unused biome.
+    biome &= (Heightmap.Biome)~128;
+    if (biome == DefaultMax) return "";
     List<string> biomes = new();
     var number = 1;
     var biomeNumber = (int)biome;
@@ -133,7 +142,7 @@ public class Data : MonoBehaviour {
       }
       number *= 2;
     }
-    return biomes.ToArray();
+    return string.Join(", ", biomes);
   }
   public static string FromBiomeAreas(Heightmap.BiomeArea biomeArea) {
     var edge = (biomeArea & Heightmap.BiomeArea.Edge) > 0;
@@ -143,14 +152,20 @@ public class Data : MonoBehaviour {
     if (median) return "median";
     return "";
   }
-  public static Heightmap.Biome ToBiomes(string[] m_biome) {
+  public static Heightmap.Biome ToBiomes(string biomeStr) {
     Heightmap.Biome result = 0;
-    foreach (var biome in m_biome) {
-      if (BiomeManager.TryGetBiome(biome, out var number))
-        result += (int)number;
-      else {
-        if (int.TryParse(biome, out var value)) result += value;
-        else throw new InvalidOperationException($"Invalid biome {biome}.");
+    if (biomeStr == "") {
+      foreach (var biome in BiomeManager.Biomes)
+        result |= biome;
+    } else {
+      var biomes = biomeStr.Split(',').Select(s => s.Trim()).ToArray();
+      foreach (var biome in biomes) {
+        if (BiomeManager.TryGetBiome(biome, out var number))
+          result |= number;
+        else {
+          if (int.TryParse(biome, out var value)) result += value;
+          else throw new InvalidOperationException($"Invalid biome {biome}.");
+        }
       }
     }
     return result;
@@ -250,7 +265,20 @@ public class Data : MonoBehaviour {
   public static string Read(string pattern) {
     if (!Directory.Exists(ExpandWorld.ConfigPath))
       Directory.CreateDirectory(ExpandWorld.ConfigPath);
-    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name => File.ReadAllText(name));
+    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name => {
+      var lines = File.ReadAllLines(name).ToList();
+      var migrated = false;
+      if (Migrate.BiomeAreas(lines)) migrated = true;
+      if (Migrate.Biomes(lines)) migrated = true;
+      if (Migrate.Environments(lines)) migrated = true;
+      if (Migrate.GlobalKeys(lines)) migrated = true;
+      if (Migrate.NotGlobalKeys(lines)) migrated = true;
+      if (migrated) {
+        ExpandWorld.Log.LogInfo($"Migrated file {Path.GetFileName(name)}");
+        File.WriteAllLines(name, lines);
+      }
+      return string.Join("\n", lines);
+    });
     return string.Join("\n", data);
   }
   public static void Sanity(ref Color color) {
