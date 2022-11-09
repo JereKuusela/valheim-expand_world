@@ -17,11 +17,9 @@ namespace ExpandWorld;
 public class LoadData {
   public static bool IsLoading = false;
   [HarmonyPriority(Priority.VeryLow)]
-  static void Prefix() {
+  static void Prefix(ZoneSystem __instance) {
     EnvironmentManager.SetOriginals();
-    // Little hack to stop the default location setup since it won't work with custom locations.
-    LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
-    ZoneSystem.instance.m_locations = new();
+    // Let Valheim do its default location setup since some mods rely on it.
     if (!ZNet.instance.IsServer()) return;
     EnvironmentManager.FromFile();
     BiomeManager.FromFile();
@@ -33,9 +31,8 @@ public class LoadData {
   }
   [HarmonyPriority(Priority.VeryLow)]
   static void Postfix() {
-    // Also include Jotunn locations in the default data.
-    LocationManager.DefaultItems.AddRange(ZoneSystem.instance.m_locations);
-    // Jotunn etc. has already initialized these.
+    // Overwrite location setup with our stuff.
+    LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
     LocationManager.SetupLocations(ZoneSystem.instance.m_locations);
     if (Helper.IsServer())
       LocationManager.Load();

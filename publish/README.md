@@ -32,6 +32,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Adds a new command `print_musics` to print available musics to the console.
   - Changes the format of `biome`, `biomeArea`, `requiredGlobalKeys`, `notRequiredGlobalKeys` and `requiredEnvironments` (old configs automatically converted).
   - Reworks the location system so that all available locations are loaded.
+  - Removes location data syncing as it is no longer needed.
   - Fixes Jotunn locations not working.
 
 - v1.11

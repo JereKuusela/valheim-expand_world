@@ -138,7 +138,7 @@ public class LocationManager {
     }
     zs.m_locations = items;
     zs.m_locations.AddRange(missingLocations.Select(name => ZoneLocations[name]));
-    ExpandWorld.Log.LogDebug($"Loaded {zs.m_locations.Count} zone locations");
+    ExpandWorld.Log.LogDebug($"Loaded {zs.m_locations.Count} zone locations.");
     UpdateHashes();
   }
   private static Dictionary<string, ZoneSystem.ZoneLocation> ZoneLocations = new();
@@ -151,14 +151,14 @@ public class LocationManager {
       foreach (var location in locations)
         SetupLocation(location);
     }
-    ExpandWorld.Log.LogDebug($"Loaded {ZoneLocations.Count} locations");
+    ExpandWorld.Log.LogDebug($"Loaded {ZoneLocations.Count} locations.");
   }
 
   private static void UpdateHashes() {
     var zs = ZoneSystem.instance;
     foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations)
       zs.m_locationsByHash[zoneLocation.m_hash] = zoneLocation;
-    ExpandWorld.Log.LogDebug($"Loaded {zs.m_locationsByHash.Count} zone hashes");
+    ExpandWorld.Log.LogDebug($"Loaded {zs.m_locationsByHash.Count} zone hashes.");
   }
   ///<summary>Initializes a zone location.</summary>
   private static void SetupLocation(Location location) {
