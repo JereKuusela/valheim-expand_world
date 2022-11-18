@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 namespace ExpandWorld;
 
@@ -51,4 +52,8 @@ public class LocationData
   public float forestTresholdMax = 1f;
   [DefaultValue("")]
   public string data = "";
+  [DefaultValue(null)]
+  public Dictionary<string, string>? objectData = null;
+  [DefaultValue(null)]
+  public Dictionary<string, string>? objectSwap = null;
 }

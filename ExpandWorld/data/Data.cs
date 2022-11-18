@@ -142,6 +142,14 @@ public class Data : MonoBehaviour
 
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
   public static List<string> ToList(string str) => str.Split(',').Select(s => s.Trim()).Where(s => s != "").ToList();
+  public static Dictionary<string, string> ToDict(string str) => ToList(str).Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0].Trim(), s => s[1].Trim());
+  public static ZDO ToZDO(string data)
+  {
+    ZPackage pkg = new(data);
+    ZDO zdo = new();
+    Data.Deserialize(zdo, pkg);
+    return zdo;
+  }
   public static string FromBiomes(Heightmap.Biome biome)
   {
     // Unused biome.
@@ -316,7 +324,17 @@ public class Data : MonoBehaviour
     }
     zdo.ReleaseByteArrays();
   }
-
+  public static void InitZDO(Vector3 position, Quaternion rotation, ZDO data, ZNetView view)
+  {
+    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(position);
+    Data.CopyData(data.Clone(), ZNetView.m_initZDO);
+    ZNetView.m_initZDO.m_rotation = rotation;
+    ZNetView.m_initZDO.m_type = view.m_type;
+    ZNetView.m_initZDO.m_distant = view.m_distant;
+    ZNetView.m_initZDO.m_persistent = view.m_persistent;
+    ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
+    ZNetView.m_initZDO.m_dataRevision = 1;
+  }
   public static string Read(string pattern)
   {
     if (!Directory.Exists(ExpandWorld.ConfigPath))

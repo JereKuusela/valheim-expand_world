@@ -289,6 +289,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).. To create a variant of an existing location, add `:text` to the prefab. For example "Eikthyrnir:Wolf".
+- objectSwap: Dictionary to swap child objects to some other objects. See examples at the bottom.
+- objectData: Dictionary to set child object data. See examples at the bottom.
 
 ## Vegetation
 
@@ -467,7 +469,24 @@ Streams have params:
 4. Add `data:` to the entry.
 5. Find existing Eikthyr altar in the world and use command `tweak_altar amount=0 spawn=Wolf`.
 6. Use command `data copy` and then paste (CTRL+V) to the `data` field.
-7. Create a new world or use `locations_add Eikthyrnir:Wolf` from Upgrade World mod.
+7. Create a new world or use `locations_add Eikthyrnir:Wolf start force` from Upgrade World mod.
+
+## Changing location child objects
+
+1. Open `expand_locations.yaml`.
+2. Spawn a mushroom with `spawn_object GlowingMushroom scale=5`
+3. Use `object copy=all` to copy the scale (should return AgAAAAEEYHngAACgQAAAoEAAAKBA).
+4. Add to the `StartTemple` entry:
+objectSwap: 
+    BossStone_Eikthyr: GlowingMushroom
+    BossStone_TheElder: GlowingMushroom
+    BossStone_Bonemass: GlowingMushroom
+    BossStone_DragonQueen: GlowingMushroom
+    BossStone_Yagluth: GlowingMushroom
+objectData:
+    GlowingMushroom: AgAAAAEEYHngAACgQAAAoEAAAKBA
+5. Create a new world or use `locations_reset StartTemple start force` from Upgrade World mod.
+6. Boss stones should be replaced with big Glowing Mushrooms (5x size).
 
 ## Adding a vegetation variant with Spawner Tweaks mod
 

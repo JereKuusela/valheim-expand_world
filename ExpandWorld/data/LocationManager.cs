@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
@@ -12,16 +13,17 @@ public class LocationManager
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_locations*.yaml";
   public static Dictionary<string, ZDO> ZDO = new();
+  public static Dictionary<string, Dictionary<string, string>> ObjectSwaps = new();
+  public static Dictionary<string, Dictionary<string, ZDO>> ObjectData = new();
   public static ZoneSystem.ZoneLocation FromData(LocationData data)
   {
     var loc = new ZoneSystem.ZoneLocation();
     if (data.data != "")
-    {
-      ZPackage pkg = new(data.data);
-      ZDO zdo = new();
-      Data.Deserialize(zdo, pkg);
-      ZDO[data.prefab] = zdo;
-    }
+      ZDO[data.prefab] = Data.ToZDO(data.data);
+    if (data.objectSwap != null)
+      ObjectSwaps[data.prefab] = data.objectSwap;
+    if (data.objectData != null)
+      ObjectData[data.prefab] = data.objectData.ToDictionary(kvp => kvp.Key, kvp => Data.ToZDO(kvp.Value));
     loc.m_prefabName = data.prefab;
     loc.m_enable = data.enabled;
     loc.m_biome = Data.ToBiomes(data.biome);
@@ -105,6 +107,8 @@ public class LocationManager
     try
     {
       ZDO.Clear();
+      ObjectSwaps.Clear();
+      ObjectData.Clear();
       var data = Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
@@ -211,18 +215,8 @@ public class LocationZDO
   static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation, ZoneSystem.SpawnMode mode)
   {
     if (!LocationManager.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
-    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(pos);
-    Data.CopyData(data.Clone(), ZNetView.m_initZDO);
-    ZNetView.m_initZDO.m_rotation = rotation;
-    if (__instance.m_locationProxyPrefab.GetComponent<ZNetView>() is { } view)
-    {
-      ZNetView.m_initZDO.m_type = view.m_type;
-      ZNetView.m_initZDO.m_distant = view.m_distant;
-      ZNetView.m_initZDO.m_persistent = view.m_persistent;
-      ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
-    }
-    ZNetView.m_initZDO.m_dataRevision = 1;
-
+    if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
+    Data.InitZDO(pos, rotation, data, view);
   }
 }
 [HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
@@ -236,5 +230,46 @@ public class FixGhostInit
       __instance.m_nview.m_ghost = true;
       ZNetScene.instance.m_instances.Remove(__instance.m_nview.GetZDO());
     }
+  }
+}
+
+
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SpawnLocation))]
+public class LocationObjectDataAndSwap
+{
+  private static string Location = "";
+  static void Prefix(ZoneSystem.ZoneLocation location)
+  {
+    Location = location.m_prefabName;
+  }
+  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation)
+  {
+    if (ZNetView.m_ghostInit) return;
+    if (!LocationManager.ObjectData.TryGetValue(Location, out var objectData)) return;
+    if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out var data)) return;
+    if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
+    Data.InitZDO(position, rotation, data, view);
+  }
+  static GameObject Swap(GameObject prefab)
+  {
+    if (!LocationManager.ObjectSwaps.TryGetValue(Location, out var objectSwaps)) return prefab;
+    if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swap)) return prefab;
+    return ZNetScene.instance.GetPrefab(swap) ?? prefab;
+  }
+  static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
+  {
+    prefab = Swap(prefab);
+    SetData(prefab, position, rotation);
+    return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+  }
+
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.StartGhostInit))))
+      .Advance(5)
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
+      .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
+      .InstructionEnumeration();
   }
 }

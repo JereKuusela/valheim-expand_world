@@ -30,6 +30,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 - v1.13
   - Adds a new field `data` to the `expand_spawns.yaml`.
+  - Adds new fields `objectSwap` and `objectData` to the `expand_locations.yaml`.
   - Fixes spawns not working.
 
 - v1.12

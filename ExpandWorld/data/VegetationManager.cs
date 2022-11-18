@@ -157,22 +157,15 @@ public class VegetationScale
     Veg = veg;
     return veg;
   }
+  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation)
+  {
+    if (!VegetationManager.ZDO.TryGetValue(Veg, out var data)) return;
+    if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
+    Data.InitZDO(position, rotation, data, view);
+  }
   static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
   {
-    if (VegetationManager.ZDO.TryGetValue(Veg, out var data))
-    {
-      ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(position);
-      Data.CopyData(data.Clone(), ZNetView.m_initZDO);
-      ZNetView.m_initZDO.m_rotation = rotation;
-      if (prefab.GetComponent<ZNetView>() is { } view)
-      {
-        ZNetView.m_initZDO.m_type = view.m_type;
-        ZNetView.m_initZDO.m_distant = view.m_distant;
-        ZNetView.m_initZDO.m_persistent = view.m_persistent;
-        ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
-      }
-      ZNetView.m_initZDO.m_dataRevision = 1;
-    }
+    SetData(prefab, position, rotation);
     return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
   }
   static void SetScale(ZNetView view)
