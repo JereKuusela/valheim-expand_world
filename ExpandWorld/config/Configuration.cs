@@ -78,6 +78,11 @@ public partial class Configuration
   public static int? OffsetY => ConfigWrapper.Ints[configOffsetY];
   public static ConfigEntry<string> configHeightSeed;
   public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
+  public static ConfigEntry<string> configPlanBuildFolder;
+  public static string PlanBuildFolder => configPlanBuildFolder.Value;
+  public static ConfigEntry<string> configBuildShareFolder;
+  public static string BuildShareFolder => configBuildShareFolder.Value;
+
 
 #nullable enable
   public static void Init(ConfigWrapper wrapper)
@@ -151,6 +156,8 @@ public partial class Configuration
     configDataEvents.SettingChanged += (s, e) => EventManager.FromSetting(valueEventData.Value);
     configDataSpawns = wrapper.Bind(section, "Spawn data", true, false, "Use spawn data");
     configDataSpawns.SettingChanged += (s, e) => SpawnManager.FromSetting(valueSpawnData.Value);
+    //configPlanBuildFolder = wrapper.Bind(section, "Plan Build folder", "BepInEx/config/PlanBuild", false, "Folder relative to the Valheim.exe.");
+    //configBuildShareFolder = wrapper.Bind(section, "Build Share folder", "BuildShare/Builds", false, "Folder relative to the Valheim.exe.");
 
     valueEnvironmentData = wrapper.AddValue("environment_data");
     valueEnvironmentData.ValueChanged += () => EnvironmentManager.FromSetting(valueEnvironmentData.Value);

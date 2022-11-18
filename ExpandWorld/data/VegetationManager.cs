@@ -170,11 +170,7 @@ public class VegetationScale
   }
   static void SetScale(ZNetView view)
   {
-    if (ZNetView.m_ghostInit)
-    {
-      view.m_ghost = true;
-      ZNetScene.instance.m_instances.Remove(view.GetZDO());
-    }
+    Data.CleanGhostInit(view);
     if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
       view.SetLocalScale(Helper.RandomValue(scale));
   }

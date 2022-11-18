@@ -335,6 +335,18 @@ public class Data : MonoBehaviour
     ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
+  public static void CleanGhostInit(GameObject obj)
+  {
+    if (ZNetView.m_ghostInit) CleanGhostInit(obj.GetComponent<ZNetView>());
+  }
+  public static void CleanGhostInit(ZNetView view)
+  {
+    if (ZNetView.m_ghostInit && view)
+    {
+      view.m_ghost = true;
+      ZNetScene.instance.m_instances.Remove(view.GetZDO());
+    }
+  }
   public static string Read(string pattern)
   {
     if (!Directory.Exists(ExpandWorld.ConfigPath))

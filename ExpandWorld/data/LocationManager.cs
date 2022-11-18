@@ -227,8 +227,7 @@ public class FixGhostInit
     if (ZNetView.m_ghostInit)
     {
       spawnNow = false;
-      __instance.m_nview.m_ghost = true;
-      ZNetScene.instance.m_instances.Remove(__instance.m_nview.GetZDO());
+      Data.CleanGhostInit(__instance.m_nview);
     }
   }
 }
@@ -238,13 +237,12 @@ public class FixGhostInit
 public class LocationObjectDataAndSwap
 {
   private static string Location = "";
-  static void Prefix(ZoneSystem.ZoneLocation location)
+  static void Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
   {
     Location = location.m_prefabName;
   }
   static void SetData(GameObject prefab, Vector3 position, Quaternion rotation)
   {
-    if (ZNetView.m_ghostInit) return;
     if (!LocationManager.ObjectData.TryGetValue(Location, out var objectData)) return;
     if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out var data)) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
@@ -260,7 +258,9 @@ public class LocationObjectDataAndSwap
   {
     prefab = Swap(prefab);
     SetData(prefab, position, rotation);
-    return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+    Data.CleanGhostInit(obj);
+    return obj;
   }
 
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
