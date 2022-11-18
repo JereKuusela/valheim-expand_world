@@ -1,7 +1,8 @@
 using System.ComponentModel;
 namespace ExpandWorld;
 
-public class VegetationData {
+public class VegetationData
+{
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;

@@ -14,10 +14,12 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SetupLocations))]
-public class LoadData {
+public class LoadData
+{
   public static bool IsLoading = false;
   [HarmonyPriority(Priority.VeryLow)]
-  static void Prefix(ZoneSystem __instance) {
+  static void Prefix(ZoneSystem __instance)
+  {
     EnvironmentManager.SetOriginals();
     // Let Valheim do its default location setup since some mods rely on it.
     if (!ZNet.instance.IsServer()) return;
@@ -30,7 +32,8 @@ public class LoadData {
     ClutterManager.FromFile();
   }
   [HarmonyPriority(Priority.VeryLow)]
-  static void Postfix() {
+  static void Postfix()
+  {
     // Overwrite location setup with our stuff.
     LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
     LocationManager.SetupLocations(ZoneSystem.instance.m_locations);
@@ -45,8 +48,10 @@ public class LoadData {
 }
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
-public class SaveData {
-  static void Postfix() {
+public class SaveData
+{
+  static void Postfix()
+  {
     if (!ZNet.instance.IsServer()) return;
     BiomeManager.ToFile();
     WorldManager.ToFile();
@@ -58,16 +63,20 @@ public class SaveData {
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]
-public class HandleSpawnData {
+public class HandleSpawnData
+{
   // File exist check might be bit too slow for constant checking.
   static bool Done = false;
   public static List<SpawnSystem.SpawnData>? Override = null;
-  static void Postfix(SpawnSystem __instance) {
-    if (ZNet.instance.IsServer() && !Done) {
+  static void Postfix(SpawnSystem __instance)
+  {
+    if (ZNet.instance.IsServer() && !Done)
+    {
       SpawnManager.ToFile();
       Done = true;
     }
-    if (Override != null) {
+    if (Override != null)
+    {
       __instance.m_spawnLists.Clear();
       __instance.m_spawnLists.Add(new() { m_spawners = Override });
     }
@@ -75,14 +84,17 @@ public class HandleSpawnData {
 }
 
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.UpdateSpawning))]
-public class Spawn_WaitForConfigSync {
+public class Spawn_WaitForConfigSync
+{
   static bool Prefix() => Data.IsReady;
 }
-public class Data : MonoBehaviour {
+public class Data : MonoBehaviour
+{
   public static bool IsReady => (ExpandWorld.ConfigSync.IsSourceOfTruth && BiomesLoaded) || ExpandWorld.ConfigSync.InitialSyncDone;
   public static bool BiomesLoaded = false;
 
-  public static void SetupWatcher(string pattern, Action action) {
+  public static void SetupWatcher(string pattern, Action action)
+  {
     FileSystemWatcher watcher = new(ExpandWorld.ConfigPath, pattern);
     watcher.Created += (s, e) => action();
     watcher.Changed += (s, e) => action();
@@ -104,14 +116,21 @@ public class Data : MonoBehaviour {
       .WithAttributeOverride<Color>(c => c.maxColorComponent, new YamlIgnoreAttribute())
       .Build();
 
-  public static List<T> Deserialize<T>(string raw, string fileName) {
-    try {
+  public static List<T> Deserialize<T>(string raw, string fileName)
+  {
+    try
+    {
       return Deserializer().Deserialize<List<T>>(raw);
-    } catch (Exception ex1) {
+    }
+    catch (Exception ex1)
+    {
       ExpandWorld.Log.LogError($"{fileName}: {ex1.Message}");
-      try {
+      try
+      {
         return DeserializerUnSafe().Deserialize<List<T>>(raw);
-      } catch (Exception) {
+      }
+      catch (Exception)
+      {
         return new();
       }
     }
@@ -122,16 +141,19 @@ public class Data : MonoBehaviour {
     Heightmap.Biome.Ocean | Heightmap.Biome.Plains | Heightmap.Biome.Swamp;
 
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
-  public static List<string> ToList(string str) => str.Split(',').Select(s => s.Trim()).ToList();
-  public static string FromBiomes(Heightmap.Biome biome) {
+  public static List<string> ToList(string str) => str.Split(',').Select(s => s.Trim()).Where(s => s != "").ToList();
+  public static string FromBiomes(Heightmap.Biome biome)
+  {
     // Unused biome.
     biome &= (Heightmap.Biome)~128;
     if (biome == DefaultMax) return "";
     List<string> biomes = new();
     var number = 1;
     var biomeNumber = (int)biome;
-    while (number <= biomeNumber) {
-      if ((number & biomeNumber) > 0) {
+    while (number <= biomeNumber)
+    {
+      if ((number & biomeNumber) > 0)
+      {
         if (BiomeManager.TryGetDisplayName(number, out var name))
           biomes.Add(name);
         else
@@ -141,7 +163,8 @@ public class Data : MonoBehaviour {
     }
     return string.Join(", ", biomes);
   }
-  public static string FromBiomeAreas(Heightmap.BiomeArea biomeArea) {
+  public static string FromBiomeAreas(Heightmap.BiomeArea biomeArea)
+  {
     var edge = (biomeArea & Heightmap.BiomeArea.Edge) > 0;
     var median = (biomeArea & Heightmap.BiomeArea.Median) > 0;
     if (edge && median) return "";
@@ -149,17 +172,23 @@ public class Data : MonoBehaviour {
     if (median) return "median";
     return "";
   }
-  public static Heightmap.Biome ToBiomes(string biomeStr) {
+  public static Heightmap.Biome ToBiomes(string biomeStr)
+  {
     Heightmap.Biome result = 0;
-    if (biomeStr == "") {
+    if (biomeStr == "")
+    {
       foreach (var biome in BiomeManager.Biomes)
         result |= biome;
-    } else {
+    }
+    else
+    {
       var biomes = biomeStr.Split(',').Select(s => s.Trim()).ToArray();
-      foreach (var biome in biomes) {
+      foreach (var biome in biomes)
+      {
         if (BiomeManager.TryGetBiome(biome, out var number))
           result |= number;
-        else {
+        else
+        {
           if (int.TryParse(biome, out var value)) result += value;
           else throw new InvalidOperationException($"Invalid biome {biome}.");
         }
@@ -167,7 +196,8 @@ public class Data : MonoBehaviour {
     }
     return result;
   }
-  public static Heightmap.BiomeArea ToBiomeAreas(string m_biome) {
+  public static Heightmap.BiomeArea ToBiomeAreas(string m_biome)
+  {
     if (m_biome == "") return Heightmap.BiomeArea.Edge | Heightmap.BiomeArea.Median;
     var biomes = m_biome.Split(',').Select(s => s.Trim()).ToArray();
     var biomeAreas = biomes.Select(s => Enum.TryParse<Heightmap.BiomeArea>(s, true, out var area) ? area : 0);
@@ -175,7 +205,8 @@ public class Data : MonoBehaviour {
     foreach (var biome in biomeAreas) result |= biome;
     return result;
   }
-  public static void CopyData(ZDO from, ZDO to) {
+  public static void CopyData(ZDO from, ZDO to)
+  {
     to.m_floats = from.m_floats;
     to.m_vec3 = from.m_vec3;
     to.m_quats = from.m_quats;
@@ -185,72 +216,99 @@ public class Data : MonoBehaviour {
     to.m_byteArrays = from.m_byteArrays;
     to.IncreseDataRevision();
   }
-  public static void Deserialize(ZDO zdo, ZPackage pkg) {
+  public static void Deserialize(ZDO zdo, ZPackage pkg)
+  {
     int num = pkg.ReadInt();
-    if ((num & 1) != 0) {
+    if ((num & 1) != 0)
+    {
       zdo.InitFloats();
       int num2 = (int)pkg.ReadByte();
-      for (int i = 0; i < num2; i++) {
+      for (int i = 0; i < num2; i++)
+      {
         int key = pkg.ReadInt();
         zdo.m_floats[key] = pkg.ReadSingle();
       }
-    } else {
+    }
+    else
+    {
       zdo.ReleaseFloats();
     }
-    if ((num & 2) != 0) {
+    if ((num & 2) != 0)
+    {
       zdo.InitVec3();
       int num3 = (int)pkg.ReadByte();
-      for (int j = 0; j < num3; j++) {
+      for (int j = 0; j < num3; j++)
+      {
         int key2 = pkg.ReadInt();
         zdo.m_vec3[key2] = pkg.ReadVector3();
       }
-    } else {
+    }
+    else
+    {
       zdo.ReleaseVec3();
     }
-    if ((num & 4) != 0) {
+    if ((num & 4) != 0)
+    {
       zdo.InitQuats();
       int num4 = (int)pkg.ReadByte();
-      for (int k = 0; k < num4; k++) {
+      for (int k = 0; k < num4; k++)
+      {
         int key3 = pkg.ReadInt();
         zdo.m_quats[key3] = pkg.ReadQuaternion();
       }
-    } else {
+    }
+    else
+    {
       zdo.ReleaseQuats();
     }
-    if ((num & 8) != 0) {
+    if ((num & 8) != 0)
+    {
       zdo.InitInts();
       int num5 = (int)pkg.ReadByte();
-      for (int l = 0; l < num5; l++) {
+      for (int l = 0; l < num5; l++)
+      {
         int key4 = pkg.ReadInt();
         zdo.m_ints[key4] = pkg.ReadInt();
       }
-    } else {
+    }
+    else
+    {
       zdo.ReleaseInts();
     }
-    if ((num & 64) != 0) {
+    if ((num & 64) != 0)
+    {
       zdo.InitLongs();
       int num6 = (int)pkg.ReadByte();
-      for (int m = 0; m < num6; m++) {
+      for (int m = 0; m < num6; m++)
+      {
         int key5 = pkg.ReadInt();
         zdo.m_longs[key5] = pkg.ReadLong();
       }
-    } else {
+    }
+    else
+    {
       zdo.ReleaseLongs();
     }
-    if ((num & 16) != 0) {
+    if ((num & 16) != 0)
+    {
       zdo.InitStrings();
       int num7 = (int)pkg.ReadByte();
-      for (int n = 0; n < num7; n++) {
+      for (int n = 0; n < num7; n++)
+      {
         int key6 = pkg.ReadInt();
         zdo.m_strings[key6] = pkg.ReadString();
       }
-    } else {
+    }
+    else
+    {
       zdo.ReleaseStrings();
     }
-    if ((num & 128) != 0) {
+    if ((num & 128) != 0)
+    {
       zdo.InitByteArrays();
       int num8 = (int)pkg.ReadByte();
-      for (int num9 = 0; num9 < num8; num9++) {
+      for (int num9 = 0; num9 < num8; num9++)
+      {
         int key7 = pkg.ReadInt();
         zdo.m_byteArrays[key7] = pkg.ReadByteArray();
       }
@@ -259,10 +317,12 @@ public class Data : MonoBehaviour {
     zdo.ReleaseByteArrays();
   }
 
-  public static string Read(string pattern) {
+  public static string Read(string pattern)
+  {
     if (!Directory.Exists(ExpandWorld.ConfigPath))
       Directory.CreateDirectory(ExpandWorld.ConfigPath);
-    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name => {
+    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name =>
+    {
       var lines = File.ReadAllLines(name).ToList();
       var migrated = false;
       if (Migrate.BiomeAreas(lines)) migrated = true;
@@ -270,7 +330,8 @@ public class Data : MonoBehaviour {
       if (Migrate.Environments(lines)) migrated = true;
       if (Migrate.GlobalKeys(lines)) migrated = true;
       if (Migrate.NotGlobalKeys(lines)) migrated = true;
-      if (migrated) {
+      if (migrated)
+      {
         ExpandWorld.Log.LogInfo($"Migrated file {Path.GetFileName(name)}");
         File.WriteAllLines(name, lines);
       }
@@ -278,13 +339,15 @@ public class Data : MonoBehaviour {
     });
     return string.Join("\n", data);
   }
-  public static void Sanity(ref Color color) {
+  public static void Sanity(ref Color color)
+  {
     if (color.r > 1.0f) color.r /= 255f;
     if (color.g > 1.0f) color.g /= 255f;
     if (color.b > 1.0f) color.b /= 255f;
     if (color.a > 1.0f) color.a /= 255f;
   }
-  public static Color Sanity(Color color) {
+  public static Color Sanity(Color color)
+  {
     if (color.r > 1.0f) color.r /= 255f;
     if (color.g > 1.0f) color.g /= 255f;
     if (color.b > 1.0f) color.b /= 255f;
@@ -294,17 +357,20 @@ public class Data : MonoBehaviour {
 
 }
 #nullable disable
-public class FloatConverter : IYamlTypeConverter {
+public class FloatConverter : IYamlTypeConverter
+{
   public bool Accepts(Type type) => type == typeof(float);
 
-  public object ReadYaml(IParser parser, Type type) {
+  public object ReadYaml(IParser parser, Type type)
+  {
     var scalar = (YamlDotNet.Core.Events.Scalar)parser.Current;
     var number = float.Parse(scalar.Value, NumberStyles.Float, CultureInfo.InvariantCulture);
     parser.MoveNext();
     return number;
   }
 
-  public void WriteYaml(IEmitter emitter, object value, Type type) {
+  public void WriteYaml(IEmitter emitter, object value, Type type)
+  {
     var number = (float)value;
     emitter.Emit(new YamlDotNet.Core.Events.Scalar(number.ToString("0.###", CultureInfo.InvariantCulture)));
   }

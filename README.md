@@ -288,7 +288,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
-- data: ZDO data override. For example to change altars with Spawner Tweaks mod. To create a variant of an existing location, add `:text` to the prefab. For example "Eikthyrnir:Wolf".
+- data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).. To create a variant of an existing location, add `:text` to the prefab. For example "Eikthyrnir:Wolf".
 
 ## Vegetation
 
@@ -324,7 +324,7 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
-- data: ZDO data override. For example to create hidden stashes with Spawner Tweaks mod.
+- data: ZDO data override. For example to create hidden stashes with Spawner Tweaks mod (`object copy` from World Edit Commands).
 
 ## Spawns
 
@@ -362,6 +362,7 @@ See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 - huntPlayer (default: `false`): Spawned creatures are more aggressive.
 - groundOffset (default: `0.5` meters): Spawns above the ground.
 - levelUpMinCenterDistance (default: `0` meters): Distance from the world center to enable higher creature levels. This is not scaled with the world size.
+- data: ZDO data override. For example to change faction with Spawner Tweaks mod (`object copy` from World Edit Commands).
 
 ## Events
 

@@ -8,24 +8,30 @@ using ServerSync;
 
 namespace Service;
 
-public class ConfigWrapper {
+public class ConfigWrapper
+{
 
   private ConfigFile ConfigFile;
   private ConfigSync ConfigSync;
-  public ConfigWrapper(string command, ConfigFile configFile, ConfigSync configSync) {
+  public ConfigWrapper(string command, ConfigFile configFile, ConfigSync configSync)
+  {
     ConfigFile = configFile;
     ConfigSync = configSync;
 
-    new Terminal.ConsoleCommand(command, "[key] [value] - Toggles or sets a config value.", (Terminal.ConsoleEventArgs args) => {
-      if (configSync.IsLocked && !configSync.IsAdmin) {
+    new Terminal.ConsoleCommand(command, "[key] [value] - Toggles or sets a config value.", (Terminal.ConsoleEventArgs args) =>
+    {
+      if (configSync.IsLocked && !configSync.IsAdmin)
+      {
         args.Context.AddString("Error: Unable to edit locked config.");
         return;
       }
-      if (args.Length < 2) {
+      if (args.Length < 2)
+      {
         args.Context.AddString("Error: Missing the key.");
         return;
       }
-      if (!SettingHandlers.TryGetValue(args[1].ToLower(), out var handler)) {
+      if (!SettingHandlers.TryGetValue(args[1].ToLower(), out var handler))
+      {
         args.Context.AddString("Error: Key not found.");
         return;
       }
@@ -36,7 +42,8 @@ public class ConfigWrapper {
     }, optionsFetcher: () => SettingHandlers.Keys.ToList());
   }
   public CustomSyncedValue<string> AddValue(string identifier) => new CustomSyncedValue<string>(ConfigSync, identifier);
-  public ConfigEntry<bool> BindLocking(string group, string name, bool value, ConfigDescription description) {
+  public ConfigEntry<bool> BindLocking(string group, string name, bool value, ConfigDescription description)
+  {
     var configEntry = ConfigFile.Bind(group, name, value, description);
     Register(configEntry);
     var syncedConfigEntry = ConfigSync.AddLockingConfigEntry(configEntry);
@@ -44,7 +51,8 @@ public class ConfigWrapper {
     return configEntry;
   }
   public ConfigEntry<bool> BindLocking(string group, string name, bool value, string description) => BindLocking(group, name, value, new ConfigDescription(description));
-  public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, ConfigDescription description, bool synchronizedSetting = true) {
+  public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, ConfigDescription description, bool synchronizedSetting = true)
+  {
     var configEntry = ConfigFile.Bind(group, name, value, description);
     if (forceRegen)
       configEntry.SettingChanged += ForceRegen;
@@ -64,31 +72,36 @@ public class ConfigWrapper {
   public static Dictionary<ConfigEntry<string>, int?> Ints = new();
   public static Dictionary<ConfigEntry<int>, float> Amounts = new();
 
-  public ConfigEntry<string> BindFloat(string group, string name, float value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
+  public ConfigEntry<string> BindFloat(string group, string name, float value, bool forceRegen, string description = "", bool synchronizedSetting = true)
+  {
     var entry = Bind(group, name, value.ToString(CultureInfo.InvariantCulture), forceRegen, description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry);
     Floats[entry] = TryParseFloat(entry);
     return entry;
   }
-  public ConfigEntry<string> BindInt(string group, string name, int? value, bool forceRegen, string description = "", bool synchronizedSetting = true) {
+  public ConfigEntry<string> BindInt(string group, string name, int? value, bool forceRegen, string description = "", bool synchronizedSetting = true)
+  {
     var entry = Bind(group, name, value.HasValue ? value.ToString() : "", forceRegen, description, synchronizedSetting);
     entry.SettingChanged += (s, e) => Ints[entry] = TryParseInt(entry);
     Ints[entry] = TryParseInt(entry);
     return entry;
   }
-  private static void AddMessage(Terminal context, string message) {
+  private static void AddMessage(Terminal context, string message)
+  {
     context.AddString(message);
     Player.m_localPlayer?.Message(MessageHud.MessageType.TopLeft, message);
   }
   private Dictionary<string, ConfigEntryBase> Settings = new();
   private Dictionary<string, Action<Terminal, string>> SettingHandlers = new();
   private string ToKey(string name) => name.ToLower().Replace(' ', '_').Replace("(", "").Replace(")", "");
-  private void Register(ConfigEntry<bool> setting) {
+  private void Register(ConfigEntry<bool> setting)
+  {
     var name = setting.Definition.Key;
     var key = ToKey(name);
     SettingHandlers.Add(key, (Terminal terminal, string value) => Toggle(terminal, setting, name, value));
   }
-  private void Register(ConfigEntry<string> setting) {
+  private void Register(ConfigEntry<string> setting)
+  {
     var name = setting.Definition.Key;
     var key = ToKey(name);
     SettingHandlers.Add(key, (Terminal terminal, string value) => SetValue(terminal, setting, name, value));
@@ -109,30 +122,37 @@ public class ConfigWrapper {
     "off"
   };
   private static bool IsFalsy(string value) => Falsies.Contains(value);
-  private static void Toggle(Terminal context, ConfigEntry<bool> setting, string name, string value) {
+  private static void Toggle(Terminal context, ConfigEntry<bool> setting, string name, string value)
+  {
     if (value == "") setting.Value = !setting.Value;
     else if (IsTruthy(value)) setting.Value = true;
     else if (IsFalsy(value)) setting.Value = false;
     AddMessage(context, $"{name} {State(setting.Value)}.");
   }
-  private static int TryParseInt(string value, int defaultValue) {
+  private static int TryParseInt(string value, int defaultValue)
+  {
     if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)) return result;
     return defaultValue;
   }
-  private static int? TryParseInt(ConfigEntry<string> setting) {
+  private static int? TryParseInt(ConfigEntry<string> setting)
+  {
     if (int.TryParse(setting.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)) return result;
     return null;
   }
-  private static float TryParseFloat(string value, float defaultValue) {
+  private static float TryParseFloat(string value, float defaultValue)
+  {
     if (float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result)) return result;
     return defaultValue;
   }
-  private static float TryParseFloat(ConfigEntry<string> setting) {
+  private static float TryParseFloat(ConfigEntry<string> setting)
+  {
     if (float.TryParse(setting.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var result)) return result;
     return TryParseFloat((string)setting.DefaultValue, 0f);
   }
-  private static void SetValue(Terminal context, ConfigEntry<string> setting, string name, string value) {
-    if (value == "") {
+  private static void SetValue(Terminal context, ConfigEntry<string> setting, string name, string value)
+  {
+    if (value == "")
+    {
       AddMessage(context, $"{name}: {setting.Value}.");
       return;
     }

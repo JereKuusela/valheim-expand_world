@@ -2,8 +2,10 @@ using HarmonyLib;
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(RandEventSystem), nameof(RandEventSystem.InValidBiome))]
-public class RandomEventEnvironment {
-  static bool Postfix(bool result, RandomEvent ev, ZDO zdo) {
+public class RandomEventEnvironment
+{
+  static bool Postfix(bool result, RandomEvent ev, ZDO zdo)
+  {
     if (!result) return false;
     if (!EventManager.EventToRequirentEnvironment.TryGetValue(ev.m_name, out var required)) return true;
     if (required.Count == 0) return true;
@@ -21,9 +23,11 @@ public class RandomEventEnvironment {
 }
 
 [HarmonyPatch(typeof(RandEventSystem), nameof(RandEventSystem.Awake))]
-public class RandomEventSystem {
+public class RandomEventSystem
+{
 
-  public static void Setup(RandEventSystem rs) {
+  public static void Setup(RandEventSystem rs)
+  {
     if (!rs) return;
     rs.m_eventChance = Configuration.EventChance;
     rs.m_eventIntervalMin = Configuration.EventInterval;

@@ -9,15 +9,18 @@ using UnityEngine;
 
 namespace ExpandWorld;
 
-public class VegetationManager {
+public class VegetationManager
+{
   public static string FileName = "expand_vegetation.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_vegetation*.yaml";
-  public static ZoneSystem.ZoneVegetation FromData(VegetationData data) {
+  public static ZoneSystem.ZoneVegetation FromData(VegetationData data)
+  {
     var veg = new ZoneSystem.ZoneVegetation();
     var hash = data.prefab.GetStableHashCode();
     Scale[veg] = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
-    if (data.data != "") {
+    if (data.data != "")
+    {
       ZPackage pkg = new(data.data);
       ZDO zdo = new();
       Data.Deserialize(zdo, pkg);
@@ -58,7 +61,8 @@ public class VegetationManager {
     return veg;
   }
   public static bool IsValid(ZoneSystem.ZoneVegetation veg) => veg.m_prefab && veg.m_prefab.GetComponent<ZNetView>() != null;
-  public static VegetationData ToData(ZoneSystem.ZoneVegetation veg) {
+  public static VegetationData ToData(ZoneSystem.ZoneVegetation veg)
+  {
     VegetationData data = new();
     data.enabled = veg.m_enable;
     data.prefab = veg.m_prefab.name;
@@ -92,32 +96,38 @@ public class VegetationManager {
     return data;
   }
 
-  public static void ToFile() {
+  public static void ToFile()
+  {
     if (!Helper.IsServer() || !Configuration.DataVegetation) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueVegetationData.Value = yaml;
   }
-  public static void FromFile() {
+  public static void FromFile()
+  {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataVegetation ? Data.Read(Pattern) : "";
     Configuration.valueVegetationData.Value = yaml;
     Set(yaml);
   }
-  public static void FromSetting(string yaml) {
+  public static void FromSetting(string yaml)
+  {
     if (Helper.IsClient()) Set(yaml);
   }
   public static Dictionary<ZoneSystem.ZoneVegetation, Range<Vector3>> Scale = new();
   public static Dictionary<ZoneSystem.ZoneVegetation, ZDO> ZDO = new();
-  private static void Set(string yaml) {
+  private static void Set(string yaml)
+  {
     if (yaml == "" || !Configuration.DataVegetation) return;
-    try {
+    try
+    {
       Scale.Clear();
       ZDO.Clear();
       var data = Data.Deserialize<VegetationData>(yaml, FileName)
       .Select(FromData).Where(veg => veg.m_prefab).ToList();
-      if (data.Count == 0) {
+      if (data.Count == 0)
+      {
         ExpandWorld.Log.LogWarning($"Failed to load any vegetation data.");
         return;
       }
@@ -126,28 +136,36 @@ public class VegetationManager {
         list.m_vegetation.Clear();
       ZoneSystem.instance.m_vegetation = data;
       ZoneSystem.instance.ValidateVegetation();
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, FromFile);
   }
 }
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.PlaceVegetation))]
-public class VegetationScale {
+public class VegetationScale
+{
   private static ZoneSystem.ZoneVegetation Veg = new();
-  static ZoneSystem.ZoneVegetation SetVeg(ZoneSystem.ZoneVegetation veg) {
+  static ZoneSystem.ZoneVegetation SetVeg(ZoneSystem.ZoneVegetation veg)
+  {
     Veg = veg;
     return veg;
   }
-  static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    if (VegetationManager.ZDO.TryGetValue(Veg, out var data)) {
+  static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
+  {
+    if (VegetationManager.ZDO.TryGetValue(Veg, out var data))
+    {
       ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(position);
       Data.CopyData(data.Clone(), ZNetView.m_initZDO);
       ZNetView.m_initZDO.m_rotation = rotation;
-      if (prefab.GetComponent<ZNetView>() is { } view) {
+      if (prefab.GetComponent<ZNetView>() is { } view)
+      {
         ZNetView.m_initZDO.m_type = view.m_type;
         ZNetView.m_initZDO.m_distant = view.m_distant;
         ZNetView.m_initZDO.m_persistent = view.m_persistent;
@@ -157,19 +175,23 @@ public class VegetationScale {
     }
     return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
   }
-  static void SetScale(ZNetView view) {
-    if (ZNetView.m_ghostInit) {
+  static void SetScale(ZNetView view)
+  {
+    if (ZNetView.m_ghostInit)
+    {
       view.m_ghost = true;
       ZNetScene.instance.m_instances.Remove(view.GetZDO());
     }
     if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
       view.SetLocalScale(Helper.RandomValue(scale));
   }
-  static void SetScaleTr(Transform tr) {
+  static void SetScaleTr(Transform tr)
+  {
     if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
       tr.localScale = Helper.RandomValue(scale);
   }
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ZoneSystem.ZoneVegetation), nameof(ZoneSystem.ZoneVegetation.m_enable))))
       .Insert(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetVeg).operand))

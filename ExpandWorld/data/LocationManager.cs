@@ -6,14 +6,17 @@ using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
 
-public class LocationManager {
+public class LocationManager
+{
   public static string FileName = "expand_locations.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_locations*.yaml";
   public static Dictionary<string, ZDO> ZDO = new();
-  public static ZoneSystem.ZoneLocation FromData(LocationData data) {
+  public static ZoneSystem.ZoneLocation FromData(LocationData data)
+  {
     var loc = new ZoneSystem.ZoneLocation();
-    if (data.data != "") {
+    if (data.data != "")
+    {
       ZPackage pkg = new(data.data);
       ZDO zdo = new();
       Data.Deserialize(zdo, pkg);
@@ -45,7 +48,8 @@ public class LocationManager {
     loc.m_maxAltitude = data.maxAltitude;
     return loc;
   }
-  public static LocationData ToData(ZoneSystem.ZoneLocation loc) {
+  public static LocationData ToData(ZoneSystem.ZoneLocation loc)
+  {
     LocationData data = new();
     data.prefab = loc.m_prefab.name;
     data.enabled = loc.m_enable;
@@ -79,13 +83,15 @@ public class LocationManager {
   }
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
 
-  private static void ToFile() {
+  private static void ToFile()
+  {
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
 
-  public static void Load() {
+  public static void Load()
+  {
     if (Helper.IsClient()) return;
     if (Configuration.DataLocation && File.Exists(FilePath))
       SetLocations(FromFile(Data.Read(Pattern)));
@@ -94,8 +100,10 @@ public class LocationManager {
     ToFile();
   }
   public static List<ZoneSystem.ZoneLocation> DefaultItems = new();
-  private static List<ZoneSystem.ZoneLocation> FromFile(string yaml) {
-    try {
+  private static List<ZoneSystem.ZoneLocation> FromFile(string yaml)
+  {
+    try
+    {
       ZDO.Clear();
       var data = Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
@@ -103,15 +111,19 @@ public class LocationManager {
       foreach (var list in LocationList.m_allLocationLists)
         list.m_locations.Clear();
       return data;
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
     return new();
   }
   ///<summary>Copies setup from locations.</summary>
-  private static ZoneSystem.ZoneLocation Setup(ZoneSystem.ZoneLocation item) {
+  private static ZoneSystem.ZoneLocation Setup(ZoneSystem.ZoneLocation item)
+  {
     var prefabName = item.m_prefabName.Split(':')[0];
-    if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation)) {
+    if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation))
+    {
       // Don't warn on the default data since it has missing stuff.
       if (File.Exists(FilePath))
         ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
@@ -129,10 +141,12 @@ public class LocationManager {
     return item;
   }
   ///<summary>Sets zone location entries (ensures that all locations have an entry).</summary>
-  public static void SetLocations(List<ZoneSystem.ZoneLocation> items) {
+  public static void SetLocations(List<ZoneSystem.ZoneLocation> items)
+  {
     var zs = ZoneSystem.instance;
     var missingLocations = ZoneLocations.Keys.ToHashSet();
-    foreach (var item in items) {
+    foreach (var item in items)
+    {
       Setup(item);
       missingLocations.Remove(item.m_prefabName);
     }
@@ -142,10 +156,12 @@ public class LocationManager {
     UpdateHashes();
   }
   private static Dictionary<string, ZoneSystem.ZoneLocation> ZoneLocations = new();
-  public static void SetupLocations(List<ZoneSystem.ZoneLocation> initialized) {
+  public static void SetupLocations(List<ZoneSystem.ZoneLocation> initialized)
+  {
     ZoneLocations = initialized.ToDictionary(kvp => kvp.m_prefabName, kvp => kvp);
     var array = Resources.FindObjectsOfTypeAll<GameObject>();
-    foreach (var obj in array) {
+    foreach (var obj in array)
+    {
       if (obj.name != "_Locations") continue;
       var locations = obj.GetComponentsInChildren<Location>(true);
       foreach (var location in locations)
@@ -154,14 +170,16 @@ public class LocationManager {
     ExpandWorld.Log.LogDebug($"Loaded {ZoneLocations.Count} locations.");
   }
 
-  private static void UpdateHashes() {
+  private static void UpdateHashes()
+  {
     var zs = ZoneSystem.instance;
     foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations)
       zs.m_locationsByHash[zoneLocation.m_hash] = zoneLocation;
     ExpandWorld.Log.LogDebug($"Loaded {zs.m_locationsByHash.Count} zone hashes.");
   }
   ///<summary>Initializes a zone location.</summary>
-  private static void SetupLocation(Location location) {
+  private static void SetupLocation(Location location)
+  {
     ZoneSystem.ZoneLocation zoneLocation = new();
     zoneLocation.m_enable = false;
     zoneLocation.m_maxTerrainDelta = 10f;
@@ -172,7 +190,8 @@ public class LocationManager {
     zoneLocation.m_location = location;
     zoneLocation.m_interiorRadius = (location.m_hasInterior ? location.m_interiorRadius : 0f);
     zoneLocation.m_exteriorRadius = location.m_exteriorRadius;
-    if (location.m_interiorTransform && location.m_generator) {
+    if (location.m_interiorTransform && location.m_generator)
+    {
       zoneLocation.m_interiorPosition = location.m_interiorTransform.localPosition;
       zoneLocation.m_generatorPosition = location.m_generator.transform.localPosition;
     }
@@ -181,18 +200,22 @@ public class LocationManager {
     ZoneLocations[location.gameObject.name] = zoneLocation;
   }
 
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, Load);
   }
 }
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.CreateLocationProxy))]
-public class LocationZDO {
-  static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation, ZoneSystem.SpawnMode mode) {
+public class LocationZDO
+{
+  static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation, ZoneSystem.SpawnMode mode)
+  {
     if (!LocationManager.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(pos);
     Data.CopyData(data.Clone(), ZNetView.m_initZDO);
     ZNetView.m_initZDO.m_rotation = rotation;
-    if (__instance.m_locationProxyPrefab.GetComponent<ZNetView>() is { } view) {
+    if (__instance.m_locationProxyPrefab.GetComponent<ZNetView>() is { } view)
+    {
       ZNetView.m_initZDO.m_type = view.m_type;
       ZNetView.m_initZDO.m_distant = view.m_distant;
       ZNetView.m_initZDO.m_persistent = view.m_persistent;
@@ -203,9 +226,12 @@ public class LocationZDO {
   }
 }
 [HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
-public class FixGhostInit {
-  static void Prefix(LocationProxy __instance, ref bool spawnNow) {
-    if (ZNetView.m_ghostInit) {
+public class FixGhostInit
+{
+  static void Prefix(LocationProxy __instance, ref bool spawnNow)
+  {
+    if (ZNetView.m_ghostInit)
+    {
       spawnNow = false;
       __instance.m_nview.m_ghost = true;
       ZNetScene.instance.m_instances.Remove(__instance.m_nview.GetZDO());

@@ -4,7 +4,8 @@ using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
-public partial class Configuration {
+public partial class Configuration
+{
 #nullable disable
   public static ConfigEntry<string> configWorldRadius;
   public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius];
@@ -79,12 +80,14 @@ public partial class Configuration {
   public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
 
 #nullable enable
-  public static void Init(ConfigWrapper wrapper) {
+  public static void Init(ConfigWrapper wrapper)
+  {
     var section = "1. General";
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, true, "Radius of the world in meters (excluding the edge).");
     configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, true, "Size of the edge area in meters (added to the radius for the total size).");
     configMapSize = wrapper.BindFloat(section, "Minimap size", 1f, false, "Increases the minimap size, but also significantly increases the generation time.");
-    configMapSize.SettingChanged += (e, s) => {
+    configMapSize.SettingChanged += (e, s) =>
+    {
       if (!Minimap.instance) return;
       var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
       if (newValue == Minimap.instance.m_textureSize) return;
@@ -95,7 +98,8 @@ public partial class Configuration {
     };
     configServerOnly = wrapper.Bind(section, "Server only", false, false, "If true, enables server side only mode and clients can't have the mod installed.");
     configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, false, "Decreases the minimap detail, but doesn't affect the generation time.");
-    configMapPixelSize.SettingChanged += (e, s) => {
+    configMapPixelSize.SettingChanged += (e, s) =>
+    {
       if (!Minimap.instance) return;
       var newValue = MinimapAwake.OriginalPixelSize * MapPixelSize;
       if (newValue == Minimap.instance.m_pixelSize) return;
@@ -103,7 +107,8 @@ public partial class Configuration {
       Generate.Map();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
-    configWorldStretch.SettingChanged += (s, e) => {
+    configWorldStretch.SettingChanged += (s, e) =>
+    {
       WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
     };
     WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];

@@ -5,34 +5,41 @@ using UnityEngine;
 
 namespace ExpandWorld;
 
-public static class Helper {
-  public static CodeMatcher Replace(CodeMatcher instructions, float value, Func<float> call) {
+public static class Helper
+{
+  public static CodeMatcher Replace(CodeMatcher instructions, float value, Func<float> call)
+  {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldc_R4, value))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
-  public static CodeMatcher Replace(CodeMatcher instructions, sbyte value, Func<int> call) {
+  public static CodeMatcher Replace(CodeMatcher instructions, sbyte value, Func<int> call)
+  {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldc_I4_S, value))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
-  public static CodeMatcher Replace(CodeMatcher instructions, int value, Func<int> call) {
+  public static CodeMatcher Replace(CodeMatcher instructions, int value, Func<int> call)
+  {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldc_I4, value))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
 
-  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, int> call) {
+  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, int> call)
+  {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
-  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, float> call) {
+  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, float> call)
+  {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
       .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
   }
-  public static CodeMatcher ReplaceStretch(CodeMatcher instructions, OpCode code) {
+  public static CodeMatcher ReplaceStretch(CodeMatcher instructions, OpCode code)
+  {
     return instructions
       .MatchForward(false, new CodeMatch(code))
       .Advance(1)
@@ -47,7 +54,8 @@ public static class Helper {
   public static float BaseHeightToAltitude(float baseHeight) => baseHeight * 200f - Configuration.WaterLevel;
   public static bool IsServer() => ZNet.instance && ZNet.instance.IsServer();
   public static bool IsClient() => ZNet.instance && !ZNet.instance.IsServer();
-  public static Vector3 RandomValue(Range<Vector3> range) {
+  public static Vector3 RandomValue(Range<Vector3> range)
+  {
     var x = UnityEngine.Random.Range(range.Min.x, range.Max.x);
     var y = UnityEngine.Random.Range(range.Min.y, range.Max.y);
     var z = UnityEngine.Random.Range(range.Min.z, range.Max.z);

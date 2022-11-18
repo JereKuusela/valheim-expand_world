@@ -5,18 +5,21 @@ using System.Linq;
 using UnityEngine;
 
 namespace ExpandWorld;
-public class BiomeManager {
+public class BiomeManager
+{
   public static string FileName = "expand_biomes.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_biomes*.yaml";
 
-  public static EnvEntry FromData(BiomeEnvironment data) {
+  public static EnvEntry FromData(BiomeEnvironment data)
+  {
     EnvEntry env = new();
     env.m_environment = data.environment;
     env.m_weight = data.weight;
     return env;
   }
-  public static BiomeEnvironment ToData(EnvEntry env) {
+  public static BiomeEnvironment ToData(EnvEntry env)
+  {
     BiomeEnvironment data = new();
     data.environment = env.m_environment;
     data.weight = env.m_weight;
@@ -51,7 +54,8 @@ public class BiomeManager {
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain[biome];
   public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature.TryGetValue((Heightmap.Biome)biome, out var nature) ? nature : biome;
   public static Heightmap.Biome MaxBiome = (Heightmap.Biome)((2 * (int)Heightmap.Biome.Mistlands) - 1);
-  public static BiomeEnvSetup FromData(BiomeData data) {
+  public static BiomeEnvSetup FromData(BiomeData data)
+  {
     var biome = new BiomeEnvSetup();
     biome.m_biome = Data.ToBiomes(data.biome);
     biome.m_environments = data.environments.Select(FromData).ToList();
@@ -61,7 +65,8 @@ public class BiomeManager {
     biome.m_musicNight = data.musicNight;
     return biome;
   }
-  public static BiomeData ToData(BiomeEnvSetup biome) {
+  public static BiomeData ToData(BiomeEnvSetup biome)
+  {
     BiomeData data = new();
     data.biome = Data.FromBiomes(biome.m_biome);
     data.environments = biome.m_environments.Select(ToData).ToArray();
@@ -76,29 +81,35 @@ public class BiomeManager {
     return data;
   }
 
-  public static void ToFile() {
+  public static void ToFile()
+  {
     if (!Helper.IsServer() || !Configuration.DataBiome) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueBiomeData.Value = yaml;
   }
-  public static void FromFile() {
+  public static void FromFile()
+  {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataBiome ? Data.Read(Pattern) : "";
     Configuration.valueBiomeData.Value = yaml;
     Set(yaml);
   }
-  public static void FromSetting(string yaml) {
+  public static void FromSetting(string yaml)
+  {
     if (Helper.IsClient()) Set(yaml);
   }
   public static bool BiomeForestMultiplier = false;
   public static bool BiomePaint = false;
-  private static void Load(string yaml) {
+  private static void Load(string yaml)
+  {
     if (yaml == "" || !Configuration.DataBiome) return;
-    try {
+    try
+    {
       var rawData = Data.Deserialize<BiomeData>(yaml, FileName);
-      if (rawData.Count == 0) {
+      if (rawData.Count == 0)
+      {
         ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
         return;
       }
@@ -107,13 +118,15 @@ public class BiomeManager {
       NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
       BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
       var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
-      foreach (var item in rawData) {
+      foreach (var item in rawData)
+      {
         item.biome = item.biome.ToLower();
         item.terrain = item.terrain.ToLower();
         item.nature = item.nature.ToLower();
         var biome = (Heightmap.Biome)biomeNumber;
         var isDefaultBiome = false;
-        if (NameToBiome.TryGetValue(item.biome, out var defaultBiome)) {
+        if (NameToBiome.TryGetValue(item.biome, out var defaultBiome))
+        {
           isDefaultBiome = true;
           biome = defaultBiome;
         }
@@ -122,12 +135,14 @@ public class BiomeManager {
         Data.Sanity(ref item.paint);
         if (!BiomeToDisplayName.ContainsKey(biome))
           BiomeToDisplayName[biome] = item.biome;
-        if (item.name != "" || !isDefaultBiome) {
+        if (item.name != "" || !isDefaultBiome)
+        {
           var name = item.name == "" ? biome.ToString() : item.name;
           var key = "biome_" + biome.ToString().ToLower();
           Localization.instance.m_translations[key] = name;
         }
-        if (isDefaultBiome) {
+        if (isDefaultBiome)
+        {
           BiomeToData[biome] = item;
           continue;
         }
@@ -137,12 +152,14 @@ public class BiomeManager {
       }
       MaxBiome = (Heightmap.Biome)(biomeNumber - 1);
       BiomeToName = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
-      BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+      BiomeToTerrain = rawData.ToDictionary(data => NameToBiome[data.biome], data =>
+      {
         if (NameToBiome.TryGetValue(data.terrain, out var terrain))
           return terrain;
         return NameToBiome[data.biome];
       });
-      BiomeToNature = rawData.ToDictionary(data => NameToBiome[data.biome], data => {
+      BiomeToNature = rawData.ToDictionary(data => NameToBiome[data.biome], data =>
+      {
         if (NameToBiome.TryGetValue(data.nature, out var nature))
           return nature;
         if (NameToBiome.TryGetValue(data.terrain, out var terrain))
@@ -164,11 +181,14 @@ public class BiomeManager {
       EnvMan.instance.m_environmentPeriod = -1;
       EnvMan.instance.m_firstEnv = true;
       Generate.World();
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
-  private static void Set(string yaml) {
+  private static void Set(string yaml)
+  {
     Load(yaml);
     Data.BiomesLoaded = true;
     SpawnThatPatcher.InitConfiguration();
@@ -176,7 +196,8 @@ public class BiomeManager {
     CLLCPatcher.InitConfiguration();
 
   }
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, FromFile);
   }
 }

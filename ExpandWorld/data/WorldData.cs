@@ -2,7 +2,8 @@ using System.ComponentModel;
 using YamlDotNet.Serialization;
 namespace ExpandWorld;
 
-public class WorldData {
+public class WorldData
+{
   public string biome = "";
   [YamlIgnore]
   public Heightmap.Biome _biome = Heightmap.Biome.None;

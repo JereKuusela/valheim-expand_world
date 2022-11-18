@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
-public class EnvironmentManager {
+public class EnvironmentManager
+{
   public static string FileName = "expand_environments.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_environments*.yaml";
   public static Dictionary<string, EnvSetup> Originals = new();
-  public static EnvSetup FromData(EnvironmentData data) {
+  public static EnvSetup FromData(EnvironmentData data)
+  {
     var env = new EnvSetup();
     if (Originals.TryGetValue(data.particles, out var setup))
       env = setup.Clone();
@@ -55,7 +57,8 @@ public class EnvironmentManager {
     env.m_musicNight = data.musicNight;
     return env;
   }
-  public static EnvironmentData ToData(EnvSetup env) {
+  public static EnvironmentData ToData(EnvSetup env)
+  {
     EnvironmentData data = new();
     data.name = env.m_name;
     data.isDefault = env.m_default;
@@ -98,36 +101,43 @@ public class EnvironmentManager {
     return data;
   }
 
-  public static void ToFile() {
+  public static void ToFile()
+  {
     if (!Helper.IsServer() || !Configuration.DataEnvironments) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueEnvironmentData.Value = yaml;
   }
-  public static void FromFile() {
+  public static void FromFile()
+  {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataEnvironments ? Data.Read(Pattern) : "";
     Configuration.valueEnvironmentData.Value = yaml;
     Set(yaml);
   }
 
-  public static void SetOriginals() {
+  public static void SetOriginals()
+  {
     Originals = LocationList.m_allLocationLists
       .Select(list => list.m_environments)
       .Append(EnvMan.instance.m_environments)
       .SelectMany(list => list).ToLookup(env => env.m_name, env => env).ToDictionary(kvp => kvp.Key, kvp => kvp.First());
   }
-  public static void FromSetting(string yaml) {
+  public static void FromSetting(string yaml)
+  {
     if (Helper.IsClient()) Set(yaml);
   }
-  private static void Set(string yaml) {
+  private static void Set(string yaml)
+  {
     if (yaml == "" || !Configuration.DataEnvironments) return;
-    try {
+    try
+    {
       if (Originals.Count == 0) SetOriginals();
       var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
         .Select(FromData).ToList();
-      if (data.Count == 0) {
+      if (data.Count == 0)
+      {
         ExpandWorld.Log.LogWarning($"Failed to load any environment data.");
         return;
       }
@@ -142,11 +152,14 @@ public class EnvironmentManager {
       em.m_firstEnv = true;
       foreach (var biome in em.m_biomes)
         em.InitializeBiomeEnvSetup(biome);
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, FromFile);
   }
 }

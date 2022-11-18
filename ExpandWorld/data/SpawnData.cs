@@ -1,7 +1,8 @@
 using System.ComponentModel;
 namespace ExpandWorld;
 
-public class SpawnData {
+public class SpawnData
+{
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;
@@ -18,7 +19,7 @@ public class SpawnData {
   [DefaultValue(1)]
   public int minLevel = 1;
   [DefaultValue(-10000f)]
-  public float minAltitude = -1000f;
+  public float minAltitude = -10000f;
   [DefaultValue(1000f)]
   public float maxAltitude = 1000f;
   [DefaultValue(true)]
@@ -58,4 +59,6 @@ public class SpawnData {
   public float groundOffset = 0.5f;
   [DefaultValue(0f)]
   public float levelUpMinCenterDistance = 0f;
+  [DefaultValue("")]
+  public string data = "";
 }

@@ -1,7 +1,8 @@
 using System.ComponentModel;
 namespace ExpandWorld;
 
-public class EventData {
+public class EventData
+{
   public string name = "";
   [DefaultValue(true)]
   public bool enabled = true;

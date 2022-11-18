@@ -7,19 +7,22 @@ using UnityEngine;
 namespace ExpandWorld;
 
 [HarmonyPatch]
-public class ClutterManager {
+public class ClutterManager
+{
   public static string FileName = "expand_clutter.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_clutter*.yaml";
   private static Dictionary<string, GameObject> Prefabs = new();
   [HarmonyPatch(typeof(ClutterSystem), nameof(ClutterSystem.Awake)), HarmonyPriority(Priority.VeryLow), HarmonyFinalizer]
-  public static void LoadPrefabs() {
+  public static void LoadPrefabs()
+  {
     if (!ZNet.instance) return;
     Prefabs = ClutterSystem.instance.m_clutter
       .ToLookup(item => item.m_prefab.name, item => item.m_prefab)
       .ToDictionary(kvp => kvp.Key, kvp => kvp.First());
   }
-  public static ClutterSystem.Clutter FromData(ClutterData data) {
+  public static ClutterSystem.Clutter FromData(ClutterData data)
+  {
     ClutterSystem.Clutter clutter = new();
     if (Prefabs.TryGetValue(data.prefab, out var prefab))
       clutter.m_prefab = prefab;
@@ -50,7 +53,8 @@ public class ClutterManager {
     clutter.m_fractalTresholdMax = data.fractalThresholdMax;
     return clutter;
   }
-  public static ClutterData ToData(ClutterSystem.Clutter clutter) {
+  public static ClutterData ToData(ClutterSystem.Clutter clutter)
+  {
     ClutterData data = new();
     data.prefab = clutter.m_prefab.name;
     data.enabled = clutter.m_enabled;
@@ -79,28 +83,34 @@ public class ClutterManager {
     return data;
   }
 
-  public static void ToFile() {
+  public static void ToFile()
+  {
     if (!Helper.IsServer() || !Configuration.DataClutter) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ClutterSystem.instance.m_clutter.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueClutterData.Value = yaml;
   }
-  public static void FromFile() {
+  public static void FromFile()
+  {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataClutter ? Data.Read(Pattern) : "";
     Configuration.valueClutterData.Value = yaml;
     Set(yaml);
   }
-  public static void FromSetting(string yaml) {
+  public static void FromSetting(string yaml)
+  {
     if (Helper.IsClient()) Set(yaml);
   }
-  private static void Set(string yaml) {
+  private static void Set(string yaml)
+  {
     if (yaml == "" || !Configuration.DataClutter) return;
-    try {
+    try
+    {
       var data = Data.Deserialize<ClutterData>(yaml, FileName)
         .Select(FromData).Where(clutter => clutter.m_prefab).ToList();
-      if (data.Count == 0) {
+      if (data.Count == 0)
+      {
         ExpandWorld.Log.LogWarning($"Failed to load any clutter data.");
         return;
       }
@@ -109,11 +119,14 @@ public class ClutterManager {
       foreach (var clutter in data)
         ClutterSystem.instance.m_clutter.Add(clutter);
       ClutterSystem.instance.ClearAll();
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, FromFile);
   }
 }

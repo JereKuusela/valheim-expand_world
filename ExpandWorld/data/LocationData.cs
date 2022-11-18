@@ -1,7 +1,8 @@
 using System.ComponentModel;
 namespace ExpandWorld;
 
-public class LocationData {
+public class LocationData
+{
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 
 namespace ExpandWorld;
 
-public class Migrate {
+public class Migrate
+{
 
-  public static bool BiomeAreas(List<string> lines) {
+  public static bool BiomeAreas(List<string> lines)
+  {
     var migrated = false;
-    for (var i = lines.Count - 1; i >= 0; i -= 1) {
+    for (var i = lines.Count - 1; i >= 0; i -= 1)
+    {
       var line = lines[i];
       if (!line.Contains("biomeArea:")) continue;
       var value = line.Split(':')[1].Trim();
@@ -16,7 +19,8 @@ public class Migrate {
       var entry = "";
       var multipleEntries = false;
       var j = i + 1;
-      while (j < lines.Count) {
+      while (j < lines.Count)
+      {
         line = lines[j];
         if (line.Contains(":") || !line.Contains("-")) break;
         lines.RemoveAt(j);
@@ -43,13 +47,16 @@ public class Migrate {
   public static bool Environments(List<string> lines) => ListMerger(lines, "requiredEnvironments");
   public static bool GlobalKeys(List<string> lines) => ListMerger(lines, "requiredGlobalKeys");
   public static bool NotGlobalKeys(List<string> lines) => ListMerger(lines, "notRequiredGlobalKeys");
-  private static bool ListMerger(List<string> lines, string key, Func<string, string>? post = null) {
+  private static bool ListMerger(List<string> lines, string key, Func<string, string>? post = null)
+  {
     var migrated = false;
-    for (var i = lines.Count - 1; i >= 0; i -= 1) {
+    for (var i = lines.Count - 1; i >= 0; i -= 1)
+    {
       var line = lines[i];
       if (!line.Contains($"{key}:")) continue;
       var value = line.Split(':')[1].Trim();
-      if (value == "[]") {
+      if (value == "[]")
+      {
         lines.RemoveAt(i);
         migrated = true;
       }
@@ -57,7 +64,8 @@ public class Migrate {
       migrated = true;
       List<string> entries = new();
       var j = i + 1;
-      while (j < lines.Count) {
+      while (j < lines.Count)
+      {
         line = lines[j];
         if (line.Contains(":") || !line.Contains("-")) break;
         lines.RemoveAt(j);

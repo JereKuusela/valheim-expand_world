@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace ExpandWorld;
 
-public class EnvironmentData {
+public class EnvironmentData
+{
   public string name = "";
   [DefaultValue("")]
   public string particles = "";

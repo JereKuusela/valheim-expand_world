@@ -8,10 +8,11 @@ using UnityEngine;
 namespace ExpandWorld;
 [BepInDependency(SpawnThatPatcher.GUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(GUID, NAME, VERSION)]
-public class ExpandWorld : BaseUnityPlugin {
+public class ExpandWorld : BaseUnityPlugin
+{
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.12";
+  public const string VERSION = "1.13";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -24,7 +25,8 @@ public class ExpandWorld : BaseUnityPlugin {
   };
   public static string ConfigName = "";
   public static string ConfigPath = "";
-  public void Awake() {
+  public void Awake()
+  {
     Log = Logger;
     ConfigName = $"{GUID}.cfg";
     ConfigPath = Path.Combine(Paths.ConfigPath, GUID);
@@ -44,19 +46,23 @@ public class ExpandWorld : BaseUnityPlugin {
     ClutterManager.SetupWatcher();
     EnvironmentManager.SetupWatcher();
   }
-  public void Start() {
+  public void Start()
+  {
     SpawnThatPatcher.Run();
     CLLCPatcher.Run();
     CustomRaidsPatcher.Run();
   }
-  public void LateUpdate() {
+  public void LateUpdate()
+  {
     Generate.CheckRegen(Time.deltaTime);
   }
-  private void OnDestroy() {
+  private void OnDestroy()
+  {
     Config.Save();
   }
 
-  private void SetupWatcher() {
+  private void SetupWatcher()
+  {
     FileSystemWatcher watcher = new(Paths.ConfigPath, ConfigName);
     watcher.Changed += ReadConfigValues;
     watcher.Created += ReadConfigValues;
@@ -66,12 +72,16 @@ public class ExpandWorld : BaseUnityPlugin {
     watcher.EnableRaisingEvents = true;
   }
 
-  private void ReadConfigValues(object sender, FileSystemEventArgs e) {
+  private void ReadConfigValues(object sender, FileSystemEventArgs e)
+  {
     if (!File.Exists(Config.ConfigFilePath)) return;
-    try {
+    try
+    {
       Log.LogDebug("ReadConfigValues called");
       Config.Reload();
-    } catch {
+    }
+    catch
+    {
       Log.LogError($"There was an issue loading your {Config.ConfigFilePath}");
       Log.LogError("Please check your config entries for spelling and format!");
     }
@@ -80,8 +90,10 @@ public class ExpandWorld : BaseUnityPlugin {
 }
 
 [HarmonyPatch(typeof(Terminal), nameof(Terminal.InitTerminal))]
-public class SetCommands {
-  static void Postfix() {
+public class SetCommands
+{
+  static void Postfix()
+  {
     new DebugCommands();
   }
 }

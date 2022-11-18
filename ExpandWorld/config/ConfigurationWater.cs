@@ -2,7 +2,8 @@ using BepInEx.Configuration;
 using Service;
 
 namespace ExpandWorld;
-public partial class Configuration {
+public partial class Configuration
+{
 #nullable disable
   public static ConfigEntry<bool> configRivers;
   public static bool Rivers => configRivers.Value;
@@ -68,22 +69,26 @@ public partial class Configuration {
   public static ConfigEntry<string> configWaterDepthMultiplier;
   public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier];
 #nullable enable
-  public static void InitWater(ConfigWrapper wrapper) {
+  public static void InitWater(ConfigWrapper wrapper)
+  {
     var section = "3. Water";
     configWaterDepthMultiplier = wrapper.BindFloat(section, "Water depth multiplier", 1f, true, "Multplies the water depth.");
     configRivers = wrapper.Bind(section, "Rivers", true, true, "Enables rivers.");
     configWaterLevel = wrapper.BindFloat(section, "Water level", 30f, true, "Sets the altitude of the water.");
-    configWaterLevel.SettingChanged += (s, e) => {
+    configWaterLevel.SettingChanged += (s, e) =>
+    {
       WaterHelper.SetLevel(ZoneSystem.instance);
       WaterHelper.SetLevel(ClutterSystem.instance);
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetLevel(obj);
     };
     configWaveMultiplier = wrapper.BindFloat(section, "Wave multiplier", 1f, false, "Multiplies the wave size.");
-    configWaveMultiplier.SettingChanged += (s, e) => {
+    configWaveMultiplier.SettingChanged += (s, e) =>
+    {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };
     configWaveOnlyHeight = wrapper.Bind(section, "Wave only height", true, false, "Multiplier only affects the height.");
-    configWaveOnlyHeight.SettingChanged += (s, e) => {
+    configWaveOnlyHeight.SettingChanged += (s, e) =>
+    {
       foreach (var obj in WaterHelper.Get()) WaterHelper.SetWaveSize(obj);
     };
     configLakeSearchInterval = wrapper.BindFloat(section, "Lake search interval", 128f, true, "How often a point is checked for lakes (meters). Increase to find more smaller lakes.");

@@ -4,8 +4,10 @@ using HarmonyLib;
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.FindLakes))]
-public class FindLakes {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+public class FindLakes
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.Replace(matcher, -10000f, () => -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, -10000f, () => -Configuration.WorldRadius);
@@ -22,14 +24,17 @@ public class FindLakes {
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.PlaceRivers))]
-public class PlaceRivers {
-  static bool Prefix(ref List<WorldGenerator.River> __result) {
+public class PlaceRivers
+{
+  static bool Prefix(ref List<WorldGenerator.River> __result)
+  {
     if (Configuration.Rivers) return true;
     __result = new();
     return false;
   }
 
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_riverSeed), (WorldGenerator obj) => Configuration.RiverSeed ?? obj.m_riverSeed);
     matcher = Helper.Replace(matcher, 2000f, () => Configuration.LakeMaxDistance1);
@@ -49,8 +54,10 @@ public class PlaceRivers {
 
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.IsRiverAllowed))]
-public class IsRiverAllowed {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+public class IsRiverAllowed
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldfld);
     matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldfld);
@@ -60,13 +67,16 @@ public class IsRiverAllowed {
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.PlaceStreams))]
-public class PlaceStreams {
-  static bool Prefix(ref List<WorldGenerator.River> __result) {
+public class PlaceStreams
+{
+  static bool Prefix(ref List<WorldGenerator.River> __result)
+  {
     if (Configuration.Streams) return true;
     __result = new();
     return false;
   }
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_streamSeed), (WorldGenerator obj) => Configuration.StreamSeed ?? obj.m_streamSeed);
     matcher = Helper.Replace(matcher, (sbyte)100, () => Configuration.StreamSearchIterations ?? 100);
@@ -89,8 +99,10 @@ public class PlaceStreams {
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.FindStreamStartPoint))]
-public class FindStreamStartPoint {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+public class FindStreamStartPoint
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.Replace(matcher, -10000f, () => -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
@@ -100,9 +112,11 @@ public class FindStreamStartPoint {
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.AddRivers))]
-public class AddRivers {
+public class AddRivers
+{
   // Rivers are placed at unstretched positions.
-  static void Prefix(ref float wx, ref float wy) {
+  static void Prefix(ref float wx, ref float wy)
+  {
     wx *= Configuration.WorldStretch;
     wy *= Configuration.WorldStretch;
   }

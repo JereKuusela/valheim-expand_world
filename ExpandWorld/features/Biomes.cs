@@ -5,16 +5,20 @@ using UnityEngine;
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.WorldAngle))]
-public class WorldAngle {
-  static bool Prefix(float wx, float wy, ref float __result) {
+public class WorldAngle
+{
+  static bool Prefix(float wx, float wy, ref float __result)
+  {
     __result = Mathf.Sin(Mathf.Atan2(wx, wy) * Configuration.WiggleFrequency);
     return false;
   }
 }
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiomeColor), new[] { typeof(Heightmap.Biome) })]
-public class GetBiomeColor {
-  static bool Prefix(Heightmap.Biome biome, ref Color32 __result) {
+public class GetBiomeColor
+{
+  static bool Prefix(Heightmap.Biome biome, ref Color32 __result)
+  {
     if (!BiomeManager.TryGetData(biome, out var data)) return true;
     __result = data.color;
     return false;
@@ -22,11 +26,13 @@ public class GetBiomeColor {
 }
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiome))]
-public class HeightmapGetBiome {
+public class HeightmapGetBiome
+{
   public static bool Nature = false;
   private static Dictionary<Heightmap.Biome, float> Weights = new();
 
-  public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z) {
+  public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z)
+  {
     var values = Enum.GetValues(typeof(Heightmap.Biome)) as Heightmap.Biome[];
     if (values == null) return Heightmap.Biome.None;
     for (var i = 0; i < values.Length; i++)
@@ -37,17 +43,21 @@ public class HeightmapGetBiome {
     Weights[__instance.m_cornerBiomes[3]] += __instance.Distance(x, z, 1f, 1f);
     var result = Heightmap.Biome.None;
     var num = -99999f;
-    foreach (var kvp in Weights) {
-      if (kvp.Value > num) {
+    foreach (var kvp in Weights)
+    {
+      if (kvp.Value > num)
+      {
         result = kvp.Key;
         num = kvp.Value;
       }
     }
     return result;
   }
-  static bool Prefix(Heightmap __instance, Vector3 point, ref Heightmap.Biome __result) {
+  static bool Prefix(Heightmap __instance, Vector3 point, ref Heightmap.Biome __result)
+  {
     if (__instance.m_isDistantLod) return true;
-    if (__instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[1] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[2] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[3]) {
+    if (__instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[1] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[2] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[3])
+    {
       __result = __instance.m_cornerBiomes[0];
       return false;
     }
@@ -57,7 +67,8 @@ public class HeightmapGetBiome {
     __result = GetBiome(__instance, x, z);
     return false;
   }
-  static Heightmap.Biome Postfix(Heightmap.Biome biome) {
+  static Heightmap.Biome Postfix(Heightmap.Biome biome)
+  {
     if (Nature) return BiomeManager.GetNature(biome);
     return biome;
   }
@@ -65,24 +76,30 @@ public class HeightmapGetBiome {
 
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.FindBiome))]
-public class HeightmapFindBiome {
+public class HeightmapFindBiome
+{
   public static bool Nature = false;
-  static Heightmap.Biome Postfix(Heightmap.Biome biome) {
+  static Heightmap.Biome Postfix(Heightmap.Biome biome)
+  {
     if (Nature) return BiomeManager.GetNature(biome);
     return biome;
   }
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Initialize))]
-public class ResetBiomeOffsets {
-  static void Prefix() {
+public class ResetBiomeOffsets
+{
+  static void Prefix()
+  {
     GetBiome.Offsets.Clear();
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
-public class SetBiomeOffsets {
+public class SetBiomeOffsets
+{
   [HarmonyPriority(Priority.VeryHigh)]
-  static void Prefix(WorldGenerator __instance) {
+  static void Prefix(WorldGenerator __instance)
+  {
     if (GetBiome.Offsets.Count > 0) return;
     GetBiome.Offsets[Heightmap.Biome.Swamp] = __instance.m_offset0;
     GetBiome.Offsets[Heightmap.Biome.Plains] = __instance.m_offset1;
@@ -97,17 +114,20 @@ public class SetBiomeOffsets {
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
-public class GetBiome {
+public class GetBiome
+{
   public static List<WorldData> Data = WorldManager.GetDefault();
   public static Dictionary<Heightmap.Biome, float> Offsets = new();
 
-  private static float GetOffset(WorldGenerator obj, Heightmap.Biome biome) {
+  private static float GetOffset(WorldGenerator obj, Heightmap.Biome biome)
+  {
     if (Offsets.TryGetValue(biome, out var value)) return value;
     return obj.m_offset0;
   }
   private static float ConvertDist(float percent) => percent * Configuration.WorldRadius;
 
-  private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy) {
+  private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy)
+  {
     var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     if (magnitude > Configuration.WorldTotalRadius)
       return Heightmap.Biome.Ocean;
@@ -121,14 +141,16 @@ public class GetBiome {
     var bx = wx / Configuration.BiomeStretch;
     var by = wy / Configuration.BiomeStretch;
 
-    foreach (var item in Data) {
+    foreach (var item in Data)
+    {
       if (item.minAltitude > altitude || item.maxAltitude < altitude) continue;
       var mag = magnitude;
       var min = ConvertDist(item.minDistance);
       if (min > 0)
         min += (item.wiggleDistance ? num : 0f);
       var max = ConvertDist(item.maxDistance);
-      if (item.curveX != 0f || item.curveY != 0f) {
+      if (item.curveX != 0f || item.curveY != 0f)
+      {
         var curveX = ConvertDist(item.curveX);
         var curveY = ConvertDist(item.curveY);
         mag = new Vector2(Configuration.WorldStretch * wx + curveX, Configuration.WorldStretch * wy + curveY).magnitude;
@@ -147,7 +169,8 @@ public class GetBiome {
     }
     return Heightmap.Biome.Ocean;
   }
-  static bool Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome __result) {
+  static bool Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome __result)
+  {
     if (__instance.m_world.m_menu) return true;
     wx /= Configuration.WorldStretch;
     wy /= Configuration.WorldStretch;
@@ -158,15 +181,18 @@ public class GetBiome {
 }
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.ApplyModifiers))]
-public class ApplyModifiers {
+public class ApplyModifiers
+{
   private static Dictionary<Heightmap.Biome, float> Weights = new();
 
-  static void Prefix(Heightmap __instance) {
+  static void Prefix(Heightmap __instance)
+  {
     if (__instance.m_isDistantLod) return;
     if (!BiomeManager.BiomePaint) return;
     var paint = __instance.m_paintMask;
     var biomes = __instance.m_cornerBiomes;
-    if (biomes[0] == biomes[1] && biomes[0] == biomes[2] && biomes[0] == biomes[3]) {
+    if (biomes[0] == biomes[1] && biomes[0] == biomes[2] && biomes[0] == biomes[3])
+    {
       if (!BiomeManager.TryGetData(biomes[0], out var data))
         return;
       if (data.paint.Equals(new Color()))
@@ -175,10 +201,14 @@ public class ApplyModifiers {
       for (var i = 0; i < pixels.Length; i++)
         pixels[i] = data.paint;
       paint.SetPixels(pixels);
-    } else {
+    }
+    else
+    {
       var pixels = new Color[paint.width * paint.height];
-      for (var z = 0; z < paint.height; z++) {
-        for (var x = 0; x < paint.width; x++) {
+      for (var z = 0; z < paint.height; z++)
+      {
+        for (var x = 0; x < paint.width; x++)
+        {
           var biome = HeightmapGetBiome.GetBiome(__instance, x, z);
           if (!BiomeManager.TryGetData(biome, out var data))
             continue;

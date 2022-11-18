@@ -10,28 +10,34 @@ using UnityEngine;
 
 namespace ExpandWorld;
 
-public class Generate {
+public class Generate
+{
   public static int LastTaskIndex = 0;
   public static bool Generating => WorldGeneration.Generating || MapGeneration.Generating;
   private static float Debouncer = 10f;
-  public static void World() {
+  public static void World()
+  {
     Debouncer = 0f;
     MapOnly = false;
   }
   private static bool MapOnly = true;
-  public static void Map() {
+  public static void Map()
+  {
     Debouncer = 0f;
   }
-  public static void Cancel() {
+  public static void Cancel()
+  {
     Debouncer = 10f;
     WorldGeneration.Cancel();
     MapGeneration.Cancel();
   }
-  public static void CheckRegen(float dt) {
+  public static void CheckRegen(float dt)
+  {
     var limit = WorldGeneration.HasLoaded ? 2f : 0.1f;
     if (Debouncer > limit) return;
     Debouncer += dt;
-    if (Debouncer > limit) {
+    if (Debouncer > limit)
+    {
       var map = Minimap.instance;
       var wg = WorldGenerator.instance;
       if (MapOnly)
@@ -45,8 +51,10 @@ public class Generate {
 
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), new Type[0])]
-public class LocationGeneration {
-  static void Prefix() {
+public class LocationGeneration
+{
+  static void Prefix()
+  {
     if (WorldGeneration.HasLoaded) return;
     WorldGeneration.GenerateSync(WorldGenerator.instance);
     // This is called at ZNet.Start before Minimap.Start.
@@ -55,8 +63,10 @@ public class LocationGeneration {
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
-public class WorldGeneration {
-  public static void GenerateSync(WorldGenerator wg) {
+public class WorldGeneration
+{
+  public static void GenerateSync(WorldGenerator wg)
+  {
     Generate.Cancel();
     ExpandWorld.Log.LogInfo("Started world generation.");
     var stopwatch = Stopwatch.StartNew();
@@ -71,7 +81,8 @@ public class WorldGeneration {
     WorldGeneration.HasLoaded = true;
   }
   public static bool HasLoaded = false;
-  static bool Prefix(WorldGenerator __instance) {
+  static bool Prefix(WorldGenerator __instance)
+  {
     if (__instance.m_world.m_menu) return true;
     if (!Data.IsReady) return false;
     if (HasLoaded)
@@ -80,8 +91,10 @@ public class WorldGeneration {
       GenerateSync(__instance);
     return false;
   }
-  public static void Cancel() {
-    if (CTS != null) {
+  public static void Cancel()
+  {
+    if (CTS != null)
+    {
       ExpandWorld.Log.LogInfo("Cancelling previous world generation.");
       CTS.Cancel();
       CTS = null;
@@ -89,7 +102,8 @@ public class WorldGeneration {
   }
   public static bool Generating => CTS != null;
   static CancellationTokenSource? CTS = null;
-  static IEnumerator Coroutine(WorldGenerator wg) {
+  static IEnumerator Coroutine(WorldGenerator wg)
+  {
     int taskIndex = global::ExpandWorld.Generate.LastTaskIndex++;
     Cancel();
     MapGeneration.Cancel();
@@ -116,7 +130,8 @@ public class WorldGeneration {
     if (ct.IsCancellationRequested)
       yield break;
     yield return null;
-    foreach (var heightmap in Heightmaps.All) {
+    foreach (var heightmap in Heightmaps.All)
+    {
       heightmap.m_buildData = null;
       heightmap.Regenerate();
     }
@@ -147,12 +162,15 @@ public class WorldGeneration {
 
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.GenerateWorldMap))]
-public class MapGeneration {
+public class MapGeneration
+{
   // Some map mods may do stuff after generation which won't work with async.
   // So do one "fake" generate call to trigger those.
   static bool DoFakeGenerate = false;
-  static bool Prefix(Minimap __instance) {
-    if (DoFakeGenerate) {
+  static bool Prefix(Minimap __instance)
+  {
+    if (DoFakeGenerate)
+    {
       DoFakeGenerate = false;
       return false;
     }
@@ -160,14 +178,17 @@ public class MapGeneration {
     Game.instance.StartCoroutine(Coroutine(__instance));
     return false;
   }
-  public static void Cancel() {
-    if (CTS != null) {
+  public static void Cancel()
+  {
+    if (CTS != null)
+    {
       ExpandWorld.Log.LogInfo($"Cancelling previous map generation.");
       CTS.Cancel();
       CTS = null;
     }
   }
-  public static void UpdateTextureSize(Minimap map, int textureSize) {
+  public static void UpdateTextureSize(Minimap map, int textureSize)
+  {
     if (map.m_textureSize == textureSize) return;
     map.m_textureSize = textureSize;
     map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
@@ -192,7 +213,8 @@ public class MapGeneration {
   }
   public static bool Generating => CTS != null;
   static CancellationTokenSource? CTS = null;
-  static IEnumerator Coroutine(Minimap map) {
+  static IEnumerator Coroutine(Minimap map)
+  {
     Cancel();
 
     ExpandWorld.Log.LogInfo($"Starting map generation.");
@@ -213,7 +235,8 @@ public class MapGeneration {
 
     if (task.IsFaulted)
       ExpandWorld.Log.LogError($"Map generation failed!\n{task.Exception}");
-    else if (!ct.IsCancellationRequested) {
+    else if (!ct.IsCancellationRequested)
+    {
       map.m_mapTexture.SetPixels32(mapTexture);
       yield return null;
       map.m_mapTexture.Apply();
@@ -242,10 +265,12 @@ public class MapGeneration {
   }
 
   static async Task Generate(
-      Minimap map, Color32[] mapTexture, Color32[] forestMaskTexture, Color[] heightTexture, CancellationToken ct) {
+      Minimap map, Color32[] mapTexture, Color32[] forestMaskTexture, Color[] heightTexture, CancellationToken ct)
+  {
     await Task
         .Run(
-          () => {
+          () =>
+          {
             if (ct.IsCancellationRequested)
               ct.ThrowIfCancellationRequested();
 
@@ -255,8 +280,10 @@ public class MapGeneration {
             var pixelSize = map.m_pixelSize;   // default 12
             var halfPixelSize = pixelSize / 2f;
 
-            for (var i = 0; i < textureSize; i++) {
-              for (var j = 0; j < textureSize; j++) {
+            for (var i = 0; i < textureSize; i++)
+            {
+              for (var j = 0; j < textureSize; j++)
+              {
                 var wx = (j - halfTextureSize) * pixelSize + halfPixelSize;
                 var wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
 
@@ -287,7 +314,8 @@ public class MapGeneration {
   static readonly Color32 SwampColor = new Color(0.6395f, 0.447f, 0.3449f);
   static readonly Color32 WhiteColor32 = Color.white;
 
-  public static Color32 GetPixelColor32(Heightmap.Biome biome) {
+  public static Color32 GetPixelColor32(Heightmap.Biome biome)
+  {
     if (BiomeManager.TryGetData(biome, out var data))
       return data.mapColor;
     return biome switch
@@ -308,8 +336,10 @@ public class MapGeneration {
   static readonly Color32 ForestColor = new Color(1f, 0f, 0f, 0f);
   static readonly Color32 NoForestColor = new Color(0f, 0f, 0f, 0f);
 
-  static Color32 GetMaskColor32(float wx, float wy, float height, Heightmap.Biome biome, Heightmap.Biome terrain) {
-    if (height < Configuration.WaterLevel) {
+  static Color32 GetMaskColor32(float wx, float wy, float height, Heightmap.Biome biome, Heightmap.Biome terrain)
+  {
+    if (height < Configuration.WaterLevel)
+    {
       return NoForestColor;
     }
 
@@ -323,20 +353,24 @@ public class MapGeneration {
     };
   }
 
-  static float GetForestFactor(Heightmap.Biome biome, float vx, float vz) {
+  static float GetForestFactor(Heightmap.Biome biome, float vx, float vz)
+  {
     var multiplier = Configuration.ForestMultiplier;
-    if (BiomeManager.TryGetData(biome, out var data)) {
+    if (BiomeManager.TryGetData(biome, out var data))
+    {
       multiplier *= data.forestMultiplier;
     }
     if (multiplier == 0f) return 10f;
     return Fbm(vx * 0.004f, vz * 0.004f, 3, 1.6f, 0.7f) / multiplier;
   }
 
-  static float Fbm(float vx, float vz, int octaves, float lacunarity, float gain) {
+  static float Fbm(float vx, float vz, int octaves, float lacunarity, float gain)
+  {
     float result = 0f;
     float multiplier = 1f;
 
-    for (int i = 0; i < octaves; i++) {
+    for (int i = 0; i < octaves; i++)
+    {
       result += multiplier * Mathf.PerlinNoise(vx, vz);
       multiplier *= gain;
       vx *= lacunarity;
@@ -348,24 +382,30 @@ public class MapGeneration {
 }
 
 [HarmonyPatch(typeof(Heightmap))]
-public class Heightmaps {
+public class Heightmaps
+{
   public static List<Heightmap> All = new();
   [HarmonyPatch(nameof(Heightmap.Awake)), HarmonyPostfix]
-  static void Add(Heightmap __instance) {
+  static void Add(Heightmap __instance)
+  {
     All.Add(__instance);
   }
   [HarmonyPatch(nameof(Heightmap.OnDestroy)), HarmonyPostfix]
-  static void Remove(Heightmap __instance) {
+  static void Remove(Heightmap __instance)
+  {
     All.Remove(__instance);
   }
 }
 [HarmonyPatch(typeof(Game), nameof(Game.FindSpawnPoint))]
-public class FindSpawnPoint {
+public class FindSpawnPoint
+{
   static bool Prefix() => WorldGeneration.HasLoaded;
 }
 [HarmonyPatch(typeof(Game), nameof(Game.Logout))]
-public class CancelOnLogout {
-  static void Prefix() {
+public class CancelOnLogout
+{
+  static void Prefix()
+  {
     Generate.Cancel();
     Data.BiomesLoaded = false;
     WorldGeneration.HasLoaded = false;

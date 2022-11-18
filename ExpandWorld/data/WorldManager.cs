@@ -4,11 +4,13 @@ using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
-public class WorldManager {
+public class WorldManager
+{
   public static string FileName = "expand_world.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_world*.yaml";
-  public static List<WorldData> GetDefault() {
+  public static List<WorldData> GetDefault()
+  {
     return new() {
       new() {
         biome = "ocean",
@@ -84,7 +86,8 @@ public class WorldManager {
     };
   }
 
-  public static WorldData FromData(WorldData data) {
+  public static WorldData FromData(WorldData data)
+  {
     data._biome = Data.ToBiomes(data.biome);
     data._biomeSeed = BiomeManager.GetTerrain(data._biome);
     if (int.TryParse(data.seed, out var seed))
@@ -97,39 +100,48 @@ public class WorldManager {
   }
   public static WorldData ToData(WorldData biome) => biome;
 
-  public static void ToFile() {
+  public static void ToFile()
+  {
     if (!Helper.IsServer() || !Configuration.DataWorld) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueWorldData.Value = yaml;
   }
-  public static void FromFile() {
+  public static void FromFile()
+  {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataWorld ? Data.Read(Pattern) : "";
     Configuration.valueWorldData.Value = yaml;
     Set(yaml);
   }
-  public static void FromSetting(string yaml) {
+  public static void FromSetting(string yaml)
+  {
     if (Helper.IsClient()) Set(yaml);
   }
-  private static void Set(string yaml) {
+  private static void Set(string yaml)
+  {
     if (yaml == "" || !Configuration.DataWorld) return;
-    try {
+    try
+    {
       var data = Data.Deserialize<WorldData>(yaml, FileName)
         .Select(FromData).ToList();
-      if (data.Count == 0) {
+      if (data.Count == 0)
+      {
         ExpandWorld.Log.LogWarning($"Failed to load any world data.");
         return;
       }
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
       GetBiome.Data = data;
       Generate.World();
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, FromFile);
   }
 }

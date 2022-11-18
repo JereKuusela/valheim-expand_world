@@ -2,43 +2,52 @@ using System.Globalization;
 using UnityEngine;
 namespace ExpandWorld;
 
-public class Range<T> {
+public class Range<T>
+{
   public T Min;
   public T Max;
-  public Range(T value) {
+  public Range(T value)
+  {
     Min = value;
     Max = value;
   }
-  public Range(T min, T max) {
+  public Range(T min, T max)
+  {
     Min = min;
     Max = max;
   }
 }
 
 ///<summary>Contains functions for parsing arguments, etc.</summary>
-public static class Parse {
-  public static int Int(string arg, int defaultValue = 0) {
+public static class Parse
+{
+  public static int Int(string arg, int defaultValue = 0)
+  {
     if (!int.TryParse(arg, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
       return defaultValue;
     return result;
   }
-  public static int Int(string[] args, int index, int defaultValue = 0) {
+  public static int Int(string[] args, int index, int defaultValue = 0)
+  {
     if (args.Length <= index) return defaultValue;
     return Int(args[index], defaultValue);
   }
-  public static float Float(string arg, float defaultValue = 0f) {
+  public static float Float(string arg, float defaultValue = 0f)
+  {
     if (!float.TryParse(arg, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
       return defaultValue;
     return result;
   }
-  public static float Float(string[] args, int index, float defaultValue = 0f) {
+  public static float Float(string[] args, int index, float defaultValue = 0f)
+  {
     if (args.Length <= index) return defaultValue;
     return Float(args[index], defaultValue);
   }
   ///<summary>Parses YXZ vector starting at given index. Zero is used for missing values.</summary>
   public static Vector3 VectorXZY(string[] args, int index) => VectorXZY(args, index, Vector3.zero);
   ///<summary>Parses YXZ vector starting at given index. Default values is used for missing values.</summary>
-  public static Vector3 VectorXZY(string[] args, int index, Vector3 defaultValue) {
+  public static Vector3 VectorXZY(string[] args, int index, Vector3 defaultValue)
+  {
     var vector = Vector3.zero;
     vector.x = Float(args, index, defaultValue.x);
     vector.z = Float(args, index + 1, defaultValue.z);
@@ -50,7 +59,8 @@ public static class Parse {
   public static Vector3 Scale(string[] args) => Scale(args, 0);
   ///<summary>Parses scale starting at given index. Includes a sanity check and giving a single value for all axis.</summary>
   public static Vector3 Scale(string[] args, int index) => SanityCheck(VectorXZY(args, index));
-  private static Vector3 SanityCheck(Vector3 scale) {
+  private static Vector3 SanityCheck(Vector3 scale)
+  {
     // Sanity check and also adds support for setting all values with a single number.
     if (scale.x == 0) scale.x = 1;
     if (scale.y == 0) scale.y = scale.x;

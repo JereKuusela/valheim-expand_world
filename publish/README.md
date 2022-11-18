@@ -28,6 +28,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.13
+  - Adds a new field `data` to the `expand_spawns.yaml`.
+  - Fixes spawns not working.
+
 - v1.12
   - Adds a new command `print_musics` to print available musics to the console.
   - Changes the format of `biome`, `biomeArea`, `requiredGlobalKeys`, `notRequiredGlobalKeys` and `requiredEnvironments` (old configs automatically converted).

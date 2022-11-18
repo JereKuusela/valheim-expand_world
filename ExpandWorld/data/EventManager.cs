@@ -4,13 +4,15 @@ using System.IO;
 using System.Linq;
 namespace ExpandWorld;
 
-public class EventManager {
+public class EventManager
+{
   public static string FileName = "expand_events.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_events*.yaml";
   public static Dictionary<string, List<string>> EventToRequirentEnvironment = new();
 
-  public static RandomEvent FromData(EventData data) {
+  public static RandomEvent FromData(EventData data)
+  {
     var random = new RandomEvent();
     random.m_name = data.name;
     random.m_spawn = data.spawns.Select(SpawnManager.FromData).ToList();
@@ -29,7 +31,8 @@ public class EventManager {
     EventToRequirentEnvironment[data.name] = Data.ToList(data.requiredEnvironments);
     return random;
   }
-  public static EventData ToData(RandomEvent random) {
+  public static EventData ToData(RandomEvent random)
+  {
     EventData data = new();
     data.name = random.m_name;
     data.spawns = random.m_spawn.Select(SpawnManager.ToData).ToArray();
@@ -48,36 +51,44 @@ public class EventManager {
     return data;
   }
 
-  public static void ToFile() {
+  public static void ToFile()
+  {
     if (!Helper.IsServer() || !Configuration.DataEvents) return;
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueEventData.Value = yaml;
   }
-  public static void FromFile() {
+  public static void FromFile()
+  {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataEvents ? Data.Read(Pattern) : "";
     Configuration.valueEventData.Value = yaml;
     Set(yaml);
   }
-  public static void FromSetting(string yaml) {
+  public static void FromSetting(string yaml)
+  {
     if (Helper.IsClient()) Set(yaml);
   }
-  private static void Set(string yaml) {
+  private static void Set(string yaml)
+  {
     if (yaml == "" || !Configuration.DataEvents) return;
-    try {
+    try
+    {
       EventToRequirentEnvironment.Clear();
       var data = Data.Deserialize<EventData>(yaml, FileName).Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} event data.");
       foreach (var list in LocationList.m_allLocationLists)
         list.m_events.Clear();
       RandEventSystem.instance.m_events = data;
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
-  public static void SetupWatcher() {
+  public static void SetupWatcher()
+  {
     Data.SetupWatcher(Pattern, FromFile);
   }
 }

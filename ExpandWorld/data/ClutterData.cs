@@ -1,6 +1,7 @@
 using System.ComponentModel;
 namespace ExpandWorld;
-public class ClutterData {
+public class ClutterData
+{
   public string prefab = "";
   [DefaultValue(true)]
   public bool enabled = true;

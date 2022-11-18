@@ -3,12 +3,14 @@ using UnityEngine;
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Awake))]
-public class MinimapAwake {
+public class MinimapAwake
+{
   // Applies the map parameter changes.
   public static float OriginalPixelSize;
   public static int OriginalTextureSize;
   public static float OriginalMinZoom;
-  static void Postfix(Minimap __instance) {
+  static void Postfix(Minimap __instance)
+  {
     OriginalTextureSize = __instance.m_textureSize;
     __instance.m_textureSize = (int)(__instance.m_textureSize * Configuration.MapSize);
     OriginalMinZoom = __instance.m_maxZoom;
@@ -20,8 +22,10 @@ public class MinimapAwake {
 }
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapData))]
-public class InitializeWhenDimensionsChange {
-  static bool Prefix(Minimap __instance, byte[] data) {
+public class InitializeWhenDimensionsChange
+{
+  static bool Prefix(Minimap __instance, byte[] data)
+  {
     var obj = __instance;
     ZPackage zpackage = new(data);
     var num = zpackage.ReadInt();
@@ -36,6 +40,7 @@ public class InitializeWhenDimensionsChange {
 }
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
-public class Map_WaitForConfigSync {
+public class Map_WaitForConfigSync
+{
   static bool Prefix() => Data.IsReady;
 }

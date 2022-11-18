@@ -5,8 +5,10 @@ using UnityEngine;
 namespace ExpandWorld;
 
 [HarmonyPatch]
-public class HeightSeed {
-  static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions) {
+public class HeightSeed
+{
+  static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions)
+  {
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset3), (WorldGenerator instance) => Configuration.HeightSeed ?? instance.m_offset3);
     return matcher.InstructionEnumeration();
@@ -26,8 +28,10 @@ public class HeightSeed {
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
-public class BaseHeight {
-  static void Postfix(WorldGenerator __instance, ref float __result) {
+public class BaseHeight
+{
+  static void Postfix(WorldGenerator __instance, ref float __result)
+  {
     if (__instance.m_world.m_menu) return;
     var waterLevel = Helper.HeightToBaseHeight(Configuration.WaterLevel);
     __result = waterLevel + (__result - waterLevel) * Configuration.AltitudeMultiplier;
@@ -35,21 +39,26 @@ public class BaseHeight {
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight))]
-public class BiomeHeight {
-  static void Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome biome, ref Heightmap.Biome __state) {
+public class BiomeHeight
+{
+  static void Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome biome, ref Heightmap.Biome __state)
+  {
     if (__instance.m_world.m_menu) return;
     wx /= Configuration.WorldStretch;
     wy /= Configuration.WorldStretch;
     __state = biome;
     biome = BiomeManager.GetTerrain(biome);
   }
-  static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result) {
+  static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result)
+  {
     if (__instance.m_world.m_menu) return;
     __result -= Configuration.WaterLevel;
-    if (BiomeManager.TryGetData(__state, out var data)) {
+    if (BiomeManager.TryGetData(__state, out var data))
+    {
       __result *= data.altitudeMultiplier;
       __result += data.altitudeDelta;
-      if (__result < 0f) {
+      if (__result < 0f)
+      {
         __result *= data.waterDepthMultiplier;
         __result *= Configuration.WaterDepthMultiplier;
       }
@@ -57,7 +66,9 @@ public class BiomeHeight {
         __result = data.maximumAltitude + Mathf.Pow(__result - data.maximumAltitude, data.excessFactor);
       if (__result < data.minimumAltitude)
         __result = data.minimumAltitude - Mathf.Pow(data.minimumAltitude - __result, data.excessFactor);
-    } else {
+    }
+    else
+    {
       if (__result < 0f)
         __result *= Configuration.WaterDepthMultiplier;
     }

@@ -2,13 +2,15 @@ using System.ComponentModel;
 using UnityEngine;
 namespace ExpandWorld;
 
-public class BiomeEnvironment {
+public class BiomeEnvironment
+{
   public string environment = "";
   [DefaultValue(1f)]
   public float weight = 1f;
 }
 
-public class BiomeData {
+public class BiomeData
+{
   public string biome = "";
   [DefaultValue("")]
   public string name = "";
