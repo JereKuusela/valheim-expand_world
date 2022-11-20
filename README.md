@@ -477,14 +477,16 @@ Streams have params:
 2. Spawn a mushroom with `spawn_object GlowingMushroom scale=5`
 3. Use `object copy=all` to copy the scale (should return AgAAAAEEYHngAACgQAAAoEAAAKBA).
 4. Add to the `StartTemple` entry:
->objectSwap: 
->    BossStone_Eikthyr: GlowingMushroom
->    BossStone_TheElder: GlowingMushroom
->    BossStone_Bonemass: GlowingMushroom
->    BossStone_DragonQueen: GlowingMushroom
->    BossStone_Yagluth: GlowingMushroom
->objectData:
->    GlowingMushroom: AgAAAAEEYHngAACgQAAAoEAAAKBA
+```
+objectSwap:
+    BossStone_Eikthyr: GlowingMushroom
+    BossStone_TheElder: GlowingMushroom
+    BossStone_Bonemass: GlowingMushroom
+    BossStone_DragonQueen: GlowingMushroom
+    BossStone_Yagluth: GlowingMushroom
+objectData:
+    GlowingMushroom: AgAAAAEEYHngAACgQAAAoEAAAKBA
+```
 5. Create a new world or use `locations_reset StartTemple start force` from Upgrade World mod.
 6. Boss stones should be replaced with big Glowing Mushrooms (5x size).
 
@@ -519,12 +521,14 @@ Streams have params:
 Example:
 
 Copy-paste ashlands entry and change:
->- biome: desert
->  name: Desert
->  terrain: ashlands
->  environments:
->  - environment: Clear
+
+    - biome: desert
+      name: Desert
+      terrain: ashlands
+      environments:
+      - environment: Clear
 
 Copy-paste plains entry and change the top one:
->- biome: desert
->  amount: 0.5
+
+    - biome: desert
+      amount: 0.5
