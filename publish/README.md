@@ -28,6 +28,11 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.14
+  - Adds support for location blueprints.
+  - Adds support for adding new objects to locations.
+  - Changes `objectSwap` and `objectData` to also affect dungeon rooms.
+
 - v1.13
   - Adds a new field `data` to the `expand_spawns.yaml`.
   - Adds new fields `objectSwap` and `objectData` to the `expand_locations.yaml`.

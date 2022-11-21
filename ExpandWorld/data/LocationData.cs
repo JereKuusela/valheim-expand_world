@@ -56,4 +56,8 @@ public class LocationData
   public Dictionary<string, string>? objectData = null;
   [DefaultValue(null)]
   public Dictionary<string, string>? objectSwap = null;
+  [DefaultValue(null)]
+  public Dictionary<string, string>? objects = null;
+  [DefaultValue(0f)]
+  public float clearRadius = 0f;
 }

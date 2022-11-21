@@ -14,8 +14,8 @@ public class BlueprintObject
   public Quaternion Rot;
   public Vector3 Scale;
   public string ExtraInfo;
-  public ZDO Data;
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO data)
+  public ZDO? Data;
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data)
   {
     Prefab = name;
     Pos = pos;
@@ -23,6 +23,15 @@ public class BlueprintObject
     Scale = scale;
     ExtraInfo = info;
     Data = data;
+  }
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot)
+  {
+    Prefab = name;
+    Pos = pos;
+    Rot = rot.normalized;
+    Scale = Vector3.one;
+    ExtraInfo = "";
+    Data = null;
   }
 }
 public class Blueprint
@@ -40,6 +49,11 @@ public class Blueprints
     return planBuild.Concat(buildShare).OrderBy(s => s);
   }
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
+  public static bool Exists(string name)
+  {
+    var path = Files().FirstOrDefault(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_") == name);
+    return path != null;
+  }
   public static Blueprint? GetBluePrint(string name)
   {
     var path = Files().FirstOrDefault(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_") == name);
@@ -184,9 +198,10 @@ public class Blueprints
     var scaleY = InvariantFloat(split, 11, 1f);
     var scaleZ = InvariantFloat(split, 12, 1f);
     var data = split.Length > 13 ? split[13] : "";
-    ZDO zdo = new();
+    ZDO? zdo = null;
     if (data != "")
     {
+      zdo = new();
       ZPackage pkg = new(data);
       Deserialize(zdo, pkg);
     }
@@ -218,7 +233,7 @@ public class Blueprints
     var posX = InvariantFloat(split, 5);
     var posY = InvariantFloat(split, 6);
     var posZ = InvariantFloat(split, 7);
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, "", new());
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, "", null);
   }
   private static float InvariantFloat(string[] row, int index, float defaultValue = 0f)
   {

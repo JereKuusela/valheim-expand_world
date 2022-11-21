@@ -15,15 +15,29 @@ public class LocationManager
   public static Dictionary<string, ZDO> ZDO = new();
   public static Dictionary<string, Dictionary<string, string>> ObjectSwaps = new();
   public static Dictionary<string, Dictionary<string, ZDO>> ObjectData = new();
+  public static Dictionary<string, List<BlueprintObject>> Objects = new();
+  public static Dictionary<string, float> ClearAreas = new();
+  public static HashSet<string> BlueprintNames = new();
+  public static Dictionary<string, Location> BlueprintLocations = new();
   public static ZoneSystem.ZoneLocation FromData(LocationData data)
   {
     var loc = new ZoneSystem.ZoneLocation();
+    if (data.clearRadius != 0f)
+      ClearAreas[data.prefab] = data.clearRadius;
     if (data.data != "")
       ZDO[data.prefab] = Data.ToZDO(data.data);
     if (data.objectSwap != null)
       ObjectSwaps[data.prefab] = data.objectSwap;
     if (data.objectData != null)
       ObjectData[data.prefab] = data.objectData.ToDictionary(kvp => kvp.Key, kvp => Data.ToZDO(kvp.Value));
+    if (data.objects != null)
+    {
+      Objects[data.prefab] = data.objects.Select(kvp => new BlueprintObject(
+        kvp.Key,
+        Parse.VectorXZY(kvp.Value.Split(','), 0),
+        Parse.AngleYXZ(kvp.Value.Split(','), 3)
+      )).ToList();
+    }
     loc.m_prefabName = data.prefab;
     loc.m_enable = data.enabled;
     loc.m_biome = Data.ToBiomes(data.biome);
@@ -109,6 +123,9 @@ public class LocationManager
       ZDO.Clear();
       ObjectSwaps.Clear();
       ObjectData.Clear();
+      Objects.Clear();
+      ClearAreas.Clear();
+      BlueprintNames.Clear();
       var data = Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
@@ -128,6 +145,27 @@ public class LocationManager
     var prefabName = item.m_prefabName.Split(':')[0];
     if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation))
     {
+      if (Blueprints.Exists(prefabName))
+      {
+        BlueprintNames.Add(prefabName);
+        item.m_hash = item.m_prefabName.GetStableHashCode();
+        item.m_prefab = new();
+        if (!BlueprintLocations.TryGetValue(item.m_prefabName, out item.m_location))
+        {
+          var obj = new GameObject();
+          item.m_location = obj.AddComponent<Location>();
+          BlueprintLocations.Add(item.m_prefabName, item.m_location);
+        }
+        if (ClearAreas.TryGetValue(item.m_prefabName, out var radius))
+        {
+          item.m_location.m_clearArea = true;
+          item.m_exteriorRadius = radius;
+          item.m_interiorRadius = radius;
+        }
+        item.m_netViews = new();
+        item.m_randomSpawns = new();
+        return item;
+      }
       // Don't warn on the default data since it has missing stuff.
       if (File.Exists(FilePath))
         ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
@@ -237,14 +275,19 @@ public class FixGhostInit
 public class LocationObjectDataAndSwap
 {
   private static string Location = "";
-  static void Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
+  static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
   {
     Location = location.m_prefabName;
+    return !LocationManager.BlueprintNames.Contains(Location);
   }
-  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation)
+  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
   {
-    if (!LocationManager.ObjectData.TryGetValue(Location, out var objectData)) return;
-    if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out var data)) return;
+    if (data == null)
+    {
+      if (!LocationManager.ObjectData.TryGetValue(Location, out var objectData)) return;
+      if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out data)) return;
+    }
+    if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
     Data.InitZDO(position, rotation, data, view);
   }
@@ -254,10 +297,14 @@ public class LocationObjectDataAndSwap
     if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swap)) return prefab;
     return ZNetScene.instance.GetPrefab(swap) ?? prefab;
   }
-  static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
+  public static GameObject InstantiateWithSwap(GameObject prefab, Vector3 position, Quaternion rotation)
   {
     prefab = Swap(prefab);
-    SetData(prefab, position, rotation);
+    return Instantiate(prefab, position, rotation);
+  }
+  public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  {
+    SetData(prefab, position, rotation, data);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     Data.CleanGhostInit(obj);
     return obj;
@@ -268,8 +315,82 @@ public class LocationObjectDataAndSwap
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.StartGhostInit))))
       .Advance(5)
-      .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
-      .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(InstantiateWithSwap).operand)
+      .InstructionEnumeration();
+  }
+
+  static void SpawnBPO(ZoneSystem __instance, bool flag, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects, BlueprintObject obj)
+  {
+    var objPos = pos + rot * obj.Pos;
+    var objRot = rot * obj.Rot;
+    if (mode == ZoneSystem.SpawnMode.Ghost)
+    {
+      ZNetView.StartGhostInit();
+    }
+    var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
+    var go = Instantiate(prefab, objPos, objRot, obj.Data);
+    go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
+    var dg = go.GetComponent<DungeonGenerator>();
+    if (dg)
+    {
+      if (flag)
+        dg.m_originalPosition = location.m_generatorPosition;
+      dg.Generate(mode);
+    }
+    if (mode == ZoneSystem.SpawnMode.Ghost)
+    {
+      spawnedGhostObjects.Add(go);
+      ZNetView.FinishGhostInit();
+    }
+  }
+
+  [HarmonyPostfix, HarmonyPriority(Priority.LowerThanNormal)]
+  static void SpawnCustomObjects(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  {
+    if (mode == ZoneSystem.SpawnMode.Client) return;
+    if (!LocationManager.Objects.TryGetValue(location.m_prefabName, out var objects)) return;
+    var loc = location.m_location;
+    var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
+    foreach (var obj in objects)
+    {
+      SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
+    }
+  }
+
+  [HarmonyPostfix]
+  static void SpawnBlueprint(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  {
+    if (mode == ZoneSystem.SpawnMode.Client) return;
+    if (!LocationManager.BlueprintNames.Contains(location.m_prefabName)) return;
+    if (location.m_location.m_clearArea && location.m_exteriorRadius != 0f)
+    {
+      ExpandWorld.Log.LogWarning("EDITING");
+      var compilers = Terrain.GetCompilers(pos, location.m_exteriorRadius);
+      var indicer = Terrain.CreateIndexer(pos, location.m_exteriorRadius);
+      var compilerIndices = Terrain.GetIndices(compilers, indicer);
+      Terrain.ResetTerrain(compilerIndices, pos, location.m_exteriorRadius);
+      Terrain.LevelTerrain(compilerIndices, pos, location.m_exteriorRadius, 0.5f, pos.y);
+    }
+    var bp = Blueprints.GetBluePrint(location.m_prefabName);
+    if (bp == null) return;
+    var loc = location.m_location;
+    var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
+    foreach (var obj in bp.Objects)
+    {
+      SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
+    }
+  }
+}
+
+[HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode))]
+public class DungeonDataAndSwap
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.GetZDO))))
+      .Advance(-6)
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(LocationObjectDataAndSwap.InstantiateWithSwap).operand)
       .InstructionEnumeration();
   }
 }

@@ -43,6 +43,17 @@ public static class Parse
     if (args.Length <= index) return defaultValue;
     return Float(args[index], defaultValue);
   }
+
+  public static Quaternion AngleYXZ(string[] args, int index) => AngleYXZ(args, index, Vector3.zero);
+  public static Quaternion AngleYXZ(string[] args, int index, Vector3 defaultValue)
+  {
+    var vector = Vector3.zero;
+    vector.x = Float(args, index, defaultValue.x);
+    vector.z = Float(args, index + 1, defaultValue.z);
+    vector.y = Float(args, index + 2, defaultValue.y);
+    return Quaternion.Euler(vector);
+  }
+
   ///<summary>Parses YXZ vector starting at given index. Zero is used for missing values.</summary>
   public static Vector3 VectorXZY(string[] args, int index) => VectorXZY(args, index, Vector3.zero);
   ///<summary>Parses YXZ vector starting at given index. Default values is used for missing values.</summary>

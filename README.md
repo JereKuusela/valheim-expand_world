@@ -264,7 +264,7 @@ See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for mor
 
 Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored areas, you need to use Upgrade World mod.
 
-- prefab: Identifier of the location object. Check wiki for available locations. Hidden ones work too.
+- prefab: Identifier of the location object or name of blueprint. Check wiki for available locations. Hidden ones work too.
 - enabled (default: `true`): Quick way to disable this entry.
 - biome: List of possible biomes.
 - biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome).
@@ -291,6 +291,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).. To create a variant of an existing location, add `:text` to the prefab. For example "Eikthyrnir:Wolf".
 - objectSwap: Dictionary to swap child objects to some other objects. See examples at the bottom.
 - objectData: Dictionary to set child object data. See examples at the bottom.
+- objects: Dictionary to add new objects. Format is `id: posX,posZ,posY,rotY,rotX,rotZ`
+- clearRadius: For blueprints, this area is cleared and leveled.
 
 ## Vegetation
 
