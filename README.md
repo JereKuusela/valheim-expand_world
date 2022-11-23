@@ -369,6 +369,7 @@ See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 - huntPlayer (default: `false`): Spawned creatures are more aggressive.
 - groundOffset (default: `0.5` meters): Spawns above the ground.
 - levelUpMinCenterDistance (default: `0` meters): Distance from the world center to enable higher creature levels. This is not scaled with the world size.
+- overrideLevelupChance (default: `-1` percent): Chance per level up (from the default 10%).
 - data: ZDO data override. For example to change faction with Spawner Tweaks mod (`object copy` from World Edit Commands).
 
 ## Events

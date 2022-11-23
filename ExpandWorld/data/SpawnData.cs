@@ -59,6 +59,8 @@ public class SpawnData
   public float groundOffset = 0.5f;
   [DefaultValue(0f)]
   public float levelUpMinCenterDistance = 0f;
+  [DefaultValue(-1f)]
+  public float overrideLevelupChance = -1f;
   [DefaultValue("")]
   public string data = "";
 }
