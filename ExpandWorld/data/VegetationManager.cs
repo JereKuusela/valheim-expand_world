@@ -45,12 +45,15 @@ public class VegetationManager
     veg.m_maxAltitude = data.maxAltitude;
     veg.m_minOceanDepth = data.minOceanDepth;
     veg.m_maxOceanDepth = data.maxOceanDepth;
+    veg.m_minVegetation = data.minVegetation;
+    veg.m_maxVegetation = data.maxVegetation;
     veg.m_minTilt = data.minTilt;
     veg.m_maxTilt = data.maxTilt;
     veg.m_terrainDeltaRadius = data.terrainDeltaRadius;
     veg.m_maxTerrainDelta = data.maxTerrainDelta;
     veg.m_minTerrainDelta = data.minTerrainDelta;
     veg.m_snapToWater = data.snapToWater;
+    veg.m_snapToStaticSolid = data.snapToStaticSolid;
     veg.m_groundOffset = data.groundOffset;
     veg.m_groupSizeMin = data.groupSizeMin;
     veg.m_groupSizeMax = data.groupSizeMax;
@@ -80,12 +83,15 @@ public class VegetationManager
     data.maxAltitude = veg.m_maxAltitude;
     data.minOceanDepth = veg.m_minOceanDepth;
     data.maxOceanDepth = veg.m_maxOceanDepth;
+    data.minVegetation = veg.m_minVegetation;
+    data.maxVegetation = veg.m_maxVegetation;
     data.minTilt = veg.m_minTilt;
     data.maxTilt = veg.m_maxTilt;
     data.terrainDeltaRadius = veg.m_terrainDeltaRadius;
     data.maxTerrainDelta = veg.m_maxTerrainDelta;
     data.minTerrainDelta = veg.m_minTerrainDelta;
     data.snapToWater = veg.m_snapToWater;
+    data.snapToStaticSolid = veg.m_snapToStaticSolid;
     data.groundOffset = veg.m_groundOffset;
     data.groupSizeMin = veg.m_groupSizeMin;
     data.groupSizeMax = veg.m_groupSizeMax;
@@ -132,8 +138,6 @@ public class VegetationManager
         return;
       }
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} vegetation data.");
-      foreach (var list in LocationList.m_allLocationLists)
-        list.m_vegetation.Clear();
       ZoneSystem.instance.m_vegetation = data;
       ZoneSystem.instance.ValidateVegetation();
     }
@@ -168,11 +172,12 @@ public class VegetationScale
     SetData(prefab, position, rotation);
     return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
   }
-  static void SetScale(ZNetView view)
+  static void SetScale(ZNetView view, Vector3 scale)
   {
     Data.CleanGhostInit(view);
-    if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
-      view.SetLocalScale(Helper.RandomValue(scale));
+    if (VegetationManager.Scale.TryGetValue(Veg, out var randomScale))
+      scale = Helper.RandomValue(randomScale);
+    view.SetLocalScale(scale);
   }
   static void SetScaleTr(Transform tr)
   {
@@ -188,9 +193,7 @@ public class VegetationScale
       .Advance(5)
       .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
-      .Advance(1)
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Dup))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetScale).operand))
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(SetScale).operand)
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.PropertySetter(typeof(Transform), nameof(Transform.localScale))))
       .Advance(1)
       .InsertAndAdvance(new CodeInstruction(OpCodes.Dup))

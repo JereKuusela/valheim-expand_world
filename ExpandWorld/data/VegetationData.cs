@@ -35,6 +35,10 @@ public class VegetationData
   [DefaultValue(0f)]
   public float maxOceanDepth = 0f;
   [DefaultValue(0f)]
+  public float minVegetation = 0f;
+  [DefaultValue(0f)]
+  public float maxVegetation = 0f;
+  [DefaultValue(0f)]
   public float minTilt = 0f;
   [DefaultValue(90f)]
   public float maxTilt = 90f;
@@ -46,6 +50,8 @@ public class VegetationData
   public float maxTerrainDelta = 10f;
   [DefaultValue(false)]
   public bool snapToWater = false;
+  [DefaultValue(false)]
+  public bool snapToStaticSolid = false;
   [DefaultValue(0f)]
   public float groundOffset = 0f;
   [DefaultValue(1)]

@@ -316,12 +316,15 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - maxAltitude (default: `1000` meters): Maximum terrain altitude.
 - minOceanDepth (default: `0` meters): Minimum ocean depth.
 - maxOceanDepth (default: `0` meters): Maximum ocean depth.
+- minVegetation (default: `0`): Minimum vegetation mask.
+- maxVegetation (default: `0`): Maximum vegetation mask.
 - minTilt (default: `0` degrees): Minimum terrain angle.
 - maxTilt (default: `90` degrees): Maximum terrain angle.
 - terrainDeltaRadius (default: `0` meters): Radius for terrain delta limits.
 - minTerrainDelta (default: `0` meters): Minimum terrain height change.
 - maxTerrainDelta (default: `10` meters): Maximum terrain height change.
 - snapToWater (default: `false`): Placed at the water level instead of the terrain.
+- snapToStaticSolid (default: `false`): Placed at the top of solid objects instead of terrain.
 - groundOffset (default: `0` meters): Placed above the ground.
 - groupSizeMin (default: `1`): Minimum amount to be placed at the same time.
 - groupSizeMax (default: `1`): Maximum amount to be placed at the same time.

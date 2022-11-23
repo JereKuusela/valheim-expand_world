@@ -289,7 +289,8 @@ public class MapGeneration
 
                 var biome = wg.GetBiome(wx, wy);
                 var terrain = BiomeManager.GetTerrain(biome);
-                var biomeHeight = wg.GetBiomeHeight(biome, wx, wy);
+                Color mask;
+                var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out mask);
                 if (BiomeManager.TryGetData(biome, out var data))
                   biomeHeight = Configuration.WaterLevel + (biomeHeight - Configuration.WaterLevel) * data.mapColorMultiplier;
                 mapTexture[i * textureSize + j] = GetPixelColor32(biome);

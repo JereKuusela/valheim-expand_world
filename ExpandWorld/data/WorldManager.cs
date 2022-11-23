@@ -11,6 +11,7 @@ public class WorldManager
   public static string Pattern = "expand_world*.yaml";
   public static List<WorldData> GetDefault()
   {
+    var version = WorldGenerator.instance.m_world.m_worldGenVersion;
     return new() {
       new() {
         biome = "ocean",
@@ -44,7 +45,7 @@ public class WorldManager
         _biomeSeed = Heightmap.Biome.Swamp,
         wiggleDistance = false,
         minDistance = 0.2f,
-        maxDistance = 0.8f,
+        maxDistance = version > 1 ? 0.6f :0.8f,
         minAltitude = -20f,
         maxAltitude = 20f,
         amount = 0.4f,
@@ -54,7 +55,7 @@ public class WorldManager
         _biome = Heightmap.Biome.Mistlands,
         _biomeSeed = Heightmap.Biome.Mistlands,
         minDistance = 0.6f,
-        amount = 0.5f,
+        amount = version > 1 ? 0.6f : 0.5f,
       },
       new() {
         biome = "plains",

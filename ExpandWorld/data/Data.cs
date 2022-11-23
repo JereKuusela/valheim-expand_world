@@ -23,17 +23,24 @@ public class LoadData
     EnvironmentManager.SetOriginals();
     // Let Valheim do its default location setup since some mods rely on it.
     if (!ZNet.instance.IsServer()) return;
+    // Biomes need environments.
     EnvironmentManager.FromFile();
+    // Other mods may need custom biomes (so load early).
     BiomeManager.FromFile();
     WorldManager.FromFile();
-    VegetationManager.FromFile();
-    EventManager.FromFile();
-    SpawnManager.FromFile();
-    ClutterManager.FromFile();
   }
   [HarmonyPriority(Priority.VeryLow)]
   static void Postfix()
   {
+    if (Helper.IsServer())
+    {
+      // Clutter must be here because since SetupLocations adds prefabs to the list.
+      ClutterManager.FromFile();
+      // These are here to not have to clear location lists (slightly better compatibility).
+      VegetationManager.FromFile();
+      EventManager.FromFile();
+      SpawnManager.FromFile();
+    }
     // Overwrite location setup with our stuff.
     LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
     LocationManager.SetupLocations(ZoneSystem.instance.m_locations);

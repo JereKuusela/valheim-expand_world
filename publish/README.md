@@ -29,8 +29,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 # Changelog
 
 - v1.14
-  - Adds support for location blueprints.
+  - Update for Mistlands PTB.
+  - Adds support for location blueprints (experimental, will be improved in the next version).
   - Adds support for adding new objects to locations.
+  - Adds new fields `maxVegetation`, `minVegetation` and `snapToStaticSolid` to the `expand_vegetation.yaml`.
   - Changes `objectSwap` and `objectData` to also affect dungeon rooms.
 
 - v1.13

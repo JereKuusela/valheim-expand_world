@@ -364,7 +364,6 @@ public class LocationObjectDataAndSwap
     if (!LocationManager.BlueprintNames.Contains(location.m_prefabName)) return;
     if (location.m_location.m_clearArea && location.m_exteriorRadius != 0f)
     {
-      ExpandWorld.Log.LogWarning("EDITING");
       var compilers = Terrain.GetCompilers(pos, location.m_exteriorRadius);
       var indicer = Terrain.CreateIndexer(pos, location.m_exteriorRadius);
       var compilerIndices = Terrain.GetIndices(compilers, indicer);
