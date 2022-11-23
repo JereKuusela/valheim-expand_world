@@ -292,9 +292,13 @@ public class MapGeneration
                 Color mask;
                 var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out mask);
                 if (BiomeManager.TryGetData(biome, out var data))
+                {
                   biomeHeight = Configuration.WaterLevel + (biomeHeight - Configuration.WaterLevel) * data.mapColorMultiplier;
-                mapTexture[i * textureSize + j] = GetPixelColor32(biome);
-                forestMaskTexture[i * textureSize + j] = GetMaskColor32(wx, wy, biomeHeight, biome, terrain);
+                  mapTexture[i * textureSize + j] = data.mapColor;
+                }
+                else
+                  mapTexture[i * textureSize + j] = map.GetPixelColor(biome);
+                forestMaskTexture[i * textureSize + j] = map.GetMaskColor(wx, wy, biomeHeight, terrain);
                 heightTexture[i * textureSize + j] = new Color(biomeHeight, 0f, 0f);
                 if (ct.IsCancellationRequested)
                   ct.ThrowIfCancellationRequested();
@@ -302,83 +306,6 @@ public class MapGeneration
             }
           })
         .ConfigureAwait(continueOnCapturedContext: false);
-  }
-
-
-  static readonly Color32 AshlandsColor = new Color(0.6903f, 0.192f, 0.192f);
-  static readonly Color32 BlackForestColor = new Color(0.4190f, 0.4548f, 0.2467f);
-  static readonly Color32 DeepNorthColor = new Color(1f, 1f, 1f);
-  static readonly Color32 HeathColor = new Color(0.9062f, 0.6707f, 0.4704f);
-  static readonly Color32 MeadowsColor = new Color(0.5725f, 0.6551f, 0.3605f);
-  static readonly Color32 MistlandsColor = new Color(0.3254f, 0.3254f, 0.3254f);
-  static readonly Color32 MountainColor = new Color(1f, 1f, 1f);
-  static readonly Color32 SwampColor = new Color(0.6395f, 0.447f, 0.3449f);
-  static readonly Color32 WhiteColor32 = Color.white;
-
-  public static Color32 GetPixelColor32(Heightmap.Biome biome)
-  {
-    if (BiomeManager.TryGetData(biome, out var data))
-      return data.mapColor;
-    return biome switch
-    {
-      Heightmap.Biome.Meadows => MeadowsColor,
-      Heightmap.Biome.Swamp => SwampColor,
-      Heightmap.Biome.Mountain => MountainColor,
-      Heightmap.Biome.BlackForest => BlackForestColor,
-      Heightmap.Biome.Plains => HeathColor,
-      Heightmap.Biome.DeepNorth => DeepNorthColor,
-      Heightmap.Biome.AshLands => AshlandsColor,
-      Heightmap.Biome.Mistlands => MistlandsColor,
-      Heightmap.Biome.Ocean => WhiteColor32,
-      _ => WhiteColor32,
-    };
-  }
-
-  static readonly Color32 ForestColor = new Color(1f, 0f, 0f, 0f);
-  static readonly Color32 NoForestColor = new Color(0f, 0f, 0f, 0f);
-
-  static Color32 GetMaskColor32(float wx, float wy, float height, Heightmap.Biome biome, Heightmap.Biome terrain)
-  {
-    if (height < Configuration.WaterLevel)
-    {
-      return NoForestColor;
-    }
-
-    return terrain switch
-    {
-      Heightmap.Biome.Meadows => GetForestFactor(biome, wx, wy) < 1.15f ? ForestColor : NoForestColor,
-      Heightmap.Biome.Plains => GetForestFactor(biome, wx, wy) < 0.8f ? ForestColor : NoForestColor,
-      Heightmap.Biome.BlackForest => ForestColor,
-      Heightmap.Biome.Mistlands => ForestColor,
-      _ => NoForestColor,
-    };
-  }
-
-  static float GetForestFactor(Heightmap.Biome biome, float vx, float vz)
-  {
-    var multiplier = Configuration.ForestMultiplier;
-    if (BiomeManager.TryGetData(biome, out var data))
-    {
-      multiplier *= data.forestMultiplier;
-    }
-    if (multiplier == 0f) return 10f;
-    return Fbm(vx * 0.004f, vz * 0.004f, 3, 1.6f, 0.7f) / multiplier;
-  }
-
-  static float Fbm(float vx, float vz, int octaves, float lacunarity, float gain)
-  {
-    float result = 0f;
-    float multiplier = 1f;
-
-    for (int i = 0; i < octaves; i++)
-    {
-      result += multiplier * Mathf.PerlinNoise(vx, vz);
-      multiplier *= gain;
-      vx *= lacunarity;
-      vz *= lacunarity;
-    }
-
-    return result;
   }
 }
 
