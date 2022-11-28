@@ -30,6 +30,8 @@ public class ExpandWorld : BaseUnityPlugin
     Log = Logger;
     ConfigName = $"{GUID}.cfg";
     ConfigPath = Path.Combine(Paths.ConfigPath, GUID);
+    if (!File.Exists(Path.Combine(Paths.ConfigPath, ConfigName)))
+      Directory.Delete(ConfigPath, true);
     if (!Directory.Exists(ConfigPath))
       Directory.CreateDirectory(ConfigPath);
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);

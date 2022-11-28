@@ -66,8 +66,14 @@ public class SpawnThatPatcher
     IsDedicatedDelayed = !Data.BiomesLoaded;
     return Data.BiomesLoaded;
   }
+  [HarmonyPatch(typeof(ZNet), nameof(ZNet.Awake)), HarmonyPrefix]
+  static void CleanUpOnJoin()
+  {
+    IsSingleplayerDelayed = false;
+    IsDedicatedDelayed = false;
+  }
   [HarmonyPatch(typeof(Game), nameof(Game.Logout)), HarmonyPrefix]
-  static void CleanUp()
+  static void CleanUpOnExit()
   {
     IsSingleplayerDelayed = false;
     IsDedicatedDelayed = false;

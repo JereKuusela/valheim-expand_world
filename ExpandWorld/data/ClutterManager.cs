@@ -13,8 +13,7 @@ public class ClutterManager
   public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
   public static string Pattern = "expand_clutter*.yaml";
   private static Dictionary<string, GameObject> Prefabs = new();
-  [HarmonyPatch(typeof(ClutterSystem), nameof(ClutterSystem.Awake)), HarmonyPriority(Priority.VeryLow), HarmonyFinalizer]
-  public static void LoadPrefabs()
+  static void LoadPrefabs()
   {
     if (!ZNet.instance) return;
     Prefabs = ClutterSystem.instance.m_clutter
@@ -23,6 +22,8 @@ public class ClutterManager
   }
   public static ClutterSystem.Clutter FromData(ClutterData data)
   {
+    if (Prefabs.Count == 0)
+      LoadPrefabs();
     ClutterSystem.Clutter clutter = new();
     if (Prefabs.TryGetValue(data.prefab, out var prefab))
       clutter.m_prefab = prefab;

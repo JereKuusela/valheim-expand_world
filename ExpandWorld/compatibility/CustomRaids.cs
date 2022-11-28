@@ -69,9 +69,8 @@ public class CustomRaidsPatcher
     }
     return ev;
   }
-  [HarmonyPatch(typeof(Game), nameof(Game.Logout)), HarmonyPrefix]
-  static void CleanUp()
-  {
-    IsDelayed = false;
-  }
+  [HarmonyPatch(typeof(ZNet), nameof(ZNet.Awake)), HarmonyPrefix]
+  static void CleanUpOnJoin() => IsDelayed = false;
+  [HarmonyPatch(typeof(Game), nameof(Game.Shutdown)), HarmonyPrefix]
+  static void CleanUpOnExit() => IsDelayed = false;
 }

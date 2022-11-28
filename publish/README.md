@@ -10,9 +10,9 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/main/README.md).
 
-## Migration from version 1.5
+## Migration from version 1.13
 
-- Verify that `expand_vegetation.yaml` uses `.` as the separate character for `scaleMin` and `scaleMax` instead of `,`. Fix manually or remove the file to regerenate it.
+- Regenerate `expand_locations.yaml` by removing it to get values for new fields `clearArea`, `exteriorRadius`, `noBuild` and `randomDamage`
 
 # Credits
 
@@ -29,12 +29,13 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 # Changelog
 
 - v1.14
-  - Update for Mistlands PTB.
-  - Adds support for location blueprints (experimental, will be improved in the next version).
+  - Warning: Breaking changes!
+  - Adds support for location blueprints (experimental / work in progress, use at your own risk).
   - Adds support for adding new objects to locations.
-  - Adds new fields `maxVegetation`, `minVegetation` and `snapToStaticSolid` to the `expand_vegetation.yaml`.
-  - Adds a new field `overrideLevelupChance` to the `expand_spawns.yaml`.
   - Changes `objectSwap` and `objectData` to also affect dungeon rooms.
+  - Config files are now deleted automatically on startup if `expand_world.cfg` doesn't exist.
+  - Possible fixes config loading conflict with CLLC.
+  - Fixes config files not working on sub-directories.
 
 - v1.13
   - Adds a new field `data` to the `expand_spawns.yaml`.
@@ -53,24 +54,3 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 - v1.10
   - Fixes the black screen.
-
-- v1.9
-  - Fixes the altitude delta having the same effect as the altiude multiplier.
-
-- v1.8
-  - Adds a new field `data` to the `expand_locations.yaml`.
-  - Adds a new field `data` to the `expand_vegetation.yaml`.
-  - Fixes compatibility issue with Spawn That mod.
-
-- v1.7
-  - Adds a new field `waterDepthMultiplier` to the `expand_biomes.yaml`.
-  - Adds a new field `requiredEnvironments` to the `expand_events.yaml`.
-  - Adds new fields `maximumAltitude`, `minimumAltitude` and `excessFactor` to the `expand_biomes.yaml`.
-  - Adds a failsafe for missing locations or vegetations (so that the world loads at least).
-  - Changes the default minimum altitude of `expand_spawns.yaml` to depend on maximum altitude (-1000 or 0).
-  - Improves compatibility with Spawn That mod.
-  - Fixes possible error when flying.
-  - Fixes incompatibility with Custom Raids mod (+ event data is disabled).
-
-- v1.6
-  - Fixes default vegetation scale being wrong in `expand_vegetation.yaml` (for some users).

@@ -57,7 +57,7 @@ public class SpawnManager
     spawn.m_maxLevel = data.maxLevel;
     spawn.m_minLevel = data.minLevel;
     spawn.m_levelUpMinCenterDistance = data.levelUpMinCenterDistance;
-    spawn.m_overrideLevelupChance = data.overrideLevelupChance;
+    // PTB spawn.m_overrideLevelupChance = data.overrideLevelupChance;
     return spawn;
   }
   public static SpawnData ToData(SpawnSystem.SpawnData spawn)
@@ -93,7 +93,7 @@ public class SpawnManager
     data.maxLevel = spawn.m_maxLevel;
     data.minLevel = spawn.m_minLevel;
     data.levelUpMinCenterDistance = spawn.m_levelUpMinCenterDistance;
-    data.overrideLevelupChance = spawn.m_overrideLevelupChance;
+    // PTB data.overrideLevelupChance = spawn.m_overrideLevelupChance;
     return data;
   }
   public static bool IsValid(SpawnSystem.SpawnData spawn) => spawn.m_prefab;

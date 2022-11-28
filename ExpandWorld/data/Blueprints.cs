@@ -37,6 +37,21 @@ public class BlueprintObject
 public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
+  public float Radius = 0f;
+  public void Normalize()
+  {
+    Bounds bounds = new();
+    foreach (var obj in Objects)
+      bounds.Encapsulate(obj.Pos);
+    Radius = Utils.LengthXZ(bounds.extents);
+    ExpandWorld.Log.LogWarning("Radius " + Radius);
+    ExpandWorld.Log.LogWarning("Center " + bounds.center.ToString());
+    foreach (var obj in Objects)
+    {
+      obj.Pos.x -= bounds.center.x;
+      obj.Pos.z -= bounds.center.z;
+    }
+  }
 }
 public class Blueprints
 {
@@ -53,6 +68,14 @@ public class Blueprints
   {
     var path = Files().FirstOrDefault(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_") == name);
     return path != null;
+  }
+  public static bool TryGetBluePrint(string name, out Blueprint blueprint)
+  {
+    blueprint = new();
+    var bp = GetBluePrint(name);
+    if (bp == null) return false;
+    blueprint = bp;
+    return true;
   }
   public static Blueprint? GetBluePrint(string name)
   {
@@ -79,6 +102,7 @@ public class Blueprints
       else if (piece)
         bp.Objects.Add(GetPlanBuildObject(row));
     }
+    bp.Normalize();
     return bp;
   }
   private static void Deserialize(ZDO zdo, ZPackage pkg)

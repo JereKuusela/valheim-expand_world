@@ -59,5 +59,13 @@ public class LocationData
   [DefaultValue(null)]
   public Dictionary<string, string>? objects = null;
   [DefaultValue(0f)]
-  public float clearRadius = 0f;
+  public float exteriorRadius = 0f;
+  [DefaultValue(false)]
+  public bool clearArea = false;
+  [DefaultValue(false)]
+  public bool randomDamage = false;
+  [DefaultValue(false)]
+  public bool noBuild = false;
+  [DefaultValue(true)]
+  public bool levelArea = true;
 }

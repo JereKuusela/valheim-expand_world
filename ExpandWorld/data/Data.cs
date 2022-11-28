@@ -358,7 +358,7 @@ public class Data : MonoBehaviour
   {
     if (!Directory.Exists(ExpandWorld.ConfigPath))
       Directory.CreateDirectory(ExpandWorld.ConfigPath);
-    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern).Select(name =>
+    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern, SearchOption.AllDirectories).Select(name =>
     {
       var lines = File.ReadAllLines(name).ToList();
       var migrated = false;

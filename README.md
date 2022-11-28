@@ -292,7 +292,11 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - objectSwap: Dictionary to swap child objects to some other objects. See examples at the bottom.
 - objectData: Dictionary to set child object data. See examples at the bottom.
 - objects: Dictionary to add new objects. Format is `id: posX,posZ,posY,rotY,rotX,rotZ`
-- clearRadius: For blueprints, this area is cleared and leveled.
+- applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
+- exteriorRadius: How many meters are cleared, leveled or no build.
+- clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
+- levelArea (default: `true`): If true, some leveling is applied within `exteriorRadius` (only for blueprints).
+- noBuild (default: `false`): If true, players can't build within `exteriorRadius`.
 
 ## Vegetation
 
@@ -316,15 +320,12 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - maxAltitude (default: `1000` meters): Maximum terrain altitude.
 - minOceanDepth (default: `0` meters): Minimum ocean depth.
 - maxOceanDepth (default: `0` meters): Maximum ocean depth.
-- minVegetation (default: `0`): Minimum vegetation mask.
-- maxVegetation (default: `0`): Maximum vegetation mask.
 - minTilt (default: `0` degrees): Minimum terrain angle.
 - maxTilt (default: `90` degrees): Maximum terrain angle.
 - terrainDeltaRadius (default: `0` meters): Radius for terrain delta limits.
 - minTerrainDelta (default: `0` meters): Minimum terrain height change.
 - maxTerrainDelta (default: `10` meters): Maximum terrain height change.
 - snapToWater (default: `false`): Placed at the water level instead of the terrain.
-- snapToStaticSolid (default: `false`): Placed at the top of solid objects instead of terrain.
 - groundOffset (default: `0` meters): Placed above the ground.
 - groupSizeMin (default: `1`): Minimum amount to be placed at the same time.
 - groupSizeMax (default: `1`): Maximum amount to be placed at the same time.
@@ -369,7 +370,6 @@ See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 - huntPlayer (default: `false`): Spawned creatures are more aggressive.
 - groundOffset (default: `0.5` meters): Spawns above the ground.
 - levelUpMinCenterDistance (default: `0` meters): Distance from the world center to enable higher creature levels. This is not scaled with the world size.
-- overrideLevelupChance (default: `-1` percent): Chance per level up (from the default 10%).
 - data: ZDO data override. For example to change faction with Spawner Tweaks mod (`object copy` from World Edit Commands).
 
 ## Events

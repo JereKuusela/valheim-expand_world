@@ -16,14 +16,13 @@ public class LocationManager
   public static Dictionary<string, Dictionary<string, string>> ObjectSwaps = new();
   public static Dictionary<string, Dictionary<string, ZDO>> ObjectData = new();
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
-  public static Dictionary<string, float> ClearAreas = new();
-  public static HashSet<string> BlueprintNames = new();
+  public static Dictionary<string, LocationData> LocationData = new();
+  public static Dictionary<string, Blueprint> BlueprintFiles = new();
   public static Dictionary<string, Location> BlueprintLocations = new();
   public static ZoneSystem.ZoneLocation FromData(LocationData data)
   {
     var loc = new ZoneSystem.ZoneLocation();
-    if (data.clearRadius != 0f)
-      ClearAreas[data.prefab] = data.clearRadius;
+    LocationData[data.prefab] = data;
     if (data.data != "")
       ZDO[data.prefab] = Data.ToZDO(data.data);
     if (data.objectSwap != null)
@@ -95,6 +94,13 @@ public class LocationManager
       data.maxDistance /= 10000f;
     data.minAltitude = loc.m_minAltitude;
     data.maxAltitude = loc.m_maxAltitude;
+    if (loc.m_location)
+    {
+      data.randomDamage = loc.m_location.m_applyRandomDamage;
+      data.exteriorRadius = loc.m_location.m_exteriorRadius;
+      data.clearArea = loc.m_location.m_clearArea;
+      data.noBuild = loc.m_location.m_noBuild;
+    }
     return data;
   }
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
@@ -124,8 +130,8 @@ public class LocationManager
       ObjectSwaps.Clear();
       ObjectData.Clear();
       Objects.Clear();
-      ClearAreas.Clear();
-      BlueprintNames.Clear();
+      LocationData.Clear();
+      BlueprintFiles.Clear();
       var data = Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
@@ -139,15 +145,26 @@ public class LocationManager
     }
     return new();
   }
+  private static void ApplyLocationData(ZoneSystem.ZoneLocation item, float? radius = null)
+  {
+    if (!LocationData.TryGetValue(item.m_prefabName, out var data)) return;
+    item.m_location.m_exteriorRadius = data.exteriorRadius;
+    item.m_exteriorRadius = item.m_location.m_exteriorRadius;
+    if (radius.HasValue && item.m_exteriorRadius == 0)
+      item.m_exteriorRadius = radius.Value;
+    item.m_location.m_applyRandomDamage = data.randomDamage;
+    item.m_location.m_clearArea = data.clearArea;
+    item.m_location.m_noBuild = data.noBuild;
+  }
   ///<summary>Copies setup from locations.</summary>
   private static ZoneSystem.ZoneLocation Setup(ZoneSystem.ZoneLocation item)
   {
     var prefabName = item.m_prefabName.Split(':')[0];
     if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation))
     {
-      if (Blueprints.Exists(prefabName))
+      if (Blueprints.TryGetBluePrint(prefabName, out var bp))
       {
-        BlueprintNames.Add(prefabName);
+        BlueprintFiles[prefabName] = bp;
         item.m_hash = item.m_prefabName.GetStableHashCode();
         item.m_prefab = new();
         if (!BlueprintLocations.TryGetValue(item.m_prefabName, out item.m_location))
@@ -156,12 +173,7 @@ public class LocationManager
           item.m_location = obj.AddComponent<Location>();
           BlueprintLocations.Add(item.m_prefabName, item.m_location);
         }
-        if (ClearAreas.TryGetValue(item.m_prefabName, out var radius))
-        {
-          item.m_location.m_clearArea = true;
-          item.m_exteriorRadius = radius;
-          item.m_interiorRadius = radius;
-        }
+        ApplyLocationData(item, bp.Radius);
         item.m_netViews = new();
         item.m_randomSpawns = new();
         return item;
@@ -178,6 +190,7 @@ public class LocationManager
     item.m_interiorPosition = zoneLocation.m_interiorPosition;
     item.m_generatorPosition = zoneLocation.m_generatorPosition;
     item.m_hash = zoneLocation.m_hash;
+    ApplyLocationData(item);
     item.m_netViews = zoneLocation.m_netViews;
     item.m_randomSpawns = zoneLocation.m_randomSpawns;
     return item;
@@ -278,7 +291,7 @@ public class LocationObjectDataAndSwap
   static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
   {
     Location = location.m_prefabName;
-    return !LocationManager.BlueprintNames.Contains(Location);
+    return !LocationManager.BlueprintFiles.ContainsKey(Location);
   }
   static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
   {
@@ -319,7 +332,7 @@ public class LocationObjectDataAndSwap
       .InstructionEnumeration();
   }
 
-  static void SpawnBPO(ZoneSystem __instance, bool flag, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects, BlueprintObject obj)
+  static GameObject SpawnBPO(ZoneSystem __instance, bool flag, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects, BlueprintObject obj)
   {
     var objPos = pos + rot * obj.Pos;
     var objRot = rot * obj.Rot;
@@ -342,6 +355,7 @@ public class LocationObjectDataAndSwap
       spawnedGhostObjects.Add(go);
       ZNetView.FinishGhostInit();
     }
+    return go;
   }
 
   [HarmonyPostfix, HarmonyPriority(Priority.LowerThanNormal)]
@@ -361,23 +375,26 @@ public class LocationObjectDataAndSwap
   static void SpawnBlueprint(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
     if (mode == ZoneSystem.SpawnMode.Client) return;
-    if (!LocationManager.BlueprintNames.Contains(location.m_prefabName)) return;
-    if (location.m_location.m_clearArea && location.m_exteriorRadius != 0f)
+    if (!LocationManager.BlueprintFiles.TryGetValue(location.m_prefabName, out var bp)) return;
+    if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
     {
-      var compilers = Terrain.GetCompilers(pos, location.m_exteriorRadius);
-      var indicer = Terrain.CreateIndexer(pos, location.m_exteriorRadius);
-      var compilerIndices = Terrain.GetIndices(compilers, indicer);
-      Terrain.ResetTerrain(compilerIndices, pos, location.m_exteriorRadius);
-      Terrain.LevelTerrain(compilerIndices, pos, location.m_exteriorRadius, 0.5f, pos.y);
+      if (data.levelArea)
+      {
+        var radius = location.m_exteriorRadius;
+        ExpandWorld.Log.LogWarning("Leveling " + radius);
+        var compilers = Terrain.GetCompilers(pos, radius);
+        var indicer = Terrain.CreateIndexer(pos, radius);
+        var compilerIndices = Terrain.GetIndices(compilers, indicer);
+        Terrain.ResetTerrain(compilerIndices, pos, radius);
+        Terrain.LevelTerrain(compilerIndices, pos, radius, 0.5f, pos.y);
+      }
     }
-    var bp = Blueprints.GetBluePrint(location.m_prefabName);
-    if (bp == null) return;
     var loc = location.m_location;
+    WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     foreach (var obj in bp.Objects)
-    {
       SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
-    }
+    WearNTear.m_randomInitialDamage = false;
   }
 }
 
