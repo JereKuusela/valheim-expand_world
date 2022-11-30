@@ -12,7 +12,7 @@ namespace ExpandWorld;
 public class VegetationManager
 {
   public static string FileName = "expand_vegetation.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_vegetation*.yaml";
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data)
   {

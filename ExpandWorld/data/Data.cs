@@ -102,7 +102,7 @@ public class Data : MonoBehaviour
 
   public static void SetupWatcher(string pattern, Action action)
   {
-    FileSystemWatcher watcher = new(ExpandWorld.ConfigPath, pattern);
+    FileSystemWatcher watcher = new(ExpandWorld.YamlDirectory, pattern);
     watcher.Created += (s, e) => action();
     watcher.Changed += (s, e) => action();
     watcher.Renamed += (s, e) => action();
@@ -356,9 +356,9 @@ public class Data : MonoBehaviour
   }
   public static string Read(string pattern)
   {
-    if (!Directory.Exists(ExpandWorld.ConfigPath))
-      Directory.CreateDirectory(ExpandWorld.ConfigPath);
-    var data = Directory.GetFiles(ExpandWorld.ConfigPath, pattern, SearchOption.AllDirectories).Select(name =>
+    if (!Directory.Exists(ExpandWorld.YamlDirectory))
+      Directory.CreateDirectory(ExpandWorld.YamlDirectory);
+    var data = Directory.GetFiles(ExpandWorld.YamlDirectory, pattern, SearchOption.AllDirectories).Select(name =>
     {
       var lines = File.ReadAllLines(name).ToList();
       var migrated = false;

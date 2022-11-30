@@ -10,7 +10,7 @@ namespace ExpandWorld;
 public class SpawnManager
 {
   public static string FileName = "expand_spawns.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_spawns*.yaml";
   public static SpawnSystem.SpawnData FromData(SpawnData data)
   {

@@ -28,6 +28,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.15
+  - Fixes error at start up if configs were missing.
+
 - v1.14
   - Warning: Breaking changes!
   - Adds support for location blueprints (experimental / work in progress, use at your own risk).

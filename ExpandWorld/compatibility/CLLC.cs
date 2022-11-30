@@ -15,7 +15,11 @@ public class CLLCPatcher
     var type = CLLC.GetType("CreatureLevelControl.ConfigLoader");
     if (type == null) return;
     if (IsDelayed)
+    {
       Call(type, "loadConfigFile");
+      ExpandWorld.Log.LogInfo("Manually called CLLC initialization.");
+    }
+
   }
   private static Assembly? CLLC;
   public static void Run()
@@ -42,6 +46,7 @@ public class CLLCPatcher
   static bool Prefix()
   {
     IsDelayed = !Data.BiomesLoaded;
+    if (IsDelayed) ExpandWorld.Log.LogInfo("Delayed CLLC initialization.");
     return Data.BiomesLoaded;
   }
   [HarmonyPatch(typeof(ZNet), nameof(ZNet.Awake)), HarmonyPrefix]

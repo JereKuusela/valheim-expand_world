@@ -7,7 +7,7 @@ namespace ExpandWorld;
 public class WorldManager
 {
   public static string FileName = "expand_world.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_world*.yaml";
   public static List<WorldData> GetDefault()
   {

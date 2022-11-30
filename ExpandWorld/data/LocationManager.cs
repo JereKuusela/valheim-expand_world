@@ -10,7 +10,7 @@ namespace ExpandWorld;
 public class LocationManager
 {
   public static string FileName = "expand_locations.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_locations*.yaml";
   public static Dictionary<string, ZDO> ZDO = new();
   public static Dictionary<string, Dictionary<string, string>> ObjectSwaps = new();

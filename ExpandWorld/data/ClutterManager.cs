@@ -10,7 +10,7 @@ namespace ExpandWorld;
 public class ClutterManager
 {
   public static string FileName = "expand_clutter.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_clutter*.yaml";
   private static Dictionary<string, GameObject> Prefabs = new();
   static void LoadPrefabs()

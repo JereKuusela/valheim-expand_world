@@ -8,7 +8,7 @@ namespace ExpandWorld;
 public class BiomeManager
 {
   public static string FileName = "expand_biomes.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_biomes*.yaml";
 
   public static EnvEntry FromData(BiomeEnvironment data)

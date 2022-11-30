@@ -7,7 +7,7 @@ namespace ExpandWorld;
 public class EventManager
 {
   public static string FileName = "expand_events.yaml";
-  public static string FilePath = Path.Combine(ExpandWorld.ConfigPath, FileName);
+  public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_events*.yaml";
   public static Dictionary<string, List<string>> EventToRequirentEnvironment = new();
 

@@ -12,7 +12,7 @@ public class ExpandWorld : BaseUnityPlugin
 {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.14";
+  public const string VERSION = "1.15";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -24,16 +24,14 @@ public class ExpandWorld : BaseUnityPlugin
     IsLocked = true
   };
   public static string ConfigName = "";
-  public static string ConfigPath = "";
+  public static string YamlDirectory = "";
   public void Awake()
   {
     Log = Logger;
     ConfigName = $"{GUID}.cfg";
-    ConfigPath = Path.Combine(Paths.ConfigPath, GUID);
-    if (!File.Exists(Path.Combine(Paths.ConfigPath, ConfigName)))
-      Directory.Delete(ConfigPath, true);
-    if (!Directory.Exists(ConfigPath))
-      Directory.CreateDirectory(ConfigPath);
+    YamlDirectory = Path.Combine(Paths.ConfigPath, GUID);
+    if (!Directory.Exists(YamlDirectory))
+      Directory.CreateDirectory(YamlDirectory);
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
     Configuration.Init(wrapper);
     Harmony harmony = new(GUID);
@@ -73,7 +71,19 @@ public class ExpandWorld : BaseUnityPlugin
     watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
     watcher.EnableRaisingEvents = true;
   }
-
+  private void YamlCleanUp()
+  {
+    try
+    {
+      if (!Directory.Exists(YamlDirectory)) return;
+      if (File.Exists(Path.Combine(Paths.ConfigPath, ConfigName))) return;
+      Directory.Delete(YamlDirectory, true);
+    }
+    catch
+    {
+      Log.LogWarning("Failed to remove old yaml files.");
+    }
+  }
   private void ReadConfigValues(object sender, FileSystemEventArgs e)
   {
     if (!File.Exists(Config.ConfigFilePath)) return;
