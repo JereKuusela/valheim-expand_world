@@ -10,9 +10,16 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/main/README.md).
 
+## Migration from version 1.15
+
+- Regenerate `expand_clutter.yaml` by removing it to get values for the new fields `minVegetation`, `maxVegetation` and `minTilt`.
+- Regenerate `expand_spawns.yaml` by removing it to get values for the new field `overrideLevelupChance`.
+- Regenerate `expand_vegetation.yaml` by removing it to get values for the new fields `minVegetation`, `maxVegetation` and `snapToStaticSolid`.
+
+
 ## Migration from version 1.13
 
-- Regenerate `expand_locations.yaml` by removing it to get values for new fields `clearArea`, `exteriorRadius`, `noBuild` and `randomDamage`
+- Regenerate `expand_locations.yaml` by removing it to get values for the new fields `clearArea`, `exteriorRadius`, `noBuild` and `randomDamage`.
 
 # Credits
 
@@ -27,6 +34,12 @@ Sources: [GitHub](https://github.com/JereKuusela/valheim-infinity_hammer)
 Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
+
+- v1.16
+  - Warning: Breaking changes!
+  - Adds new fields `minVegetation`. `maxVegetation` and `minTilt` to the `expand_clutter.yaml`.
+  - Adds a new field `overrideLevelupChance` to the `expand_spawns.yaml`.
+  - Adds new fields `minVegetation`. `maxVegetation` and `snapToStaticSolid` to the `expand_vegetation.yaml`.
 
 - v1.15
   - Fixes error at start up if configs were missing.

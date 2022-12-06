@@ -18,12 +18,18 @@ public class ClutterData
   public float scaleMin = 1f;
   [DefaultValue(1f)]
   public float scaleMax = 1f;
+  [DefaultValue(0f)]
+  public float minTilt = 0f;
   [DefaultValue(10f)]
   public float maxTilt = 10f;
   [DefaultValue(-1000f)]
   public float minAltitude = -1000f;
   [DefaultValue(1000f)]
   public float maxAltitude = 1000f;
+  [DefaultValue(0f)]
+  public float minVegetation = 0f;
+  [DefaultValue(0f)]
+  public float maxVegetation = 0f;
   [DefaultValue(false)]
   public bool snapToWater = false;
   [DefaultValue(false)]

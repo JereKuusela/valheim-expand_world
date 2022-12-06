@@ -38,8 +38,11 @@ public class ClutterManager
     clutter.m_scaleMin = data.scaleMin;
     clutter.m_scaleMax = data.scaleMax;
     clutter.m_maxTilt = data.maxTilt;
+    clutter.m_minTilt = data.minTilt;
     clutter.m_maxAlt = data.maxAltitude;
     clutter.m_minAlt = data.minAltitude;
+    clutter.m_maxVegetation = data.maxVegetation;
+    clutter.m_minVegetation = data.minVegetation;
     clutter.m_snapToWater = data.snapToWater;
     clutter.m_terrainTilt = data.terrainTilt;
     clutter.m_randomOffset = data.randomOffset;
@@ -67,8 +70,11 @@ public class ClutterManager
     data.scaleMin = clutter.m_scaleMin;
     data.scaleMax = clutter.m_scaleMax;
     data.maxTilt = clutter.m_maxTilt;
+    data.minTilt = clutter.m_minTilt;
     data.maxAltitude = clutter.m_maxAlt;
     data.minAltitude = clutter.m_minAlt;
+    data.maxVegetation = clutter.m_maxVegetation;
+    data.minVegetation = clutter.m_minVegetation;
     data.snapToWater = clutter.m_snapToWater;
     data.terrainTilt = clutter.m_terrainTilt;
     data.randomOffset = clutter.m_randomOffset;

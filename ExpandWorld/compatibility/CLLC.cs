@@ -46,7 +46,8 @@ public class CLLCPatcher
   static bool Prefix()
   {
     IsDelayed = !Data.BiomesLoaded;
-    if (IsDelayed) ExpandWorld.Log.LogInfo("Delayed CLLC initialization.");
+    if (IsDelayed) ExpandWorld.Log.LogInfo("Delayed CLLC initialization (biomes not loaded).");
+    else ExpandWorld.Log.LogInfo("Allowing CLLC to initialize (biomes loaded).");
     return Data.BiomesLoaded;
   }
   [HarmonyPatch(typeof(ZNet), nameof(ZNet.Awake)), HarmonyPrefix]
