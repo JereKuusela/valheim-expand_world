@@ -44,8 +44,8 @@ public class Blueprint
     foreach (var obj in Objects)
       bounds.Encapsulate(obj.Pos);
     Radius = Utils.LengthXZ(bounds.extents);
-    ExpandWorld.Log.LogWarning("Radius " + Radius);
-    ExpandWorld.Log.LogWarning("Center " + bounds.center.ToString());
+    ExpandWorld.Log.LogDebug("Radius " + Radius);
+    ExpandWorld.Log.LogDebug("Center " + bounds.center.ToString());
     foreach (var obj in Objects)
     {
       obj.Pos.x -= bounds.center.x;

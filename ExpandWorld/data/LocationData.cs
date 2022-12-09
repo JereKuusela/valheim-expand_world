@@ -8,6 +8,8 @@ public class LocationData
   [DefaultValue(true)]
   public bool enabled = true;
   [DefaultValue("")]
+  public string dungeon = "";
+  [DefaultValue("")]
   public string biome = "";
   [DefaultValue("")]
   public string biomeArea = "";
@@ -57,7 +59,7 @@ public class LocationData
   [DefaultValue(null)]
   public Dictionary<string, string>? objectSwap = null;
   [DefaultValue(null)]
-  public Dictionary<string, string>? objects = null;
+  public string[]? objects = null;
   [DefaultValue(0f)]
   public float exteriorRadius = 0f;
   [DefaultValue(false)]

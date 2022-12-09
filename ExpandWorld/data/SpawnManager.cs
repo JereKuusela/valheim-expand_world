@@ -15,10 +15,7 @@ public class SpawnManager
   public static SpawnSystem.SpawnData FromData(SpawnData data)
   {
     var spawn = new SpawnSystem.SpawnData();
-    if (ZNetScene.instance.m_namedPrefabs.TryGetValue(data.prefab.GetStableHashCode(), out var obj))
-      spawn.m_prefab = obj;
-    else
-      ExpandWorld.Log.LogWarning($"Spawn prefab {data.prefab} not found!");
+    spawn.m_prefab = Data.ToPrefab(data.prefab);
     if (data.data != "")
     {
       ZPackage pkg = new(data.data);

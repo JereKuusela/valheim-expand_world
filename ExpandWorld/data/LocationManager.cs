@@ -17,6 +17,7 @@ public class LocationManager
   public static Dictionary<string, Dictionary<string, ZDO>> ObjectData = new();
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, LocationData> LocationData = new();
+  public static Dictionary<string, string> Dungeons = new();
   public static Dictionary<string, Blueprint> BlueprintFiles = new();
   public static Dictionary<string, Location> BlueprintLocations = new();
   public static ZoneSystem.ZoneLocation FromData(LocationData data)
@@ -25,16 +26,18 @@ public class LocationManager
     LocationData[data.prefab] = data;
     if (data.data != "")
       ZDO[data.prefab] = Data.ToZDO(data.data);
+    if (data.dungeon != "")
+      Dungeons[data.prefab] = data.dungeon;
     if (data.objectSwap != null)
       ObjectSwaps[data.prefab] = data.objectSwap;
     if (data.objectData != null)
       ObjectData[data.prefab] = data.objectData.ToDictionary(kvp => kvp.Key, kvp => Data.ToZDO(kvp.Value));
     if (data.objects != null)
     {
-      Objects[data.prefab] = data.objects.Select(kvp => new BlueprintObject(
-        kvp.Key,
-        Parse.VectorXZY(kvp.Value.Split(','), 0),
-        Parse.AngleYXZ(kvp.Value.Split(','), 3)
+      Objects[data.prefab] = data.objects.Select(s => s.Split(',')).Select(split => new BlueprintObject(
+        split[0],
+        Parse.VectorXZY(split, 1),
+        Parse.AngleYXZ(split, 4)
       )).ToList();
     }
     loc.m_prefabName = data.prefab;
@@ -129,6 +132,7 @@ public class LocationManager
       ZDO.Clear();
       ObjectSwaps.Clear();
       ObjectData.Clear();
+      Dungeons.Clear();
       Objects.Clear();
       LocationData.Clear();
       BlueprintFiles.Clear();
@@ -157,15 +161,15 @@ public class LocationManager
     item.m_location.m_noBuild = data.noBuild;
   }
   ///<summary>Copies setup from locations.</summary>
-  private static ZoneSystem.ZoneLocation Setup(ZoneSystem.ZoneLocation item)
+  private static void Setup(ZoneSystem.ZoneLocation item)
   {
     var prefabName = item.m_prefabName.Split(':')[0];
+    item.m_hash = item.m_prefabName.GetStableHashCode();
     if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation))
     {
       if (Blueprints.TryGetBluePrint(prefabName, out var bp))
       {
         BlueprintFiles[prefabName] = bp;
-        item.m_hash = item.m_prefabName.GetStableHashCode();
         item.m_prefab = new();
         if (!BlueprintLocations.TryGetValue(item.m_prefabName, out item.m_location))
         {
@@ -176,12 +180,12 @@ public class LocationManager
         ApplyLocationData(item, bp.Radius);
         item.m_netViews = new();
         item.m_randomSpawns = new();
-        return item;
+        return;
       }
       // Don't warn on the default data since it has missing stuff.
       if (File.Exists(FilePath))
         ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
-      return item;
+      return;
     }
     item.m_prefab = zoneLocation.m_prefab;
     item.m_location = zoneLocation.m_location;
@@ -189,11 +193,9 @@ public class LocationManager
     item.m_exteriorRadius = zoneLocation.m_exteriorRadius;
     item.m_interiorPosition = zoneLocation.m_interiorPosition;
     item.m_generatorPosition = zoneLocation.m_generatorPosition;
-    item.m_hash = zoneLocation.m_hash;
     ApplyLocationData(item);
     item.m_netViews = zoneLocation.m_netViews;
     item.m_randomSpawns = zoneLocation.m_randomSpawns;
-    return item;
   }
   ///<summary>Sets zone location entries (ensures that all locations have an entry).</summary>
   public static void SetLocations(List<ZoneSystem.ZoneLocation> items)
@@ -310,15 +312,22 @@ public class LocationObjectDataAndSwap
     if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swap)) return prefab;
     return ZNetScene.instance.GetPrefab(swap) ?? prefab;
   }
-  public static GameObject InstantiateWithSwap(GameObject prefab, Vector3 position, Quaternion rotation)
+  public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
   {
     prefab = Swap(prefab);
-    return Instantiate(prefab, position, rotation);
+    return InstantiateWithData(prefab, position, rotation);
   }
-  public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  public static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
   {
     SetData(prefab, position, rotation, data);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+    if (obj.TryGetComponent<DungeonGenerator>(out var dg))
+    {
+      if (LocationManager.Dungeons.TryGetValue(Location, out var dungeon))
+        DungeonManager.Override(dg, dungeon);
+      else
+        DungeonManager.Override(dg, Utils.GetPrefabName(obj));
+    }
     Data.CleanGhostInit(obj);
     return obj;
   }
@@ -328,7 +337,7 @@ public class LocationObjectDataAndSwap
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.StartGhostInit))))
       .Advance(5)
-      .Set(OpCodes.Call, Transpilers.EmitDelegate(InstantiateWithSwap).operand)
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
       .InstructionEnumeration();
   }
 
@@ -341,7 +350,7 @@ public class LocationObjectDataAndSwap
       ZNetView.StartGhostInit();
     }
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
-    var go = Instantiate(prefab, objPos, objRot, obj.Data);
+    var go = InstantiateWithData(prefab, objPos, objRot, obj.Data);
     go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
     var dg = go.GetComponent<DungeonGenerator>();
     if (dg)
@@ -381,7 +390,7 @@ public class LocationObjectDataAndSwap
       if (data.levelArea)
       {
         var radius = location.m_exteriorRadius;
-        ExpandWorld.Log.LogWarning("Leveling " + radius);
+        ExpandWorld.Log.LogDebug("Leveling " + radius);
         var compilers = Terrain.GetCompilers(pos, radius);
         var indicer = Terrain.CreateIndexer(pos, radius);
         var compilerIndices = Terrain.GetIndices(compilers, indicer);
@@ -406,7 +415,7 @@ public class DungeonDataAndSwap
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.GetZDO))))
       .Advance(-6)
-      .Set(OpCodes.Call, Transpilers.EmitDelegate(LocationObjectDataAndSwap.InstantiateWithSwap).operand)
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(LocationObjectDataAndSwap.Instantiate).operand)
       .InstructionEnumeration();
   }
 }

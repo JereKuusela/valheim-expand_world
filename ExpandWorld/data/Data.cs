@@ -20,7 +20,6 @@ public class LoadData
   [HarmonyPriority(Priority.VeryLow)]
   static void Prefix(ZoneSystem __instance)
   {
-    EnvironmentManager.SetOriginals();
     // Let Valheim do its default location setup since some mods rely on it.
     if (!ZNet.instance.IsServer()) return;
     // Biomes need environments.
@@ -40,6 +39,7 @@ public class LoadData
       VegetationManager.FromFile();
       EventManager.FromFile();
       SpawnManager.FromFile();
+      DungeonManager.FromFile();
     }
     // Overwrite location setup with our stuff.
     LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
@@ -66,6 +66,7 @@ public class SaveData
     EventManager.ToFile();
     EnvironmentManager.ToFile();
     ClutterManager.ToFile();
+    DungeonManager.ToFile();
     // Spawn data handled elsewhere.
   }
 }
@@ -187,6 +188,34 @@ public class Data : MonoBehaviour
     if (median) return "median";
     return "";
   }
+  public static string FromEnum<T>(T value) where T : struct, Enum
+  {
+    List<string> names = new();
+    var number = 1;
+    var maxNumber = (int)(object)value;
+    while (number <= maxNumber)
+    {
+      if ((number & maxNumber) > 0)
+      {
+        names.Add(((T)(object)(number)).ToString());
+      }
+      number *= 2;
+    }
+    return FromList(names);
+  }
+  public static T ToEnum<T>(string str) where T : struct, Enum
+  {
+    var list = ToList(str);
+    int value = 0;
+    foreach (var item in list)
+    {
+      if (Enum.TryParse<T>(item, true, out var parsed))
+        value = value + (int)(object)parsed;
+      else
+        ExpandWorld.Log.LogWarning($"Failed to parse value {item} as {nameof(T)}.");
+    }
+    return (T)(object)value;
+  }
   public static Heightmap.Biome ToBiomes(string biomeStr)
   {
     Heightmap.Biome result = 0;
@@ -219,6 +248,14 @@ public class Data : MonoBehaviour
     Heightmap.BiomeArea result = 0;
     foreach (var biome in biomeAreas) result |= biome;
     return result;
+  }
+  public static GameObject? ToPrefab(string str)
+  {
+    if (ZNetScene.instance.m_namedPrefabs.TryGetValue(str.GetStableHashCode(), out var obj))
+      return obj;
+    else
+      ExpandWorld.Log.LogWarning($"Prefab {str} not found!");
+    return null;
   }
   public static void CopyData(ZDO from, ZDO to)
   {

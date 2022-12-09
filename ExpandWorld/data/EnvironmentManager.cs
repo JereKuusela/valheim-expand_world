@@ -9,7 +9,7 @@ public class EnvironmentManager
   public static string FileName = "expand_environments.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_environments*.yaml";
-  public static Dictionary<string, EnvSetup> Originals = new();
+  private static Dictionary<string, EnvSetup> Originals = new();
   public static EnvSetup FromData(EnvironmentData data)
   {
     var env = new EnvSetup();
@@ -117,7 +117,7 @@ public class EnvironmentManager
     Set(yaml);
   }
 
-  public static void SetOriginals()
+  private static void SetOriginals()
   {
     Originals = LocationList.m_allLocationLists
       .Select(list => list.m_environments)
