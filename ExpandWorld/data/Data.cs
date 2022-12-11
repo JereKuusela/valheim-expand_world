@@ -39,7 +39,7 @@ public class LoadData
       VegetationManager.FromFile();
       EventManager.FromFile();
       SpawnManager.FromFile();
-      DungeonManager.FromFile();
+      // NOT READY DungeonManager.FromFile();
     }
     // Overwrite location setup with our stuff.
     LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
@@ -66,7 +66,7 @@ public class SaveData
     EventManager.ToFile();
     EnvironmentManager.ToFile();
     ClutterManager.ToFile();
-    DungeonManager.ToFile();
+    // NOT READY DungeonManager.ToFile();
     // Spawn data handled elsewhere.
   }
 }
@@ -404,6 +404,8 @@ public class Data : MonoBehaviour
       if (Migrate.Environments(lines)) migrated = true;
       if (Migrate.GlobalKeys(lines)) migrated = true;
       if (Migrate.NotGlobalKeys(lines)) migrated = true;
+      if (Migrate.DictionaryToList(lines, "objects")) migrated = true;
+      if (Migrate.DictionaryToList(lines, "objectSwaps")) migrated = true;
       if (migrated)
       {
         ExpandWorld.Log.LogInfo($"Migrated file {Path.GetFileName(name)}");

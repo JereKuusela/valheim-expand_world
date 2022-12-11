@@ -5,7 +5,27 @@ namespace ExpandWorld;
 
 public class Migrate
 {
-
+  public static bool DictionaryToList(List<string> lines, string field)
+  {
+    var migrated = false;
+    for (var i = lines.Count - 1; i >= 0; i -= 1)
+    {
+      var line = lines[i];
+      if (!line.Contains(field + ":")) continue;
+      var intend = line.Length - line.TrimStart().Length;
+      var j = i + 1;
+      while (j < lines.Count)
+      {
+        line = lines[j];
+        var subIntend = line.Length - line.TrimStart().Length;
+        if (intend == subIntend) break;
+        if (line.Contains("-") || !line.Contains(":")) break;
+        migrated = true;
+        lines[j] = line = "".PadLeft(subIntend, ' ') + "- " + line.Split(':')[0] + ", " + line.Split(':')[1];
+      }
+    }
+    return migrated;
+  }
   public static bool BiomeAreas(List<string> lines)
   {
     var migrated = false;

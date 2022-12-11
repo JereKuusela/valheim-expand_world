@@ -65,5 +65,23 @@ public class DebugCommands {
       var names = mm.m_music.Where(music => music.m_enabled).Select(music => music.m_name);
       args.Context.AddString(string.Join("\n", names));
     }, true);
+    new Terminal.ConsoleCommand("print_seeds", "- Prints different seeds.", args => {
+      var wg = WorldGenerator.m_instance;
+      if (wg == null) return;
+      List<string> lines = new () {
+        "Main: " + wg.m_world.m_seedName,
+        "Generator: " + wg.m_world.m_worldGenVersion,
+        "World: " + wg.m_world.m_seed,
+        "Offset X: " + wg.m_offset0,
+        "Offset Y: " + wg.m_offset1,
+        "Height: " + wg.m_offset3,
+        "Meadows: " + wg.m_offset3,
+        "Black forest: " + wg.m_offset2,
+        "Swamp: "+ wg.m_offset0,
+        "Plains: "+ wg.m_offset1,
+        "Mistlands: " + wg.m_offset4
+      };
+      args.Context.AddString(string.Join("\n", lines));
+    }, true);
   }
 }

@@ -76,6 +76,9 @@ public partial class Configuration
   public static ConfigEntry<bool> configDataWorld;
   public static bool DataWorld => configDataWorld.Value;
 
+  public static ConfigEntry<string> configSeed;
+  public static string Seed => configSeed.Value;
+  
   public static ConfigEntry<string> configOffsetX;
   public static int? OffsetX => ConfigWrapper.Ints[configOffsetX];
   public static ConfigEntry<string> configOffsetY;
@@ -135,6 +138,20 @@ public partial class Configuration
     configWiggleWidth = wrapper.BindFloat(section, "Wiggle width", 100f, true, "How many meters are the wiggles.");
     configOffsetX = wrapper.BindInt(section, "Offset X", null, true);
     configOffsetY = wrapper.BindInt(section, "Offset Y", null, true);
+    configSeed = wrapper.Bind(section, "Seed", "", false);
+    configSeed.SettingChanged += (s,e) => {
+      if (Seed == "") return;
+      if (WorldGenerator.instance == null) return;
+      var world = WorldGenerator.instance.m_world;
+      if (world.m_menu) return;
+      world.m_seedName = Seed;
+      world.m_seed = Seed.GetStableHashCode();
+      // Prevents default generate (better use the debounced).
+      world.m_menu = true;
+      WorldGenerator.Initialize(world);
+      world.m_menu = false;
+      Generate.World();
+    };
     configHeightSeed = wrapper.BindInt(section, "Height variation seed", null, true);
     configEventChance = wrapper.BindFloat(section, "Random event chance", 20, false, "The chance to try starting a random event.");
     configEventChance.SettingChanged += (s, e) => RandomEventSystem.Setup(RandEventSystem.instance);

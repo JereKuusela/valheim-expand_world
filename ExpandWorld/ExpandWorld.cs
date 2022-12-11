@@ -111,3 +111,16 @@ public class SetCommands
   }
 }
 
+
+
+[HarmonyPatch(typeof(ZRpc), nameof(ZRpc.SetLongTimeout))]
+public class IncreaseTimeout
+{
+  static bool Prefix(bool enable)
+  {
+    ZRpc.m_timeout = 300f;
+		ZLog.Log(string.Format("ZRpc timeout set to {0}s ", ZRpc.m_timeout));
+    return false;
+  }
+}
+

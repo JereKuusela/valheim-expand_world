@@ -83,9 +83,17 @@ Amount of forest can be changed with `Forest multiplier`.
 
 # Seeds
 
-The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it. The world can be manually moved in this layout with `Offset X` (to west) and `Offset Y` (to south) settings.
+The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it.
+
+The world can be manually moved in this layout with `Offset X` (to west) and `Offset Y` (to south) settings.
+
+For example x = 0 and y = 0 would move the world center to the center of the big map. Similarly x = -20000 and y = 0 would move it to the edge of the big map.
+
+Command `print_seeds` prints the default offset and other seeds of the world.
 
 Each biome adds some height variation on top of the base altitude. This can be controlled with `Height variation seed` setting.
+
+The whole seed can be replaced with `Seed` setting. This gets permanently saved to the save file.
 
 # Data
 

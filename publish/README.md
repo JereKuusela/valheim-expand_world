@@ -10,6 +10,11 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/main/README.md).
 
+## Migration for Mistlands update
+
+- Regenerate all yaml files by removing them.
+- Regenerate at least environments to remove constant raining.
+
 ## Migration from version 1.15
 
 - Regenerate `expand_clutter.yaml` by removing it to get values for the new fields `minVegetation`, `maxVegetation` and `minTilt`.
@@ -34,6 +39,12 @@ Sources: [GitHub](https://github.com/JereKuusela/valheim-infinity_hammer)
 Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
+
+- v1.17
+  - Adds a new command `print_seeds` to output seed information.
+  - Adds a new setting `seed` to set the world seed.
+  - Changes the `objects` format of `expand_locations_yaml`.
+  - Increases the network timeout duration to 10x of the normal.
 
 - v1.16
   - Warning: Breaking changes!
