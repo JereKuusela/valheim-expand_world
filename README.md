@@ -89,7 +89,7 @@ The world can be manually moved in this layout with `Offset X` (to west) and `Of
 
 For example x = 0 and y = 0 would move the world center to the center of the big map. Similarly x = -20000 and y = 0 would move it to the edge of the big map.
 
-Command `print_seeds` prints the default offset and other seeds of the world.
+Command `ew_seeds` prints the default offset and other seeds of the world.
 
 Each biome adds some height variation on top of the base altitude. This can be controlled with `Height variation seed` setting.
 
@@ -159,7 +159,7 @@ Note: The world edge is always ocean. This is currently hardcoded.
 
 Technically the amount is not a percentage but something closer to a normal distribution.
 
-Manual testing with `debug_biomes` command has given these rough values:
+Manual testing with `ew_biomes` command has given these rough values:
 - 0.1: 0.4 %
 - 0.2: 2.7 %
 - 0.25: 5.3 %
@@ -206,7 +206,7 @@ Note: Of course any number is valid for sectors. Like from 0.37 to 0.62.
 
 ## Environments
 
-The file `expand_environments.yaml` sets the available weathers. Command `print_musics` can be used to print available musics.
+The file `expand_environments.yaml` sets the available weathers. Command `ew_musics` can be used to print available musics.
 
 - name: Identifier to be used in other files.
 - particles: Identifier of a default environment to set particles. Required for new environments.
@@ -419,7 +419,7 @@ Similarly wave size can be changed with `Wave multiplier` setting. With the `Wav
 
 ## Lakes
 
-Lakes are needed to generate rivers. The code searches for points with enough water and then merges them to lake objects. Use command `find_lakes` to show their positions on the map.
+Lakes are needed to generate rivers. The code searches for points with enough water and then merges them to lake objects. Use command `ew_lakes` to show their positions on the map.
 
 Note: Lake object is an abstract concept, not a real thing. So the settings only affect river generation.
 

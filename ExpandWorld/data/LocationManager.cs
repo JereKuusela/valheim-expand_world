@@ -76,8 +76,9 @@ public class LocationManager
     {
       var weight = Parse.Float(s, 1, 1f);
       total += weight;
+      ExpandWorld.Log.LogWarning(total);
       return Tuple.Create(weight, s[0]);
-    }).Select(t => Tuple.Create(t.Item1 / total, t.Item2)).ToList();
+    }).ToList().Select(t => Tuple.Create(t.Item1 / total, t.Item2)).ToList();
   }
   public static LocationData ToData(ZoneSystem.ZoneLocation loc)
   {
@@ -326,9 +327,11 @@ public class LocationObjectDataAndSwap
     if (swaps.Count == 1)
       return swaps[0].Item2;
     var rng = UnityEngine.Random.value;
+    ExpandWorld.Log.LogWarning(rng);
     foreach (var swap in swaps)
     {
       rng -= swap.Item1;
+      ExpandWorld.Log.LogWarning(swap.Item1);
       if (rng <= 0f) return swap.Item2;
     }
     return swaps[swaps.Count - 1].Item2;

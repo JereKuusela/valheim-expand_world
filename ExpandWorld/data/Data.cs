@@ -405,7 +405,8 @@ public class Data : MonoBehaviour
       if (Migrate.GlobalKeys(lines)) migrated = true;
       if (Migrate.NotGlobalKeys(lines)) migrated = true;
       if (Migrate.DictionaryToList(lines, "objects")) migrated = true;
-      if (Migrate.DictionaryToList(lines, "objectSwaps")) migrated = true;
+      if (Migrate.DictionaryToList(lines, "objectSwap")) migrated = true;
+      if (Migrate.DictionaryToList(lines, "objectData")) migrated = true;
       if (migrated)
       {
         ExpandWorld.Log.LogInfo($"Migrated file {Path.GetFileName(name)}");

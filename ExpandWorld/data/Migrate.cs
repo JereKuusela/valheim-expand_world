@@ -21,7 +21,9 @@ public class Migrate
         if (intend == subIntend) break;
         if (line.Contains("-") || !line.Contains(":")) break;
         migrated = true;
-        lines[j] = line = "".PadLeft(subIntend, ' ') + "- " + line.Split(':')[0] + ", " + line.Split(':')[1];
+        var split = line.Split(':');
+        lines[j] = line = "".PadLeft(subIntend, ' ') + "- " + split[0].Trim() + ", " + split[1].Trim();
+        j += 1;
       }
     }
     return migrated;
