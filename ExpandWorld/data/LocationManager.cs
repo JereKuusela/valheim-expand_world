@@ -13,7 +13,7 @@ public class LocationManager
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_locations*.yaml";
   public static Dictionary<string, ZDO> ZDO = new();
-  public static Dictionary<string, Dictionary<string, string>> ObjectSwaps = new();
+  public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
   public static Dictionary<string, Dictionary<string, ZDO>> ObjectData = new();
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, LocationData> LocationData = new();
@@ -29,9 +29,12 @@ public class LocationManager
     if (data.dungeon != "")
       Dungeons[data.prefab] = data.dungeon;
     if (data.objectSwap != null)
-      ObjectSwaps[data.prefab] = data.objectSwap;
+    {
+      ObjectSwaps[data.prefab] = data.objectSwap.Select(Data.ToList)
+        .ToDictionary(arr => arr[0], arr => ParseTuple(arr.Skip(1)));
+    }
     if (data.objectData != null)
-      ObjectData[data.prefab] = data.objectData.ToDictionary(kvp => kvp.Key, kvp => Data.ToZDO(kvp.Value));
+      ObjectData[data.prefab] = data.objectData.Select(Data.ToList).ToDictionary(arr => arr[0], arr => Data.ToZDO(arr[1]));
     if (data.objects != null)
     {
       Objects[data.prefab] = data.objects.Select(s => s.Split(',')).Select(split => new BlueprintObject(
@@ -65,6 +68,16 @@ public class LocationManager
     loc.m_minAltitude = data.minAltitude;
     loc.m_maxAltitude = data.maxAltitude;
     return loc;
+  }
+  private static List<Tuple<float, string>> ParseTuple(IEnumerable<string> items)
+  {
+    var total = 0f;
+    return items.Select(s => s.Split(':')).Select(s =>
+    {
+      var weight = Parse.Float(s, 1, 1f);
+      total += weight;
+      return Tuple.Create(weight, s[0]);
+    }).Select(t => Tuple.Create(t.Item1 / total, t.Item2)).ToList();
   }
   public static LocationData ToData(ZoneSystem.ZoneLocation loc)
   {
@@ -306,10 +319,25 @@ public class LocationObjectDataAndSwap
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
     Data.InitZDO(position, rotation, data, view);
   }
+  static string RandomizeSwap(List<Tuple<float, string>> swaps)
+  {
+    if (swaps.Count == 0)
+      return "";
+    if (swaps.Count == 1)
+      return swaps[0].Item2;
+    var rng = UnityEngine.Random.value;
+    foreach (var swap in swaps)
+    {
+      rng -= swap.Item1;
+      if (rng <= 0f) return swap.Item2;
+    }
+    return swaps[swaps.Count - 1].Item2;
+  }
   static GameObject Swap(GameObject prefab)
   {
     if (!LocationManager.ObjectSwaps.TryGetValue(Location, out var objectSwaps)) return prefab;
-    if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swap)) return prefab;
+    if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swaps)) return prefab;
+    var swap = RandomizeSwap(swaps);
     return ZNetScene.instance.GetPrefab(swap) ?? prefab;
   }
   public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)

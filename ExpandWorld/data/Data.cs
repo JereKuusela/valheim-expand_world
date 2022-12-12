@@ -170,7 +170,7 @@ public class Data : MonoBehaviour
     {
       if ((number & biomeNumber) > 0)
       {
-        if (BiomeManager.TryGetDisplayName(number, out var name))
+        if (BiomeManager.TryGetDisplayName((Heightmap.Biome)number, out var name))
           biomes.Add(name);
         else
           biomes.Add(number.ToString());
@@ -221,7 +221,7 @@ public class Data : MonoBehaviour
     Heightmap.Biome result = 0;
     if (biomeStr == "")
     {
-      foreach (var biome in BiomeManager.Biomes)
+      foreach (var biome in BiomeManager.BiomeToDisplayName.Keys)
         result |= biome;
     }
     else

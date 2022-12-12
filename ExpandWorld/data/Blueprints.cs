@@ -41,14 +41,19 @@ public class Blueprint
   public void Normalize()
   {
     Bounds bounds = new();
+    var minY = float.MaxValue;
     foreach (var obj in Objects)
+    {
+      minY = Mathf.Min(minY, obj.Pos.y);
       bounds.Encapsulate(obj.Pos);
+    }
     Radius = Utils.LengthXZ(bounds.extents);
     ExpandWorld.Log.LogDebug("Radius " + Radius);
     ExpandWorld.Log.LogDebug("Center " + bounds.center.ToString());
     foreach (var obj in Objects)
     {
       obj.Pos.x -= bounds.center.x;
+      obj.Pos.y -= minY;
       obj.Pos.z -= bounds.center.z;
     }
   }

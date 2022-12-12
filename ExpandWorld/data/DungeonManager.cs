@@ -95,7 +95,7 @@ public class DungeonManager
   }
   public static void FromSetting(string yaml)
   {
-    if (Helper.IsClient()) Set(yaml);
+    //NOTREADY if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml)
   {

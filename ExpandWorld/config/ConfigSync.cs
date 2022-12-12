@@ -1233,7 +1233,17 @@ public class VersionCheck
     string guid = pkg.ReadString();
     string minimumRequiredVersion = pkg.ReadString();
     string currentVersion = pkg.ReadString();
-
+    if (!ZNet.instance.IsServer())
+    {
+      Dictionary<Heightmap.Biome, string> biomes = new();
+      while (pkg.m_reader.BaseStream.Position != pkg.m_reader.BaseStream.Length)
+      {
+        var biome = (Heightmap.Biome)pkg.ReadInt();
+        var name = pkg.ReadString();
+        biomes.Add(biome, name);
+      }
+      BiomeManager.SetNames(biomes);
+    }
     bool matched = false;
 
     foreach (VersionCheck check in versionChecks)
@@ -1331,6 +1341,14 @@ public class VersionCheck
       zpackage.Write(check.Name);
       zpackage.Write(check.MinimumRequiredVersion);
       zpackage.Write(check.CurrentVersion);
+      if (ZNet.instance.IsServer())
+      {
+        foreach (var kvp in BiomeManager.BiomeToDisplayName)
+        {
+          zpackage.Write((int)kvp.Key);
+          zpackage.Write(kvp.Value);
+        }
+      }
       peer.m_rpc.Invoke("ServerSync VersionCheck", zpackage);
     }
   }

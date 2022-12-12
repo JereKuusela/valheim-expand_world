@@ -30,6 +30,7 @@ public class ExpandWorld : BaseUnityPlugin
     Log = Logger;
     ConfigName = $"{GUID}.cfg";
     YamlDirectory = Path.Combine(Paths.ConfigPath, GUID);
+    YamlCleanUp();
     if (!Directory.Exists(YamlDirectory))
       Directory.CreateDirectory(YamlDirectory);
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
@@ -49,8 +50,8 @@ public class ExpandWorld : BaseUnityPlugin
   }
   public void Start()
   {
+    BiomeManager.NamesFromFile();
     SpawnThatPatcher.Run();
-    CLLCPatcher.Run();
     CustomRaidsPatcher.Run();
   }
   public void LateUpdate()
@@ -119,7 +120,7 @@ public class IncreaseTimeout
   static bool Prefix(bool enable)
   {
     ZRpc.m_timeout = 300f;
-		ZLog.Log(string.Format("ZRpc timeout set to {0}s ", ZRpc.m_timeout));
+    ZLog.Log(string.Format("ZRpc timeout set to {0}s ", ZRpc.m_timeout));
     return false;
   }
 }

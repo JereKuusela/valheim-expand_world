@@ -28,7 +28,7 @@ public class GetValues
   static bool Prefix(Type enumType, ref Array __result)
   {
     if (enumType != typeof(Heightmap.Biome)) return true;
-    __result = BiomeManager.Biomes;
+    __result = BiomeManager.BiomeToDisplayName.Keys.ToArray();
     return false;
   }
 }

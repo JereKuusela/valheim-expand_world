@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel;
 namespace ExpandWorld;
 
@@ -55,9 +54,9 @@ public class LocationData
   [DefaultValue("")]
   public string data = "";
   [DefaultValue(null)]
-  public Dictionary<string, string>? objectData = null;
+  public string[]? objectData = null;
   [DefaultValue(null)]
-  public Dictionary<string, string>? objectSwap = null;
+  public string[]? objectSwap = null;
   [DefaultValue(null)]
   public string[]? objects = null;
   [DefaultValue(0f)]

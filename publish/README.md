@@ -43,7 +43,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 - v1.17
   - Adds a new command `print_seeds` to output seed information.
   - Adds a new setting `seed` to set the world seed.
-  - Changes the `objects` format of `expand_locations_yaml`.
+  - Adds preloading for biome names (improves mod compatibility).
+  - Changes the format of `objects`, `objectData` and `objectSwap` in `expand_locations_yaml` (automatically migrated).
+  - Changes the location blueprints to snap to the ground.
   - Increases the network timeout duration to 10x of the normal.
 
 - v1.16
