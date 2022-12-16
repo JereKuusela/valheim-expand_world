@@ -82,8 +82,8 @@ Spawner_DraugrPile:-5,0,-6,... -> 4.5,0,-4.5
 2. Use `tweak_spawner maxnear=20` on one of the spawners.
 3. Add to the `objectData` field.
 ```
-  objectData:
 # Replaces the spawn limit with 20.
+  objectData:
     - Spawner_DraugrPile, CAAAAAECXKVYFAAAAA==
 ```
 

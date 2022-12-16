@@ -44,9 +44,11 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Adds a new command `ew_seeds` to output seed information.
   - Adds a new setting `seed` to set the world seed.
   - Adds preloading for biome names (improves mod compatibility).
+  - Adds automatic migration for missing `exteriorRadius` in `expand_locations.yaml`.	
   - Changes console commands to start with `ew_`.
   - Changes the format of `objects`, `objectData` and `objectSwap` in `expand_locations_yaml` (automatically migrated).
   - Changes the location blueprints to snap to the ground.
+  - Increases terrain leveling performance (for blueprints).
   - Increases the default altitude cap from 1000 meters to 10000 meters.
   - Increases the network timeout duration to 10x of the normal.
   - Fixes objects sometimes being duplicated.

@@ -76,7 +76,6 @@ public class LocationManager
     {
       var weight = Parse.Float(s, 1, 1f);
       total += weight;
-      ExpandWorld.Log.LogWarning(total);
       return Tuple.Create(weight, s[0]);
     }).ToList().Select(t => Tuple.Create(t.Item1 / total, t.Item2)).ToList();
   }
@@ -122,9 +121,9 @@ public class LocationManager
   }
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
 
-  private static void ToFile()
+  private static void ToFile(bool force = false)
   {
-    if (File.Exists(FilePath)) return;
+    if (!force && File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
@@ -136,7 +135,8 @@ public class LocationManager
       SetLocations(FromFile(Data.Read(Pattern)));
     else
       SetLocations(DefaultItems);
-    ToFile();
+    var force = LocationData.Values.Any(value => value.exteriorRadius == 0f && !BlueprintLocations.ContainsKey(value.prefab));
+    ToFile(force);
   }
   public static List<ZoneSystem.ZoneLocation> DefaultItems = new();
   private static List<ZoneSystem.ZoneLocation> FromFile(string yaml)
@@ -166,6 +166,8 @@ public class LocationManager
   private static void ApplyLocationData(ZoneSystem.ZoneLocation item, float? radius = null)
   {
     if (!LocationData.TryGetValue(item.m_prefabName, out var data)) return;
+    // Old config won't have exterior radius so don't set anything.
+    if (data.exteriorRadius == 0f && radius == null) return;
     item.m_location.m_exteriorRadius = data.exteriorRadius;
     item.m_exteriorRadius = item.m_location.m_exteriorRadius;
     if (radius.HasValue && item.m_exteriorRadius == 0)
@@ -306,22 +308,19 @@ public class LocationObjectDataAndSwap
   private static string Location = "";
   static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
   {
-    Location = location.m_prefabName;
-    return !LocationManager.BlueprintFiles.ContainsKey(Location);
+    if (mode != ZoneSystem.SpawnMode.Client)
+      Location = location.m_prefabName;
+    return !LocationManager.BlueprintFiles.ContainsKey(location.m_prefabName);
   }
-  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  static void SetData(string location, GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
   {
     if (data == null)
     {
-      ExpandWorld.Log.LogWarning(Location);
-      if (!LocationManager.ObjectData.TryGetValue(Location, out var objectData)) return;
-      ExpandWorld.Log.LogWarning("FOUND DATAS");
+      if (!LocationManager.ObjectData.TryGetValue(location, out var objectData)) return;
       if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out data)) return;
-      ExpandWorld.Log.LogWarning("FOUND DATA");
     }
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    ExpandWorld.Log.LogWarning("INIT DATA");
     Data.InitZDO(position, rotation, data, view);
   }
   static string RandomizeSwap(List<Tuple<float, string>> swaps)
@@ -331,34 +330,32 @@ public class LocationObjectDataAndSwap
     if (swaps.Count == 1)
       return swaps[0].Item2;
     var rng = UnityEngine.Random.value;
-    ExpandWorld.Log.LogWarning(rng);
     foreach (var swap in swaps)
     {
       rng -= swap.Item1;
-      ExpandWorld.Log.LogWarning(swap.Item1);
       if (rng <= 0f) return swap.Item2;
     }
     return swaps[swaps.Count - 1].Item2;
   }
-  static GameObject Swap(GameObject prefab)
+  static GameObject Swap(string location, GameObject prefab)
   {
-    if (!LocationManager.ObjectSwaps.TryGetValue(Location, out var objectSwaps)) return prefab;
+    if (!LocationManager.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return prefab;
     if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swaps)) return prefab;
     var swap = RandomizeSwap(swaps);
     return ZNetScene.instance.GetPrefab(swap) ?? prefab;
   }
   public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
   {
-    prefab = Swap(prefab);
-    return InstantiateWithData(prefab, position, rotation);
+    prefab = Swap(Location, prefab);
+    return InstantiateWithData(Location, prefab, position, rotation);
   }
-  public static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  public static GameObject InstantiateWithData(string location, GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
   {
-    SetData(prefab, position, rotation, data);
+    SetData(location, prefab, position, rotation, data);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     if (obj.TryGetComponent<DungeonGenerator>(out var dg))
     {
-      if (LocationManager.Dungeons.TryGetValue(Location, out var dungeon))
+      if (LocationManager.Dungeons.TryGetValue(location, out var dungeon))
         DungeonManager.Override(dg, dungeon);
       else
         DungeonManager.Override(dg, Utils.GetPrefabName(obj));
@@ -385,7 +382,7 @@ public class LocationObjectDataAndSwap
       ZNetView.StartGhostInit();
     }
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
-    var go = InstantiateWithData(prefab, objPos, objRot, obj.Data);
+    var go = InstantiateWithData(location.m_prefabName, prefab, objPos, objRot, obj.Data);
     go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
     if (go.TryGetComponent<DungeonGenerator>(out var dg))
     {
@@ -413,7 +410,6 @@ public class LocationObjectDataAndSwap
       SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
     }
   }
-
   [HarmonyPostfix]
   static void SpawnBlueprint(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
@@ -422,15 +418,7 @@ public class LocationObjectDataAndSwap
     if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
     {
       if (data.levelArea)
-      {
-        var radius = location.m_exteriorRadius;
-        ExpandWorld.Log.LogDebug("Leveling " + radius);
-        var compilers = Terrain.GetCompilers(pos, radius);
-        var indicer = Terrain.CreateIndexer(pos, radius);
-        var compilerIndices = Terrain.GetIndices(compilers, indicer);
-        Terrain.ResetTerrain(compilerIndices, pos, radius);
-        Terrain.LevelTerrain(compilerIndices, pos, radius, 0.5f, pos.y);
-      }
+        Terrain.Level(pos, location.m_exteriorRadius, 0.5f);
       pos.y += data.offset;
     }
     var loc = location.m_location;
