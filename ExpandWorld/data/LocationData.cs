@@ -19,8 +19,8 @@ public class LocationData
   public float maxDistance = 0f;
   [DefaultValue(-1000f)]
   public float minAltitude = 0f;
-  [DefaultValue(1000f)]
-  public float maxAltitude = 1000f;
+  [DefaultValue(10000f)]
+  public float maxAltitude = 10000f;
   [DefaultValue(false)]
   public bool prioritized = false;
   [DefaultValue(false)]
@@ -69,4 +69,6 @@ public class LocationData
   public bool noBuild = false;
   [DefaultValue(true)]
   public bool levelArea = true;
+  [DefaultValue(-0.05f)]
+  public float offset = -0.05f;
 }

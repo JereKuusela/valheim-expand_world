@@ -20,8 +20,8 @@ public class SpawnData
   public int minLevel = 1;
   [DefaultValue(-10000f)]
   public float minAltitude = -10000f;
-  [DefaultValue(1000f)]
-  public float maxAltitude = 1000f;
+  [DefaultValue(10000f)]
+  public float maxAltitude = 10000f;
   [DefaultValue(true)]
   public bool spawnAtDay = true;
   [DefaultValue(true)]

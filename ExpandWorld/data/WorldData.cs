@@ -7,8 +7,8 @@ public class WorldData
   public string biome = "";
   [YamlIgnore]
   public Heightmap.Biome _biome = Heightmap.Biome.None;
-  [DefaultValue(1000f)]
-  public float maxAltitude = 1000f;
+  [DefaultValue(10000f)]
+  public float maxAltitude = 10000f;
   [DefaultValue(-1000f)]
   public float minAltitude = -1000f;
   [DefaultValue(1f)]

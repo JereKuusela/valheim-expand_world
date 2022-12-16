@@ -128,14 +128,14 @@ public class Data : MonoBehaviour
   {
     try
     {
-      return Deserializer().Deserialize<List<T>>(raw);
+      return Deserializer().Deserialize<List<T>>(raw) ?? new();
     }
     catch (Exception ex1)
     {
       ExpandWorld.Log.LogError($"{fileName}: {ex1.Message}");
       try
       {
-        return DeserializerUnSafe().Deserialize<List<T>>(raw);
+        return DeserializerUnSafe().Deserialize<List<T>>(raw) ?? new();
       }
       catch (Exception)
       {
@@ -414,7 +414,7 @@ public class Data : MonoBehaviour
       }
       return string.Join("\n", lines);
     });
-    return string.Join("\n", data);
+    return string.Join("\n", data) ?? "";
   }
   public static void Sanity(ref Color color)
   {

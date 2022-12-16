@@ -24,8 +24,8 @@ public class BiomeData
   public float waterDepthMultiplier = 1f;
   [DefaultValue(-1000f)]
   public float minimumAltitude = -1000f;
-  [DefaultValue(1000f)]
-  public float maximumAltitude = 1000f;
+  [DefaultValue(10000f)]
+  public float maximumAltitude = 10000f;
   [DefaultValue(0.5f)]
   public float excessFactor = 0.5f;
   [DefaultValue(1f)]

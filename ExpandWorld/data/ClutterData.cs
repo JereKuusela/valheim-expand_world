@@ -24,8 +24,8 @@ public class ClutterData
   public float maxTilt = 10f;
   [DefaultValue(-1000f)]
   public float minAltitude = -1000f;
-  [DefaultValue(1000f)]
-  public float maxAltitude = 1000f;
+  [DefaultValue(10000f)]
+  public float maxAltitude = 10000f;
   [DefaultValue(0f)]
   public float minVegetation = 0f;
   [DefaultValue(0f)]

@@ -47,7 +47,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Changes console commands to start with `ew_`.
   - Changes the format of `objects`, `objectData` and `objectSwap` in `expand_locations_yaml` (automatically migrated).
   - Changes the location blueprints to snap to the ground.
+  - Increases the default altitude cap from 1000 meters to 10000 meters.
   - Increases the network timeout duration to 10x of the normal.
+  - Fixes objects sometimes being duplicated.
 
 - v1.16
   - Warning: Breaking changes!

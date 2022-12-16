@@ -141,14 +141,13 @@ public class BiomeManager
       if (originalNames.Contains(item.biome.ToLower())) continue;
       var biome = (Heightmap.Biome)biomeNumber;
       BiomeToDisplayName[biome] = item.biome;
-      NameToBiome.Add(item.biome.ToLower(), biome);
-      BiomeToData[biome] = item;
       biomeNumber *= 2;
     }
     NameToBiome = BiomeToDisplayName.ToDictionary(kvp => kvp.Value.ToLower(), kvp => kvp.Key);
   }
   private static void Load(string yaml)
   {
+    if (yaml == "" || !Configuration.DataBiome) return;
     var rawData = Parse(yaml);
     if (rawData.Count > 0)
       ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");

@@ -191,7 +191,7 @@ public class LocationManager
           item.m_location = obj.AddComponent<Location>();
           BlueprintLocations.Add(item.m_prefabName, item.m_location);
         }
-        ApplyLocationData(item, bp.Radius);
+        ApplyLocationData(item, bp.Radius + 5);
         item.m_netViews = new();
         item.m_randomSpawns = new();
         return;
@@ -313,11 +313,15 @@ public class LocationObjectDataAndSwap
   {
     if (data == null)
     {
+      ExpandWorld.Log.LogWarning(Location);
       if (!LocationManager.ObjectData.TryGetValue(Location, out var objectData)) return;
+      ExpandWorld.Log.LogWarning("FOUND DATAS");
       if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out data)) return;
+      ExpandWorld.Log.LogWarning("FOUND DATA");
     }
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
+    ExpandWorld.Log.LogWarning("INIT DATA");
     Data.InitZDO(position, rotation, data, view);
   }
   static string RandomizeSwap(List<Tuple<float, string>> swaps)
@@ -383,8 +387,7 @@ public class LocationObjectDataAndSwap
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
     var go = InstantiateWithData(prefab, objPos, objRot, obj.Data);
     go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
-    var dg = go.GetComponent<DungeonGenerator>();
-    if (dg)
+    if (go.TryGetComponent<DungeonGenerator>(out var dg))
     {
       if (flag)
         dg.m_originalPosition = location.m_generatorPosition;
@@ -428,6 +431,7 @@ public class LocationObjectDataAndSwap
         Terrain.ResetTerrain(compilerIndices, pos, radius);
         Terrain.LevelTerrain(compilerIndices, pos, radius, 0.5f, pos.y);
       }
+      pos.y += data.offset;
     }
     var loc = location.m_location;
     WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;

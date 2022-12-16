@@ -170,19 +170,15 @@ public class VegetationScale
   static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
   {
     SetData(prefab, position, rotation);
-    return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+    Data.CleanGhostInit(obj);
+    return obj;
   }
   static void SetScale(ZNetView view, Vector3 scale)
   {
-    Data.CleanGhostInit(view);
     if (VegetationManager.Scale.TryGetValue(Veg, out var randomScale))
       scale = Helper.RandomValue(randomScale);
     view.SetLocalScale(scale);
-  }
-  static void SetScaleTr(Transform tr)
-  {
-    if (VegetationManager.Scale.TryGetValue(Veg, out var scale))
-      tr.localScale = Helper.RandomValue(scale);
   }
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
@@ -195,9 +191,6 @@ public class VegetationScale
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
       .Set(OpCodes.Call, Transpilers.EmitDelegate(SetScale).operand)
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.PropertySetter(typeof(Transform), nameof(Transform.localScale))))
-      .Advance(1)
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Dup))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetScaleTr).operand))
       .InstructionEnumeration();
   }
 }
