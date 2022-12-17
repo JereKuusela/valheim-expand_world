@@ -124,10 +124,12 @@ public class EnvironmentManager
 
   private static void SetOriginals()
   {
-    Originals = LocationList.m_allLocationLists
+    var newOriginals = LocationList.m_allLocationLists
       .Select(list => list.m_environments)
       .Append(EnvMan.instance.m_environments)
       .SelectMany(list => list).ToLookup(env => env.m_name, env => env).ToDictionary(kvp => kvp.Key, kvp => kvp.First());
+    // Needs to be set once per world. This can be checked detected by checking location lists.
+    if (newOriginals.Count > 0) Originals = newOriginals;
   }
   public static void FromSetting(string yaml)
   {
@@ -138,7 +140,7 @@ public class EnvironmentManager
     if (yaml == "" || !Configuration.DataEnvironments) return;
     try
     {
-      if (Originals.Count == 0) SetOriginals();
+      SetOriginals();
       var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
         .Select(FromData).ToList();
       if (data.Count == 0)
