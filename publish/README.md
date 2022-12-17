@@ -54,6 +54,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Increases the default altitude cap from 1000 meters to 10000 meters.
   - Increases the network timeout duration to 10x of the normal.
   - Fixes objects sometimes being duplicated.
+  - Fixes purple thunder sky if a custom environment is not set properly.
 
 - v1.16
   - Warning: Breaking changes!

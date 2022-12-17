@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
+
 namespace ExpandWorld;
 
 public class EnvironmentManager
@@ -13,10 +15,13 @@ public class EnvironmentManager
   public static EnvSetup FromData(EnvironmentData data)
   {
     var env = new EnvSetup();
+    env.m_psystems = new GameObject[0];
     if (Originals.TryGetValue(data.particles, out var setup))
       env = setup.Clone();
     else if (Originals.TryGetValue(data.name, out setup))
       env = setup.Clone();
+    else
+      ExpandWorld.Log.LogWarning($"Failed to find a particle system \"{data.particles}\". Make sure field \"particles\" it set correctly.");
     env.m_name = data.name;
     env.m_default = data.isDefault;
     env.m_isWet = data.isWet;
