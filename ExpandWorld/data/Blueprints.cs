@@ -38,24 +38,31 @@ public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
   public float Radius = 0f;
-  public void Normalize()
+  public void Center(Vector2? offset)
   {
     Bounds bounds = new();
-    var minY = float.MaxValue;
     foreach (var obj in Objects)
-    {
-      minY = Mathf.Min(minY, obj.Pos.y);
       bounds.Encapsulate(obj.Pos);
-    }
     Radius = Utils.LengthXZ(bounds.extents);
-    ExpandWorld.Log.LogDebug("Radius " + Radius);
-    ExpandWorld.Log.LogDebug("Center " + bounds.center.ToString());
+    var center = offset ?? new(bounds.center.x, bounds.center.z);
     foreach (var obj in Objects)
     {
-      obj.Pos.x -= bounds.center.x;
-      obj.Pos.y -= minY;
-      obj.Pos.z -= bounds.center.z;
+      obj.Pos.x -= center.x;
+      obj.Pos.z -= center.y;
     }
+  }
+  public void Offset(float? offset)
+  {
+    var y = float.MaxValue;
+    if (offset.HasValue) y = -offset.Value;
+    else
+    {
+      foreach (var obj in Objects) y = Mathf.Min(y, obj.Pos.y);
+      // Slightly towards the ground to prevent gaps.
+      y += 0.05f;
+    }
+    foreach (var obj in Objects)
+      obj.Pos.y -= y;
   }
 }
 public class Blueprints
@@ -107,7 +114,6 @@ public class Blueprints
       else if (piece)
         bp.Objects.Add(GetPlanBuildObject(row));
     }
-    bp.Normalize();
     return bp;
   }
   private static void Deserialize(ZDO zdo, ZPackage pkg)

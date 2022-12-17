@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 namespace ExpandWorld;
 
 public class LocationData
@@ -67,8 +68,10 @@ public class LocationData
   public bool randomDamage = false;
   [DefaultValue(false)]
   public bool noBuild = false;
-  [DefaultValue(true)]
-  public bool levelArea = true;
-  [DefaultValue(-0.05f)]
-  public float offset = -0.05f;
+  [DefaultValue(0.5f)]
+  public float levelArea = 0.5f;
+  [DefaultValue(null)]
+  public float? offset;
+  [DefaultValue("")]
+  public string center = "";
 }

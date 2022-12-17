@@ -45,8 +45,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Adds a new setting `seed` to set the world seed.
   - Adds preloading for biome names (improves mod compatibility).
   - Adds automatic migration for missing `exteriorRadius` in `expand_locations.yaml`.	
+  - Adds new fields `offset` and `center` (for blueprints) to the `expand_locations.yaml`.
   - Changes console commands to start with `ew_`.
   - Changes the format of `objects`, `objectData` and `objectSwap` in `expand_locations_yaml` (automatically migrated).
+  - Changes the `levelArea` field in `expand_locations_yaml` to be a numeric (for smoothness).
   - Changes the location blueprints to snap to the ground.
   - Increases terrain leveling performance (for blueprints).
   - Increases the default altitude cap from 1000 meters to 10000 meters.
@@ -55,9 +57,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 - v1.16
   - Warning: Breaking changes!
-  - Adds new fields `minVegetation`. `maxVegetation` and `minTilt` to the `expand_clutter.yaml`.
+  - Adds new fields `minVegetation`, `maxVegetation` and `minTilt` to the `expand_clutter.yaml`.
   - Adds a new field `overrideLevelupChance` to the `expand_spawns.yaml`.
-  - Adds new fields `minVegetation`. `maxVegetation` and `snapToStaticSolid` to the `expand_vegetation.yaml`.
+  - Adds new fields `minVegetation`, `maxVegetation` and `snapToStaticSolid` to the `expand_vegetation.yaml`.
 
 - v1.15
   - Fixes error at start up if configs were missing.

@@ -82,6 +82,9 @@ public class LocationManager
   public static LocationData ToData(ZoneSystem.ZoneLocation loc)
   {
     LocationData data = new();
+    // For migrations, ensures that old data is preserved.
+    if (LocationData.TryGetValue(loc.m_prefabName, out var existing))
+      data = existing;
     data.prefab = loc.m_prefab.name;
     data.enabled = loc.m_enable;
     data.biome = Data.FromBiomes(loc.m_biome);
@@ -185,6 +188,15 @@ public class LocationManager
     {
       if (Blueprints.TryGetBluePrint(prefabName, out var bp))
       {
+        float? offset = null;
+        Vector2? center = null;
+        if (LocationData.TryGetValue(item.m_prefabName, out var data))
+        {
+          offset = data.offset;
+          center = Parse.VectorXY(data.center);
+        }
+        bp.Center(center);
+        bp.Offset(offset);
         BlueprintFiles[prefabName] = bp;
         item.m_prefab = new();
         if (!BlueprintLocations.TryGetValue(item.m_prefabName, out item.m_location))
@@ -417,9 +429,8 @@ public class LocationObjectDataAndSwap
     if (!LocationManager.BlueprintFiles.TryGetValue(location.m_prefabName, out var bp)) return;
     if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
     {
-      if (data.levelArea)
-        Terrain.Level(pos, location.m_exteriorRadius, 0.5f);
-      pos.y += data.offset;
+      if (data.levelArea != 0f)
+        Terrain.Level(pos, location.m_exteriorRadius, 1f - data.levelArea);
     }
     var loc = location.m_location;
     WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;
