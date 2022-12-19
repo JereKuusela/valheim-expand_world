@@ -273,9 +273,11 @@ The file `expand_locations.yaml` sets the available locations and their placemen
 
 See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.
 
+See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md).
+
 Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored areas, you need to use Upgrade World mod.
 
-- prefab: Identifier of the location object or name of blueprint. Check wiki for available locations. Hidden ones work too.
+- prefab: Identifier of the location object or name of blueprint file. Check wiki for available locations. Hidden ones work too. To create a variant of an existing location, add `:text` to the prefab. For example "Dolmen01:Ghost".
 - enabled (default: `true`): Quick way to disable this entry.
 - biome: List of possible biomes.
 - biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome).
@@ -299,15 +301,17 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
-- data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).. To create a variant of an existing location, add `:text` to the prefab. For example "Eikthyrnir:Wolf".
-- objectSwap: Dictionary to swap child objects to some other objects. See examples at the bottom.
-- objectData: Dictionary to set child object data. See examples at the bottom.
-- objects: Dictionary to add new objects. Format is `id: posX,posZ,posY,rotY,rotX,rotZ`
+- data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
+- objectSwap: List to swap child objects to some other objects. Format is `id:swapid` or `id,swapid:weight,swapid2:weight2,...`.
+- objectData: List to set child object data. Format is `id,data`.
+- objects: List to add new objects. Format is `id,posX,posZ,posY,rotY,rotX,rotZ`.
 - applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
-- exteriorRadius: How many meters are cleared, leveled or no build.
+- exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
-- levelArea (default: `true`): If true, some leveling is applied within `exteriorRadius` (only for blueprints).
 - noBuild (default: `false`): If true, players can't build within `exteriorRadius`.
+- levelArea (default: `0.5`): Levels within `exteriorRadius` with the given smoothness (only for blueprints). If 0, no leveling is done. If 1, the terrain will be flat.
+- offset: Moves the blueprint up/down. If not given, the blueprint is placed at the terrain level (0.05 meters towards the ground). If 0, the blueprint is used as it is. If for example 5, the blueprint is moved 5 meters up.
+- center: Moves the blueprint center. If not given, the blueprint is automatically centered. For example value 0,0 would use the blueprint as it is.
 
 ## Vegetation
 

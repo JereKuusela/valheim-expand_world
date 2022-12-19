@@ -10,6 +10,10 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/main/README.md).
 
+See [location examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md).
+
+See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples.md).
+
 ## Migration for Mistlands update
 
 - Regenerate all yaml files by removing them.
@@ -20,11 +24,6 @@ See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/mai
 - Regenerate `expand_clutter.yaml` by removing it to get values for the new fields `minVegetation`, `maxVegetation` and `minTilt`.
 - Regenerate `expand_spawns.yaml` by removing it to get values for the new field `overrideLevelupChance`.
 - Regenerate `expand_vegetation.yaml` by removing it to get values for the new fields `minVegetation`, `maxVegetation` and `snapToStaticSolid`.
-
-
-## Migration from version 1.13
-
-- Regenerate `expand_locations.yaml` by removing it to get values for the new fields `clearArea`, `exteriorRadius`, `noBuild` and `randomDamage`.
 
 # Credits
 
