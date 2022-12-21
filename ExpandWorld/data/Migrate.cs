@@ -11,14 +11,14 @@ public class Migrate
     for (var i = lines.Count - 1; i >= 0; i -= 1)
     {
       var line = lines[i];
-      if (!line.Contains(field + ":")) continue;
+      if (line.Trim() != field + ":") continue;
       var intend = line.Length - line.TrimStart().Length;
       var j = i + 1;
       while (j < lines.Count)
       {
         line = lines[j];
         var subIntend = line.Length - line.TrimStart().Length;
-        if (intend == subIntend) break;
+        if (subIntend <= intend) break;
         if (line.Contains("-") || !line.Contains(":")) break;
         migrated = true;
         var split = line.Split(':');

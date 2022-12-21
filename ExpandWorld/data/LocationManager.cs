@@ -85,7 +85,7 @@ public class LocationManager
     // For migrations, ensures that old data is preserved.
     if (LocationData.TryGetValue(loc.m_prefabName, out var existing))
       data = existing;
-    data.prefab = loc.m_prefab.name;
+    data.prefab = loc.m_prefabName;
     data.enabled = loc.m_enable;
     data.biome = Data.FromBiomes(loc.m_biome);
     data.biomeArea = Data.FromBiomeAreas(loc.m_biomeArea);
@@ -112,7 +112,10 @@ public class LocationManager
     if (data.maxDistance > 1f)
       data.maxDistance /= 10000f;
     data.minAltitude = loc.m_minAltitude;
-    data.maxAltitude = loc.m_maxAltitude;
+    if (loc.m_maxAltitude == 1000f)
+      data.maxAltitude = 10000f;
+    else
+      data.maxAltitude = loc.m_maxAltitude;
     if (loc.m_location)
     {
       data.randomDamage = loc.m_location.m_applyRandomDamage;

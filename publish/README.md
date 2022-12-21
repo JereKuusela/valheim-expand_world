@@ -39,6 +39,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.18
+  - Fixes automatic migration for missing `exteriorRadius` overwriting blueprint and location variant names.
+
 - v1.17
   - Adds a new command `ew_seeds` to output seed information.
   - Adds a new setting `seed` to set the world seed.
