@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BepInEx.Configuration;
 using ServerSync;
 using Service;
@@ -56,6 +57,7 @@ public partial class Configuration
   public static CustomSyncedValue<string> valueSpawnData;
   public static CustomSyncedValue<string> valueEventData;
   public static CustomSyncedValue<string> valueEnvironmentData;
+  public static CustomSyncedValue<string> valueLocationData;
   public static ConfigEntry<bool> configDataEnvironments;
   public static bool DataEnvironments => configDataEnvironments.Value;
   public static ConfigEntry<bool> configDataEvents;
@@ -182,6 +184,8 @@ public partial class Configuration
     configPlanBuildFolder = wrapper.Bind(section, "Plan Build folder", "BepInEx/config/PlanBuild", false, "Folder relative to the Valheim.exe.");
     configBuildShareFolder = wrapper.Bind(section, "Build Share folder", "BuildShare/Builds", false, "Folder relative to the Valheim.exe.");
 
+    valueLocationData = wrapper.AddValue("location_data");
+    valueLocationData.ValueChanged += () => LocationSyncManager.Load(valueLocationData.Value);
     valueEnvironmentData = wrapper.AddValue("environment_data");
     valueEnvironmentData.ValueChanged += () => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     valueBiomeData = wrapper.AddValue("biome_data");
@@ -198,6 +202,5 @@ public partial class Configuration
     valueWorldData.ValueChanged += () => WorldManager.FromSetting(valueWorldData.Value);
     valueVegetationData = wrapper.AddValue("vegetation_data");
     valueVegetationData.ValueChanged += () => VegetationManager.FromSetting(valueVegetationData.Value);
-
   }
 }

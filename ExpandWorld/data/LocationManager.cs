@@ -141,6 +141,7 @@ public class LocationManager
       SetLocations(FromFile(Data.Read(Pattern)));
     else
       SetLocations(DefaultItems);
+    LocationSyncManager.Sync(LocationData.Values.ToList());
     var force = LocationData.Values.Any(value => value.exteriorRadius == 0f && !BlueprintLocations.ContainsKey(value.prefab));
     ToFile(force);
   }
@@ -182,6 +183,16 @@ public class LocationManager
     item.m_location.m_clearArea = data.clearArea;
     item.m_location.m_noBuild = data.noBuild;
   }
+  public static Location GetBluePrintLocation(string prefab)
+  {
+    if (!LocationManager.BlueprintLocations.TryGetValue(prefab, out var location))
+    {
+      var obj = new GameObject();
+      location = obj.AddComponent<Location>();
+      LocationManager.BlueprintLocations.Add(prefab, location);
+    }
+    return location;
+  }
   ///<summary>Copies setup from locations.</summary>
   private static void Setup(ZoneSystem.ZoneLocation item)
   {
@@ -202,12 +213,7 @@ public class LocationManager
         bp.Offset(offset);
         BlueprintFiles[prefabName] = bp;
         item.m_prefab = new();
-        if (!BlueprintLocations.TryGetValue(item.m_prefabName, out item.m_location))
-        {
-          var obj = new GameObject();
-          item.m_location = obj.AddComponent<Location>();
-          BlueprintLocations.Add(item.m_prefabName, item.m_location);
-        }
+        item.m_location = GetBluePrintLocation(item.m_prefabName);
         ApplyLocationData(item, bp.Radius + 5);
         item.m_netViews = new();
         item.m_randomSpawns = new();
@@ -258,7 +264,7 @@ public class LocationManager
     ExpandWorld.Log.LogDebug($"Loaded {ZoneLocations.Count} locations.");
   }
 
-  private static void UpdateHashes()
+  public static void UpdateHashes()
   {
     var zs = ZoneSystem.instance;
     foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations)

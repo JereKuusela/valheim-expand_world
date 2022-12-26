@@ -271,6 +271,8 @@ The file `expand_clutter.yaml` sets the small visual objects.
 
 The file `expand_locations.yaml` sets the available locations and their placement.
 
+Note: Location information is a server side feature. For testing, use single player so that your client has also server side features available.
+
 See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.
 
 See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md).

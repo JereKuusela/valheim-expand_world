@@ -40,6 +40,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 # Changelog
 
 - v1.18
+  - Adds data sync for location `prefab`, `exteriorRadius` and `noBuild` fields.
   - Fixes automatic migration for missing `exteriorRadius` overwriting blueprint and location variant names.
 
 - v1.17
