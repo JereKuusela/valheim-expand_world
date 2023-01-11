@@ -3,7 +3,7 @@ using BepInEx.Bootstrap;
 using HarmonyLib;
 namespace ExpandWorld;
 
-public class CustomRaidsPatcher
+public class CustomRaids
 {
   public const string GUID = "asharppen.valheim.custom_raids";
   public static void Run()

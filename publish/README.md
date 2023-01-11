@@ -42,6 +42,8 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 - v1.18
   - Adds data sync for location `prefab`, `exteriorRadius` and `noBuild` fields.
   - Fixes automatic migration for missing `exteriorRadius` overwriting blueprint and location variant names.
+  - Fixes minimap loading error with Marketplace territories.
+  - Improves compatiblity with mods adding new vegetation.
 
 - v1.17
   - Adds a new command `ew_seeds` to output seed information.

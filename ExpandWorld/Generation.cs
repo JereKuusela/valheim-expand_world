@@ -227,7 +227,8 @@ public class MapGeneration
 
     CancellationTokenSource cts = new();
     var ct = cts.Token;
-
+    while (Marketplace.IsLoading())
+      yield return null;
     var task = Generate(map, mapTexture, forestMaskTexture, heightTexture, ct);
     CTS = cts;
     while (!task.IsCompleted)
@@ -286,7 +287,11 @@ public class MapGeneration
               {
                 var wx = (j - halfTextureSize) * pixelSize + halfPixelSize;
                 var wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
-
+                while (Marketplace.IsLoading())
+                {
+                  ExpandWorld.Log.LogInfo("Waiting for Marketplace to load...");
+                  Thread.Sleep(100);
+                }
                 var biome = wg.GetBiome(wx, wy);
                 var terrain = BiomeManager.GetTerrain(biome);
                 var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out var mask);

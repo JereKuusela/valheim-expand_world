@@ -6,7 +6,7 @@ using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
-[BepInDependency(SpawnThatPatcher.GUID, BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency(SpawnThat.GUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(GUID, NAME, VERSION)]
 public class ExpandWorld : BaseUnityPlugin
 {
@@ -51,8 +51,9 @@ public class ExpandWorld : BaseUnityPlugin
   public void Start()
   {
     BiomeManager.NamesFromFile();
-    SpawnThatPatcher.Run();
-    CustomRaidsPatcher.Run();
+    SpawnThat.Run();
+    CustomRaids.Run();
+    Marketplace.Run();
   }
   public void LateUpdate()
   {

@@ -13,26 +13,17 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace ExpandWorld;
 
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SetupLocations))]
-public class LoadData
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
+public class LoadAndSaveData
 {
-  public static bool IsLoading = false;
-  [HarmonyPriority(Priority.VeryLow)]
-  static void Prefix(ZoneSystem __instance)
-  {
-    // Let Valheim do its default location setup since some mods rely on it.
-    if (!ZNet.instance.IsServer()) return;
-    // Biomes need environments.
-    EnvironmentManager.FromFile();
-    // Other mods may need custom biomes (so load early).
-    BiomeManager.FromFile();
-    WorldManager.FromFile();
-  }
-  [HarmonyPriority(Priority.VeryLow)]
   static void Postfix()
   {
-    if (Helper.IsServer())
+    if (ZNet.instance.IsServer())
     {
+      // Biomes need environments.
+      EnvironmentManager.FromFile();
+      BiomeManager.FromFile();
+      WorldManager.FromFile();
       // Clutter must be here because since SetupLocations adds prefabs to the list.
       ClutterManager.FromFile();
       // These are here to not have to clear location lists (slightly better compatibility).
@@ -40,6 +31,15 @@ public class LoadData
       EventManager.FromFile();
       SpawnManager.FromFile();
       // NOT READY DungeonManager.FromFile();
+      VegetationManager.FromFile();
+      BiomeManager.ToFile();
+      WorldManager.ToFile();
+      VegetationManager.ToFile();
+      EventManager.ToFile();
+      EnvironmentManager.ToFile();
+      ClutterManager.ToFile();
+      // NOT READY DungeonManager.ToFile();
+      // Spawn data handled elsewhere.
     }
     // Overwrite location setup with our stuff.
     LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
@@ -51,23 +51,6 @@ public class LoadData
       LocationManager.SetLocations(new());
     Generate.Cancel();
     WorldGenerator.instance?.Pregenerate();
-  }
-}
-
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
-public class SaveData
-{
-  static void Postfix()
-  {
-    if (!ZNet.instance.IsServer()) return;
-    BiomeManager.ToFile();
-    WorldManager.ToFile();
-    VegetationManager.ToFile();
-    EventManager.ToFile();
-    EnvironmentManager.ToFile();
-    ClutterManager.ToFile();
-    // NOT READY DungeonManager.ToFile();
-    // Spawn data handled elsewhere.
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]

@@ -1,7 +1,7 @@
 using BepInEx.Bootstrap;
 namespace ExpandWorld;
 
-public class SpawnThatPatcher
+public class SpawnThat
 {
   public const string GUID = "asharppen.valheim.spawn_that";
   public static void Run()
