@@ -105,7 +105,7 @@ public class WorldManager
   {
     if (!Helper.IsServer() || !Configuration.DataWorld) return;
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(GetBiome.Data.Select(ToData).ToList());
+    var yaml = Data.Serializer().Serialize(GetBiome.GetData().Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     Configuration.valueWorldData.Value = yaml;
   }
