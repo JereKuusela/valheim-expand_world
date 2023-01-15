@@ -15,6 +15,7 @@ See [location examples](https://github.com/JereKuusela/valheim-expand_world/blob
 See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples.md).
 
 ## Migration from version 1.19
+
 - If you have modded creatures spawning in wrong places, regenerate `expand_spawns.yaml` by removing it or manually set `biome: None` when missing.
 
 ## Migration for Mistlands update
