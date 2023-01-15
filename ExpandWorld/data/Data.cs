@@ -146,6 +146,7 @@ public class Data : MonoBehaviour
     // Unused biome.
     biome &= (Heightmap.Biome)~128;
     if (biome == DefaultMax) return "";
+    if (biome == Heightmap.Biome.None) return "None";
     List<string> biomes = new();
     var number = 1;
     var biomeNumber = (int)biome;

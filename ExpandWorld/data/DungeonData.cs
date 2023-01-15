@@ -27,6 +27,7 @@ public class DungeonData
   public float campRadiusMin;
   public float campRadiusMax;
   public float minAltitude;
+  public int gridSize;
   public int perimeterSections;
   public float perimeterBuffer;
   [DefaultValue(false)]

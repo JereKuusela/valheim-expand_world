@@ -14,6 +14,9 @@ See [location examples](https://github.com/JereKuusela/valheim-expand_world/blob
 
 See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples.md).
 
+## Migration from version 1.19
+- If you have modded creatures spawning in wrong places, regenerate `expand_spawns.yaml` by removing it or manually set `biome: None` when missing.
+
 ## Migration for Mistlands update
 
 - Regenerate all yaml files by removing them.
@@ -38,6 +41,9 @@ Sources: [GitHub](https://github.com/JereKuusela/valheim-infinity_hammer)
 Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
+
+- v1.20
+  - Fixes None biome not being saved to the `expand_spawns.yaml` which caused spawning in every biome (some mods have the default biome as None).
 
 - v1.19
   - Fixes default config generation sometimes failing.
