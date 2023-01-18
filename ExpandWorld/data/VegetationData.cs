@@ -14,6 +14,8 @@ public class VegetationData
   public string scaleMin = "1";
   [DefaultValue("1")]
   public string scaleMax = "1";
+  [DefaultValue(true)]
+  public bool scaleUniform = true;
   [DefaultValue(0f)]
   public float randTilt = 0f;
   [DefaultValue(0f)]

@@ -25,6 +25,17 @@ public class GetBiomeColor
   }
 }
 
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.GetPixelColor))]
+public class GetMapColor
+{
+  static bool Prefix(Heightmap.Biome biome, ref Color __result)
+  {
+    if (!BiomeManager.TryGetData(biome, out var data)) return true;
+    __result = data.mapColor;
+    return false;
+  }
+}
+
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiome))]
 public class HeightmapGetBiome
 {

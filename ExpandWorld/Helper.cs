@@ -56,10 +56,30 @@ public static class Helper
   public static bool IsClient() => ZNet.instance && !ZNet.instance.IsServer();
   public static Vector3 RandomValue(Range<Vector3> range)
   {
-    var x = UnityEngine.Random.Range(range.Min.x, range.Max.x);
-    var y = UnityEngine.Random.Range(range.Min.y, range.Max.y);
-    var z = UnityEngine.Random.Range(range.Min.z, range.Max.z);
-    return new(x, y, z);
+    if (range.Uniform)
+    {
+      var multiplier = UnityEngine.Random.Range(0f, 1f);
+      return new(
+        range.Min.x + (range.Max.x - range.Min.x) * multiplier,
+        range.Min.y + (range.Max.y - range.Min.y) * multiplier,
+        range.Min.z + (range.Max.z - range.Min.z) * multiplier);
+    }
+    else
+    {
+      return new(
+        UnityEngine.Random.Range(range.Min.x, range.Max.x),
+        UnityEngine.Random.Range(range.Min.y, range.Max.y),
+        UnityEngine.Random.Range(range.Min.z, range.Max.z));
+    }
+  }
+
+  public static bool IsMultiAxis(Range<Vector3> range)
+  {
+    // Same value would always return the same value.
+    if (range.Min == range.Max) return false;
+    // Without uniform, each axis would be separate resulting in multiple possible values.
+    if (!range.Uniform) return true;
+    return range.Min.normalized != Vector3.one || range.Max.normalized != Vector3.one;
   }
 }
 

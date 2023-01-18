@@ -289,19 +289,15 @@ public class MapGeneration
                 var wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
                 while (Marketplace.IsLoading())
                 {
-                  ExpandWorld.Log.LogInfo("Waiting for Marketplace to load...");
+                  ExpandWorld.Log.LogInfo("Waiting 100 ms for Marketplace to load...");
                   Thread.Sleep(100);
                 }
                 var biome = wg.GetBiome(wx, wy);
                 var terrain = BiomeManager.GetTerrain(biome);
                 var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out var mask);
                 if (BiomeManager.TryGetData(biome, out var data))
-                {
                   biomeHeight = Configuration.WaterLevel + (biomeHeight - Configuration.WaterLevel) * data.mapColorMultiplier;
-                  mapTexture[i * textureSize + j] = data.mapColor;
-                }
-                else
-                  mapTexture[i * textureSize + j] = map.GetPixelColor(biome);
+                mapTexture[i * textureSize + j] = map.GetPixelColor(biome);
                 forestMaskTexture[i * textureSize + j] = map.GetMaskColor(wx, wy, biomeHeight, terrain);
                 heightTexture[i * textureSize + j] = new Color(biomeHeight, 0f, 0f);
                 if (ct.IsCancellationRequested)

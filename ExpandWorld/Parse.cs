@@ -16,6 +16,7 @@ public class Range<T>
     Min = min;
     Max = max;
   }
+  public bool Uniform = true;
 }
 
 ///<summary>Contains functions for parsing arguments, etc.</summary>

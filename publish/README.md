@@ -43,6 +43,11 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.21
+  - Adds a new field `scaleUniform` to the `expand_vegetations.yaml` (default is true).
+  - Improves mod compatibility.
+  - Fixes the vegetation scaling being separate for each axis.
+
 - v1.20
   - Fixes None biome not being saved to the `expand_spawns.yaml` which caused spawning in every biome (some mods have the default biome as None).
 

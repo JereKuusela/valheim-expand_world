@@ -18,7 +18,11 @@ public class VegetationManager
   {
     var veg = new ZoneSystem.ZoneVegetation();
     var hash = data.prefab.GetStableHashCode();
-    Scale[veg] = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
+    Range<Vector3> scale = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
+    scale.Uniform = data.scaleUniform;
+    // Minor optimization to skip RNG calls if there is nothing to randomize.
+    if (Helper.IsMultiAxis(scale))
+      Scale[veg] = scale;
     if (data.data != "")
     {
       ZPackage pkg = new(data.data);
