@@ -350,6 +350,7 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - groundOffset (default: `0` meters): Placed above the ground.
 - groupSizeMin (default: `1`): Minimum amount to be placed at the same time.
 - groupSizeMax (default: `1`): Maximum amount to be placed at the same time.
+- groupRadius (default: `0` meters): Radius for group placement. This should be less than 32 meters to avoid overflowing to adjacent zones.
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
