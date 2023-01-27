@@ -394,7 +394,7 @@ public class LocationObjectDataAndSwap
       .InstructionEnumeration();
   }
 
-  static GameObject SpawnBPO(ZoneSystem __instance, bool flag, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects, BlueprintObject obj)
+  static void SpawnBPO(ZoneSystem __instance, bool flag, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects, BlueprintObject obj)
   {
     var objPos = pos + rot * obj.Pos;
     var objRot = rot * obj.Rot;
@@ -403,6 +403,12 @@ public class LocationObjectDataAndSwap
       ZNetView.StartGhostInit();
     }
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
+    if (!prefab)
+    {
+      ExpandWorld.Log.LogWarning($"Blueprint prefab {obj.Prefab} not found!");
+      ZNetView.FinishGhostInit();
+      return;
+    }
     var go = InstantiateWithData(location.m_prefabName, prefab, objPos, objRot, obj.Data);
     go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
     if (go.TryGetComponent<DungeonGenerator>(out var dg))
@@ -416,7 +422,6 @@ public class LocationObjectDataAndSwap
       spawnedGhostObjects.Add(go);
       ZNetView.FinishGhostInit();
     }
-    return go;
   }
 
   [HarmonyPostfix, HarmonyPriority(Priority.LowerThanNormal)]
