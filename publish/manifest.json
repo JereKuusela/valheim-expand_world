@@ -1,6 +1,6 @@
 {
   "name": "Expand_World",
-  "version_number": "1.21.0",
+  "version_number": "1.22.0",
   "website_url": "https://github.com/JereKuusela/valheim-expand_world",
   "description": "This mod allows adding new biomes and changing most of the world generation.",
   "dependencies": [
