@@ -198,7 +198,7 @@ public class LocationManager
   {
     var prefabName = item.m_prefabName.Split(':')[0];
     item.m_hash = item.m_prefabName.GetStableHashCode();
-    if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation))
+    if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
     {
       if (Blueprints.TryGetBluePrint(prefabName, out var bp))
       {
@@ -219,9 +219,7 @@ public class LocationManager
         item.m_randomSpawns = new();
         return;
       }
-      // Don't warn on the default data since it has missing stuff.
-      if (File.Exists(FilePath))
-        ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
+      ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
       return;
     }
     item.m_prefab = zoneLocation.m_prefab;

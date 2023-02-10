@@ -43,6 +43,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.22
+  - Fixes error message caused by removed locations.
+  - Fixes location blueprints causing terrain issues when overflowing to adjacent zones.
+
 - v1.21
   - Adds a new field `scaleUniform` to the `expand_vegetations.yaml` (default is true).
   - Improves mod compatibility.

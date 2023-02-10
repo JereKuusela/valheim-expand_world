@@ -13,7 +13,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace ExpandWorld;
 
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start)), HarmonyPriority(Priority.VeryLow)]
 public class LoadAndSaveData
 {
   static void Postfix()
