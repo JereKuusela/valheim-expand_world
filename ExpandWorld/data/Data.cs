@@ -48,7 +48,7 @@ public class LoadAndSaveData
       LocationManager.Load();
     else
       // Client doesn't need any real data.
-      LocationManager.SetLocations(new());
+      LocationManager.SetLocations(new(), false);
     Generate.Cancel();
     WorldGenerator.instance?.Pregenerate();
   }

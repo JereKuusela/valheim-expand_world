@@ -138,9 +138,9 @@ public class LocationManager
   {
     if (Helper.IsClient()) return;
     if (Configuration.DataLocation && File.Exists(FilePath))
-      SetLocations(FromFile(Data.Read(Pattern)));
+      SetLocations(FromFile(Data.Read(Pattern)), true);
     else
-      SetLocations(DefaultItems);
+      SetLocations(DefaultItems, false);
     LocationSyncManager.Sync(LocationData.Values.ToList());
     var force = LocationData.Values.Any(value => value.exteriorRadius == 0f && !BlueprintLocations.ContainsKey(value.prefab));
     ToFile(force);
@@ -194,7 +194,7 @@ public class LocationManager
     return location;
   }
   ///<summary>Copies setup from locations.</summary>
-  private static void Setup(ZoneSystem.ZoneLocation item)
+  private static void Setup(ZoneSystem.ZoneLocation item, bool showWarnings)
   {
     var prefabName = item.m_prefabName.Split(':')[0];
     item.m_hash = item.m_prefabName.GetStableHashCode();
@@ -219,7 +219,8 @@ public class LocationManager
         item.m_randomSpawns = new();
         return;
       }
-      ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
+      if (showWarnings)
+        ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
       return;
     }
     item.m_prefab = zoneLocation.m_prefab;
@@ -233,13 +234,13 @@ public class LocationManager
     item.m_randomSpawns = zoneLocation.m_randomSpawns;
   }
   ///<summary>Sets zone location entries (ensures that all locations have an entry).</summary>
-  public static void SetLocations(List<ZoneSystem.ZoneLocation> items)
+  public static void SetLocations(List<ZoneSystem.ZoneLocation> items, bool showWarnings)
   {
     var zs = ZoneSystem.instance;
     var missingLocations = ZoneLocations.Keys.ToHashSet();
     foreach (var item in items)
     {
-      Setup(item);
+      Setup(item, showWarnings);
       missingLocations.Remove(item.m_prefabName);
     }
     zs.m_locations = items;
@@ -385,9 +386,9 @@ public class LocationObjectDataAndSwap
 
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
+    var instantiator = typeof(UnityEngine.Object).GetMethods().First(m => m.Name == nameof(UnityEngine.Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
     return new CodeMatcher(instructions)
-      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.StartGhostInit))))
-      .Advance(5)
+      .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator))
       .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
       .InstructionEnumeration();
   }
@@ -451,17 +452,23 @@ public class LocationObjectDataAndSwap
       SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
     WearNTear.m_randomInitialDamage = false;
   }
+
+  public static IEnumerable<CodeInstruction> TranspileInstantiate(IEnumerable<CodeInstruction> instructions)
+  {
+    var instantiator = typeof(UnityEngine.Object).GetMethods().First(m => m.Name == nameof(UnityEngine.Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator)).Set(OpCodes.Call, Transpilers.EmitDelegate(LocationObjectDataAndSwap.Instantiate).operand)
+      .InstructionEnumeration();
+  }
 }
 
 [HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode))]
 public class DungeonDataAndSwap
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-  {
-    return new CodeMatcher(instructions)
-      .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.GetZDO))))
-      .Advance(-6)
-      .Set(OpCodes.Call, Transpilers.EmitDelegate(LocationObjectDataAndSwap.Instantiate).operand)
-      .InstructionEnumeration();
-  }
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
+}
+[HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceDoors), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode))]
+public class DungeonDoorDataAndSwap
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
 }

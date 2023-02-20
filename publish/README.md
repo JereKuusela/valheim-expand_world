@@ -43,6 +43,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.23
+  - Fixes object swap not working for dungeon doors.
+  - Fixes warning message from vanilla location data.
+
 - v1.22
   - Fixes error message caused by removed locations.
   - Fixes location blueprints causing terrain issues when overflowing to adjacent zones.
