@@ -113,7 +113,7 @@ public class SpawnManager
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataBiome ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataSpawns ? Data.Read(Pattern) : "";
     Configuration.valueSpawnData.Value = yaml;
     Set(yaml);
   }
