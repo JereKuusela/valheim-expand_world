@@ -48,6 +48,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Fixes warning message from vanilla location data.
   - Fixes `expand_spawns.yaml` being affected by "Biome data" setting.
   - Fixes biome names being synced for every server synced mod.
+  - Fixes no build not working for blueprints.
 
 - v1.22
   - Fixes error message caused by removed locations.

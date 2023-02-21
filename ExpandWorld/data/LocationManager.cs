@@ -472,3 +472,29 @@ public class DungeonDoorDataAndSwap
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
 }
+
+[HarmonyPatch(typeof(Location), nameof(Location.IsInsideNoBuildLocation))]
+public class IsInsideNoBuildLocation
+{
+  static bool IsInsideNoBuild(Vector3 point)
+  {
+    var zs = ZoneSystem.instance;
+    var zone = zs.GetZone(point);
+    for (var i = zone.x - 1; i <= zone.x + 1; i++)
+    {
+      for (var j = zone.y - 1; j <= zone.y + 1; j++)
+      {
+        if (!zs.m_locationInstances.TryGetValue(new Vector2i(i, j), out var loc)) continue;
+        var location = loc.m_location.m_location;
+        if (location.m_noBuild && location.IsInside(point, 0f))
+          return true;
+      }
+    }
+    return false;
+  }
+  static bool Prefix(Vector3 point, ref bool __result)
+  {
+    __result = IsInsideNoBuild(point);
+    return false;
+  }
+}
