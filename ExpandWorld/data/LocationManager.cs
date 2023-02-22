@@ -141,9 +141,22 @@ public class LocationManager
       SetLocations(FromFile(Data.Read(Pattern)), true);
     else
       SetLocations(DefaultItems, false);
-    LocationSyncManager.Sync(LocationData.Values.ToList());
+    UpdateInstances();
+    NoBuildManager.UpdateData();
     var force = LocationData.Values.Any(value => value.exteriorRadius == 0f && !BlueprintLocations.ContainsKey(value.prefab));
     ToFile(force);
+  }
+  private static void UpdateInstances()
+  {
+    var zs = ZoneSystem.m_instance;
+    var instances = zs.m_locationInstances;
+    foreach (var zone in instances.Keys.ToArray())
+    {
+      var value = instances[zone];
+      var location = zs.GetLocation(value.m_location.m_prefabName);
+      value.m_location = location;
+      instances[zone] = value;
+    }
   }
   public static List<ZoneSystem.ZoneLocation> DefaultItems = new();
   private static List<ZoneSystem.ZoneLocation> FromFile(string yaml)
@@ -467,34 +480,8 @@ public class DungeonDataAndSwap
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
 }
-[HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceDoors), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode))]
+[HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceDoors))]
 public class DungeonDoorDataAndSwap
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
-}
-
-[HarmonyPatch(typeof(Location), nameof(Location.IsInsideNoBuildLocation))]
-public class IsInsideNoBuildLocation
-{
-  static bool IsInsideNoBuild(Vector3 point)
-  {
-    var zs = ZoneSystem.instance;
-    var zone = zs.GetZone(point);
-    for (var i = zone.x - 1; i <= zone.x + 1; i++)
-    {
-      for (var j = zone.y - 1; j <= zone.y + 1; j++)
-      {
-        if (!zs.m_locationInstances.TryGetValue(new Vector2i(i, j), out var loc)) continue;
-        var location = loc.m_location.m_location;
-        if (location.m_noBuild && location.IsInside(point, 0f))
-          return true;
-      }
-    }
-    return false;
-  }
-  static bool Prefix(Vector3 point, ref bool __result)
-  {
-    __result = IsInsideNoBuild(point);
-    return false;
-  }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BepInEx.Configuration;
 using ServerSync;
 using Service;
@@ -57,7 +56,7 @@ public partial class Configuration
   public static CustomSyncedValue<string> valueSpawnData;
   public static CustomSyncedValue<string> valueEventData;
   public static CustomSyncedValue<string> valueEnvironmentData;
-  public static CustomSyncedValue<string> valueLocationData;
+  public static CustomSyncedValue<string> valueNoBuildData;
   public static ConfigEntry<bool> configDataEnvironments;
   public static bool DataEnvironments => configDataEnvironments.Value;
   public static ConfigEntry<bool> configDataEvents;
@@ -80,7 +79,7 @@ public partial class Configuration
 
   public static ConfigEntry<string> configSeed;
   public static string Seed => configSeed.Value;
-  
+
   public static ConfigEntry<string> configOffsetX;
   public static int? OffsetX => ConfigWrapper.Ints[configOffsetX];
   public static ConfigEntry<string> configOffsetY;
@@ -141,7 +140,8 @@ public partial class Configuration
     configOffsetX = wrapper.BindInt(section, "Offset X", null, true);
     configOffsetY = wrapper.BindInt(section, "Offset Y", null, true);
     configSeed = wrapper.Bind(section, "Seed", "", false);
-    configSeed.SettingChanged += (s,e) => {
+    configSeed.SettingChanged += (s, e) =>
+    {
       if (Seed == "") return;
       if (WorldGenerator.instance == null) return;
       var world = WorldGenerator.instance.m_world;
@@ -184,8 +184,8 @@ public partial class Configuration
     configPlanBuildFolder = wrapper.Bind(section, "Plan Build folder", "BepInEx/config/PlanBuild", false, "Folder relative to the Valheim.exe.");
     configBuildShareFolder = wrapper.Bind(section, "Build Share folder", "BuildShare/Builds", false, "Folder relative to the Valheim.exe.");
 
-    valueLocationData = wrapper.AddValue("location_data");
-    valueLocationData.ValueChanged += () => LocationSyncManager.Load(valueLocationData.Value);
+    valueNoBuildData = wrapper.AddValue("no_build_data");
+    valueNoBuildData.ValueChanged += () => NoBuildManager.Load(valueNoBuildData.Value);
     valueEnvironmentData = wrapper.AddValue("environment_data");
     valueEnvironmentData.ValueChanged += () => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     valueBiomeData = wrapper.AddValue("biome_data");
