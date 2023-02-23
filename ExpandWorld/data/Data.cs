@@ -31,7 +31,6 @@ public class LoadAndSaveData
       EventManager.FromFile();
       SpawnManager.FromFile();
       // NOT READY DungeonManager.FromFile();
-      VegetationManager.FromFile();
       BiomeManager.ToFile();
       WorldManager.ToFile();
       VegetationManager.ToFile();
