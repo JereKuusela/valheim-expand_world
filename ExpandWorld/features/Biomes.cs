@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
@@ -44,10 +43,11 @@ public class HeightmapGetBiome
 
   public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z)
   {
-    var values = Enum.GetValues(typeof(Heightmap.Biome)) as Heightmap.Biome[];
-    if (values == null) return Heightmap.Biome.None;
-    for (var i = 0; i < values.Length; i++)
-      Weights[values[i]] = 0f;
+    Weights.Clear();
+    Weights[__instance.m_cornerBiomes[0]] = 0;
+    Weights[__instance.m_cornerBiomes[1]] = 0;
+    Weights[__instance.m_cornerBiomes[2]] = 0;
+    Weights[__instance.m_cornerBiomes[3]] = 0;
     Weights[__instance.m_cornerBiomes[0]] += __instance.Distance(x, z, 0f, 0f);
     Weights[__instance.m_cornerBiomes[1]] += __instance.Distance(x, z, 1f, 0f);
     Weights[__instance.m_cornerBiomes[2]] += __instance.Distance(x, z, 0f, 1f);

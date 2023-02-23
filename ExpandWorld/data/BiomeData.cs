@@ -46,4 +46,6 @@ public class BiomeData
   public string musicDay = "";
   [DefaultValue("")]
   public string musicNight = "";
+  [DefaultValue(false)]
+  public bool noBuild = false;
 }

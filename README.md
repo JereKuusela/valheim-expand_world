@@ -130,6 +130,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - musicDay: Music override for the day time.
 - musicEvening: Music override for the evening time.
 - musicNight: Music override for the night time.
+- noBuild (default: `false`): If true, players can't build in this biome.
 
 ## World
 

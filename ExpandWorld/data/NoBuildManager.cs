@@ -29,7 +29,7 @@ public class NoBuildManager
     Configuration.valueNoBuildData.Value = Data.Serializer().Serialize(data);
   }
   private static Dictionary<Vector2i, NoBuildData> NoBuild = new();
-  public static bool IsInsideNoBuild(Vector3 point)
+  public static bool IsInsideNoBuildZone(Vector3 point)
   {
     var zs = ZoneSystem.instance;
     var zone = zs.GetZone(point);
@@ -43,6 +43,11 @@ public class NoBuildManager
       }
     }
     return false;
+  }
+  public static bool IsInsideNoBuildBiome(Vector3 point)
+  {
+    var biome = WorldGenerator.instance.GetBiome(point);
+    return BiomeManager.TryGetData(biome, out var biomeData) && biomeData.noBuild;
   }
   public static void Load(string yaml)
   {
@@ -65,10 +70,9 @@ public class NoBuildManager
 public class IsInsideNoBuildLocation
 {
 
-  static bool Prefix(Vector3 point, ref bool __result)
+  static bool Postfix(bool result, Vector3 point)
   {
-    __result = NoBuildManager.IsInsideNoBuild(point);
-    return false;
+    return result || NoBuildManager.IsInsideNoBuildZone(point) || NoBuildManager.IsInsideNoBuildBiome(point);
   }
 }
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Load))]

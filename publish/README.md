@@ -44,6 +44,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 # Changelog
 
 - v1.23
+  - Adds a new field `noBuild` to the `expand_biomes.yaml` (default is false).
   - Fixes object swap not working for dungeon doors.
   - Fixes warning message from vanilla location data.
   - Fixes `expand_spawns.yaml` being affected by "Biome data" setting.
