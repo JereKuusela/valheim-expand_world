@@ -51,7 +51,6 @@ public class NoBuildManager
   }
   public static void Load(string yaml)
   {
-    ExpandWorld.Log.LogInfo($"Reloading {yaml} no build data.");
     if (yaml == "") return;
     try
     {
