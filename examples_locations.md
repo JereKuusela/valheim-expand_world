@@ -27,7 +27,7 @@ Useful commands:
 
 This also works for dungeons.
 ```
-- prefab: Crypt2:Graydwarf
+- prefab: Crypt2:Greydwarf
   objectSwap:
     - Spawner_Skeleton, Spawner_Greydwarf
     - Spawner_Ghost, Spawner_Greydwarf_Shaman
