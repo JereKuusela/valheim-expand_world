@@ -32,7 +32,7 @@ This also works for dungeons.
     - Spawner_Skeleton, Spawner_Greydwarf
     - Spawner_Ghost, Spawner_Greydwarf_Shaman
     - Spawner_Skeleton_poison, Spawner_Greydwarf_Elite
-    - BonePileSpawne, Spawner_Greydwarf_Elite
+    - BonePileSpawner, Spawner_Greydwarf_Elite
 ```
 
 ## Location: Custom data with Spawner Tweaks mod
