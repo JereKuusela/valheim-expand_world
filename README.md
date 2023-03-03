@@ -19,7 +19,7 @@ For example you can create entirely flat worlds with only Meadows for building. 
 
 # Tutorials
 
-- How to make custom biomes (https://youtu.be/TgFhW0MtYyw, 33 minutes, created by StonedProphet)
+- How to make custom biomes: https://youtu.be/TgFhW0MtYyw (33 minutes, created by StonedProphet)
 
 # Configuration
 

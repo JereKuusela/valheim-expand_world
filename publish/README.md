@@ -16,7 +16,7 @@ See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/ma
 
 # Tutorials
 
-- How to make custom biomes (https://youtu.be/TgFhW0MtYyw, 33 minutes, created by StonedProphet)
+- How to make custom biomes: https://youtu.be/TgFhW0MtYyw (33 minutes, created by StonedProphet)
 
 ## Migration from version 1.19
 
