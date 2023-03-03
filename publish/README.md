@@ -14,6 +14,10 @@ See [location examples](https://github.com/JereKuusela/valheim-expand_world/blob
 
 See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples.md).
 
+# Tutorials
+
+- How to make custom biomes (https://youtu.be/TgFhW0MtYyw, 33 minutes, created by StonedProphet)
+
 ## Migration from version 1.19
 
 - If you have modded creatures spawning in wrong places, regenerate `expand_spawns.yaml` by removing it or manually set `biome: None` when missing.

@@ -17,6 +17,10 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 For example you can create entirely flat worlds with only Meadows for building. Or group up colder biomes up north while more warmer biomes end up in the other side. Or just have a world with terrain shapes no one has ever seen before.
 
+# Tutorials
+
+- How to make custom biomes (https://youtu.be/TgFhW0MtYyw, 33 minutes, created by StonedProphet)
+
 # Configuration
 
 The mod supports live reloading when changing the configuration (either with [Configuration manager](https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/) or by saving the config file). This can lead to weird behavior so after playing with the settings it's recommended to make a fresh world.
