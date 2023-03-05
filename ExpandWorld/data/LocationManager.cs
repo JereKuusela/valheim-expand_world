@@ -414,16 +414,20 @@ public class LocationObjectDataAndSwap
   {
     var objPos = pos + rot * obj.Pos;
     var objRot = rot * obj.Rot;
-    if (mode == ZoneSystem.SpawnMode.Ghost)
-    {
-      ZNetView.StartGhostInit();
-    }
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
     if (!prefab)
     {
+      if (LocationManager.BlueprintFiles.TryGetValue(obj.Prefab, out var bp))
+      {
+        SpawnBlueprint(__instance, location, objPos, objRot, mode, spawnedGhostObjects);
+        return;
+      }
       ExpandWorld.Log.LogWarning($"Blueprint prefab {obj.Prefab} not found!");
-      ZNetView.FinishGhostInit();
       return;
+    }
+    if (mode == ZoneSystem.SpawnMode.Ghost)
+    {
+      ZNetView.StartGhostInit();
     }
     var go = InstantiateWithData(location.m_prefabName, prefab, objPos, objRot, obj.Data);
     go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);

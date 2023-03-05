@@ -50,7 +50,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 - v1.24
   - Adds scale, chance and zdo data to the field `objects` in the `expand_locations.yaml`.
   - Adds a new field `noBuildDungeon` to the `expand_locations.yaml` (default is false).
+  - Adds support for blueprints to the field `objects` in the `expand_locations.yaml`.
+  - Adds support for blueprints in the blueprints.
   - Changes the field `noBuild` in the `expand_locations.yaml` to also accept numbers.
+  - Changes the default no build to not affect dungeons.
 
 - v1.23
   - Adds a new field `noBuild` to the `expand_biomes.yaml` (default is false).
