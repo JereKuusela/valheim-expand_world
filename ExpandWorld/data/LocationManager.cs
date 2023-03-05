@@ -121,7 +121,7 @@ public class LocationManager
       data.randomDamage = loc.m_location.m_applyRandomDamage;
       data.exteriorRadius = loc.m_location.m_exteriorRadius;
       data.clearArea = loc.m_location.m_clearArea;
-      data.noBuild = loc.m_location.m_noBuild;
+      data.noBuild = loc.m_location.m_noBuild ? "true" : "";
     }
     return data;
   }
@@ -194,7 +194,7 @@ public class LocationManager
       item.m_exteriorRadius = radius.Value;
     item.m_location.m_applyRandomDamage = data.randomDamage;
     item.m_location.m_clearArea = data.clearArea;
-    item.m_location.m_noBuild = data.noBuild;
+    item.m_location.m_noBuild = data.noBuild != "" && data.noBuild != "0" && data.noBuild != "false";
   }
   public static Location GetBluePrintLocation(string prefab)
   {

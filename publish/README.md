@@ -47,6 +47,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.24
+  - Adds a new field `noBuildDungeon` to the `expand_locations.yaml` (default is false).
+  - Changes the field `noBuild` in the `expand_locations.yaml` to also accept numbers.
+
 - v1.23
   - Adds a new field `noBuild` to the `expand_biomes.yaml` (default is false).
   - Fixes object swap not working for dungeon doors.

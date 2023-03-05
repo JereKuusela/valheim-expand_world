@@ -315,7 +315,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
 - exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
-- noBuild (default: `false`): If true, players can't build within `exteriorRadius`.
+- noBuild (default: `false`): If true, players can't build within `exteriorRadius`. If number, player can't build within the given radius.
+- noBuildDungeon (default: `false`): If true, players can't build inside dungeons within `exteriorRadius`. If number, player can't build inside dungeons within the given radius.
 - levelArea (default: `0.5`): Levels within `exteriorRadius` with the given smoothness (only for blueprints). If 0, no leveling is done. If 1, the terrain will be flat.
 - offset: Moves the blueprint up/down. If not given, the blueprint is placed at the terrain level (0.05 meters towards the ground). If 0, the blueprint is used as it is. If for example 5, the blueprint is moved 5 meters up.
 - center: Moves the blueprint center. If not given, the blueprint is automatically centered. For example value 0,0 would use the blueprint as it is.

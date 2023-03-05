@@ -66,8 +66,10 @@ public class LocationData
   public bool clearArea = false;
   [DefaultValue(false)]
   public bool randomDamage = false;
-  [DefaultValue(false)]
-  public bool noBuild = false;
+  [DefaultValue("")]
+  public string noBuild = "";
+  [DefaultValue("")]
+  public string noBuildDungeon = "";
   [DefaultValue(0.5f)]
   public float levelArea = 0.5f;
   [DefaultValue(null)]
