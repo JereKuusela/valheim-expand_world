@@ -12,9 +12,9 @@ public class LocationManager
   public static string FileName = "expand_locations.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_locations*.yaml";
-  public static Dictionary<string, ZDO> ZDO = new();
+  public static Dictionary<string, ZDO?> ZDO = new();
   public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
-  public static Dictionary<string, Dictionary<string, ZDO>> ObjectData = new();
+  public static Dictionary<string, Dictionary<string, ZDO?>> ObjectData = new();
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, LocationData> LocationData = new();
   public static Dictionary<string, string> Dungeons = new();
@@ -40,7 +40,11 @@ public class LocationManager
       Objects[data.prefab] = data.objects.Select(s => s.Split(',')).Select(split => new BlueprintObject(
         split[0],
         Parse.VectorXZY(split, 1),
-        Parse.AngleYXZ(split, 4)
+        Parse.AngleYXZ(split, 4),
+        Parse.VectorXZY(split, 7, Vector3.one),
+        "",
+        Data.ToZDO(split.Length > 10 ? split[11] : ""),
+        Parse.Float(split, 10, 1f)
       )).ToList();
     }
     loc.m_prefabName = data.prefab;
@@ -318,7 +322,7 @@ public class LocationZDO
   {
     if (!LocationManager.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(pos, rotation, data, view);
+    if (data != null) Data.InitZDO(pos, rotation, data, view);
   }
 }
 [HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
@@ -445,6 +449,7 @@ public class LocationObjectDataAndSwap
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     foreach (var obj in objects)
     {
+      if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
       SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
     }
   }
@@ -462,7 +467,10 @@ public class LocationObjectDataAndSwap
     WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     foreach (var obj in bp.Objects)
+    {
+      if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
       SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
+    }
     WearNTear.m_randomInitialDamage = false;
   }
 

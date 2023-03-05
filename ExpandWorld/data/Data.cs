@@ -133,8 +133,9 @@ public class Data : MonoBehaviour
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
   public static List<string> ToList(string str) => str.Split(',').Select(s => s.Trim()).Where(s => s != "").ToList();
   public static Dictionary<string, string> ToDict(string str) => ToList(str).Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0].Trim(), s => s[1].Trim());
-  public static ZDO ToZDO(string data)
+  public static ZDO? ToZDO(string data)
   {
+    if (data == "") return null;
     ZPackage pkg = new(data);
     ZDO zdo = new();
     Data.Deserialize(zdo, pkg);

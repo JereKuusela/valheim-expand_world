@@ -15,7 +15,8 @@ public class BlueprintObject
   public Vector3 Scale;
   public string ExtraInfo;
   public ZDO? Data;
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data)
+  public float Chance = 1f;
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data, float chance = 1f)
   {
     Prefab = name;
     Pos = pos;
@@ -23,6 +24,7 @@ public class BlueprintObject
     Scale = scale;
     ExtraInfo = info;
     Data = data;
+    Chance = chance;
   }
   public BlueprintObject(string name, Vector3 pos, Quaternion rot)
   {

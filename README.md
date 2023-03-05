@@ -311,7 +311,15 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
 - objectSwap: List to swap child objects to some other objects. Format is `id:swapid` or `id,swapid:weight,swapid2:weight2,...`.
 - objectData: List to set child object data. Format is `id,data`.
-- objects: List to add new objects. Format is `id,posX,posZ,posY,rotY,rotX,rotZ`.
+  - id: Prefab name.
+  - data: ZDO data override.
+- objects: List to add new objects. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
+  - id: Prefab name.
+  - posX, posZ, posY: Offset from the location position. Defalt is 0.
+  - rotY, rotX, rotZ: Rotation. Default is 0.
+  - scaleX, scaleZ, scaleY: Scale. Default is 1.
+  - chance: Chance to spawn (from 0 to 1). Default is 1.
+  - data: ZDO data override.
 - applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
 - exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
