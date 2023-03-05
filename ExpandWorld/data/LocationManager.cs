@@ -43,7 +43,7 @@ public class LocationManager
         Parse.AngleYXZ(split, 4),
         Parse.VectorXZY(split, 7, Vector3.one),
         "",
-        Data.ToZDO(split.Length > 10 ? split[11] : ""),
+        Data.ToZDO(split.Length > 11 ? split[11] : ""),
         Parse.Float(split, 10, 1f)
       )).ToList();
     }

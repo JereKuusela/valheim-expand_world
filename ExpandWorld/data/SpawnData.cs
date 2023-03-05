@@ -63,4 +63,6 @@ public class SpawnData
   public float overrideLevelupChance = -1f;
   [DefaultValue("")]
   public string data = "";
+  [DefaultValue(null)]
+  public string[]? objects = null;
 }

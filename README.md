@@ -313,7 +313,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - objectData: List to set child object data. Format is `id,data`.
   - id: Prefab name.
   - data: ZDO data override.
-- objects: List to add new objects. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
+- objects: Extra objects or blueprints. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
   - id: Prefab name.
   - posX, posZ, posY: Offset from the location position. Defalt is 0.
   - rotY, rotX, rotZ: Rotation. Default is 0.
@@ -408,6 +408,11 @@ See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 - levelUpMinCenterDistance (default: `0` meters): Distance from the world center to enable higher creature levels. This is not scaled with the world size.
 - overrideLevelupChance (default: `-1` percent): Chance per level up (from the default 10%).
 - data: ZDO data override. For example to change faction with Spawner Tweaks mod (`object copy` from World Edit Commands).
+- objects: Extra objects to spawn. Spawned on top of any obstacles. The spawning is skipped if 10 meters above the original position. Format is `id,posX,posZ,posY,chance,data`.
+  - id: Prefab name.
+  - posX, posZ, posY: Offset from the location position. Defalt is 0.
+  - chance: Chance to spawn (from 0 to 1). Default is 1.
+  - data: ZDO data override.
 
 ## Events
 

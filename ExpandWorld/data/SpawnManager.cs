@@ -12,6 +12,7 @@ public class SpawnManager
   public static string FileName = "expand_spawns.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_spawns*.yaml";
+  public static Dictionary<SpawnSystem.SpawnData, List<BlueprintObject>> Objects = new();
   public static SpawnSystem.SpawnData FromData(SpawnData data)
   {
     var spawn = new SpawnSystem.SpawnData();
@@ -22,6 +23,18 @@ public class SpawnManager
       ZDO zdo = new();
       Data.Deserialize(zdo, pkg);
       ZDO[spawn] = zdo;
+    }
+    if (data.objects != null)
+    {
+      Objects[spawn] = data.objects.Select(s => s.Split(',')).Select(split => new BlueprintObject(
+        split[0],
+        Parse.VectorXZY(split, 1),
+        Quaternion.identity,
+        Vector3.one,
+        "",
+        Data.ToZDO(split.Length > 5 ? split[5] : ""),
+        Parse.Float(split, 4, 1f)
+      )).ToList();
     }
     spawn.m_enabled = data.enabled;
     spawn.m_biome = Data.ToBiomes(data.biome);
@@ -172,5 +185,45 @@ public class SpawnZDO
     ZNetView.m_initZDO.m_persistent = view.m_persistent;
     ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
     ZNetView.m_initZDO.m_dataRevision = 1;
+  }
+
+  static void Postfix(SpawnSystem.SpawnData critter, Vector3 spawnPoint)
+  {
+    if (!SpawnManager.Objects.TryGetValue(critter, out var objects)) return;
+    foreach (var obj in objects)
+    {
+      if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
+      SpawnBPO(spawnPoint, Quaternion.identity, obj);
+    }
+  }
+
+  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  {
+    if (data == null) return;
+    if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
+    Data.InitZDO(position, rotation, data, view);
+  }
+  static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  {
+    SetData(prefab, position, rotation, data);
+    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
+    Data.CleanGhostInit(obj);
+    return obj;
+  }
+  static void SpawnBPO(Vector3 pos, Quaternion rot, BlueprintObject obj)
+  {
+    var objPos = pos + rot * obj.Pos;
+    var objRot = rot * obj.Rot;
+    var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
+    if (!prefab)
+    {
+      ExpandWorld.Log.LogWarning($"Extra spawn prefab {obj.Prefab} not found!");
+      return;
+    }
+    var solid = ZoneSystem.instance.GetSolidHeight(objPos);
+    // Prevent spawning on top of tall objects like trees.
+    if (solid > objPos.y + 10f) return;
+    objPos.y = solid;
+    InstantiateWithData(prefab, objPos, objRot, obj.Data);
   }
 }
