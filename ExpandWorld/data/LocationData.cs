@@ -32,10 +32,10 @@ public class LocationData
   public string group = "";
   [DefaultValue(0f)]
   public float minDistanceFromSimilar = 0f;
-  [DefaultValue(false)]
-  public bool iconAlways = false;
-  [DefaultValue(false)]
-  public bool iconPlaced = false;
+  [DefaultValue("")]
+  public string iconAlways = "";
+  [DefaultValue("")]
+  public string iconPlaced = "";
   [DefaultValue(false)]
   public bool randomRotation = false;
   [DefaultValue(false)]

@@ -78,6 +78,13 @@ public class DebugCommands
       var names = mm.m_music.Where(music => music.m_enabled).Select(music => music.m_name);
       args.Context.AddString(string.Join("\n", names));
     }, true);
+    new Terminal.ConsoleCommand("ew_icons", "- Prints available location icons.", args =>
+    {
+      var mm = Minimap.instance;
+      if (!mm) return;
+      var names = mm.m_locationIcons.Select(icon => icon.m_name).Concat(mm.m_icons.Select(icon => icon.m_name.ToString()));
+      args.Context.AddString(string.Join("\n", names));
+    }, true);
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {
       var wg = WorldGenerator.m_instance;

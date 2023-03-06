@@ -53,7 +53,10 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Adds a new field `objects` to the `expand_spawns.yaml`.
   - Adds blueprint support to the field `objects` in the `expand_locations.yaml`.
   - Adds blueprint support to the blueprint files.
+  - Adds a new command `ew_icons` to print available location icons.
   - Changes the field `noBuild` in the `expand_locations.yaml` to also accept numbers.
+  - Changes the field `iconAlways` in the `expand_locations.yaml` to also accept text (to set the icon).
+  - Changes the field `iconPlaced` in the `expand_locations.yaml` to also accept text (to set the icon).
   - Changes the default no build to not affect dungeons.
 
 - v1.23

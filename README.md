@@ -298,8 +298,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - unique (default: `false`): When placed, all other unplaced locations are removed. Guaranteed maximum of one instance.
 - group: Group name for `minDistanceFromSimilar`.
 - minDistanceFromSimilar (default: `0` meters): Minimum distance between the same location, or locations in the `group` if given.
-- iconAlways (default: `false`): Location icon is always shown.
-- iconPlaced (default: `false`): Location icon is only shown when the location instance is actually placed.
+- iconAlways: Location icon that is always shown. Use `ew_icons` to see what is available.
+- iconPlaced: Location icon to show when the location is generated. Use `ew_icons` to see what is available.
 - randomRotation (default: `false`): Randomly rotates the location (unaffected by world seed).
 - slopeRotation (default: `false`): Rotates based on the terrain angle. For example for locations at mountain sides.
 - snapToWater (default: `false`): Placed at the water level instead of the terrain.

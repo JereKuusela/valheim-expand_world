@@ -57,8 +57,8 @@ public class LocationManager
     loc.m_unique = data.unique;
     loc.m_group = data.group;
     loc.m_minDistanceFromSimilar = data.minDistanceFromSimilar;
-    loc.m_iconAlways = data.iconAlways;
-    loc.m_iconPlaced = data.iconPlaced;
+    loc.m_iconAlways = data.iconAlways != "" && data.iconAlways != "false";
+    loc.m_iconPlaced = data.iconPlaced != "" && data.iconPlaced != "false";
     loc.m_randomRotation = data.randomRotation;
     loc.m_slopeRotation = data.slopeRotation;
     loc.m_snapToWater = data.snapToWater;
@@ -99,8 +99,8 @@ public class LocationManager
     data.unique = loc.m_unique;
     data.group = loc.m_group;
     data.minDistanceFromSimilar = loc.m_minDistanceFromSimilar;
-    data.iconAlways = loc.m_iconAlways;
-    data.iconPlaced = loc.m_iconPlaced;
+    data.iconAlways = loc.m_iconAlways ? loc.m_prefabName : "";
+    data.iconPlaced = loc.m_iconPlaced ? loc.m_prefabName : "";
     data.randomRotation = loc.m_randomRotation;
     data.slopeRotation = loc.m_slopeRotation;
     data.snapToWater = loc.m_snapToWater;
@@ -147,8 +147,18 @@ public class LocationManager
       SetLocations(DefaultItems, false);
     UpdateInstances();
     NoBuildManager.UpdateData();
+    ZoneSystem.instance.SendLocationIcons(ZRoutedRpc.Everybody);
+    CleanMap();
     var force = LocationData.Values.Any(value => value.exteriorRadius == 0f && !BlueprintLocations.ContainsKey(value.prefab));
     ToFile(force);
+  }
+  private static void CleanMap()
+  {
+    var mm = Minimap.instance;
+    if (!mm) return;
+    foreach (var pin in mm.m_locationPins)
+      mm.RemovePin(pin.Value);
+    mm.m_locationPins.Clear();
   }
   private static void UpdateInstances()
   {
@@ -496,4 +506,44 @@ public class DungeonDataAndSwap
 public class DungeonDoorDataAndSwap
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
+}
+
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GetLocationIcons))]
+public class LocationIcons
+{
+  static void Postfix(ZoneSystem __instance, Dictionary<Vector3, string> icons)
+  {
+    if (!ZNet.instance.IsServer()) return;
+    foreach (var kvp in __instance.m_locationInstances)
+    {
+      var loc = kvp.Value.m_location;
+      var pos = kvp.Value.m_position;
+      if (loc == null) continue;
+      if (!LocationManager.LocationData.TryGetValue(loc.m_prefabName, out var data)) continue;
+      var placed = data.iconPlaced == "true" ? loc.m_prefabName : data.iconPlaced == "false" ? "" : data.iconPlaced;
+      if (kvp.Value.m_placed && placed != "")
+      {
+        icons[pos] = placed;
+      }
+      else
+      {
+        pos.y += 0.00001f; // Trivial amount for a different key.
+        var always = data.iconAlways == "true" ? loc.m_prefabName : data.iconAlways == "false" ? "" : data.iconAlways;
+        if (always != "") icons[pos] = always;
+      }
+    }
+  }
+}
+
+
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.GetLocationIcon))]
+public class NewLocationIcons
+{
+  static Sprite Postfix(Sprite result, string name)
+  {
+    if (result != null) return result;
+    if (Enum.TryParse<Minimap.PinType>(name, true, out var icon))
+      return Minimap.instance.GetSprite(icon);
+    return null!;
+  }
 }
