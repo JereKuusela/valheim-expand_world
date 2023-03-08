@@ -2,67 +2,95 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 namespace ExpandWorld;
-public class HeightIndex
+using Operation = Action<TerrainComp, int, TerrainNode>;
+public abstract class TerrainNode
 {
   public int Index;
   public Vector3 Position;
+  public float DistanceWidth;
+  public float DistanceDepth;
   public float Distance;
+
+  public TerrainComp? Compiler;
 }
+
+public class HeightNode : TerrainNode { }
+public class PaintNode : TerrainNode { }
 public partial class Terrain
 {
+  public static Dictionary<string, Color> Paints = new() {
+    {"grass", Color.black},
+    {"patches", new(0f, 0.75f, 0f)},
+    {"grass_dark", new(0.6f, 0.5f, 0f)},
+    {"dirt", Color.red},
+    {"cultivated", Color.green},
+    {"paved", Color.blue},
+    {"paved_moss", new(0f, 0f, 0.5f)},
+    {"paved_dirt", new(1f, 0f, 0.5f)},
+    {"paved_dark", new(0f, 1f, 0.5f)},
+  };
+  public static Color ParsePaint(string paint)
+  {
+    if (Paints.TryGetValue(paint, out var color)) return color;
+    var split = paint.Split(',');
+    if (split.Length < 3) return Color.black;
+    return new(Parse.Float(split, 0), Parse.Float(split, 1), Parse.Float(split, 2), Parse.Float(split, 3, 1f));
+  }
   private static float CalculateSmooth(float smooth, float distance) => (1f - distance) >= smooth ? 1f : (1f - distance) / smooth;
 
-  private static List<HeightIndex> GetIndices(TerrainComp compiler, Vector3 centerPos, float radius)
+  private static void GetHeightNodes(List<HeightNode> nodes, TerrainComp compiler, Vector3 centerPos, float radius)
   {
-    List<HeightIndex> indices = new();
-    compiler.m_hmap.WorldToVertex(centerPos, out var cx, out var cy);
-    var distanceLimit = radius / compiler.m_hmap.m_scale;
+    if (radius == 0f) return;
     var max = compiler.m_width + 1;
-    Vector2 center = new((float)cx, (float)cy);
-    // Don't include the edges to avoid overflowing.
-    for (int i = 1; i < max - 1; i++)
+    for (int x = 0; x < max; x++)
     {
-      for (int j = 1; j < max - 1; j++)
+      for (int z = 0; z < max; z++)
       {
-        var distance = Vector2.Distance(center, new((float)j, (float)i));
-        if (distance > distanceLimit) continue;
-        var distanceX = j - cx;
-        var distanceY = i - cy;
-        indices.Add(new()
+        var nodePos = VertexToWorld(compiler.m_hmap, x, z);
+        var dx = nodePos.x - centerPos.x;
+        var dz = nodePos.z - centerPos.z;
+        var distance = Utils.DistanceXZ(centerPos, nodePos);
+        if (distance > radius) continue;
+        nodes.Add(new()
         {
-          Index = i * max + j,
-          Position = VertexToWorld(compiler.m_hmap, j, i),
-          Distance = distance / distanceLimit
+          Index = z * max + x,
+          Position = nodePos,
+          DistanceWidth = dx / radius,
+          DistanceDepth = dz / radius,
+          Distance = distance / radius,
+          Compiler = compiler
         });
       }
     }
-    return indices;
   }
-  private static List<HeightIndex> GetPaintIndices(TerrainComp compiler, Vector3 centerPos, float radius)
+  private static void GetPaintNodes(List<PaintNode> nodes, TerrainComp compiler, Vector3 centerPos, float radius)
   {
-    List<HeightIndex> indices = new();
-    compiler.m_hmap.WorldToVertex(centerPos, out var cx, out var cy);
-    var distanceLimit = radius / compiler.m_hmap.m_scale;
     var max = compiler.m_width;
-    Vector2 center = new((float)cx, (float)cy);
-    for (int i = 0; i < max; i++)
+    for (int x = 0; x < max; x++)
     {
-      for (int j = 0; j < max; j++)
+      for (int z = 0; z < max; z++)
       {
-        var distance = Vector2.Distance(center, new((float)j, (float)i));
-        if (distance > distanceLimit) continue;
-        var distanceX = j - cx;
-        var distanceY = i - cy;
-        indices.Add(new()
+        var nodePos = VertexToWorld(compiler.m_hmap, x, z);
+        // Painting is applied from the corner of the node, not the center.
+        nodePos.x += 0.5f;
+        nodePos.z += 0.5f;
+        var dx = nodePos.x - centerPos.x;
+        var dz = nodePos.z - centerPos.z;
+        var distance = Utils.DistanceXZ(centerPos, nodePos);
+        if (distance > radius) continue;
+        nodes.Add(new()
         {
-          Index = i * max + j,
-          Position = VertexToWorld(compiler.m_hmap, j, i),
-          Distance = distance / distanceLimit
+          Index = z * max + x,
+          Position = nodePos,
+          DistanceWidth = dx / radius,
+          DistanceDepth = dz / radius,
+          Distance = distance / radius,
+          Compiler = compiler
         });
       }
     }
-    return indices;
   }
+
   private static Vector3 VertexToWorld(Heightmap hmap, int x, int y)
   {
     var vector = hmap.transform.position;
@@ -71,6 +99,14 @@ public partial class Terrain
     return vector;
   }
 
+  public static void LevelAndPaint(Vector3 pos, float radius, float smooth, string paint)
+  {
+    var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
+    if (compiler == null) return;
+    Level(compiler, pos, radius, smooth);
+    Paint(compiler, pos, radius, smooth, paint);
+    Save(compiler);
+  }
   public static void Level(Vector3 pos, float radius, float smooth)
   {
     var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
@@ -78,30 +114,40 @@ public partial class Terrain
     Level(compiler, pos, radius, smooth);
     Save(compiler);
   }
+  public static void Paint(Vector3 pos, float radius, string paint)
+  {
+    var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
+    if (compiler == null) return;
+    Paint(compiler, pos, radius, 0f, paint);
+    Save(compiler);
+  }
   private static void Level(TerrainComp compiler, Vector3 pos, float radius, float smooth)
   {
-    var indices = GetIndices(compiler, pos, radius);
-    Action<TerrainComp, HeightIndex> action = (compiler, heightIndex) =>
+    List<HeightNode> nodes = new();
+    GetHeightNodes(nodes, compiler, pos, radius);
+    Operation action = (compiler, index, node) =>
     {
-      var multiplier = CalculateSmooth(smooth, heightIndex.Distance);
-      var index = heightIndex.Index;
+      var multiplier = CalculateSmooth(smooth, node.Distance);
       compiler.m_levelDelta[index] = multiplier * (pos.y - compiler.m_hmap.m_heights[index]);
       compiler.m_smoothDelta[index] = 0f;
       compiler.m_modifiedHeight[index] = compiler.m_levelDelta[index] != 0f;
     };
-    foreach (var index in indices) action(compiler, index);
+    DoOperation(nodes, pos, radius, action);
   }
-  private static void Paint(TerrainComp compiler, Vector3 pos, float radius, float smooth)
+  private static void Paint(TerrainComp compiler, Vector3 pos, float radius, float smooth, string paint)
   {
-    var indices = GetPaintIndices(compiler, pos, radius);
-    Action<TerrainComp, HeightIndex> action = (compiler, heightIndex) =>
+    Color color = ParsePaint(paint);
+    List<PaintNode> nodes = new();
+    GetPaintNodes(nodes, compiler, pos, radius);
+    Operation action = (compiler, index, node) =>
     {
-      var multiplier = CalculateSmooth(smooth, heightIndex.Distance);
-      var index = heightIndex.Index;
-      //compiler.m_paintMask[index] = multiplier * (pos.y - compiler.m_hmap.m_heights[index]);
+      var multiplier = CalculateSmooth(smooth, node.Distance);
+      var newColor = Color.Lerp(compiler.m_paintMask[index], color, multiplier);
+      newColor.a = color.a;
+      compiler.m_paintMask[index] = newColor;
       compiler.m_modifiedPaint[index] = true;
     };
-    foreach (var index in indices) action(compiler, index);
+    DoOperation(nodes, pos, radius, action);
   }
 
   private static void Save(TerrainComp compiler)
@@ -113,5 +159,17 @@ public partial class Terrain
     compiler.m_lastOpRadius = 0f;
     compiler.Save();
     compiler.m_hmap.Poke(false);
+  }
+  private static void DoOperation(List<PaintNode> nodes, Vector3 pos, float radius, Operation action)
+  {
+    foreach (var node in nodes)
+      action(node.Compiler!, node.Index, node);
+    ClutterSystem.instance?.ResetGrass(pos, radius);
+  }
+  private static void DoOperation(List<HeightNode> nodes, Vector3 pos, float radius, Operation action)
+  {
+    foreach (var node in nodes)
+      action(node.Compiler!, node.Index, node);
+    ClutterSystem.instance?.ResetGrass(pos, radius);
   }
 }

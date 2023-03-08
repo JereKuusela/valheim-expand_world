@@ -207,13 +207,13 @@ public class ApplyModifiers
     var biomes = __instance.m_cornerBiomes;
     if (biomes[0] == biomes[1] && biomes[0] == biomes[2] && biomes[0] == biomes[3])
     {
-      if (!BiomeManager.TryGetData(biomes[0], out var data))
+      if (!BiomeManager.TryGetPaint(biomes[0], out var color))
         return;
-      if (data.paint.Equals(new Color()))
+      if (color.Equals(new Color()))
         return;
       var pixels = new Color[paint.width * paint.height];
       for (var i = 0; i < pixels.Length; i++)
-        pixels[i] = data.paint;
+        pixels[i] = color;
       paint.SetPixels(pixels);
     }
     else
@@ -224,11 +224,9 @@ public class ApplyModifiers
         for (var x = 0; x < paint.width; x++)
         {
           var biome = HeightmapGetBiome.GetBiome(__instance, x, z);
-          if (!BiomeManager.TryGetData(biome, out var data))
+          if (!BiomeManager.TryGetPaint(biome, out var color))
             continue;
-          if (data.paint.Equals(new Color()))
-            continue;
-          pixels[x + z * paint.height] = data.paint;
+          pixels[x + z * paint.height] = color;
         }
       }
       paint.SetPixels(pixels);

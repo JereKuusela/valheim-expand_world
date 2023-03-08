@@ -72,6 +72,8 @@ public class LocationData
   public string noBuildDungeon = "";
   [DefaultValue(0.5f)]
   public float levelArea = 0.5f;
+  [DefaultValue("")]
+  public string paint = "";
   [DefaultValue(null)]
   public float? offset;
   [DefaultValue("")]

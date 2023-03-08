@@ -43,7 +43,9 @@ public class BiomeManager
   public static Dictionary<Heightmap.Biome, string> BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToNature = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
+  private static Dictionary<Heightmap.Biome, Color> BiomeToPaint = new();
   private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
+  public static bool TryGetPaint(Heightmap.Biome biome, out Color color) => BiomeToPaint.TryGetValue(biome, out color);
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
   public static Heightmap.Biome GetBiome(string name) => NameToBiome.TryGetValue(name.ToLower(), out var biome) ? biome : Heightmap.Biome.None;
@@ -152,6 +154,7 @@ public class BiomeManager
     if (rawData.Count > 0)
       ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
     BiomeToData.Clear();
+    BiomeToPaint.Clear();
     NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
@@ -166,7 +169,6 @@ public class BiomeManager
       }
       Data.Sanity(ref item.mapColor);
       Data.Sanity(ref item.color);
-      Data.Sanity(ref item.paint);
       if (!BiomeToDisplayName.ContainsKey(biome))
         BiomeToDisplayName[biome] = item.biome;
       if (item.name != "" || !isDefaultBiome)
@@ -182,6 +184,7 @@ public class BiomeManager
       }
       NameToBiome.Add(item.biome.ToLower(), biome);
       BiomeToData[biome] = item;
+      if (item.paint != "") BiomeToPaint[biome] = Terrain.ParsePaint(item.paint);
       biomeNumber *= 2;
     }
     MaxBiome = (Heightmap.Biome)(biomeNumber - 1);
@@ -203,7 +206,7 @@ public class BiomeManager
     // But better still set as a failsafe.
     Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
-    BiomePaint = rawData.Any(data => data.paint != new Color());
+    BiomePaint = rawData.Any(data => data.paint != "");
     var data = rawData.Select(FromData).ToList();
     foreach (var list in LocationList.m_allLocationLists)
       list.m_biomeEnvironments.Clear();

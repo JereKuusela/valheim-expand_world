@@ -50,10 +50,12 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 - v1.24
   - Adds scale, chance and zdo data to the field `objects` in the `expand_locations.yaml`.
   - Adds a new field `noBuildDungeon` to the `expand_locations.yaml` (default is false).
+  - Adds a new field `paint` to the `expand_locations.yaml`.
   - Adds a new field `objects` to the `expand_spawns.yaml`.
   - Adds blueprint support to the field `objects` in the `expand_locations.yaml`.
   - Adds blueprint support to the blueprint files.
   - Adds a new command `ew_icons` to print available location icons.
+  - Changes the format of field `paint` in the `expand_biomes.yaml` to match `expand_locations.yaml`.
   - Changes the field `noBuild` in the `expand_locations.yaml` to also accept numbers.
   - Changes the field `iconAlways` in the `expand_locations.yaml` to also accept text (to set the icon).
   - Changes the field `iconPlaced` in the `expand_locations.yaml` to also accept text (to set the icon).

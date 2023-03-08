@@ -126,7 +126,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - maximumAltitude (default: `1000` meters): Maximum altitude.
 - minimumAltitude (default: `-1000` meters): Minimum altitude.
 - excessFactor (default: `0.5`): How strongly the altitude is reduced if over the maximum or minimum limit. For example 0.5 square roots the excess altitude.
-- paint: Default terrain paint. r = dirt, g = cultivated, b = paved, a = does nothing. Values from 0.0 to 1.0. Using this will lower the performance.
+- paint: Default terrain paint. Using this will lower the performance. Format is `dirt,cultivated,paved,vegetation` (from 0.0 to 1.0) or pre-defined color (cultivated, dirt, grass, grass_dark, patches, paved, paved_dark, paved_dirt, paved_moss)
 - color: Terrain style. Not fully sure how this works but the color value somehow determines which default biome terrain style to use.
 - mapColorMultiplier (default: `1.0`): Changes how quickly the terrain altitude affects the map color. Increasing the value can be useful for low altitude biomes to show the altitude differences better. Lowering the value can be useful for high altitude biomes to reduce amount of white color (from mountain altitudes). Negative value can be useful for underwater biomes to show the map color (normally all underwater areas get blueish color).
 - mapColor: Color in the minimap (red, green, blue, alpha).
@@ -326,6 +326,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - noBuild (default: `false`): If true, players can't build within `exteriorRadius`. If number, player can't build within the given radius.
 - noBuildDungeon (default: `false`): If true, players can't build inside dungeons within `exteriorRadius`. If number, player can't build inside dungeons within the given radius.
 - levelArea (default: `0.5`): Levels within `exteriorRadius` with the given smoothness (only for blueprints). If 0, no leveling is done. If 1, the terrain will be flat.
+- paint: Paints within `exteriorRadius` (only for blueprints). Uses the same smoothness as `levelArea`. Format is `dirt,cultivated,paved,vegetation` (from 0.0 to 1.0) or pre-defined color (cultivated, dirt, grass, grass_dark, patches, paved, paved_dark, paved_dirt, paved_moss)
 - offset: Moves the blueprint up/down. If not given, the blueprint is placed at the terrain level (0.05 meters towards the ground). If 0, the blueprint is used as it is. If for example 5, the blueprint is moved 5 meters up.
 - center: Moves the blueprint center. If not given, the blueprint is automatically centered. For example value 0,0 would use the blueprint as it is.
 

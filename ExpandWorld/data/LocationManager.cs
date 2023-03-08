@@ -474,8 +474,12 @@ public class LocationObjectDataAndSwap
     if (!LocationManager.BlueprintFiles.TryGetValue(location.m_prefabName, out var bp)) return;
     if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
     {
-      if (data.levelArea != 0f)
+      if (data.levelArea != 0f && data.paint != "")
+        Terrain.LevelAndPaint(pos, location.m_exteriorRadius, 1f - data.levelArea, data.paint);
+      else if (data.levelArea != 0f)
         Terrain.Level(pos, location.m_exteriorRadius, 1f - data.levelArea);
+      else if (data.paint != "")
+        Terrain.Paint(pos, location.m_exteriorRadius, data.paint);
     }
     var loc = location.m_location;
     WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;
