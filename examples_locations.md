@@ -40,7 +40,7 @@ This also works for dungeons.
 1. Create a new variant if needed. For example `Eikthyrnir:Wolf`.
 2. Use `tweak_altar amount=0 spawn=Wolf` on any existing altar.
 3. The command can be used on any object but this will cause more data.
-4. Use `data copy` and then paste (CTRL+V) to the `data` field.
+4. Use `object copy` and then paste (CTRL+V) to the `data` field.
 ```
 - prefab: Eikthyrnir:Wolf
 # Causes the altar to spawn a wolf instead and require no item.
