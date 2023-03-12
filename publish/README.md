@@ -60,6 +60,7 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Changes the field `iconAlways` in the `expand_locations.yaml` to also accept text (to set the icon).
   - Changes the field `iconPlaced` in the `expand_locations.yaml` to also accept text (to set the icon).
   - Changes the default no build to not affect dungeons.
+  - Removes the Custom Raids biome compatibility (no longer works with the latest version of Custom Raids).
 
 - v1.23
   - Adds a new field `noBuild` to the `expand_biomes.yaml` (default is false).
