@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 namespace ExpandWorld;
 public class BiomeManager
@@ -43,16 +42,15 @@ public class BiomeManager
   public static Dictionary<Heightmap.Biome, string> BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToNature = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
-  private static Dictionary<Heightmap.Biome, Color> BiomeToPaint = new();
+  private static Dictionary<Heightmap.Biome, Paint> BiomeToPaint = new();
   private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
-  public static bool TryGetPaint(Heightmap.Biome biome, out Color color) => BiomeToPaint.TryGetValue(biome, out color);
+  public static bool TryGetPaint(Heightmap.Biome biome, out Paint color) => BiomeToPaint.TryGetValue(biome, out color);
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
   public static Heightmap.Biome GetBiome(string name) => NameToBiome.TryGetValue(name.ToLower(), out var biome) ? biome : Heightmap.Biome.None;
   public static bool TryGetDisplayName(Heightmap.Biome biome, out string name) => BiomeToDisplayName.TryGetValue(biome, out name);
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain.TryGetValue(biome, out var terrain) ? terrain : biome;
   public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature.TryGetValue(biome, out var nature) ? nature : biome;
-  public static Heightmap.Biome MaxBiome = (Heightmap.Biome)((2 * (int)Heightmap.Biome.Mistlands) - 1);
   public static BiomeEnvSetup FromData(BiomeData data)
   {
     var biome = new BiomeEnvSetup();
@@ -187,7 +185,6 @@ public class BiomeManager
       if (item.paint != "") BiomeToPaint[biome] = Terrain.ParsePaint(item.paint);
       biomeNumber *= 2;
     }
-    MaxBiome = (Heightmap.Biome)(biomeNumber - 1);
     BiomeToTerrain = rawData.ToDictionary(data => GetBiome(data.biome), data =>
     {
       if (TryGetBiome(data.terrain, out var terrain))
