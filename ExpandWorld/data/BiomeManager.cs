@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace ExpandWorld;
 public class BiomeManager
@@ -42,9 +43,9 @@ public class BiomeManager
   public static Dictionary<Heightmap.Biome, string> BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToNature = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
-  private static Dictionary<Heightmap.Biome, Paint> BiomeToPaint = new();
+  private static Dictionary<Heightmap.Biome, Color> BiomeToColor = new();
   private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
-  public static bool TryGetPaint(Heightmap.Biome biome, out Paint color) => BiomeToPaint.TryGetValue(biome, out color);
+  public static bool TryGetColor(Heightmap.Biome biome, out Color color) => BiomeToColor.TryGetValue(biome, out color);
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
   public static Heightmap.Biome GetBiome(string name) => NameToBiome.TryGetValue(name.ToLower(), out var biome) ? biome : Heightmap.Biome.None;
@@ -152,7 +153,7 @@ public class BiomeManager
     if (rawData.Count > 0)
       ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
     BiomeToData.Clear();
-    BiomeToPaint.Clear();
+    BiomeToColor.Clear();
     NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
@@ -182,7 +183,7 @@ public class BiomeManager
       }
       NameToBiome.Add(item.biome.ToLower(), biome);
       BiomeToData[biome] = item;
-      if (item.paint != "") BiomeToPaint[biome] = Terrain.ParsePaint(item.paint);
+      if (item.paint != "") BiomeToColor[biome] = Terrain.ParsePaint(item.paint);
       biomeNumber *= 2;
     }
     BiomeToTerrain = rawData.ToDictionary(data => GetBiome(data.biome), data =>

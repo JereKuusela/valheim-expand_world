@@ -70,10 +70,18 @@ public class LocationData
   public string noBuild = "";
   [DefaultValue("")]
   public string noBuildDungeon = "";
-  [DefaultValue(0.5f)]
-  public float levelArea = 0.5f;
+  [DefaultValue("")]
+  public string levelArea = "";
+  [DefaultValue(0f)]
+  public float levelRadius = 0f;
+  [DefaultValue(0f)]
+  public float levelBorder = 0f;
   [DefaultValue("")]
   public string paint = "";
+  [DefaultValue(null)]
+  public float? paintRadius = null;
+  [DefaultValue(null)]
+  public float? paintBorder = null;
   [DefaultValue(null)]
   public float? offset;
   [DefaultValue("")]

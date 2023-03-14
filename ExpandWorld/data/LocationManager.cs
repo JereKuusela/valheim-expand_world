@@ -429,7 +429,7 @@ public class LocationObjectDataAndSwap
     {
       if (LocationManager.BlueprintFiles.TryGetValue(obj.Prefab, out var bp))
       {
-        SpawnBlueprint(__instance, location, objPos, objRot, mode, spawnedGhostObjects);
+        SpawnBlueprint(bp, __instance, location, objPos, objRot, mode, spawnedGhostObjects);
         return;
       }
       ExpandWorld.Log.LogWarning($"Blueprint prefab {obj.Prefab} not found!");
@@ -453,41 +453,66 @@ public class LocationObjectDataAndSwap
       ZNetView.FinishGhostInit();
     }
   }
-
-  [HarmonyPostfix, HarmonyPriority(Priority.LowerThanNormal)]
-  static void SpawnCustomObjects(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  static void Postfix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
     if (mode == ZoneSystem.SpawnMode.Client) return;
+    var isBluePrint = LocationManager.BlueprintFiles.TryGetValue(location.m_prefabName, out var bp);
+    if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
+      HandleTerrain(pos, location.m_exteriorRadius, isBluePrint, data);
+    if (isBluePrint)
+      SpawnBlueprint(bp, __instance, location, pos, rot, mode, spawnedGhostObjects);
+    SpawnCustomObjects(__instance, location, pos, rot, mode, spawnedGhostObjects);
+  }
+  static void SpawnCustomObjects(ZoneSystem zs, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  {
     if (!LocationManager.Objects.TryGetValue(location.m_prefabName, out var objects)) return;
     var loc = location.m_location;
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
+      SpawnBPO(zs, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
     }
   }
-  [HarmonyPostfix]
-  static void SpawnBlueprint(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  static void HandleTerrain(Vector3 pos, float radius, bool isBlueprint, LocationData data)
   {
-    if (mode == ZoneSystem.SpawnMode.Client) return;
-    if (!LocationManager.BlueprintFiles.TryGetValue(location.m_prefabName, out var bp)) return;
-    if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
+    var level = false;
+    if (data.levelArea == "") level = isBlueprint;
+    else if (data.levelArea == "false") level = false;
+    else level = true;
+    if (!level && data.paint == "") return;
+
+    Terrain.ChangeTerrain(pos, compiler =>
     {
-      if (data.levelArea != 0f && data.paint != "")
-        Terrain.LevelAndPaint(pos, location.m_exteriorRadius, 1f - data.levelArea, data.paint);
-      else if (data.levelArea != 0f)
-        Terrain.Level(pos, location.m_exteriorRadius, 1f - data.levelArea);
-      else if (data.paint != "")
-        Terrain.Paint(pos, location.m_exteriorRadius, data.paint);
-    }
+      if (level)
+      {
+        var levelRadius = data.levelRadius;
+        var levelBorder = data.levelBorder;
+        if (levelRadius == 0f && levelBorder == 0f)
+        {
+          var multiplier = Parse.Float(data.levelArea, 0.5f);
+          levelRadius = multiplier * radius;
+          levelBorder = (1 - multiplier) * radius;
+        }
+        Terrain.Level(compiler, pos, levelRadius, levelBorder);
+      }
+      if (data.paint != "")
+      {
+        var paintRadius = data.paintRadius ?? radius;
+        var paintBorder = data.paintBorder ?? 5f;
+        Terrain.Paint(compiler, pos, data.paint, paintRadius, paintBorder);
+      }
+    });
+  }
+  static void SpawnBlueprint(Blueprint bp, ZoneSystem zs, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  {
     var loc = location.m_location;
     WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     foreach (var obj in bp.Objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      SpawnBPO(__instance, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
+      SpawnBPO(zs, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
     }
     WearNTear.m_randomInitialDamage = false;
   }

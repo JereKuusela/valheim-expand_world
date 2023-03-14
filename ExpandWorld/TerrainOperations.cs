@@ -31,9 +31,12 @@ public partial class Terrain
   };
   public static Color ParsePaint(string paint)
   {
-    if (Paints.TryGetValue(paint, out var color)) return color;
+    return ParsePaintColor(paint);
+  }
+  private static Color ParsePaintColor(string paint)
+  {
     var split = paint.Split(',');
-    if (split.Length < 3) return Color.black;
+    if (split.Length < 3 && Paints.TryGetValue(paint, out var color)) return color;
     return new(Parse.Float(split, 0), Parse.Float(split, 1), Parse.Float(split, 2), Parse.Float(split, 3, 1f));
   }
   private static float CalculateSmooth(float smooth, float distance) => (1f - distance) >= smooth ? 1f : (1f - distance) / smooth;
@@ -98,31 +101,19 @@ public partial class Terrain
     vector.z += (y - hmap.m_width / 2 + 0.5f) * hmap.m_scale;
     return vector;
   }
+  public static void ChangeTerrain(Vector3 pos, Action<TerrainComp> action)
+  {
+    var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
+    if (compiler == null) return;
+    action(compiler);
+    Save(compiler);
+  }
 
-  public static void LevelAndPaint(Vector3 pos, float radius, float smooth, string paint)
+  public static void Level(TerrainComp compiler, Vector3 pos, float radius, float border)
   {
-    var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
-    if (compiler == null) return;
-    Level(compiler, pos, radius, smooth);
-    Paint(compiler, pos, radius, smooth, paint);
-    Save(compiler);
-  }
-  public static void Level(Vector3 pos, float radius, float smooth)
-  {
-    var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
-    if (compiler == null) return;
-    Level(compiler, pos, radius, smooth);
-    Save(compiler);
-  }
-  public static void Paint(Vector3 pos, float radius, string paint)
-  {
-    var compiler = Heightmap.FindHeightmap(pos)?.GetAndCreateTerrainCompiler();
-    if (compiler == null) return;
-    Paint(compiler, pos, radius, 0f, paint);
-    Save(compiler);
-  }
-  private static void Level(TerrainComp compiler, Vector3 pos, float radius, float smooth)
-  {
+    radius += border;
+    if (radius == 0f) return;
+    var smooth = border / radius;
     List<HeightNode> nodes = new();
     GetHeightNodes(nodes, compiler, pos, radius);
     Operation action = (compiler, index, node) =>
@@ -134,10 +125,13 @@ public partial class Terrain
     };
     DoOperation(nodes, pos, radius, action);
   }
-  private static void Paint(TerrainComp compiler, Vector3 pos, float radius, float smooth, string paint)
+  public static void Paint(TerrainComp compiler, Vector3 pos, string paint, float radius, float border)
   {
-    Color color = ParsePaint(paint);
+    radius += border;
+    if (radius == 0f) return;
+    var smooth = border / radius;
     List<PaintNode> nodes = new();
+    Color color = ParsePaint(paint);
     GetPaintNodes(nodes, compiler, pos, radius);
     Operation action = (compiler, index, node) =>
     {

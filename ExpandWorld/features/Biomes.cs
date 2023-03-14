@@ -203,33 +203,33 @@ public class ApplyModifiers
   {
     if (__instance.m_isDistantLod) return;
     if (!BiomeManager.BiomePaint) return;
-    var paint = __instance.m_paintMask;
+    var paintMask = __instance.m_paintMask;
     var biomes = __instance.m_cornerBiomes;
     if (biomes[0] == biomes[1] && biomes[0] == biomes[2] && biomes[0] == biomes[3])
     {
-      if (!BiomeManager.TryGetPaint(biomes[0], out var color))
+      if (!BiomeManager.TryGetColor(biomes[0], out var color))
         return;
       if (color.Equals(new Color()))
         return;
-      var pixels = new Color[paint.width * paint.height];
+      var pixels = new Color[paintMask.width * paintMask.height];
       for (var i = 0; i < pixels.Length; i++)
         pixels[i] = color;
-      paint.SetPixels(pixels);
+      paintMask.SetPixels(pixels);
     }
     else
     {
-      var pixels = new Color[paint.width * paint.height];
-      for (var z = 0; z < paint.height; z++)
+      var pixels = new Color[paintMask.width * paintMask.height];
+      for (var z = 0; z < paintMask.height; z++)
       {
-        for (var x = 0; x < paint.width; x++)
+        for (var x = 0; x < paintMask.width; x++)
         {
           var biome = HeightmapGetBiome.GetBiome(__instance, x, z);
-          if (!BiomeManager.TryGetPaint(biome, out var color))
+          if (!BiomeManager.TryGetColor(biome, out var color))
             continue;
-          pixels[x + z * paint.height] = color;
+          pixels[x + z * paintMask.height] = color;
         }
       }
-      paint.SetPixels(pixels);
+      paintMask.SetPixels(pixels);
     }
   }
 
