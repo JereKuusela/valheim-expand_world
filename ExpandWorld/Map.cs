@@ -1,5 +1,6 @@
 using HarmonyLib;
 using UnityEngine;
+
 namespace ExpandWorld;
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Awake))]
@@ -17,9 +18,9 @@ public class MinimapAwake
     __instance.m_maxZoom = Mathf.Max(1f, Configuration.MapSize);
     OriginalPixelSize = __instance.m_pixelSize;
     __instance.m_pixelSize *= Configuration.MapPixelSize;
-    __instance.m_mapImageLarge.rectTransform.localScale = new(Configuration.MapSize, Configuration.MapSize, Configuration.MapSize);
   }
 }
+
 
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapData))]
 public class InitializeWhenDimensionsChange

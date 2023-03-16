@@ -40,6 +40,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.25
+  - Fixes map pins moving when panning the map with higher map sizes.
+
 - v1.24
   - Adds scale, chance and zdo data to the field `objects` in the `expand_locations.yaml`.
   - Adds a new field `noBuildDungeon` to the `expand_locations.yaml` (default is false).

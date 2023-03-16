@@ -106,7 +106,6 @@ public partial class Configuration
       if (newValue == Minimap.instance.m_textureSize) return;
       Minimap.instance.m_maxZoom = MinimapAwake.OriginalMinZoom * Mathf.Max(1f, MapSize);
       MapGeneration.UpdateTextureSize(Minimap.instance, newValue);
-      Minimap.instance.m_mapImageLarge.rectTransform.localScale = new(MapSize, MapSize, MapSize);
       Generate.Map();
     };
     configServerOnly = wrapper.Bind(section, "Server only", false, false, "If true, enables server side only mode and clients can't have the mod installed.");
