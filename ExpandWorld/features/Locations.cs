@@ -118,3 +118,8 @@ public class PlaceLocationsFailsafe
     return true;
   }
 }
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.PlaceZoneCtrl))]
+public class PlaceZoneCtrl
+{
+  static bool Prefix() => Configuration.ZoneSpawners;
+}
