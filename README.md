@@ -34,7 +34,7 @@ This mod can be used only on the server. However only following files can be con
 - `expand_events.yaml`: Fields enabled, duration, nearBaseOnly, biome, requiredGlobalKeys, notRequiredGlobalKeys, pauseIfNoPlayerInArea, random. 
 - `expand_locations.yaml`: Only normally available or disabled [prefabs](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) can be used.
 - `expand_vegetation.yaml`: All fields.
-- `expand_world.cfg`: Only settings Location multiplier, Random event chance and Random event interval.
+- `expand_world.cfg`: Only settings Location multiplier, Random event chance, Random event interval and Zone spawners.
 
 When doing this, enable `Server only` on the config to remove version check.
 
@@ -107,7 +107,7 @@ These files are generated automatically to the `config/expand_world` folder when
 
 Each file can be disabled from the main .cfg file to improve compatibility and performance (less network usage and processing when joining the server).
 
-All files with the same start will be loaded. For example both `expand_biomes.yaml` and `expand_biomes_custom.yaml` would get loaded to biomes.
+Data can be split to multiple files. The files are loaded alphabetically in reverse order. For example `expand_biomes_custom.yaml` would be loaded first and then `expand_biomes.yaml`.
 
 ## Biomes
 
@@ -381,6 +381,8 @@ The file `expand_spawns.yaml` sets the spawned creatures.
 
 See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 
+If setting Zone Spawners is disabled, all spawns stop working from unexplored areas.
+
 - prefab: Identifier of the object. Any [object](https://valheim.fandom.com/wiki/Item_IDs) is valid, not just creatures.
 - enabled (default: `false`): Quick way to disable this entry.
 - biome: List of possible biomes.
@@ -424,6 +426,8 @@ See the [wiki](https://valheim.fandom.com/wiki/Spawn_zones) for more info.
 The file `expand_events.yaml` sets the boss and random events.
 
 See the [wiki](https://valheim.fandom.com/wiki/Events) for more info.
+
+If setting Zone Spawners is disabled, all spawns stop working from unexplored areas.
 
 - name: Identifier.
 - enabled (default: `false`): Quick way to disable this entry.

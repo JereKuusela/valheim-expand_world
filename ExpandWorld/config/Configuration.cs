@@ -39,6 +39,9 @@ public partial class Configuration
   public static ConfigEntry<string> configBiomeStretch;
   public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
 
+  public static ConfigEntry<bool> configZoneSpawners;
+  public static bool ZoneSpawners => configZoneSpawners.Value;
+
   public static ConfigEntry<string> configDistanceWiggleLength;
   public static float DistanceWiggleLength => ConfigWrapper.Floats[configDistanceWiggleLength];
   public static ConfigEntry<string> configDistanceWiggleWidth;
@@ -125,6 +128,7 @@ public partial class Configuration
     };
     WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
+    configZoneSpawners = wrapper.Bind(section, "Zone spawners", true, false, "If disabled, zone spawners are not generated.");
 
     section = "2. Features";
 
