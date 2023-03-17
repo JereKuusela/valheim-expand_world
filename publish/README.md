@@ -6,6 +6,8 @@ Always back up your world before making any changes!
 
 Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm2eKLrk)).
 
+Some features are available also as server only mode.
+
 # Usage
 
 See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/main/README.md).
@@ -17,6 +19,7 @@ See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/ma
 # Tutorials
 
 - How to make custom biomes: https://youtu.be/TgFhW0MtYyw (33 minutes, created by StonedProphet)
+- How to use blueprints as locations with custom spawners: https://youtu.be/DXtm-WLF6KE (30 minutes, created by StonedProphet)
 
 ## Migration from version 1.23
 
@@ -80,31 +83,3 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
   - Adds a new field `scaleUniform` to the `expand_vegetations.yaml` (default is true).
   - Improves mod compatibility.
   - Fixes the vegetation scaling being separate for each axis.
-
-- v1.20
-  - Fixes None biome not being saved to the `expand_spawns.yaml` which caused spawning in every biome (some mods have the default biome as None).
-
-- v1.19
-  - Fixes default config generation sometimes failing.
-
-- v1.18
-  - Adds data sync for location `prefab`, `exteriorRadius` and `noBuild` fields.
-  - Fixes automatic migration for missing `exteriorRadius` overwriting blueprint and location variant names.
-  - Fixes minimap loading error with Marketplace territories.
-  - Improves compatiblity with mods adding new vegetation.
-
-- v1.17
-  - Adds a new command `ew_seeds` to output seed information.
-  - Adds a new setting `seed` to set the world seed.
-  - Adds preloading for biome names (improves mod compatibility).
-  - Adds automatic migration for missing `exteriorRadius` in `expand_locations.yaml`.	
-  - Adds new fields `offset` and `center` (for blueprints) to the `expand_locations.yaml`.
-  - Changes console commands to start with `ew_`.
-  - Changes the format of `objects`, `objectData` and `objectSwap` in `expand_locations_yaml` (automatically migrated).
-  - Changes the `levelArea` field in `expand_locations_yaml` to be a numeric (for smoothness).
-  - Changes the location blueprints to snap to the ground.
-  - Increases terrain leveling performance (for blueprints).
-  - Increases the default altitude cap from 1000 meters to 10000 meters.
-  - Increases the network timeout duration to 10x of the normal.
-  - Fixes objects sometimes being duplicated.
-  - Fixes purple thunder sky if a custom environment is not set properly.
