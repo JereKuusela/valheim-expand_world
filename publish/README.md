@@ -43,6 +43,9 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 # Changelog
 
+- v1.26
+  - Adds blueprint support for vegetation.
+
 - v1.25
   - Adds a new setting Zone Spawners to the config file.
   - Changes the data files to be loaded in reverse order (so thaat the original files are loaded last).

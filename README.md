@@ -85,6 +85,8 @@ The final water depth can be multiplied with `Water depth multiplier`.
 
 Amount of forest can be changed with `Forest multiplier`. 
 
+Note: Altitude based snow is hard coded and can't be changed.
+
 # Seeds
 
 The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it.
@@ -340,7 +342,7 @@ The file `expand_vegetations.yaml` sets the generated objects.
 
 Changes only apply to unexplored areas. Upgrade World mod can be used to reset areas.
 
-- prefab: Identifier of the object.
+- prefab: Identifier of the object or name of blueprint file.
 - enabled (default: `false`): Quick way to disable this entry.
 - min (default: `1`): Minimum amount (of groups) to be placed.
 - max (default: `1`): Maximum amount (of groups) to be placed. If less than 1, has only a chance to appear.

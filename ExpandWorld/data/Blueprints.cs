@@ -78,11 +78,6 @@ public class Blueprints
     return planBuild.Concat(buildShare).OrderBy(s => s);
   }
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
-  public static bool Exists(string name)
-  {
-    var path = Files().FirstOrDefault(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_") == name);
-    return path != null;
-  }
   public static bool TryGetBluePrint(string name, out Blueprint blueprint)
   {
     blueprint = new();
