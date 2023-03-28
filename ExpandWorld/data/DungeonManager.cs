@@ -49,9 +49,10 @@ public class DungeonManager
     DungeonData data = new();
     data.name = Utils.GetPrefabName(dg.gameObject);
     data.algorithm = dg.m_algorithm.ToString();
+    data.themes = Data.FromEnum(dg.m_themes);
+    data.interiorTransform = dg.m_useCustomInteriorTransform;
     if (dg.m_algorithm == DungeonGenerator.Algorithm.Dungeon)
     {
-      data.interiorTransform = dg.m_useCustomInteriorTransform;
       data.doorChance = dg.m_doorChance;
       data.doorTypes = dg.m_doorTypes.Select(type => new DungeonDoorData()
       {
@@ -63,12 +64,10 @@ public class DungeonManager
       data.minRequiredRooms = dg.m_minRequiredRooms;
       data.minRooms = dg.m_minRooms;
       data.requiredRooms = Data.FromList(dg.m_requiredRooms);
-      data.themes = Data.FromEnum(dg.m_themes);
       data.alternative = dg.m_alternativeFunctionality;
     }
     if (dg.m_algorithm == DungeonGenerator.Algorithm.CampRadial)
     {
-      data.interiorTransform = dg.m_useCustomInteriorTransform;
       data.campRadiusMax = dg.m_campRadiusMax;
       data.campRadiusMin = dg.m_campRadiusMin;
       data.minRooms = dg.m_minRooms;
@@ -80,7 +79,6 @@ public class DungeonManager
     }
     if (dg.m_algorithm == DungeonGenerator.Algorithm.CampGrid)
     {
-      data.interiorTransform = dg.m_useCustomInteriorTransform;
       data.maxTilt = dg.m_maxTilt;
       data.tileWidth = dg.m_tileWidth;
       data.gridSize = dg.m_gridSize;
@@ -110,7 +108,7 @@ public class DungeonManager
   }
   public static void FromSetting(string yaml)
   {
-    // NOT READY if (Helper.IsClient()) Set(yaml);
+    if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml)
   {

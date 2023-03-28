@@ -21,9 +21,9 @@ public class DungeonData
   public string themes = "";
   public DungeonDoorData[] doorTypes = new DungeonDoorData[0];
   public float doorChance;
-  public float maxTilt;
+  public float maxTilt = 90f;
   public float tileWidth;
-  public float spawnChance;
+  public float spawnChance = 1f;
   public float campRadiusMin;
   public float campRadiusMax;
   public float minAltitude;

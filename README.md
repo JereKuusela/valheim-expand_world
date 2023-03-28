@@ -290,6 +290,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - enabled (default: `true`): Quick way to disable this entry.
 - biome: List of possible biomes.
 - biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome).
+- dungeon: Overrides the default dungeon generator with a custom one from `expand_dungeons.yaml`.
 - quantity: Maximum amount. Actual amount is determined if enough suitable positions are found. The base .cfg has a setting to multiply these.
 - minDistance (default: `0.0` of world radius): Minimum distance from the world center. Values higher than 1.0 are considered meters and are automatically scaled with the world radius.
 - maxDistance (default: `1.0` of world radius): Maximum distance from the world center. Values higher than 1.0 are considered meters and are automatically scaled with the world radius.
@@ -335,6 +336,34 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - paintBorder (default: `5`): Adds a smooth transition around the `paintRadius`.
 - offset: Moves the blueprint up/down. If not given, the blueprint is placed at the terrain level (0.05 meters towards the ground). If 0, the blueprint is used as it is. If for example 5, the blueprint is moved 5 meters up.
 - center: Moves the blueprint center. If not given, the blueprint is automatically centered. For example value 0,0 would use the blueprint as it is.
+
+## Dungeons
+
+The file `expand_dungeons.yaml` sets dungeon generators.
+
+- name: Name of the dungeon generator.
+- algorithm: Type of the dungeon. Possible values are `Dungeon`, `CampGrid` or `CampRadial`.
+- themes: List of available room sets. Possible values are `Crypt`, `SunkenCrypt`, `Cave`, `ForestCrypt`, `GoblinCamp`, `MeadowsVillage`, `MeadowsFarm`, `DvergerTown`, `DvergerBoss`. For example `MeadowsVillage,MeadowsFarm` would use both sets.
+- maxRooms (default: `1`): Maximum amount of rooms. Only for Dungeon and CampRadial.
+- minRooms (default: `1`): Minimum amount of rooms. Only for Dungeon and CampRadial.
+- minRequiredRooms (default: `1`): Minimum amount of rooms in the required list. Only for Dungeon and CampRadial.
+- requiredRooms: List of required rooms. Generator stops after required rooms and minimum amount of rooms are placed. Use command `ew_rooms` to print list of rooms.
+- alternative (default: `false`): If true, can place random rooms as the end caps (possibly leading to bigger dungeons?). Only for Dungeon.
+- doorChance (default: `0`): Chance for a door to be placed. Only for Dungeon.
+- doorTypes: List of possible doors. Each door has the same chance of being selected.
+  - prefab: Identifier of the door object.
+  - connectionType: Type of the door connection.
+  - chance: Chance to be spawned if this door is selected. 
+- maxTilt (default: `90` degrees): Maximum terrain angle. Only for CampGrid and CampRadial.
+- perimeterSections (default: `0`): Amount of perimeter walls to spawn. Only for CampRadial.
+- perimeterBuffer (default: `0` meters): Size of the perimeter area around the camp. Only for CampRadial.
+- campRadiusMin (default: `0` meters): Minimum radius of the camp. Only for CampRadial.
+- campRadiusMax (default: `0` meters): Maximum radius of the camp. Only for CampRadial.
+- minAltitude (default: `0` meters): Minimum altitude for the room. Only for CampRadial.
+- gridSize (default: `0`): Size of the grid. Only for CampGrid.
+- tileWidth (default: `0` meters): Size of a single tile. Only for CampGrid.
+- spawnChance (default: `1`): Chance for each tile to spawn. Only for CampGrid.
+- interiorTransform (default: `false`): Some locations may require this being true. If you notice weird warnings, try setting this to true.
 
 ## Vegetation
 

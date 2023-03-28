@@ -30,14 +30,14 @@ public class LoadAndSaveData
       VegetationManager.FromFile();
       EventManager.FromFile();
       SpawnManager.FromFile();
-      // NOT READY DungeonManager.FromFile();
+      DungeonManager.FromFile();
       BiomeManager.ToFile();
       WorldManager.ToFile();
       VegetationManager.ToFile();
       EventManager.ToFile();
       EnvironmentManager.ToFile();
       ClutterManager.ToFile();
-      // NOT READY DungeonManager.ToFile();
+      DungeonManager.ToFile();
       // Spawn data handled elsewhere.
     }
     // Overwrite location setup with our stuff.

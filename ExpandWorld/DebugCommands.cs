@@ -85,6 +85,18 @@ public class DebugCommands
       var names = mm.m_locationIcons.Select(icon => icon.m_name).Concat(mm.m_icons.Select(icon => icon.m_name.ToString()));
       args.Context.AddString(string.Join("\n", names));
     }, true);
+    new Terminal.ConsoleCommand("ew_rooms", "- Prints available rooms.", args =>
+    {
+      var db = DungeonDB.instance;
+      if (!db) return;
+      var names = db.m_rooms.Select(room => room.m_room.name).ToList();
+      while (names.Count > 0)
+      {
+        var line = names.Take(5);
+        names.RemoveRange(0, Math.Min(5, names.Count));
+        args.Context.AddString(string.Join(", ", line));
+      }
+    }, true);
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {
       var wg = WorldGenerator.m_instance;

@@ -45,6 +45,8 @@ Donations: [Buy me a computer](https://www.buymeacoffee.com/jerekuusela)
 
 - v1.26
   - Adds blueprint support for vegetation.
+  - Adds `expand_dungeons.yaml`.
+  - Adds a new field `dungeon` to the `expand_locations.yaml`.
 
 - v1.25
   - Adds a new setting Zone Spawners to the config file.
