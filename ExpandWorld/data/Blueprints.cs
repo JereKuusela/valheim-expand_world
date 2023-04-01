@@ -71,11 +71,15 @@ public class Blueprints
 {
   private static IEnumerable<string> Files()
   {
-    if (!Directory.Exists(Configuration.PlanBuildFolder)) Directory.CreateDirectory(Configuration.PlanBuildFolder);
-    if (!Directory.Exists(Configuration.BuildShareFolder)) Directory.CreateDirectory(Configuration.BuildShareFolder);
-    var planBuild = Directory.EnumerateFiles(Configuration.PlanBuildFolder, "*.blueprint", SearchOption.AllDirectories);
-    var buildShare = Directory.EnumerateFiles(Configuration.BuildShareFolder, "*.vbuild", SearchOption.AllDirectories);
-    return planBuild.Concat(buildShare).OrderBy(s => s);
+    if (!Directory.Exists(Configuration.PlanBuildGlobalFolder)) Directory.CreateDirectory(Configuration.PlanBuildGlobalFolder);
+    if (!Directory.Exists(Configuration.PlanBuildLocalFolder)) Directory.CreateDirectory(Configuration.PlanBuildLocalFolder);
+    if (!Directory.Exists(Configuration.BuildShareGlobalFolder)) Directory.CreateDirectory(Configuration.BuildShareGlobalFolder);
+    if (!Directory.Exists(Configuration.BuildShareLocalFolder)) Directory.CreateDirectory(Configuration.BuildShareLocalFolder);
+    var planBuildGlobal = Directory.EnumerateFiles(Configuration.PlanBuildGlobalFolder, "*.blueprint", SearchOption.AllDirectories);
+    var planBuildLocal = Directory.EnumerateFiles(Configuration.PlanBuildLocalFolder, "*.blueprint", SearchOption.AllDirectories);
+    var buildShareGlobal = Directory.EnumerateFiles(Configuration.BuildShareGlobalFolder, "*.vbuild", SearchOption.AllDirectories);
+    var buildShareLocal = Directory.EnumerateFiles(Configuration.BuildShareLocalFolder, "*.vbuild", SearchOption.AllDirectories);
+    return planBuildGlobal.Concat(planBuildLocal).Concat(buildShareGlobal).Concat(buildShareLocal).OrderBy(s => s);
   }
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
   public static bool TryGetBluePrint(string name, out Blueprint blueprint)

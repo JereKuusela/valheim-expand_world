@@ -1,3 +1,5 @@
+using System.IO;
+using BepInEx;
 using BepInEx.Configuration;
 using ServerSync;
 using Service;
@@ -90,9 +92,11 @@ public partial class Configuration
   public static ConfigEntry<string> configHeightSeed;
   public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
   public static ConfigEntry<string> configPlanBuildFolder;
-  public static string PlanBuildFolder => configPlanBuildFolder.Value;
+  public static string PlanBuildGlobalFolder => configPlanBuildFolder.Value;
+  public static string PlanBuildLocalFolder => Path.Combine(Paths.GameRootPath, configPlanBuildFolder.Value);
   public static ConfigEntry<string> configBuildShareFolder;
-  public static string BuildShareFolder => configBuildShareFolder.Value;
+  public static string BuildShareGlobalFolder => configBuildShareFolder.Value;
+  public static string BuildShareLocalFolder => Path.Combine(Paths.GameRootPath, configBuildShareFolder.Value);
 
 
 #nullable enable
