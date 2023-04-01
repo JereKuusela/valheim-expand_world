@@ -40,31 +40,33 @@ public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
   public float Radius = 0f;
-  public void Center(Vector2? offset)
+  public void Center(Vector3 offset, string centerPiece = "piece_bpcenterpointinstance")
   {
     Bounds bounds = new();
-    foreach (var obj in Objects)
-      bounds.Encapsulate(obj.Pos);
-    Radius = Utils.LengthXZ(bounds.extents);
-    var center = offset ?? new(bounds.center.x, bounds.center.z);
-    foreach (var obj in Objects)
-    {
-      obj.Pos.x -= center.x;
-      obj.Pos.z -= center.y;
-    }
-  }
-  public void Offset(float? offset)
-  {
     var y = float.MaxValue;
-    if (offset.HasValue) y = -offset.Value;
-    else
-    {
-      foreach (var obj in Objects) y = Mathf.Min(y, obj.Pos.y);
-      // Slightly towards the ground to prevent gaps.
-      y += 0.05f;
-    }
     foreach (var obj in Objects)
-      obj.Pos.y -= y;
+    {
+      y = Mathf.Min(y, obj.Pos.y);
+      bounds.Encapsulate(obj.Pos);
+    }
+    // Slightly towards the ground to prevent gaps.
+    y += 0.05f;
+
+    Vector3 center = new(bounds.center.x, y, bounds.center.z);
+    foreach (var obj in Objects)
+    {
+      if (obj.Prefab == centerPiece)
+      {
+        center = obj.Pos;
+        // Bit hacky way to prevent it from being spawned.
+        obj.Chance = 0f;
+        break;
+      }
+    }
+    Radius = Utils.LengthXZ(bounds.extents);
+    center -= offset;
+    foreach (var obj in Objects)
+      obj.Pos -= center;
   }
 }
 public class Blueprints
@@ -79,7 +81,7 @@ public class Blueprints
     var planBuildLocal = Directory.EnumerateFiles(Configuration.PlanBuildLocalFolder, "*.blueprint", SearchOption.AllDirectories);
     var buildShareGlobal = Directory.EnumerateFiles(Configuration.BuildShareGlobalFolder, "*.vbuild", SearchOption.AllDirectories);
     var buildShareLocal = Directory.EnumerateFiles(Configuration.BuildShareLocalFolder, "*.vbuild", SearchOption.AllDirectories);
-    return planBuildGlobal.Concat(planBuildLocal).Concat(buildShareGlobal).Concat(buildShareLocal).OrderBy(s => s);
+    return planBuildGlobal.Concat(planBuildLocal).Concat(buildShareGlobal).Concat(buildShareLocal).Distinct().OrderBy(s => s);
   }
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
   public static bool TryGetBluePrint(string name, out Blueprint blueprint)

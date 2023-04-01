@@ -1,4 +1,7 @@
 - v1.27
+  - Adds a new field `centerPiece` to the `expand_locations.yaml`.
+  - Changes the field `offset` of the `expand_locations.yaml` to x,z,y.
+  - Removes the field `center` from the `expand_locations.yaml` as obsolete.
   - Changes the blueprint search path also to include the mod profile folder.
 
 - v1.26

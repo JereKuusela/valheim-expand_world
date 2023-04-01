@@ -229,15 +229,14 @@ public class LocationManager
     {
       if (Blueprints.TryGetBluePrint(prefabName, out var bp))
       {
-        float? offset = null;
-        Vector2? center = null;
+        Vector3 offset = Vector3.zero;
+        string centerPiece = "piece_bpcenterpointinstance";
         if (LocationData.TryGetValue(item.m_prefabName, out var data))
         {
-          offset = data.offset;
-          center = Parse.VectorXY(data.center);
+          offset = Parse.VectorXZY(data.offset.Split(','), 0);
+          centerPiece = data.centerPiece;
         }
-        bp.Center(center);
-        bp.Offset(offset);
+        bp.Center(offset, centerPiece);
         BlueprintFiles[prefabName] = bp;
         item.m_prefab = new();
         item.m_location = GetBluePrintLocation(item.m_prefabName);
