@@ -539,9 +539,9 @@ public class DungeonDoorDataAndSwap
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GetLocationIcons))]
 public class LocationIcons
 {
-  static void Postfix(ZoneSystem __instance, Dictionary<Vector3, string> icons)
+  static bool Prefix(ZoneSystem __instance, Dictionary<Vector3, string> icons)
   {
-    if (!ZNet.instance.IsServer()) return;
+    if (!ZNet.instance.IsServer()) return false;
     foreach (var kvp in __instance.m_locationInstances)
     {
       var loc = kvp.Value.m_location;
@@ -560,6 +560,7 @@ public class LocationIcons
         if (always != "") icons[pos] = always;
       }
     }
+    return false;
   }
 }
 
