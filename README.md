@@ -334,7 +334,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - paint: Paints the terrain. Format is `dirt,cultivated,paved,vegetation` (from 0.0 to 1.0) or a pre-defined color (cultivated, dirt, grass, grass_dark, patches, paved, paved_dark, paved_dirt, paved_moss).
 - paintRadius (default: `exteriorRadius`): Size of the painted area.
 - paintBorder (default: `5`): Adds a smooth transition around the `paintRadius`.
-- centerPiece (default: `piece_bpcenterpointinstance`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
+- centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
 - offset: Moves the blueprint away from the center point. Format is `x,z,y`. For example value 0,0,5 would move the blueprint 5 meters up.	
 
 ## Dungeons

@@ -220,6 +220,37 @@ public class LocationManager
     }
     return location;
   }
+
+  public static void ReloadBlueprint(string name)
+  {
+    name = Path.GetFileNameWithoutExtension(name);
+    var locs = ZoneSystem.instance.m_locations.Where(l => l.m_prefabName.Split(':')[0] == name).ToList();
+    if (locs.Count == 0) return;
+    ExpandWorld.Log.LogInfo($"Reloading blueprint {name} used by {locs.Count} location.");
+    foreach (var loc in locs)
+      SetupBlueprint(loc);
+  }
+
+  private static bool SetupBlueprint(ZoneSystem.ZoneLocation location)
+  {
+    var name = location.m_prefabName.Split(':')[0];
+    if (!Blueprints.TryGetBluePrint(name, out var bp)) return false;
+    Vector3 offset = Vector3.zero;
+    string centerPiece = "piece_bpcenterpoint";
+    if (LocationData.TryGetValue(name, out var data))
+    {
+      offset = Parse.VectorXZY(data.offset.Split(','), 0);
+      centerPiece = data.centerPiece;
+    }
+    bp.Center(offset, centerPiece);
+    BlueprintFiles[location.m_prefabName] = bp;
+    location.m_prefab = new();
+    location.m_location = GetBluePrintLocation(location.m_prefabName);
+    ApplyLocationData(location, bp.Radius + 5);
+    location.m_netViews = new();
+    location.m_randomSpawns = new();
+    return true;
+  }
   ///<summary>Copies setup from locations.</summary>
   private static void Setup(ZoneSystem.ZoneLocation item, bool showWarnings)
   {
@@ -227,24 +258,7 @@ public class LocationManager
     item.m_hash = item.m_prefabName.GetStableHashCode();
     if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
     {
-      if (Blueprints.TryGetBluePrint(prefabName, out var bp))
-      {
-        Vector3 offset = Vector3.zero;
-        string centerPiece = "piece_bpcenterpointinstance";
-        if (LocationData.TryGetValue(item.m_prefabName, out var data))
-        {
-          offset = Parse.VectorXZY(data.offset.Split(','), 0);
-          centerPiece = data.centerPiece;
-        }
-        bp.Center(offset, centerPiece);
-        BlueprintFiles[prefabName] = bp;
-        item.m_prefab = new();
-        item.m_location = GetBluePrintLocation(item.m_prefabName);
-        ApplyLocationData(item, bp.Radius + 5);
-        item.m_netViews = new();
-        item.m_randomSpawns = new();
-        return;
-      }
+      if (SetupBlueprint(item)) return;
       if (showWarnings)
         ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
       return;

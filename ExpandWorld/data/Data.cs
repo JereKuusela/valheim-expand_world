@@ -83,17 +83,32 @@ public class Data : MonoBehaviour
   public static bool IsReady => (ExpandWorld.ConfigSync.IsSourceOfTruth && BiomesLoaded) || ExpandWorld.ConfigSync.InitialSyncDone;
   public static bool BiomesLoaded = false;
 
-  public static void SetupWatcher(string pattern, Action action)
+  private static void SetupWatcher(string folder, string pattern, Action<string> action)
   {
-    FileSystemWatcher watcher = new(ExpandWorld.YamlDirectory, pattern);
-    watcher.Created += (s, e) => action();
-    watcher.Changed += (s, e) => action();
-    watcher.Renamed += (s, e) => action();
-    watcher.Deleted += (s, e) => action();
+    FileSystemWatcher watcher = new(folder, pattern);
+    watcher.Created += (s, e) => action(e.Name);
+    watcher.Changed += (s, e) => action(e.Name);
+    watcher.Renamed += (s, e) => action(e.Name);
+    watcher.Deleted += (s, e) => action(e.Name);
     watcher.IncludeSubdirectories = true;
     watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
     watcher.EnableRaisingEvents = true;
   }
+  private static void ReloadBlueprint(string name)
+  {
+    VegetationManager.ReloadBlueprint(name);
+    LocationManager.ReloadBlueprint(name);
+  }
+  public static void SetupBlueprintWatcher()
+  {
+    SetupWatcher(Configuration.PlanBuildGlobalFolder, "*.blueprint", ReloadBlueprint);
+    if (Path.GetFullPath(Configuration.PlanBuildLocalFolder) != Path.GetFullPath(Configuration.PlanBuildGlobalFolder))
+      SetupWatcher(Configuration.PlanBuildLocalFolder, "*.blueprint", ReloadBlueprint);
+    SetupWatcher(Configuration.BuildShareGlobalFolder, "*.vbuild", ReloadBlueprint);
+    if (Path.GetFullPath(Configuration.BuildShareLocalFolder) != Path.GetFullPath(Configuration.BuildShareGlobalFolder))
+      SetupWatcher(Configuration.BuildShareLocalFolder, "*.vbuild", ReloadBlueprint);
+  }
+  public static void SetupWatcher(string pattern, Action action) => SetupWatcher(ExpandWorld.YamlDirectory, pattern, _ => action());
   public static IDeserializer Deserializer() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance)
     .WithTypeConverter(new FloatConverter()).Build();
   public static IDeserializer DeserializerUnSafe() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance)

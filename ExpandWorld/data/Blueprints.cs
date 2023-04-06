@@ -40,7 +40,7 @@ public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
   public float Radius = 0f;
-  public void Center(Vector3 offset, string centerPiece = "piece_bpcenterpointinstance")
+  public void Center(Vector3 offset, string centerPiece = "piece_bpcenterpoint")
   {
     Bounds bounds = new();
     var y = float.MaxValue;
@@ -71,17 +71,27 @@ public class Blueprint
 }
 public class Blueprints
 {
+  private static IEnumerable<string> LoadFiles(string folder, IEnumerable<string> bps)
+  {
+    if (Directory.Exists(folder))
+    {
+      var blueprints = Directory.EnumerateFiles(folder, "*.blueprint", SearchOption.AllDirectories);
+      var vbuilds = Directory.EnumerateFiles(folder, "*.vbuild", SearchOption.AllDirectories);
+      return bps.Concat(blueprints).Concat(vbuilds);
+    }
+    return bps;
+  }
   private static IEnumerable<string> Files()
   {
-    if (!Directory.Exists(Configuration.PlanBuildGlobalFolder)) Directory.CreateDirectory(Configuration.PlanBuildGlobalFolder);
-    if (!Directory.Exists(Configuration.PlanBuildLocalFolder)) Directory.CreateDirectory(Configuration.PlanBuildLocalFolder);
-    if (!Directory.Exists(Configuration.BuildShareGlobalFolder)) Directory.CreateDirectory(Configuration.BuildShareGlobalFolder);
-    if (!Directory.Exists(Configuration.BuildShareLocalFolder)) Directory.CreateDirectory(Configuration.BuildShareLocalFolder);
-    var planBuildGlobal = Directory.EnumerateFiles(Configuration.PlanBuildGlobalFolder, "*.blueprint", SearchOption.AllDirectories);
-    var planBuildLocal = Directory.EnumerateFiles(Configuration.PlanBuildLocalFolder, "*.blueprint", SearchOption.AllDirectories);
-    var buildShareGlobal = Directory.EnumerateFiles(Configuration.BuildShareGlobalFolder, "*.vbuild", SearchOption.AllDirectories);
-    var buildShareLocal = Directory.EnumerateFiles(Configuration.BuildShareLocalFolder, "*.vbuild", SearchOption.AllDirectories);
-    return planBuildGlobal.Concat(planBuildLocal).Concat(buildShareGlobal).Concat(buildShareLocal).Distinct().OrderBy(s => s);
+    IEnumerable<string> bps = new List<string>();
+    bps = LoadFiles(Configuration.PlanBuildGlobalFolder, bps);
+    if (Path.GetFullPath(Configuration.PlanBuildLocalFolder) != Path.GetFullPath(Configuration.PlanBuildGlobalFolder))
+      bps = LoadFiles(Configuration.PlanBuildLocalFolder, bps);
+
+    bps = LoadFiles(Configuration.BuildShareGlobalFolder, bps);
+    if (Path.GetFullPath(Configuration.BuildShareLocalFolder) != Path.GetFullPath(Configuration.BuildShareGlobalFolder))
+      bps = LoadFiles(Configuration.BuildShareLocalFolder, bps);
+    return bps.Distinct().OrderBy(s => s);
   }
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
   public static bool TryGetBluePrint(string name, out Blueprint blueprint)
@@ -280,5 +290,4 @@ public class Blueprints
     if (string.IsNullOrEmpty(s)) return defaultValue;
     return float.Parse(s, NumberStyles.Any, NumberFormatInfo.InvariantInfo);
   }
-
 }

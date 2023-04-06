@@ -84,5 +84,5 @@ public class LocationData
   public float? paintBorder = null;
   [DefaultValue("")]
   public string offset = "";
-  public string centerPiece = "piece_bpcenterpointinstance";
+  public string centerPiece = "piece_bpcenterpoint";
 }

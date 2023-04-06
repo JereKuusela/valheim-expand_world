@@ -16,6 +16,16 @@ public class VegetationManager
   public static string Pattern = "expand_vegetation*.yaml";
   public static Dictionary<string, Blueprint> BlueprintFiles = new();
 
+  public static void ReloadBlueprint(string name)
+  {
+    if (!Blueprints.TryGetBluePrint(name, out var bp)) return;
+    name = Path.GetFileNameWithoutExtension(name);
+    var vegs = ZoneSystem.instance.m_vegetation.Where(l => l.m_prefab.name.Split(':')[0] == name).ToList();
+    if (vegs.Count == 0) return;
+    ExpandWorld.Log.LogInfo($"Reloading blueprint {name} used by {vegs.Count} vegetationaw  .");
+    foreach (var veg in vegs)
+      BlueprintFiles[veg.m_prefab.name] = bp;
+  }
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data)
   {
     var veg = new ZoneSystem.ZoneVegetation();
