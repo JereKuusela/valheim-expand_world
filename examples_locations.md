@@ -112,7 +112,7 @@ Blueprint with 20 meters flat area:
   levelBorder: 0
 ```
 
-Blueprint with custom centering:
+Blueprint with custom centering (add GlowingMushroom to your blueprint as the center marker):
 ```
 - prefab: Blueprint
   centerPiece: GlowingMushroom
