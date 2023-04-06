@@ -96,21 +96,41 @@ Spawner_DraugrPile:-5,0,-6,... -> 4.5,0,-4.5
 1. Use PlanBuild mod or `hammer_save` to create a blueprint.
 2. Add a new entry and use the blueprint filename as the `prefab`.
 3. Use `hammer_location` to test the location. Note: The blueprint only shows up after being placed. It's normal to see nothing while placing it.
-4. By default, the blueprint is automatically centered. Adjust the `offset` and `center` fields if needed.
-5. By default, the terrain is smoothly leveled (0.5). Adjust the `levelArea` and `exteriorRadius` fields if needed.
+4. By default, the blueprint is automatically centered. Adjust the `offset` and `centerPiece` fields if needed.
+5. By default, the terrain is smoothly leveled. Adjust the `levelArea`, `levelRadius` and `levelBorder` fields if needed.
 
-To use the blueprint as it is, with custom radius and no leveling:
+Blueprint without leveling:
 ```
 - prefab: Blueprint
-  offset: 0
-  center: 0,0
-  exteriorRadius: 20 
-  levelArea: 0
+  levelArea: false
 ```
 
-To manually adjust the blueprint center with flat leveling:
+Blueprint with 20 meters flat area:
 ```
 - prefab: Blueprint
-  center: 5,-10
-  levelArea: 1
+  levelRadius: 20
+  levelBorder: 0
+```
+
+Blueprint with custom centering:
+```
+- prefab: Blueprint
+  centerPiece: GlowingMushroom
+  # x,z,y -> 5 meters off the ground.
+  offset: 0,0,5
+```
+
+Blueprint with terrain painting:
+```
+- prefab: Blueprint
+  paint: paved
+```
+
+Blueprint with 20 meters of paint without border:
+```
+- prefab: Blueprint
+  # dirt,cultivated,paved,vegetation -> mix of cultivated and paved.
+  paint: 0,0.5,0.5,0
+  paintRadius: 20
+  paintBorder: 0
 ```

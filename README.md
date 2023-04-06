@@ -329,7 +329,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - noBuild (default: `false`): If true, players can't build within `exteriorRadius`. If number, player can't build within the given radius.
 - noBuildDungeon (default: `false`): If true, players can't build inside dungeons within `exteriorRadius`. If number, player can't build inside dungeons within the given radius.
 - levelArea (default: `true` for blueprints): Flattens the area.
-- levelRadius (default: half of`exteriorRadius`): Size of the leveled area.
+- levelRadius (default: half of `exteriorRadius`): Size of the leveled area.
 - levelBorder (default: half of `exteriorRadius`): Adds a smooth transition around the `levelRadius`.
 - paint: Paints the terrain. Format is `dirt,cultivated,paved,vegetation` (from 0.0 to 1.0) or a pre-defined color (cultivated, dirt, grass, grass_dark, patches, paved, paved_dark, paved_dirt, paved_moss).
 - paintRadius (default: `exteriorRadius`): Size of the painted area.
