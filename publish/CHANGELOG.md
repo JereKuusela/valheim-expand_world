@@ -1,10 +1,12 @@
+- v1.28
+  - Changes the blueprint search path also to include the mod profile folder.
+  - Merges the PlanBuild and BuildShare search folders to the same folder.
+
 - v1.27
   - Adds a new field `centerPiece` to the `expand_locations.yaml`.
   - Changes the field `offset` of the `expand_locations.yaml` to x,z,y.
   - Removes the field `center` from the `expand_locations.yaml` as obsolete.
   - Adds automatic reload for changed blueprints.
-  - Changes the blueprint search path also to include the mod profile folder.
-  - Changes the blueprint search to include both .blueprint and .vbuild files for all folders.
 
 - v1.26
   - Adds blueprint support for vegetation.

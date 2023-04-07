@@ -91,13 +91,9 @@ public partial class Configuration
   public static int? OffsetY => ConfigWrapper.Ints[configOffsetY];
   public static ConfigEntry<string> configHeightSeed;
   public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
-  public static ConfigEntry<string> configPlanBuildFolder;
-  public static string PlanBuildGlobalFolder => configPlanBuildFolder.Value;
-  public static string PlanBuildLocalFolder => Path.Combine(Paths.GameRootPath, configPlanBuildFolder.Value);
-  public static ConfigEntry<string> configBuildShareFolder;
-  public static string BuildShareGlobalFolder => configBuildShareFolder.Value;
-  public static string BuildShareLocalFolder => Path.Combine(Paths.GameRootPath, configBuildShareFolder.Value);
-
+  public static ConfigEntry<string> configBlueprintFolder;
+  public static string BlueprintGlobalFolder => Path.Combine("BepInEx", "config", configBlueprintFolder.Value);
+  public static string BlueprintLocalFolder => Path.Combine(Paths.ConfigPath, configBlueprintFolder.Value);
 
 #nullable enable
   public static void Init(ConfigWrapper wrapper)
@@ -188,8 +184,7 @@ public partial class Configuration
     configDataEvents.SettingChanged += (s, e) => EventManager.FromSetting(valueEventData.Value);
     configDataSpawns = wrapper.Bind(section, "Spawn data", true, false, "Use spawn data");
     configDataSpawns.SettingChanged += (s, e) => SpawnManager.FromSetting(valueSpawnData.Value);
-    configPlanBuildFolder = wrapper.Bind(section, "Plan Build folder", "BepInEx/config/PlanBuild", false, "Folder relative to the Valheim.exe.");
-    configBuildShareFolder = wrapper.Bind(section, "Build Share folder", "BuildShare/Builds", false, "Folder relative to the Valheim.exe.");
+    configBlueprintFolder = wrapper.Bind(section, "Blueprint folder", "PlanBuild", false, "Folder relative to the config folder.");
 
     valueNoBuildData = wrapper.AddValue("no_build_data");
     valueNoBuildData.ValueChanged += () => NoBuildManager.Load(valueNoBuildData.Value);

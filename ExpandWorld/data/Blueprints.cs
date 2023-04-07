@@ -84,13 +84,9 @@ public class Blueprints
   private static IEnumerable<string> Files()
   {
     IEnumerable<string> bps = new List<string>();
-    bps = LoadFiles(Configuration.PlanBuildGlobalFolder, bps);
-    if (Path.GetFullPath(Configuration.PlanBuildLocalFolder) != Path.GetFullPath(Configuration.PlanBuildGlobalFolder))
-      bps = LoadFiles(Configuration.PlanBuildLocalFolder, bps);
-
-    bps = LoadFiles(Configuration.BuildShareGlobalFolder, bps);
-    if (Path.GetFullPath(Configuration.BuildShareLocalFolder) != Path.GetFullPath(Configuration.BuildShareGlobalFolder))
-      bps = LoadFiles(Configuration.BuildShareLocalFolder, bps);
+    bps = LoadFiles(Configuration.BlueprintGlobalFolder, bps);
+    if (Path.GetFullPath(Configuration.BlueprintLocalFolder) != Path.GetFullPath(Configuration.BlueprintGlobalFolder))
+      bps = LoadFiles(Configuration.BlueprintLocalFolder, bps);
     return bps.Distinct().OrderBy(s => s);
   }
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();

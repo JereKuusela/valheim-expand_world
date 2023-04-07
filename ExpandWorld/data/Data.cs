@@ -101,12 +101,16 @@ public class Data : MonoBehaviour
   }
   public static void SetupBlueprintWatcher()
   {
-    SetupWatcher(Configuration.PlanBuildGlobalFolder, "*.blueprint", ReloadBlueprint);
-    if (Path.GetFullPath(Configuration.PlanBuildLocalFolder) != Path.GetFullPath(Configuration.PlanBuildGlobalFolder))
-      SetupWatcher(Configuration.PlanBuildLocalFolder, "*.blueprint", ReloadBlueprint);
-    SetupWatcher(Configuration.BuildShareGlobalFolder, "*.vbuild", ReloadBlueprint);
-    if (Path.GetFullPath(Configuration.BuildShareLocalFolder) != Path.GetFullPath(Configuration.BuildShareGlobalFolder))
-      SetupWatcher(Configuration.BuildShareLocalFolder, "*.vbuild", ReloadBlueprint);
+    if (!Directory.Exists(Configuration.BlueprintGlobalFolder))
+      Directory.CreateDirectory(Configuration.BlueprintGlobalFolder);
+    if (!Directory.Exists(Configuration.BlueprintLocalFolder))
+      Directory.CreateDirectory(Configuration.BlueprintLocalFolder);
+    SetupWatcher(Configuration.BlueprintGlobalFolder, "*.blueprint", ReloadBlueprint);
+    SetupWatcher(Configuration.BlueprintGlobalFolder, "*.vbuild", ReloadBlueprint);
+    if (Path.GetFullPath(Configuration.BlueprintLocalFolder) != Path.GetFullPath(Configuration.BlueprintGlobalFolder)) {
+      SetupWatcher(Configuration.BlueprintLocalFolder, "*.blueprint", ReloadBlueprint);
+      SetupWatcher(Configuration.BlueprintLocalFolder, "*.vbuild", ReloadBlueprint);
+    }
   }
   public static void SetupWatcher(string pattern, Action action) => SetupWatcher(ExpandWorld.YamlDirectory, pattern, _ => action());
   public static IDeserializer Deserializer() => new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance)
