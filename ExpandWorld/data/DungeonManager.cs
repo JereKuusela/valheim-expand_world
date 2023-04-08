@@ -97,18 +97,12 @@ public class DungeonManager
       .Distinct(new DgComparer()).ToList();
     var yaml = Data.Serializer().Serialize(dgs.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueDungeonData.Value = yaml;
   }
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
     var yaml = Configuration.DataDungeons ? Data.Read(Pattern) : "";
-    Configuration.valueDungeonData.Value = yaml;
     Set(yaml);
-  }
-  public static void FromSetting(string yaml)
-  {
-    if (Helper.IsClient()) Set(yaml);
   }
   private static void Set(string yaml)
   {

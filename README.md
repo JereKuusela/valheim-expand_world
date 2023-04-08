@@ -365,6 +365,31 @@ The file `expand_dungeons.yaml` sets dungeon generators.
 - spawnChance (default: `1`): Chance for each tile to spawn. Only for CampGrid.
 - interiorTransform (default: `false`): Some locations may require this being true. If you notice weird warnings, try setting this to true.
 
+## Rooms
+
+The file `expand_rooms.yaml` sets available dungeon rooms.
+
+Completely new rooms can't be created but you can create variants by adding `:suffix` to the name (not tested).
+
+Documentation will be improved soon.
+
+- name: Name of the room prefab.
+- theme: Determines in which dungeons this room can appear. See dungeons for available values.
+- enabled (default `true`): Quick way to disable this room.
+- entrance (default `false`): ???
+- endCap (default `false`): ???
+- divider (default `false`): ???
+- endCapPriority (default `0`): ???
+- minPlaceOrder (default `0`): ???
+- weight (default: `1`): ???
+- faceCenter (default: `false`): ???
+- perimeter (default: `false`): ???
+- connections: List of:
+  - type: ???
+  - entrance (default: `false`): ???
+  - allowDoor (default: `true`): ???
+  - doorOnlyIfOtherAlsoAllowsDoor (default: `false`): ???
+
 ## Vegetation
 
 The file `expand_vegetations.yaml` sets the generated objects.

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 namespace ExpandWorld;
 
@@ -54,7 +55,10 @@ public static class Parse
     vector.y = Float(args, index + 2, defaultValue.y);
     return Quaternion.Euler(vector);
   }
-
+  public static string[] Split(string arg) => arg.Split(',').Select(s => s.Trim()).ToArray();
+  public static string Name(string arg) => arg.Split(':')[0];
+  public static Vector3 VectorXZY(string arg) => VectorXZY(Split(arg), 0, Vector3.zero);
+  
   ///<summary>Parses YXZ vector starting at given index. Zero is used for missing values.</summary>
   public static Vector3 VectorXZY(string[] args, int index) => VectorXZY(args, index, Vector3.zero);
   ///<summary>Parses YXZ vector starting at given index. Default values is used for missing values.</summary>
@@ -69,12 +73,12 @@ public static class Parse
   public static Vector2 VectorXY(string arg)
   {
     var vector = Vector2.zero;
-    var args = arg.Split(',');
+    var args = Split(arg);
     vector.x = Float(args, 0);
     vector.y = Float(args, 1);
     return vector;
   }
-  public static Vector3 Scale(string args) => Scale(args.Split(','), 0);
+  public static Vector3 Scale(string args) => Scale(Split(args), 0);
   ///<summary>Parses scale starting at zero index. Includes a sanity check and giving a single value for all axis.</summary>
   public static Vector3 Scale(string[] args) => Scale(args, 0);
   ///<summary>Parses scale starting at given index. Includes a sanity check and giving a single value for all axis.</summary>

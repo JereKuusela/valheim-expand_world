@@ -37,7 +37,7 @@ public class LocationManager
       ObjectData[data.prefab] = data.objectData.Select(Data.ToList).ToDictionary(arr => arr[0], arr => Data.ToZDO(arr[1]));
     if (data.objects != null)
     {
-      Objects[data.prefab] = data.objects.Select(s => s.Split(',')).Select(split => new BlueprintObject(
+      Objects[data.prefab] = data.objects.Select(Parse.Split).Select(split => new BlueprintObject(
         split[0],
         Parse.VectorXZY(split, 1),
         Parse.AngleYXZ(split, 4),
@@ -224,7 +224,7 @@ public class LocationManager
   public static void ReloadBlueprint(string name)
   {
     name = Path.GetFileNameWithoutExtension(name);
-    var locs = ZoneSystem.instance.m_locations.Where(l => l.m_prefabName.Split(':')[0] == name).ToList();
+    var locs = ZoneSystem.instance.m_locations.Where(l => Parse.Name(l.m_prefabName) == name).ToList();
     if (locs.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading blueprint {name} used by {locs.Count} location.");
     foreach (var loc in locs)
@@ -233,13 +233,13 @@ public class LocationManager
 
   private static bool SetupBlueprint(ZoneSystem.ZoneLocation location)
   {
-    var name = location.m_prefabName.Split(':')[0];
+    var name = Parse.Name(location.m_prefabName);
     if (!Blueprints.TryGetBluePrint(name, out var bp)) return false;
     Vector3 offset = Vector3.zero;
     string centerPiece = "piece_bpcenterpoint";
     if (LocationData.TryGetValue(name, out var data))
     {
-      offset = Parse.VectorXZY(data.offset.Split(','), 0);
+      offset = Parse.VectorXZY(data.offset);
       centerPiece = data.centerPiece;
     }
     bp.Center(offset, centerPiece);

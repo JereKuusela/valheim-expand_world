@@ -1,4 +1,5 @@
 - v1.28
+  - Adds a new file `expand_rooms.yaml`.
   - Changes the blueprint search path also to include the mod profile folder.
   - Merges the PlanBuild and BuildShare search folders to the same folder.
 

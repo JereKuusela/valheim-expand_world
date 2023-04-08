@@ -35,7 +35,7 @@ public partial class Terrain
   }
   private static Color ParsePaintColor(string paint)
   {
-    var split = paint.Split(',');
+    var split = Parse.Split(paint);
     if (split.Length < 3 && Paints.TryGetValue(paint, out var color)) return color;
     return new(Parse.Float(split, 0), Parse.Float(split, 1), Parse.Float(split, 2), Parse.Float(split, 3, 1f));
   }

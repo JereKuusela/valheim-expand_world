@@ -49,6 +49,7 @@ public class ExpandWorld : BaseUnityPlugin
     ClutterManager.SetupWatcher();
     EnvironmentManager.SetupWatcher();
     DungeonManager.SetupWatcher();
+    RoomManager.SetupWatcher();
     Data.SetupBlueprintWatcher();
   }
   public void Start()

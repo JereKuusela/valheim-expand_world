@@ -20,7 +20,7 @@ public class VegetationManager
   {
     if (!Blueprints.TryGetBluePrint(name, out var bp)) return;
     name = Path.GetFileNameWithoutExtension(name);
-    var vegs = ZoneSystem.instance.m_vegetation.Where(l => l.m_prefab.name.Split(':')[0] == name).ToList();
+    var vegs = ZoneSystem.instance.m_vegetation.Where(l => Parse.Name(l.m_prefab.name) == name).ToList();
     if (vegs.Count == 0) return;
     ExpandWorld.Log.LogInfo($"Reloading blueprint {name} used by {vegs.Count} vegetationaw  .");
     foreach (var veg in vegs)

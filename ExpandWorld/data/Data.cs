@@ -13,6 +13,20 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace ExpandWorld;
 
+
+[HarmonyPatch(typeof(DungeonDB), nameof(DungeonDB.Start)), HarmonyPriority(Priority.VeryLow)]
+public class LoadAndSaveRoomData
+{
+  static void Postfix()
+  {
+    if (ZNet.instance.IsServer())
+    {
+      RoomManager.FromFile();
+      RoomManager.ToFile();
+    }
+  }
+}
+
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start)), HarmonyPriority(Priority.VeryLow)]
 public class LoadAndSaveData
 {
@@ -38,7 +52,8 @@ public class LoadAndSaveData
       EnvironmentManager.ToFile();
       ClutterManager.ToFile();
       DungeonManager.ToFile();
-      // Spawn data handled elsewhere.
+      // Room data is handled elsewhere.
+      // Spawn data is handled elsewhere.
     }
     // Overwrite location setup with our stuff.
     LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
@@ -150,7 +165,7 @@ public class Data : MonoBehaviour
     Heightmap.Biome.Ocean | Heightmap.Biome.Plains | Heightmap.Biome.Swamp;
 
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
-  public static List<string> ToList(string str) => str.Split(',').Select(s => s.Trim()).Where(s => s != "").ToList();
+  public static List<string> ToList(string str) => Parse.Split(str).ToList();
   public static Dictionary<string, string> ToDict(string str) => ToList(str).Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0].Trim(), s => s[1].Trim());
   public static ZDO? ToZDO(string data)
   {
@@ -229,7 +244,7 @@ public class Data : MonoBehaviour
     }
     else
     {
-      var biomes = biomeStr.Split(',').Select(s => s.Trim()).ToArray();
+      var biomes = Parse.Split(biomeStr);
       foreach (var biome in biomes)
       {
         if (BiomeManager.TryGetBiome(biome, out var number))
@@ -246,7 +261,7 @@ public class Data : MonoBehaviour
   public static Heightmap.BiomeArea ToBiomeAreas(string m_biome)
   {
     if (m_biome == "") return Heightmap.BiomeArea.Edge | Heightmap.BiomeArea.Median;
-    var biomes = m_biome.Split(',').Select(s => s.Trim()).ToArray();
+    var biomes = Parse.Split(m_biome);
     var biomeAreas = biomes.Select(s => Enum.TryParse<Heightmap.BiomeArea>(s, true, out var area) ? area : 0);
     Heightmap.BiomeArea result = 0;
     foreach (var biome in biomeAreas) result |= biome;
