@@ -69,6 +69,7 @@ public class DebugCommands
       }
       float total = biomes.Values.Sum();
       var text = biomes.OrderBy(kvp => kvp.Key.ToString()).Select(kvp => kvp.Key.ToString() + ": " + kvp.Value + "/" + total + " (" + (kvp.Value / total).ToString("P2", CultureInfo.InvariantCulture) + ")");
+      ZLog.Log(string.Join("\n", text));
       args.Context.AddString(string.Join("\n", text));
     }, true);
     new Terminal.ConsoleCommand("ew_musics", "- Prints available musics.", args =>
@@ -76,6 +77,7 @@ public class DebugCommands
       var mm = MusicMan.instance;
       if (!mm) return;
       var names = mm.m_music.Where(music => music.m_enabled).Select(music => music.m_name);
+      ZLog.Log(string.Join("\n", names));
       args.Context.AddString(string.Join("\n", names));
     }, true);
     new Terminal.ConsoleCommand("ew_icons", "- Prints available location icons.", args =>
@@ -83,6 +85,7 @@ public class DebugCommands
       var mm = Minimap.instance;
       if (!mm) return;
       var names = mm.m_locationIcons.Select(icon => icon.m_name).Concat(mm.m_icons.Select(icon => icon.m_name.ToString()));
+      ZLog.Log(string.Join("\n", names));
       args.Context.AddString(string.Join("\n", names));
     }, true);
     new Terminal.ConsoleCommand("ew_rooms", "- Logs available rooms.", args =>
@@ -110,6 +113,7 @@ public class DebugCommands
         "Plains: "+ wg.m_offset1,
         "Mistlands: " + wg.m_offset4
       };
+      ZLog.Log(string.Join("\n", lines));
       args.Context.AddString(string.Join("\n", lines));
     }, true);
   }
