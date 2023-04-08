@@ -53,12 +53,16 @@ public class RoomManager
     room.m_faceCenter = data.faceCenter;
     room.m_perimeter = data.perimeter;
     room.m_endCapPrio = data.endCapPriority;
-    room.m_roomConnections = data.connections.Select(connection => new RoomConnection {
-      m_type = connection.type,
-      m_entrance = connection.entrance,
-      m_allowDoor = connection.allowDoor,
-      m_doorOnlyIfOtherAlsoAllowsDoor = connection.doorOnlyIfOtherAlsoAllowsDoor
-    }).ToArray();
+    var connections = room.GetConnections();
+    for (var i = 0; i < connections.Length && i < data.connections.Length; i++) {
+      var connection = connections[i];
+      var dataConnection = data.connections[i];
+      connection.transform.localPosition = Parse.VectorXZY(dataConnection.position);
+      connection.m_type = dataConnection.type;
+      connection.m_entrance = dataConnection.entrance;
+      connection.m_allowDoor = dataConnection.door == "true";
+      connection.m_doorOnlyIfOtherAlsoAllowsDoor = dataConnection.door == "other";
+    }
     return roomData;
   }
   public static RoomData ToData(Room room)
@@ -77,10 +81,10 @@ public class RoomManager
     data.perimeter = room.m_perimeter;
     data.endCapPriority = room.m_endCapPrio;
     data.connections = room.GetConnections().Select(connection => new RoomConnectionData {
+      position = $"{connection.transform.localPosition.x:F2},{connection.transform.localPosition.z:F2},{connection.transform.localPosition.y:F2}",
       type = connection.m_type,
       entrance = connection.m_entrance,
-      allowDoor = connection.m_allowDoor,
-      doorOnlyIfOtherAlsoAllowsDoor = connection.m_doorOnlyIfOtherAlsoAllowsDoor
+      door = connection.m_allowDoor ? "true" : connection.m_doorOnlyIfOtherAlsoAllowsDoor ? "other" : "false"
     }).ToArray();
     return data;
   }

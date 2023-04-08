@@ -376,19 +376,20 @@ Documentation will be improved soon.
 - name: Name of the room prefab.
 - theme: Determines in which dungeons this room can appear. See dungeons for available values.
 - enabled (default `true`): Quick way to disable this room.
-- entrance (default `false`): ???
-- endCap (default `false`): ???
-- divider (default `false`): ???
-- endCapPriority (default `0`): ???
-- minPlaceOrder (default `0`): ???
-- weight (default: `1`): ???
-- faceCenter (default: `false`): ???
-- perimeter (default: `false`): ???
-- connections: List of:
-  - type: ???
-  - entrance (default: `false`): ???
-  - allowDoor (default: `true`): ???
-  - doorOnlyIfOtherAlsoAllowsDoor (default: `false`): ???
+- entrance (default `false`): If true, this room is used as an entrance (whatever that means).
+- endCap (default `false`): If true, this room is used to seal open ends.
+- divider (default `false`): If true, this room is used as a divider (whatever that means).
+- endCapPriority (default `0`): Rooms with a higher priority are preferred as end caps.
+- minPlaceOrder (default `0`): Minimum amount of rooms between this room and the entrance.
+- weight (default: `1`): Chance of this room being selected (relative to other weights).
+- faceCenter (default: `false`): If true, the room is always rotated towards the camp center. If false, the room is randomly rotated.
+- perimeter (default: `false`): If true, this room is placed on the camp perimeter (edge).
+- size: Format `x,z,y`. Size of this room in meters. Only integers. Probably no reason to change this.
+- connections: List of doorways of this room.
+  - position: Format `x,z,y`. Position relative to the room.
+  - type: Type of the connection.
+  - entrance (default: `false`): If true, used for the entrance.
+  - door (default: `true`): If true, allows placing door. If other, allows placing door if the other connection also allows placing a door.
 
 ## Vegetation
 

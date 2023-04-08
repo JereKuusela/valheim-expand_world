@@ -1,18 +1,16 @@
 using System.ComponentModel;
-using UnityEngine;
 
 namespace ExpandWorld;
 
 public class RoomConnectionData
 {
+  public string position = "";
+  [DefaultValue("")]
   public string type = "";
   [DefaultValue(false)]
   public bool entrance = false;
-  [DefaultValue(true)]
-  public bool allowDoor = true;
-  [DefaultValue(false)]
-  public bool doorOnlyIfOtherAlsoAllowsDoor = false;
-  
+  [DefaultValue("true")]
+  public string door = "true";
 }
 public class RoomData
 {
