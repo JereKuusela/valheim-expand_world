@@ -15,6 +15,8 @@ public class DungeonData
   public int minRequiredRooms = 1;
   [DefaultValue("")]
   public string requiredRooms = "";
+  [DefaultValue("")]
+  public string excludedRooms = "";
   [DefaultValue(false)]
   public bool alternative = false;
   [DefaultValue("")]

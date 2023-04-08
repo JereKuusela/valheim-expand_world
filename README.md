@@ -348,6 +348,7 @@ The file `expand_dungeons.yaml` sets dungeon generators.
 - minRooms (default: `1`): Minimum amount of rooms. Only for Dungeon and CampRadial.
 - minRequiredRooms (default: `1`): Minimum amount of rooms in the required list. Only for Dungeon and CampRadial.
 - requiredRooms: List of required rooms. Generator stops after required rooms and minimum amount of rooms are placed. Use command `ew_rooms` to print list of rooms.
+- excludedRooms: List of rooms removed from the available rooms.
 - alternative (default: `false`): If true, can place random rooms as the end caps (possibly leading to bigger dungeons?). Only for Dungeon.
 - doorChance (default: `0`): Chance for a door to be placed. Only for Dungeon.
 - doorTypes: List of possible doors. Each door has the same chance of being selected.
@@ -369,9 +370,7 @@ The file `expand_dungeons.yaml` sets dungeon generators.
 
 The file `expand_rooms.yaml` sets available dungeon rooms.
 
-Completely new rooms can't be created but you can create variants by adding `:suffix` to the name (not tested).
-
-Documentation will be improved soon.
+Completely new rooms can't be created but you can create variants by adding `:suffix` to the name (not tested at all, may not work).
 
 - name: Name of the room prefab.
 - theme: Determines in which dungeons this room can appear. See dungeons for available values.

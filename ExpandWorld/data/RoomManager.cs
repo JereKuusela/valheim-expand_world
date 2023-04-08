@@ -81,7 +81,7 @@ public class RoomManager
     data.perimeter = room.m_perimeter;
     data.endCapPriority = room.m_endCapPrio;
     data.connections = room.GetConnections().Select(connection => new RoomConnectionData {
-      position = $"{connection.transform.localPosition.x:F2},{connection.transform.localPosition.z:F2},{connection.transform.localPosition.y:F2}",
+      position = Helper.Print(connection.transform.localPosition),
       type = connection.m_type,
       entrance = connection.m_entrance,
       door = connection.m_allowDoor ? "true" : connection.m_doorOnlyIfOtherAlsoAllowsDoor ? "other" : "false"

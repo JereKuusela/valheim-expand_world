@@ -81,5 +81,12 @@ public static class Helper
     if (!range.Uniform) return true;
     return range.Min.normalized != Vector3.one || range.Max.normalized != Vector3.one;
   }
+
+  public static string Print(float value) {
+    return value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+  }
+  public static string Print(Vector3 vec) {
+    return $"{Print(vec.x)},{Print(vec.z)},{Print(vec.y)}";
+  }
 }
 

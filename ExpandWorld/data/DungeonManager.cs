@@ -13,6 +13,7 @@ public class DungeonManager
   public static string Pattern = "expand_dungeons*.yaml";
 
   private static Dictionary<string, DungeonGenerator> Generators = new();
+  private static Dictionary<DungeonGenerator, DungeonData> DungeonData = new();
   public static DungeonGenerator FromData(DungeonData data)
   {
     DungeonGenerator dg = new();
@@ -20,6 +21,7 @@ public class DungeonManager
       dg.m_algorithm = algorithm;
     else
       ExpandWorld.Log.LogWarning($"Failed to find dungeon algorithm {data.algorithm}.");
+    DungeonData[dg] = data;
     dg.m_alternativeFunctionality = data.alternative;
     dg.m_campRadiusMax = data.campRadiusMax;
     dg.m_campRadiusMin = data.campRadiusMin;
@@ -109,6 +111,7 @@ public class DungeonManager
     if (yaml == "" || !Configuration.DataDungeons) return;
     try
     {
+      DungeonData.Clear();
       Generators = Data.Deserialize<DungeonData>(yaml, FileName).ToDictionary(data => data.name, FromData);
       ExpandWorld.Log.LogInfo($"Reloading {Generators.Count} dungeon data.");
     }
@@ -143,6 +146,15 @@ public class DungeonManager
     dg.m_perimeterSections = value.m_perimeterSections;
     dg.m_perimeterBuffer = value.m_perimeterBuffer;
     dg.m_useCustomInteriorTransform = value.m_useCustomInteriorTransform;
+  }
+
+  [HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
+  public static void SetupAvailableRooms(DungeonGenerator __instance)
+  {
+    if (!DungeonData.TryGetValue(__instance, out var data)) return;
+    var excludedRooms = Parse.Split(data.excludedRooms).ToHashSet();
+    if (excludedRooms.Count == 0) return;
+    DungeonGenerator.m_availableRooms = DungeonGenerator.m_availableRooms.Where(room => !excludedRooms.Contains(room.m_room.gameObject.name)).ToList();
   }
 }
 
