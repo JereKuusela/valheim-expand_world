@@ -1,3 +1,6 @@
+- v1.29
+  - Fixes the `expand_locations.yaml` not being generated.
+
 - v1.28
   - Adds a new file `expand_rooms.yaml`.
   - Adds a new field `excludedRooms` to the `expand_dungeons.yaml`.

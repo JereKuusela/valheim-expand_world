@@ -131,9 +131,9 @@ public class LocationManager
   }
   public static bool IsValid(ZoneSystem.ZoneLocation loc) => loc.m_prefab;
 
-  private static void ToFile(bool force = false)
+  private static void ToFile()
   {
-    if (!force && File.Exists(FilePath)) return;
+    if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
@@ -149,6 +149,7 @@ public class LocationManager
     NoBuildManager.UpdateData();
     ZoneSystem.instance.SendLocationIcons(ZRoutedRpc.Everybody);
     CleanMap();
+    ToFile();
   }
   private static void CleanMap()
   {
