@@ -20,6 +20,7 @@ For example you can create entirely flat worlds with only Meadows for building. 
 # Tutorials
 
 - How to make custom biomes: https://youtu.be/TgFhW0MtYyw (33 minutes, created by StonedProphet)
+- How to use blueprints as locations with custom spawners: https://youtu.be/DXtm-WLF6KE (30 minutes, created by StonedProphet)
 
 # Configuration
 

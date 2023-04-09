@@ -21,14 +21,6 @@ See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/ma
 - How to make custom biomes: https://youtu.be/TgFhW0MtYyw (33 minutes, created by StonedProphet)
 - How to use blueprints as locations with custom spawners: https://youtu.be/DXtm-WLF6KE (30 minutes, created by StonedProphet)
 
-## Migration from version 1.23
-
-- If you have used paint in expand_biomes.yaml, then update the values to match the new format.
-
-## Migration from version 1.19
-
-- If you have modded creatures spawning in wrong places, regenerate `expand_spawns.yaml` by removing it or manually set `biome: None` when missing.
-
 # Credits
 
 Thanks for Azumatt for creating the mod icon!

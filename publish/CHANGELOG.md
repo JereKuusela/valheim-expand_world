@@ -4,6 +4,7 @@
   - Adds log file output for most `ew_*` commands.
   - Changes the blueprint search path also to include the mod profile folder.
   - Merges the PlanBuild and BuildShare search folders to the same folder.
+  - Fixes error if the blueprint folder is missing.
 
 - v1.27
   - Adds a new field `centerPiece` to the `expand_locations.yaml`.

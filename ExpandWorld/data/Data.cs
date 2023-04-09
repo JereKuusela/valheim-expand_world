@@ -414,24 +414,8 @@ public class Data : MonoBehaviour
     if (!Directory.Exists(ExpandWorld.YamlDirectory))
       Directory.CreateDirectory(ExpandWorld.YamlDirectory);
     var data = Directory.GetFiles(ExpandWorld.YamlDirectory, pattern, SearchOption.AllDirectories).Reverse().Select(name =>
-    {
-      var lines = File.ReadAllLines(name).ToList();
-      var migrated = false;
-      if (Migrate.BiomeAreas(lines)) migrated = true;
-      if (Migrate.Biomes(lines)) migrated = true;
-      if (Migrate.Environments(lines)) migrated = true;
-      if (Migrate.GlobalKeys(lines)) migrated = true;
-      if (Migrate.NotGlobalKeys(lines)) migrated = true;
-      if (Migrate.DictionaryToList(lines, "objects")) migrated = true;
-      if (Migrate.DictionaryToList(lines, "objectSwap")) migrated = true;
-      if (Migrate.DictionaryToList(lines, "objectData")) migrated = true;
-      if (migrated)
-      {
-        ExpandWorld.Log.LogInfo($"Migrated file {Path.GetFileName(name)}");
-        File.WriteAllLines(name, lines);
-      }
-      return string.Join("\n", lines);
-    });
+      string.Join("\n", File.ReadAllLines(name).ToList())
+    );
     return string.Join("\n", data) ?? "";
   }
   public static void Sanity(ref Color color)

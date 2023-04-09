@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -39,6 +40,8 @@ public class ExpandWorld : BaseUnityPlugin
     Logger.LogInfo(Path.GetFullPath(Configuration.BlueprintGlobalFolder));
     Harmony harmony = new(GUID);
     harmony.PatchAll();
+    try {
+      
     SetupWatcher();
     BiomeManager.SetupWatcher();
     LocationManager.SetupWatcher();
@@ -51,6 +54,11 @@ public class ExpandWorld : BaseUnityPlugin
     DungeonManager.SetupWatcher();
     RoomManager.SetupWatcher();
     Data.SetupBlueprintWatcher();
+    }
+    catch (Exception e)
+    {
+      Log.LogError(e);
+    }
   }
   public void Start()
   {

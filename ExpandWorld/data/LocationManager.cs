@@ -149,8 +149,6 @@ public class LocationManager
     NoBuildManager.UpdateData();
     ZoneSystem.instance.SendLocationIcons(ZRoutedRpc.Everybody);
     CleanMap();
-    var force = LocationData.Values.Any(value => value.exteriorRadius == 0f && !BlueprintLocations.ContainsKey(value.prefab));
-    ToFile(force);
   }
   private static void CleanMap()
   {
