@@ -169,7 +169,7 @@ public partial class Configuration
     section = "4. Data";
     configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
     configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
-    configDataBiome = wrapper.Bind(section, "Biome data", true, false, "Use biome data");
+    configDataBiome = wrapper.Bind(section, "Biome data", true, true, "Use biome data");
     configDataBiome.SettingChanged += (s, e) => BiomeManager.FromSetting(valueBiomeData.Value);
     configDataClutter = wrapper.Bind(section, "Clutter data", true, false, "Use clutter data");
     configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(valueClutterData.Value);
@@ -177,7 +177,7 @@ public partial class Configuration
     configDataDungeons.SettingChanged += (s, e) => DungeonManager.FromFile();
     configDataRooms = wrapper.Bind(section, "Room data", true, false, "Use dungeon room data");
     configDataRooms.SettingChanged += (s, e) => RoomManager.FromFile();
-    configDataWorld = wrapper.Bind(section, "World data", true, false, "Use world data");
+    configDataWorld = wrapper.Bind(section, "World data", true, true, "Use world data");
     configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(valueWorldData.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");
     configDataLocation.SettingChanged += (s, e) => LocationManager.Load();

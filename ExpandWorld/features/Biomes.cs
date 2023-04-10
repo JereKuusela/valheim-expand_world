@@ -129,6 +129,7 @@ public class GetBiome
 {
   public static List<WorldData> GetData() => Data ?? WorldManager.GetDefault();
   public static List<WorldData>? Data = null;
+  public static bool CheckAngles = false;
   public static Dictionary<Heightmap.Biome, float> Offsets = new();
 
   private static float GetOffset(WorldGenerator obj, Heightmap.Biome biome)
@@ -147,10 +148,15 @@ public class GetBiome
       return Heightmap.Biome.Ocean;
     var altitude = Helper.BaseHeightToAltitude(obj.GetBaseHeight(wx, wy, false));
     var num = obj.WorldAngle(wx, wy) * Configuration.WiggleWidth;
-    var baseAngle = (Mathf.Atan2(wx, wy) + Mathf.PI) / 2f / Mathf.PI;
-    var wiggledAngle = baseAngle + Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
-    if (wiggledAngle < 0f) wiggledAngle += 1f;
-    if (wiggledAngle >= 1f) wiggledAngle -= 1f;
+    var baseAngle = 0f;
+    var wiggledAngle = 0f;
+    if (CheckAngles)
+    {
+      baseAngle = (Mathf.Atan2(wx, wy) + Mathf.PI) / 2f / Mathf.PI;
+      wiggledAngle = baseAngle + Configuration.DistanceWiggleWidth * Mathf.Sin(magnitude / Configuration.DistanceWiggleLength);
+      if (wiggledAngle < 0f) wiggledAngle += 1f;
+      if (wiggledAngle >= 1f) wiggledAngle -= 1f;
+    }
     var radius = Configuration.WorldRadius;
     var bx = wx / Configuration.BiomeStretch;
     var by = wy / Configuration.BiomeStretch;
@@ -162,6 +168,8 @@ public class GetBiome
       var min = ConvertDist(item.minDistance);
       if (min > 0)
         min += (item.wiggleDistance ? num : 0f);
+      else
+        min = -0.1f; // To handle the center (0,0) correctly.
       var max = ConvertDist(item.maxDistance);
       if (item.curveX != 0f || item.curveY != 0f)
       {
@@ -170,13 +178,19 @@ public class GetBiome
         mag = new Vector2(Configuration.WorldStretch * wx + curveX, Configuration.WorldStretch * wy + curveY).magnitude;
         min += new Vector2(curveX, curveY).magnitude;
       }
-      var distOk = mag > min && (max >= radius || mag < max);
+      var distOk = mag > min && (max >= radius || mag <= max);
       if (!distOk) continue;
-      min = item.minSector;
-      max = item.maxSector;
-      var angle = item.wiggleSector ? wiggledAngle : baseAngle;
-      var angleOk = min > max ? (angle >= min || angle < max) : angle >= min && angle < max;
-      if (!angleOk) continue;
+      if (CheckAngles)
+      {
+        min = item.minSector;
+        max = item.maxSector;
+        if (min != 0f || max != 1f)
+        {
+          var angle = item.wiggleSector ? wiggledAngle : baseAngle;
+          var angleOk = min > max ? (angle >= min || angle < max) : angle >= min && angle < max;
+          if (!angleOk) continue;
+        }
+      }
       var seed = item._seed ?? GetOffset(obj, item._biomeSeed);
       if (item.amount < 1f && Mathf.PerlinNoise((seed + bx / item.stretch) * 0.001f, (seed + by / item.stretch) * 0.001f) < 1 - item.amount) continue;
       return item._biome;

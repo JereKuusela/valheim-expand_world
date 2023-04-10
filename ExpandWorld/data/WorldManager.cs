@@ -14,17 +14,17 @@ public class WorldManager
     var version = WorldGenerator.instance.m_world.m_worldGenVersion;
     return new() {
       new() {
-        biome = "ocean",
-        _biome = Heightmap.Biome.Ocean,
-        _biomeSeed = Heightmap.Biome.Ocean,
-        maxAltitude = -26f
-      },
-      new() {
         biome = "ashlands",
         _biome = Heightmap.Biome.AshLands,
         _biomeSeed = Heightmap.Biome.AshLands,
         curveY = -0.4f,
         minDistance = 0.8f,
+      },
+      new() {
+        biome = "ocean",
+        _biome = Heightmap.Biome.Ocean,
+        _biomeSeed = Heightmap.Biome.Ocean,
+        maxAltitude = -26f
       },
       new() {
         biome = "mountain",
@@ -134,6 +134,7 @@ public class WorldManager
       }
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
       GetBiome.Data = data;
+      GetBiome.CheckAngles = data.Any(x => x.minSector != 0f || x.maxSector != 1f);
       Generate.World();
     }
     catch (Exception e)

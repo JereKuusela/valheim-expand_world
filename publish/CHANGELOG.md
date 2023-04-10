@@ -1,3 +1,9 @@
+- v1.30
+  - Changes the default `expand_world.yaml` to match the vanilla world generation (Ashlands placed before Ocean) so that rivers match the vanilla world generation.
+  - Fixes the start temple being sometimes placed in the wrong location (coordinate 0,0 always had the ocean biome).
+  - Fixes location icons not working when location data is disabled.
+  - Fixes locations removed from the `expand_locations.yaml` still being enabled in the data.
+
 - v1.29
   - Fixes the `expand_locations.yaml` not being generated.
 

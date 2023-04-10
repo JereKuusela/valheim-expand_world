@@ -13,7 +13,7 @@ public class ExpandWorld : BaseUnityPlugin
 {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.29";
+  public const string VERSION = "1.30";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -40,20 +40,21 @@ public class ExpandWorld : BaseUnityPlugin
     Logger.LogInfo(Path.GetFullPath(Configuration.BlueprintGlobalFolder));
     Harmony harmony = new(GUID);
     harmony.PatchAll();
-    try {
-      
-    SetupWatcher();
-    BiomeManager.SetupWatcher();
-    LocationManager.SetupWatcher();
-    VegetationManager.SetupWatcher();
-    EventManager.SetupWatcher();
-    SpawnManager.SetupWatcher();
-    WorldManager.SetupWatcher();
-    ClutterManager.SetupWatcher();
-    EnvironmentManager.SetupWatcher();
-    DungeonManager.SetupWatcher();
-    RoomManager.SetupWatcher();
-    Data.SetupBlueprintWatcher();
+    try
+    {
+
+      SetupWatcher();
+      BiomeManager.SetupWatcher();
+      LocationManager.SetupWatcher();
+      VegetationManager.SetupWatcher();
+      EventManager.SetupWatcher();
+      SpawnManager.SetupWatcher();
+      WorldManager.SetupWatcher();
+      ClutterManager.SetupWatcher();
+      EnvironmentManager.SetupWatcher();
+      DungeonManager.SetupWatcher();
+      RoomManager.SetupWatcher();
+      Data.SetupBlueprintWatcher();
     }
     catch (Exception e)
     {

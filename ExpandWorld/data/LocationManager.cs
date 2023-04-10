@@ -282,6 +282,11 @@ public class LocationManager
       Setup(item, showWarnings);
       missingLocations.Remove(item.m_prefabName);
     }
+    foreach (var item in missingLocations)
+    {
+      var loc = ZoneLocations[item];
+      loc.m_enable = false;
+    }
     zs.m_locations = items;
     zs.m_locations.AddRange(missingLocations.Select(name => ZoneLocations[name]));
     ExpandWorld.Log.LogDebug($"Loaded {zs.m_locations.Count} zone locations.");
@@ -554,6 +559,7 @@ public class LocationIcons
 {
   static bool Prefix(ZoneSystem __instance, Dictionary<Vector3, string> icons)
   {
+    if (!Configuration.DataLocation) return true;
     if (!ZNet.instance.IsServer()) return false;
     foreach (var kvp in __instance.m_locationInstances)
     {
