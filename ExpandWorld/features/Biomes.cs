@@ -168,9 +168,15 @@ public class GetBiome
       var min = ConvertDist(item.minDistance);
       if (min > 0)
         min += (item.wiggleDistance ? num : 0f);
-      else
+      else if (min == 0f)
         min = -0.1f; // To handle the center (0,0) correctly.
       var max = ConvertDist(item.maxDistance);
+      if (item.centerX != 0f || item.centerY != 0f)
+      {
+        var centerX = ConvertDist(item.centerX);
+        var centerY = ConvertDist(item.centerY);
+        mag = new Vector2(Configuration.WorldStretch * wx - centerX, Configuration.WorldStretch * wy - centerY).magnitude;
+      }
       if (item.curveX != 0f || item.curveY != 0f)
       {
         var curveX = ConvertDist(item.curveX);

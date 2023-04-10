@@ -17,8 +17,9 @@ public class WorldManager
         biome = "ashlands",
         _biome = Heightmap.Biome.AshLands,
         _biomeSeed = Heightmap.Biome.AshLands,
-        curveY = -0.4f,
-        minDistance = 0.8f,
+        centerY = 0.4f,
+        minDistance = 1.2f,
+        maxDistance = 1.6f
       },
       new() {
         biome = "ocean",
@@ -36,8 +37,9 @@ public class WorldManager
         biome = "deepnorth",
         _biome = Heightmap.Biome.DeepNorth,
         _biomeSeed = Heightmap.Biome.DeepNorth,
-        curveY = 0.4f,
-        minDistance = 0.8f,
+        centerY = -0.4f,
+        minDistance = 1.2f,
+        maxDistance = 1.6f
       },
       new() {
         biome = "swamp",

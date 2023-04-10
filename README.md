@@ -152,8 +152,8 @@ Each entry in the file adds a new rule. When determing the biome, the rules are 
 - minDistance (default: `0.0` of world radius): Minimum distance from the world center.
 - minSector (default: `0.0` of world angle): Start of the [circle sector](https://en.wikipedia.org/wiki/Circular_sector).
 - maxSector (default: `1.0` of world angle): End of the [circle sector](https://en.wikipedia.org/wiki/Circular_sector).
-- curveX (default: `0.0` of world radius): Moves the distance center point away from the world center.
-- curveY (default: `0.0` of world radius): Moves the distance center point away from the world center.
+- centerX (default: `0.0` of world radius): Moves the center point away from the world center.
+- centerY (default: `0.0` of world radius): Moves the center point away from the world center.
 - amount (default: `1.0` of total area): How much of the valid area is randomly filled with this biome. Uses normal distribution, see values below.
 - stretch (default: `1.0`): Same as the `Stretch biomes` setting but applied just to a single entry. Multiplies the size of biome areas (average total area stays the same). 
 - seed: Overrides the random outcome of `amount`. Numeric value fixes the outcome. Biome name uses a biome specific value derived from the world seed. No value uses biome from the `terrain` parameter.

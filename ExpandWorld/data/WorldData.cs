@@ -23,6 +23,10 @@ public class WorldData
   public float curveX = 0f;
   [DefaultValue(0f)]
   public float curveY = 0f;
+  [DefaultValue(0f)]
+  public float centerX = 0f;
+  [DefaultValue(0f)]
+  public float centerY = 0f;
   [DefaultValue(1f)]
   public float amount = 1f;
   [DefaultValue(1f)]
