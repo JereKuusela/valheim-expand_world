@@ -46,8 +46,8 @@ public class GenerateLocationsQuantity
 {
   static void Prefix(ZoneSystem.ZoneLocation location, ref int __state)
   {
-    if (location.m_prefabName == Game.instance.m_StartLocation) return;
     __state = location.m_quantity;
+    if (location.m_prefabName == Game.instance.m_StartLocation) return;
     location.m_quantity = Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier);
   }
   static void Postfix(ZoneSystem.ZoneLocation location, int __state)

@@ -3,6 +3,7 @@
   - Fixes the start temple being sometimes placed in the wrong location (coordinate 0,0 always had the ocean biome).
   - Fixes location icons not working when location data is disabled.
   - Fixes locations removed from the `expand_locations.yaml` still being enabled in the data.
+  - Fixes Upgrade World resets making the start temple to dispppear.
 
 - v1.29
   - Fixes the `expand_locations.yaml` not being generated.
