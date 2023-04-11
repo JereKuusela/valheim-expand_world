@@ -137,10 +137,10 @@ public class EnvironmentManager
   }
   private static void Set(string yaml)
   {
+    SetOriginals();
     if (yaml == "" || !Configuration.DataEnvironments) return;
     try
     {
-      SetOriginals();
       var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
         .Select(FromData).ToList();
       if (data.Count == 0)

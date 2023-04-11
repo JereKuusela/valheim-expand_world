@@ -141,6 +141,13 @@ public class LocationManager
   public static void Load()
   {
     if (Helper.IsClient()) return;
+    ZDO.Clear();
+    ObjectSwaps.Clear();
+    ObjectData.Clear();
+    Dungeons.Clear();
+    Objects.Clear();
+    LocationData.Clear();
+    BlueprintFiles.Clear();
     if (Configuration.DataLocation && File.Exists(FilePath))
       SetLocations(FromFile(Data.Read(Pattern)), true);
     else
@@ -176,13 +183,6 @@ public class LocationManager
   {
     try
     {
-      ZDO.Clear();
-      ObjectSwaps.Clear();
-      ObjectData.Clear();
-      Dungeons.Clear();
-      Objects.Clear();
-      LocationData.Clear();
-      BlueprintFiles.Clear();
       var data = Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");

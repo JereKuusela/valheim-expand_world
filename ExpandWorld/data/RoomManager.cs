@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HarmonyLib;
 namespace ExpandWorld;
 
 public class RoomManager
@@ -33,7 +32,8 @@ public class RoomManager
   {
     var hash = Parse.Name(data.name).GetStableHashCode();
     var rooms = DungeonDB.instance.m_roomByHash;
-    if (!rooms.TryGetValue(hash, out var roomData)) {
+    if (!rooms.TryGetValue(hash, out var roomData))
+    {
       ExpandWorld.Log.LogWarning($"Failed to find dungeon room {data.name}.");
       return new();
     }
@@ -54,7 +54,8 @@ public class RoomManager
     room.m_perimeter = data.perimeter;
     room.m_endCapPrio = data.endCapPriority;
     var connections = room.GetConnections();
-    for (var i = 0; i < connections.Length && i < data.connections.Length; i++) {
+    for (var i = 0; i < connections.Length && i < data.connections.Length; i++)
+    {
       var connection = connections[i];
       var dataConnection = data.connections[i];
       connection.transform.localPosition = Parse.VectorXZY(dataConnection.position);
@@ -74,13 +75,14 @@ public class RoomManager
     data.endCap = room.m_endCap;
     data.divider = room.m_divider;
     data.enabled = room.m_enabled;
-    data.size = $"{room.m_size.x},{room.m_size.z},{room.m_size.y}" ;
+    data.size = $"{room.m_size.x},{room.m_size.z},{room.m_size.y}";
     data.minPlaceOrder = room.m_minPlaceOrder;
     data.weight = room.m_weight;
     data.faceCenter = room.m_faceCenter;
     data.perimeter = room.m_perimeter;
     data.endCapPriority = room.m_endCapPrio;
-    data.connections = room.GetConnections().Select(connection => new RoomConnectionData {
+    data.connections = room.GetConnections().Select(connection => new RoomConnectionData
+    {
       position = Helper.Print(connection.transform.localPosition),
       type = connection.m_type,
       entrance = connection.m_entrance,
@@ -104,6 +106,8 @@ public class RoomManager
   }
   private static void Set(string yaml)
   {
+    if (Rooms.Count > 0)
+      DungeonDB.instance.m_rooms = Rooms.Values.ToList();
     if (yaml == "" || !Configuration.DataRooms) return;
     try
     {
@@ -125,5 +129,5 @@ public class RoomManager
   public static void SetupWatcher()
   {
     Data.SetupWatcher(Pattern, FromFile);
-  }  
+  }
 }

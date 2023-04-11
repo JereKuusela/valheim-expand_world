@@ -95,8 +95,7 @@ public class Spawn_WaitForConfigSync
 }
 public class Data : MonoBehaviour
 {
-  public static bool IsReady => (ExpandWorld.ConfigSync.IsSourceOfTruth && BiomesLoaded) || ExpandWorld.ConfigSync.InitialSyncDone;
-  public static bool BiomesLoaded = false;
+  public static bool IsReady => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 
   private static void SetupWatcher(string folder, string pattern, Action<string> action)
   {
@@ -122,7 +121,8 @@ public class Data : MonoBehaviour
       Directory.CreateDirectory(Configuration.BlueprintLocalFolder);
     SetupWatcher(Configuration.BlueprintGlobalFolder, "*.blueprint", ReloadBlueprint);
     SetupWatcher(Configuration.BlueprintGlobalFolder, "*.vbuild", ReloadBlueprint);
-    if (Path.GetFullPath(Configuration.BlueprintLocalFolder) != Path.GetFullPath(Configuration.BlueprintGlobalFolder)) {
+    if (Path.GetFullPath(Configuration.BlueprintLocalFolder) != Path.GetFullPath(Configuration.BlueprintGlobalFolder))
+    {
       SetupWatcher(Configuration.BlueprintLocalFolder, "*.blueprint", ReloadBlueprint);
       SetupWatcher(Configuration.BlueprintLocalFolder, "*.vbuild", ReloadBlueprint);
     }

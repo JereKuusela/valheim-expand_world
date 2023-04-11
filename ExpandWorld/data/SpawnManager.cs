@@ -136,10 +136,12 @@ public class SpawnManager
   }
   private static void Set(string yaml)
   {
+    HandleSpawnData.Override = null;
+    ZDO.Clear();
+    Objects.Clear();
     if (yaml == "" || !Configuration.DataSpawns) return;
     try
     {
-      ZDO.Clear();
       var data = Data.Deserialize<SpawnData>(yaml, FileName)
         .Select(FromData).Where(IsValid).ToList();
       if (data.Count == 0)

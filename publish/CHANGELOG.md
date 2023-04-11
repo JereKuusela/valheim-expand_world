@@ -5,6 +5,8 @@
   - Fixes default location icons not working when location data is disabled.
   - Fixes locations removed from the `expand_locations.yaml` still being enabled in the data.
   - Fixes Upgrade World resets making the start temple to disapppear.
+  - Fixes zone spawns not working for creatures without weather requirement.
+  - Fixes zone spawns not working if biome data was disabled.
 
 - v1.29
   - Fixes the `expand_locations.yaml` not being generated.

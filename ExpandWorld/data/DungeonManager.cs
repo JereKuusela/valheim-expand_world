@@ -108,10 +108,10 @@ public class DungeonManager
   }
   private static void Set(string yaml)
   {
+    DungeonData.Clear();
     if (yaml == "" || !Configuration.DataDungeons) return;
     try
     {
-      DungeonData.Clear();
       Generators = Data.Deserialize<DungeonData>(yaml, FileName).ToDictionary(data => data.name, FromData);
       ExpandWorld.Log.LogInfo($"Reloading {Generators.Count} dungeon data.");
     }

@@ -55,10 +55,10 @@ public static class Parse
     vector.y = Float(args, index + 2, defaultValue.y);
     return Quaternion.Euler(vector);
   }
-  public static string[] Split(string arg) => arg.Split(',').Select(s => s.Trim()).ToArray();
+  public static string[] Split(string arg) => arg.Split(',').Select(s => s.Trim()).Where(s => s != "").ToArray();
   public static string Name(string arg) => arg.Split(':')[0];
   public static Vector3 VectorXZY(string arg) => VectorXZY(Split(arg), 0, Vector3.zero);
-  
+
   ///<summary>Parses YXZ vector starting at given index. Zero is used for missing values.</summary>
   public static Vector3 VectorXZY(string[] args, int index) => VectorXZY(args, index, Vector3.zero);
   ///<summary>Parses YXZ vector starting at given index. Default values is used for missing values.</summary>

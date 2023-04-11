@@ -147,12 +147,12 @@ public class VegetationManager
   public static Dictionary<ZoneSystem.ZoneVegetation, ZDO> ZDO = new();
   private static void Set(string yaml)
   {
+    BlueprintFiles.Clear();
+    Scale.Clear();
+    ZDO.Clear();
     if (yaml == "" || !Configuration.DataVegetation) return;
     try
     {
-      BlueprintFiles.Clear();
-      Scale.Clear();
-      ZDO.Clear();
       var data = Data.Deserialize<VegetationData>(yaml, FileName)
       .Select(FromData).Where(veg => veg.m_prefab).ToList();
       if (data.Count == 0)

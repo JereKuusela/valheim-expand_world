@@ -9,9 +9,9 @@ public class WorldManager
   public static string FileName = "expand_world.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_world*.yaml";
-  public static List<WorldData> GetDefault()
+  public static List<WorldData> GetDefault(WorldGenerator obj)
   {
-    var version = WorldGenerator.instance.m_world.m_worldGenVersion;
+    var version = obj.m_world.m_worldGenVersion;
     return new() {
       new() {
         biome = "ashlands",

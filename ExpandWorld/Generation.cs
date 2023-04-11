@@ -335,7 +335,6 @@ public class CancelOnLogout
   static void Prefix()
   {
     Generate.Cancel();
-    Data.BiomesLoaded = false;
     WorldGeneration.HasLoaded = false;
   }
 }

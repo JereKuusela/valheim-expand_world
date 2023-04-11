@@ -40,7 +40,7 @@ public class SpawnData
   [DefaultValue(1)]
   public int groupSizeMax = 1;
   [DefaultValue(0f)]
-  public float groupRadius = 3f;
+  public float groupRadius = 0f;
   [DefaultValue(0f)]
   public float minTilt = 0f;
   [DefaultValue(35f)]

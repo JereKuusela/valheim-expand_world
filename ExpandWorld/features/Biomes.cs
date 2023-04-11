@@ -127,7 +127,7 @@ public class SetBiomeOffsets
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
 public class GetBiome
 {
-  public static List<WorldData> GetData() => Data ?? WorldManager.GetDefault();
+  public static List<WorldData> GetData() => Data ?? WorldManager.GetDefault(WorldGenerator.instance);
   public static List<WorldData>? Data = null;
   public static bool CheckAngles = false;
   public static Dictionary<Heightmap.Biome, float> Offsets = new();
@@ -142,7 +142,7 @@ public class GetBiome
   private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy)
   {
     if (Data == null)
-      Data = WorldManager.GetDefault();
+      Data = WorldManager.GetDefault(obj);
     var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     if (magnitude > Configuration.WorldTotalRadius)
       return Heightmap.Biome.Ocean;

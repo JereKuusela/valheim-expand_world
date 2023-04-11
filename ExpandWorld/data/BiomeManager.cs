@@ -218,7 +218,6 @@ public class BiomeManager
   private static void Set(string yaml)
   {
     Load(yaml);
-    Data.BiomesLoaded = true;
   }
   public static void SetupWatcher()
   {
