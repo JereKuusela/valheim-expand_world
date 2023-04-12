@@ -1,3 +1,6 @@
+- v1.31
+  - Adds blueprint rotation based on the center piece.
+
 - v1.30
   - Adds new fields `centerX` and `centerY` to the `expand_world.yaml` (replaces `curveX` and `curveY`).
   - Changes the default `expand_world.yaml` to match the vanilla world generation (Ashlands placed before Ocean) so that rivers always match the vanilla world generation.

@@ -51,6 +51,8 @@ Note: 2x world radius means 4x world area. So for 20000 radius you would need 4x
 
 Note: If the game fails to place the spawn altar (for example if no Meadows), then it is forcefully placed at the middle of the map. With bad luck, this can be underwater.
 
+Note: File `expand_world.yaml` must be enabled to scale biomes properly.
+
 ## Minimap
 
 The minimap size must be manually changed because there are two different settings. Both of the settings increase the minimap size but have a different drawback. `Minimap size` significantly increases the minimap generation time while `Minimap pixel size` makes the minimap less detailed.

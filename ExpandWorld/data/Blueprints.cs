@@ -40,10 +40,16 @@ public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
   public float Radius = 0f;
+  public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Quaternion rotation)
+  {
+
+    return rotation * (point - pivot) + pivot;
+  }
   public void Center(Vector3 offset, string centerPiece = "piece_bpcenterpoint")
   {
     Bounds bounds = new();
     var y = float.MaxValue;
+    Quaternion rot = Quaternion.identity;
     foreach (var obj in Objects)
     {
       y = Mathf.Min(y, obj.Pos.y);
@@ -58,6 +64,7 @@ public class Blueprint
       if (obj.Prefab == centerPiece)
       {
         center = obj.Pos;
+        rot = Quaternion.Inverse(obj.Rot);
         // Bit hacky way to prevent it from being spawned.
         obj.Chance = 0f;
         break;
@@ -67,6 +74,14 @@ public class Blueprint
     center -= offset;
     foreach (var obj in Objects)
       obj.Pos -= center;
+    if (rot != Quaternion.identity)
+    {
+      foreach (var obj in Objects)
+      {
+        obj.Pos = RotatePointAroundPivot(obj.Pos, center, rot);
+        obj.Rot = rot * obj.Rot;
+      }
+    }
   }
 }
 public class Blueprints
