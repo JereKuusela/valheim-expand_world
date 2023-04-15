@@ -40,11 +40,6 @@ public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
   public float Radius = 0f;
-  public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Quaternion rotation)
-  {
-
-    return rotation * (point - pivot) + pivot;
-  }
   public void Center(Vector3 offset, string centerPiece = "piece_bpcenterpoint")
   {
     Bounds bounds = new();
@@ -78,7 +73,7 @@ public class Blueprint
     {
       foreach (var obj in Objects)
       {
-        obj.Pos = RotatePointAroundPivot(obj.Pos, center, rot);
+        obj.Pos = rot * obj.Pos;
         obj.Rot = rot * obj.Rot;
       }
     }

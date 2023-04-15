@@ -349,7 +349,7 @@ public class LocationZDO
   {
     if (!LocationManager.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
-    if (data != null) Data.InitZDO(pos, rotation, data, view);
+    if (data != null) Data.InitZDO(pos, rotation, Vector3.one, data, view);
   }
 }
 [HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
@@ -376,7 +376,7 @@ public class LocationObjectDataAndSwap
       Location = location.m_prefabName;
     return !LocationManager.BlueprintFiles.ContainsKey(location.m_prefabName);
   }
-  static void SetData(string location, GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  static void SetData(string location, GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
   {
     if (data == null)
     {
@@ -385,7 +385,7 @@ public class LocationObjectDataAndSwap
     }
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, data, view);
+    Data.InitZDO(position, rotation, scale, data, view);
   }
   static string RandomizeSwap(List<Tuple<float, string>> swaps)
   {
@@ -411,11 +411,11 @@ public class LocationObjectDataAndSwap
   public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
   {
     prefab = Swap(Location, prefab);
-    return InstantiateWithData(Location, prefab, position, rotation);
+    return InstantiateWithData(Location, prefab, position, rotation, Vector3.one);
   }
-  public static GameObject InstantiateWithData(string location, GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  public static GameObject InstantiateWithData(string location, GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
   {
-    SetData(location, prefab, position, rotation, data);
+    SetData(location, prefab, position, rotation, scale, data);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     if (obj.TryGetComponent<DungeonGenerator>(out var dg))
     {
@@ -456,7 +456,7 @@ public class LocationObjectDataAndSwap
     {
       ZNetView.StartGhostInit();
     }
-    var go = InstantiateWithData(location.m_prefabName, prefab, objPos, objRot, obj.Data);
+    var go = InstantiateWithData(location.m_prefabName, prefab, objPos, objRot, obj.Scale, obj.Data);
     go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
     if (go.TryGetComponent<DungeonGenerator>(out var dg))
     {

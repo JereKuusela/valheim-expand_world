@@ -199,15 +199,15 @@ public class SpawnZDO
     }
   }
 
-  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
   {
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, data, view);
+    Data.InitZDO(position, rotation, scale, data, view);
   }
-  static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
   {
-    SetData(prefab, position, rotation, data);
+    SetData(prefab, position, rotation, scale, data);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     Data.CleanGhostInit(obj);
     return obj;
@@ -226,6 +226,6 @@ public class SpawnZDO
     // Prevent spawning on top of tall objects like trees.
     if (solid > objPos.y + 10f) return;
     objPos.y = solid;
-    InstantiateWithData(prefab, objPos, objRot, obj.Data);
+    InstantiateWithData(prefab, objPos, objRot, obj.Scale, obj.Data);
   }
 }

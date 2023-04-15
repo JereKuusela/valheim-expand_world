@@ -191,7 +191,7 @@ public class PlaceVegetation
     Veg = veg;
     return veg;
   }
-  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
   {
     if (data == null)
     {
@@ -199,25 +199,25 @@ public class PlaceVegetation
     }
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, data, view);
+    Data.InitZDO(position, rotation, scale, data, view);
   }
   static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
   {
-    SetData(prefab, position, rotation);
+    SetData(prefab, position, rotation, Vector3.one);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     Data.CleanGhostInit(obj);
     return obj;
   }
-  static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
   {
-    SetData(prefab, position, rotation, data);
+    SetData(prefab, position, rotation, scale, data);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     Data.CleanGhostInit(obj);
     return obj;
   }
   static GameObject InstantiateBlueprint(GameObject prefab, Vector3 position, Quaternion rotation)
   {
-    SetData(prefab, position, rotation);
+    SetData(prefab, position, rotation, Vector3.one);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     Data.CleanGhostInit(obj);
     if (VegetationManager.BlueprintFiles.TryGetValue(prefab.name, out var bp))
@@ -252,7 +252,7 @@ public class PlaceVegetation
     {
       ZNetView.StartGhostInit();
     }
-    var go = InstantiateWithData(prefab, objPos, objRot, obj.Data);
+    var go = InstantiateWithData(prefab, objPos, objRot, obj.Scale, obj.Data);
     if (mode == ZoneSystem.SpawnMode.Ghost)
     {
       spawnedGhostObjects.Add(go);

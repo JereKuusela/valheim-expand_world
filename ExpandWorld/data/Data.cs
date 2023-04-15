@@ -386,7 +386,7 @@ public class Data : MonoBehaviour
     }
     zdo.ReleaseByteArrays();
   }
-  public static void InitZDO(Vector3 position, Quaternion rotation, ZDO data, ZNetView view)
+  public static void InitZDO(Vector3 position, Quaternion rotation, Vector3 scale, ZDO data, ZNetView view)
   {
     ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(position);
     Data.CopyData(data.Clone(), ZNetView.m_initZDO);
@@ -395,6 +395,8 @@ public class Data : MonoBehaviour
     ZNetView.m_initZDO.m_distant = view.m_distant;
     ZNetView.m_initZDO.m_persistent = view.m_persistent;
     ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
+    if (view.m_syncInitialScale && scale != Vector3.one)
+      ZNetView.m_initZDO.Set("scale", scale);
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
   public static void CleanGhostInit(GameObject obj)
