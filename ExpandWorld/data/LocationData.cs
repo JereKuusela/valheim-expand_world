@@ -19,7 +19,7 @@ public class LocationData
   [DefaultValue(0f)]
   public float maxDistance = 0f;
   [DefaultValue(-1000f)]
-  public float minAltitude = 0f;
+  public float minAltitude = -1000f;
   [DefaultValue(10000f)]
   public float maxAltitude = 10000f;
   [DefaultValue(false)]

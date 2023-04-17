@@ -146,6 +146,7 @@ public class BiomeManager
     }
     NameToBiome = BiomeToDisplayName.ToDictionary(kvp => kvp.Value.ToLower(), kvp => kvp.Key);
   }
+  private static List<BiomeEnvSetup> Environments = new();
   private static void Load(string yaml)
   {
     if (yaml == "" || !Configuration.DataBiome) return;
@@ -205,15 +206,28 @@ public class BiomeManager
     Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
     BiomePaint = rawData.Any(data => data.paint != "");
-    var data = rawData.Select(FromData).ToList();
+    Environments = rawData.Select(FromData).ToList();
+    // This tracks if content (environments) have been loaded.
+    if (ZoneSystem.instance.m_locationsByHash.Count > 0)
+      LoadEnvironments();
+    Generate.World();
+  }
+  public static void LoadEnvironments()
+  {
+    if (!Configuration.DataBiome) return;
+    SetupBiomeEnvs(Environments);
+  }
+  private static void SetupBiomeEnvs(List<BiomeEnvSetup> data)
+  {
+    var em = EnvMan.instance;
     foreach (var list in LocationList.m_allLocationLists)
       list.m_biomeEnvironments.Clear();
-    EnvMan.instance.m_biomes.Clear();
+    em.m_biomes.Clear();
     foreach (var biome in data)
-      EnvMan.instance.AppendBiomeSetup(biome);
-    EnvMan.instance.m_environmentPeriod = -1;
-    EnvMan.instance.m_firstEnv = true;
-    Generate.World();
+      em.AppendBiomeSetup(biome);
+    em.m_environmentPeriod = -1;
+    em.m_firstEnv = true;
+
   }
   private static void Set(string yaml)
   {

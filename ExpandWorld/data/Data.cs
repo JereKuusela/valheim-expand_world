@@ -15,7 +15,7 @@ namespace ExpandWorld;
 
 
 [HarmonyPatch(typeof(DungeonDB), nameof(DungeonDB.Start)), HarmonyPriority(Priority.VeryLow)]
-public class LoadAndSaveRoomData
+public class InitializeRooms
 {
   static void Postfix()
   {
@@ -27,8 +27,22 @@ public class LoadAndSaveRoomData
   }
 }
 
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.VersionSetup)), HarmonyPriority(Priority.VeryLow)]
+public class InitializeWorld
+{
+  // River generation requires biome and world data being loaded.
+  // Saving is done later because that requires environments.
+  static void Postfix()
+  {
+    // Only called for server so no need to check.
+    BiomeManager.FromFile();
+    WorldManager.FromFile();
+  }
+}
+
+
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start)), HarmonyPriority(Priority.VeryLow)]
-public class LoadAndSaveData
+public class InitializeContent
 {
   static void Postfix()
   {
@@ -36,8 +50,7 @@ public class LoadAndSaveData
     {
       // Biomes need environments.
       EnvironmentManager.FromFile();
-      BiomeManager.FromFile();
-      WorldManager.FromFile();
+      BiomeManager.LoadEnvironments();
       // Clutter must be here because since SetupLocations adds prefabs to the list.
       ClutterManager.FromFile();
       // These are here to not have to clear location lists (slightly better compatibility).
@@ -45,13 +58,13 @@ public class LoadAndSaveData
       EventManager.FromFile();
       SpawnManager.FromFile();
       DungeonManager.FromFile();
-      BiomeManager.ToFile();
-      WorldManager.ToFile();
+      EnvironmentManager.ToFile();
       VegetationManager.ToFile();
       EventManager.ToFile();
-      EnvironmentManager.ToFile();
       ClutterManager.ToFile();
       DungeonManager.ToFile();
+      BiomeManager.ToFile();
+      WorldManager.ToFile();
       // Room data is handled elsewhere.
       // Spawn data is handled elsewhere.
     }
@@ -63,8 +76,6 @@ public class LoadAndSaveData
     else
       // Client doesn't need any real data.
       LocationManager.SetLocations(new(), false);
-    Generate.Cancel();
-    WorldGenerator.instance?.Pregenerate();
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]

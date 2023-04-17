@@ -1,6 +1,7 @@
 - v1.31
   - Adds blueprint rotation based on the center piece.
   - Fixes blueprint scale not being used.
+  - Fixes locations being placed underwater (rivers were not considered when determining location places).
 
 - v1.30
   - Adds new fields `centerX` and `centerY` to the `expand_world.yaml` (replaces `curveX` and `curveY`).
