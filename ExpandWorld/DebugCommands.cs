@@ -7,6 +7,17 @@ using UnityEngine;
 namespace ExpandWorld;
 public class DebugCommands
 {
+  private string GetRoomItems(DungeonDB.RoomData room)
+  {
+    var items = room.m_netViews.Select(netView => Utils.GetPrefabName(netView.gameObject)).GroupBy(name => name).Select(group => group.Key + " x" + group.Count());
+    return string.Join(", ", items);
+  }
+
+  private string GetLocationItems(ZoneSystem.ZoneLocation loc)
+  {
+    var items = loc.m_netViews.Select(netView => Utils.GetPrefabName(netView.gameObject)).GroupBy(name => name).Select(group => group.Key + " x" + group.Count());
+    return string.Join(", ", items);
+  }
   public DebugCommands()
   {
     new Terminal.ConsoleCommand("ew_lakes", "Pings lakes", args =>
@@ -88,13 +99,22 @@ public class DebugCommands
       ZLog.Log(string.Join("\n", names));
       args.Context.AddString(string.Join("\n", names));
     }, true);
+
     new Terminal.ConsoleCommand("ew_rooms", "- Logs available rooms.", args =>
     {
       var db = DungeonDB.instance;
       if (!db) return;
-      var names = db.m_rooms.Select(room => $"{room.m_room.name} ({room.m_room.m_theme})").ToList();
+      var names = db.m_rooms.Select(room => $"{room.m_room.name} ({room.m_room.m_theme}): {GetRoomItems(room)}").ToList();
       ZLog.Log(string.Join("\n", names));
-      args.Context.AddString($"Logged to {names.Count} rooms to the log file.");
+      args.Context.AddString($"Logged {names.Count} rooms to the log file.");
+    }, true);
+    new Terminal.ConsoleCommand("ew_locations", "- Logs available locations.", args =>
+    {
+      var zs = ZoneSystem.instance;
+      if (!zs) return;
+      var names = zs.m_locations.Where(loc => loc.m_location).Select(loc => $"{loc.m_location.name}: {GetLocationItems(loc)}").ToList();
+      ZLog.Log(string.Join("\n", names));
+      args.Context.AddString($"Logged {names.Count} locations to the log file.");
     }, true);
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {

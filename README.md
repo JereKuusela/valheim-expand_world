@@ -315,7 +315,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
-- objectSwap: List to swap child objects to some other objects. Format is `id:swapid` or `id,swapid:weight,swapid2:weight2,...`.
+- objectSwap: List to swap child objects to some other objects. Format is `id:swapid` or `id,swapid:weight,swapid2:weight2,...`. Use command `ew_locations` and `ew_rooms` to print location and room contents.
 - objectData: List to set child object data. Format is `id,data`.
   - id: Prefab name.
   - data: ZDO data override.

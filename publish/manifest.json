@@ -4,6 +4,6 @@
   "website_url": "https://github.com/JereKuusela/valheim-expand_world",
   "description": "This mod allows adding new biomes and changing most of the world generation.",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.2102"
+    "denikson-BepInExPack_Valheim-5.4.2105"
   ]
 }

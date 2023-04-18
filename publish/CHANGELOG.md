@@ -1,5 +1,7 @@
 - v1.31
   - Adds blueprint rotation based on the center piece.
+  - Adds a new command `ew_locations` to print location names and contents.
+  - Changes the `ew_rooms` command to also print room contents.
   - Fixes blueprint scale not being used.
   - Fixes locations being placed underwater (rivers were not considered when determining location places).
 
