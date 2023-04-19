@@ -57,7 +57,6 @@ public class EventManager
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueEventData.Value = yaml;
   }
   public static void FromFile()
   {

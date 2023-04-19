@@ -112,7 +112,6 @@ public class EnvironmentManager
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueEnvironmentData.Value = yaml;
   }
   public static void FromFile()
   {

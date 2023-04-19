@@ -96,7 +96,6 @@ public class ClutterManager
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ClutterSystem.instance.m_clutter.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueClutterData.Value = yaml;
   }
   public static void FromFile()
   {

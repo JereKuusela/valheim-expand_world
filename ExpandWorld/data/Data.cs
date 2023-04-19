@@ -48,23 +48,25 @@ public class InitializeContent
   {
     if (ZNet.instance.IsServer())
     {
-      // Biomes need environments.
+      EventManager.ToFile();
+      DungeonManager.ToFile();
+      EnvironmentManager.ToFile();
+      VegetationManager.ToFile();
+      ClutterManager.ToFile();
+
       EnvironmentManager.FromFile();
       BiomeManager.LoadEnvironments();
-      // Clutter must be here because since SetupLocations adds prefabs to the list.
-      ClutterManager.FromFile();
+      BiomeManager.ToFile();
+      WorldManager.ToFile();
+
       // These are here to not have to clear location lists (slightly better compatibility).
       VegetationManager.FromFile();
+      // Clutter must be here because since SetupLocations adds prefabs to the list.
+      ClutterManager.FromFile();
+
       EventManager.FromFile();
       SpawnManager.FromFile();
       DungeonManager.FromFile();
-      EnvironmentManager.ToFile();
-      VegetationManager.ToFile();
-      EventManager.ToFile();
-      ClutterManager.ToFile();
-      DungeonManager.ToFile();
-      BiomeManager.ToFile();
-      WorldManager.ToFile();
       // Room data is handled elsewhere.
       // Spawn data is handled elsewhere.
     }

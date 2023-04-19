@@ -85,7 +85,6 @@ public class BiomeManager
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueBiomeData.Value = yaml;
   }
   public static void FromFile()
   {
@@ -214,7 +213,7 @@ public class BiomeManager
   }
   public static void LoadEnvironments()
   {
-    if (!Configuration.DataBiome) return;
+    if (!Configuration.DataBiome || Environments.Count == 0) return;
     SetupBiomeEnvs(Environments);
   }
   private static void SetupBiomeEnvs(List<BiomeEnvSetup> data)

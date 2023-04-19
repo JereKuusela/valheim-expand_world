@@ -1,3 +1,6 @@
+- v1.32
+  - Fixes configs not loading correctly on the first run.
+
 - v1.31
   - Adds blueprint rotation based on the center piece.
   - Adds a new command `ew_locations` to print location names and contents.

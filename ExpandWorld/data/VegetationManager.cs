@@ -130,7 +130,6 @@ public class VegetationManager
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_vegetation.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueVegetationData.Value = yaml;
   }
   public static void FromFile()
   {

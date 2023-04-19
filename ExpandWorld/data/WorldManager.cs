@@ -109,7 +109,6 @@ public class WorldManager
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(GetBiome.GetData().Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-    Configuration.valueWorldData.Value = yaml;
   }
   public static void FromFile()
   {
