@@ -281,6 +281,8 @@ The file `expand_clutter.yaml` sets the small visual objects.
 
 The file `expand_locations.yaml` sets the available locations and their placement.
 
+Note: Missing locations are automatically added to the file. If you want to disable a location, set `enabled` to `false` instead of removing any entries.
+
 Note: Location information is a server side feature. For testing, use single player so that your client has also server side features available.
 
 See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.

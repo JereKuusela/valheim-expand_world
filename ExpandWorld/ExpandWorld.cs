@@ -36,8 +36,6 @@ public class ExpandWorld : BaseUnityPlugin
       Directory.CreateDirectory(YamlDirectory);
     ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
     Configuration.Init(wrapper);
-    Logger.LogInfo(Path.GetFullPath(Configuration.BlueprintLocalFolder));
-    Logger.LogInfo(Path.GetFullPath(Configuration.BlueprintGlobalFolder));
     Harmony harmony = new(GUID);
     harmony.PatchAll();
     try

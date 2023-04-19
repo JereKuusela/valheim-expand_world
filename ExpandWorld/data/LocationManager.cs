@@ -137,6 +137,15 @@ public class LocationManager
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
+  private static void AddMissing(HashSet<string> missingLocations)
+  {
+    if (!File.Exists(FilePath)) return;
+    var yaml = File.ReadAllText(FilePath);
+    var data = Data.Deserialize<LocationData>(yaml, FileName).ToList();
+    data.AddRange(ZoneSystem.instance.m_locations.Where(loc => missingLocations.Contains(loc.m_prefabName)).Select(ToData));
+    // Directly appending is risky if something goes wrong (like missing a linebreak).
+    File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
+  }
 
   public static void Load()
   {
@@ -149,7 +158,15 @@ public class LocationManager
     LocationData.Clear();
     BlueprintFiles.Clear();
     if (Configuration.DataLocation && File.Exists(FilePath))
-      SetLocations(FromFile(Data.Read(Pattern)), true);
+    {
+      var missingLocations = SetLocations(FromFile(Data.Read(Pattern)), true);
+      if (missingLocations.Count > 0)
+      {
+        ExpandWorld.Log.LogWarning($"Some locations were not initialized. Adding them to the expand_locations.yaml file.");
+        AddMissing(missingLocations);
+        return;
+      }
+    }
     else
       SetLocations(DefaultItems, false);
     UpdateInstances();
@@ -273,7 +290,7 @@ public class LocationManager
     item.m_randomSpawns = zoneLocation.m_randomSpawns;
   }
   ///<summary>Sets zone location entries (ensures that all locations have an entry).</summary>
-  public static void SetLocations(List<ZoneSystem.ZoneLocation> items, bool showWarnings)
+  public static HashSet<string> SetLocations(List<ZoneSystem.ZoneLocation> items, bool showWarnings)
   {
     var zs = ZoneSystem.instance;
     var missingLocations = ZoneLocations.Keys.ToHashSet();
@@ -282,26 +299,25 @@ public class LocationManager
       Setup(item, showWarnings);
       missingLocations.Remove(item.m_prefabName);
     }
-    foreach (var item in missingLocations)
-    {
-      var loc = ZoneLocations[item];
-      loc.m_enable = false;
-    }
     zs.m_locations = items;
     zs.m_locations.AddRange(missingLocations.Select(name => ZoneLocations[name]));
     ExpandWorld.Log.LogDebug($"Loaded {zs.m_locations.Count} zone locations.");
     UpdateHashes();
+    return missingLocations;
   }
   private static Dictionary<string, ZoneSystem.ZoneLocation> ZoneLocations = new();
+  ///<summary>Vanilla only loads enabled locations. To allow extra ones, simply do setup for all content.</summary>
   public static void SetupLocations(List<ZoneSystem.ZoneLocation> initialized)
   {
-    ZoneLocations = initialized.ToDictionary(kvp => kvp.m_prefabName, kvp => kvp);
+    ZoneLocations = initialized.Where(loc => loc.m_prefab).ToDictionary(kvp => kvp.m_prefabName, kvp => kvp);
     var array = Resources.FindObjectsOfTypeAll<GameObject>();
     foreach (var obj in array)
     {
       if (obj.name != "_Locations") continue;
       var locations = obj.GetComponentsInChildren<Location>(true);
-      foreach (var location in locations)
+      var missingLocations = locations.Where(loc => !ZoneLocations.ContainsKey(loc.gameObject.name)).ToArray();
+      ExpandWorld.Log.LogDebug($"Enabled {missingLocations.Length} extra locations.");
+      foreach (var location in missingLocations)
         SetupLocation(location);
     }
     ExpandWorld.Log.LogDebug($"Loaded {ZoneLocations.Count} locations.");
