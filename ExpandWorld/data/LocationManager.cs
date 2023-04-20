@@ -582,17 +582,24 @@ public class LocationIcons
       var loc = kvp.Value.m_location;
       var pos = kvp.Value.m_position;
       if (loc == null) continue;
-      if (!LocationManager.LocationData.TryGetValue(loc.m_prefabName, out var data)) continue;
-      var placed = data.iconPlaced == "true" ? loc.m_prefabName : data.iconPlaced == "false" ? "" : data.iconPlaced;
-      if (kvp.Value.m_placed && placed != "")
+      if (LocationManager.LocationData.TryGetValue(loc.m_prefabName, out var data))
       {
-        icons[pos] = placed;
+        var placed = data.iconPlaced == "true" ? loc.m_prefabName : data.iconPlaced == "false" ? "" : data.iconPlaced;
+        if (kvp.Value.m_placed && placed != "")
+        {
+          icons[pos] = placed;
+        }
+        else
+        {
+          pos.y += 0.00001f; // Trivial amount for a different key.
+          var always = data.iconAlways == "true" ? loc.m_prefabName : data.iconAlways == "false" ? "" : data.iconAlways;
+          if (always != "") icons[pos] = always;
+        }
       }
-      else
+      // Jewelcrafting has dynamic locations so use the vanilla code as a fallback.
+      else if (loc.m_iconAlways || (loc.m_iconPlaced && kvp.Value.m_placed))
       {
-        pos.y += 0.00001f; // Trivial amount for a different key.
-        var always = data.iconAlways == "true" ? loc.m_prefabName : data.iconAlways == "false" ? "" : data.iconAlways;
-        if (always != "") icons[pos] = always;
+        icons[pos] = loc.m_prefabName;
       }
     }
     return false;

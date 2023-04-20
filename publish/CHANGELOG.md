@@ -1,3 +1,6 @@
+- v1.33
+  - Fixes Jewelcrafting boss icons not working.
+
 - v1.32
   - Adds missing location entries automatically to the `expand_locations.yaml` file.
   - Fixes configs not loading correctly on the first run.
