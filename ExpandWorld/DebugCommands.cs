@@ -112,9 +112,22 @@ public class DebugCommands
     {
       var zs = ZoneSystem.instance;
       if (!zs) return;
-      var names = zs.m_locations.Where(loc => loc.m_location).Select(loc => $"{loc.m_location.name}: {GetLocationItems(loc)}").ToList();
+      var names = zs.m_locations.Where(loc => loc.m_location && loc.m_location.name != "Blueprint").Select(loc => $"{loc.m_location.name}: {GetLocationItems(loc)}").ToList();
       ZLog.Log(string.Join("\n", names));
       args.Context.AddString($"Logged {names.Count} locations to the log file.");
+    }, true);
+    new Terminal.ConsoleCommand("ew_dungeons", "- Logs dungeons and their available rooms.", args =>
+    {
+      var zs = ZoneSystem.instance;
+      if (!zs) return;
+      var dgs = DungeonManager.Generators.Select(kvp =>
+      {
+        kvp.Value.SetupAvailableRooms();
+        var rooms = DungeonGenerator.m_availableRooms.Select(room => room.m_room.name);
+        return $"{kvp.Key}: {string.Join(", ", rooms)}";
+      }).ToList();
+      ZLog.Log(string.Join("\n", dgs));
+      args.Context.AddString($"Logged {dgs.Count} dungeons to the log file.");
     }, true);
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {

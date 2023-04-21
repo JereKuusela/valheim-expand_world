@@ -1,4 +1,7 @@
 - v1.33
+  - Adds a new command `ew_dungeons` to print their available rooms.
+  - Changes dungeon room names to case insensitive in the `expand_dungeons.yaml` file.
+  - Fixes the field `excludeRooms` in the `expand_dungeons.yaml` not working.
   - Fixes Jewelcrafting boss icons not working.
 
 - v1.32

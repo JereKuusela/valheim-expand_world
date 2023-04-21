@@ -346,6 +346,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 
 The file `expand_dungeons.yaml` sets dungeon generators.
 
+Command `ew_dungeons` can be used to list available rooms for each dungeon.
+
 - name: Name of the dungeon generator.
 - algorithm: Type of the dungeon. Possible values are `Dungeon`, `CampGrid` or `CampRadial`.
 - themes: List of available room sets. Possible values are `Crypt`, `SunkenCrypt`, `Cave`, `ForestCrypt`, `GoblinCamp`, `MeadowsVillage`, `MeadowsFarm`, `DvergerTown`, `DvergerBoss`. For example `MeadowsVillage,MeadowsFarm` would use both sets.

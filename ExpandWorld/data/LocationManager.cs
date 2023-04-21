@@ -231,6 +231,7 @@ public class LocationManager
     if (!LocationManager.BlueprintLocations.TryGetValue(prefab, out var location))
     {
       var obj = new GameObject();
+      obj.name = "Blueprint";
       location = obj.AddComponent<Location>();
       LocationManager.BlueprintLocations.Add(prefab, location);
     }
