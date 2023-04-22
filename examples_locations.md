@@ -75,6 +75,7 @@ Spawner_DraugrPile:-5,0,-6,... -> 4.5,0,-4.5
     - Spawner_DraugrPile, -4.5, 4.5
   objectSwap:
 # Replaces skeletons with draugr (2:1 ratio for normal and elites).
+# 2:1 ratio = 66% chance for normal and 33% chance for elite.
     - Spawner_Skeleton, Spawner_Draugr:2, Spawner_Draugr_Elite
 # Replaces the default spawner.
     - BonePileSpawner, Spawner_DraugrPile

@@ -1,6 +1,6 @@
 - v1.33
   - Adds a new command `ew_dungeons` to print their available rooms.
-  - Adds a blueprint support to the field `objectSpawns` in the `expand_locations.yaml`.
+  - Adds a blueprint support to the field `objectSwap` in the `expand_locations.yaml`.
   - Adds a new field `centerPiece` to the `expand_vegetation.yaml`.
   - Adds a new field `objects` the `expand_rooms.yaml`.
   - Changes dungeon room names to case insensitive in the `expand_dungeons.yaml` file.

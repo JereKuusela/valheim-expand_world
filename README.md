@@ -317,7 +317,14 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
-- objectSwap: List to swap child objects to some other objects. Format is `id:swapid` or `id,swapid:weight,swapid2:weight2,...`. Use command `ew_locations` and `ew_rooms` to print location and room contents.
+- objectSwap: Changes child objects to some other objects, including dungeons.
+    - Use format `id, swapid` for a direct swap.
+    - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
+    - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
+    - Empty id can be used to spawn nothing.
+    - Blueprints are supported.
+    - Use command `ew_locations` and `ew_rooms` to print location and room contents.
+    - [Example](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md#location-adding-new-objects)
 - objectData: List to set child object data. Format is `id,data`.
   - id: Prefab name.
   - data: ZDO data override.
@@ -406,10 +413,10 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - enabled (default: `false`): Quick way to disable this entry.
 - min (default: `1`): Minimum amount (of groups) to be placed.
 - max (default: `1`): Maximum amount (of groups) to be placed. If less than 1, has only a chance to appear.
-- forcePlacement (default: `false`): ???.
+- forcePlacement (default: `false`): By default, only one attempt is made to find a suitable position for each vegetation. If enabled, 50 attempts are done for each vegetation.
 - scaleMin (default: `1`): Minimum scale. Number or x,z,y (with y being the height).  
 - scaleMax (default: `1`): Maximum scale. Number or x,z,y (with y being the height).
-- scaleUniform (default: `true`): If set to false, each axis is scaled independently.
+- scaleUniform (default: `true`): If disabled, each axis is scaled independently.
 - randTilt (default: `0` degrees): Random rotation.
 - chanceToUseGroundTilt (default: `0.0`): Chance to set rotation based on terrain angle.
 - biome: List of possible biomes.
@@ -424,17 +431,25 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - minTilt (default: `0` degrees): Minimum terrain angle.
 - maxTilt (default: `90` degrees): Maximum terrain angle.
 - terrainDeltaRadius (default: `0` meters): Radius for terrain delta limits.
+  - 10 random points are selected within this radius.
+  - The altitude difference between the lowest and highest point must be within the limits.
 - minTerrainDelta (default: `0` meters): Minimum terrain height change.
+  - Higher values cause the vegetation to be based on slopes.
 - maxTerrainDelta (default: `10` meters): Maximum terrain height change.
-- snapToWater (default: `false`): Placed at the water level instead of the terrain.
+  - Lower values cause the vegetation to be based on flatter areas.
+- snapToWater (default: `false`): Placed at the water level instead of the terrain level.
 - snapToStaticSolid (default: `false`): Placed at the top of solid objects instead of terrain.
 - groundOffset (default: `0` meters): Placed above the ground.
 - groupSizeMin (default: `1`): Minimum amount to be placed at the same time.
 - groupSizeMax (default: `1`): Maximum amount to be placed at the same time.
 - groupRadius (default: `0` meters): Radius for group placement. This should be less than 32 meters to avoid overflowing to adjacent zones.
-- inForest (default: `false`): Only in forests.
-- forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
-- forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
+- inForest (default: `false`): If enabled, forest thresholds are checked.
+  - This creates clusters of vegetation, instead of them being placed evenly.
+  - Thresholds between 0 and 1.15 are shown as forest in the minimap.
+  - Smaller values would be more closer to the forest center.
+  - Larger values would be more away from the forest center.
+- forestTresholdMin (default: `0`): Minimum forest value.
+- forestTresholdMax (default: `0`): Maximum forest value.
 - data: ZDO data override. For example to create hidden stashes with Spawner Tweaks mod (`object copy` from World Edit Commands).
 - centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
 
