@@ -30,7 +30,7 @@ Note: Pay extra attention when loading old worlds. Certain configurations can ca
 
 ## Server side
 
-This mod can be used only on the server. However only following files can be configured:
+This mod can be used server only, without requiring clients to have it. However only following files can be configured:
 
 - `expand_events.yaml`: Fields enabled, duration, nearBaseOnly, biome, requiredGlobalKeys, notRequiredGlobalKeys, pauseIfNoPlayerInArea, random. 
 - `expand_locations.yaml`: Only normally available or disabled [prefabs](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) can be used.
