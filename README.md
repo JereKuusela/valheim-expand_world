@@ -340,7 +340,6 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - paintRadius (default: `exteriorRadius`): Size of the painted area.
 - paintBorder (default: `5`): Adds a smooth transition around the `paintRadius`.
 - centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
-- offset: Moves the blueprint away from the center point. Format is `x,z,y`. For example value 0,0,5 would move the blueprint 5 meters up.	
 
 ## Dungeons
 
@@ -437,6 +436,7 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
 - data: ZDO data override. For example to create hidden stashes with Spawner Tweaks mod (`object copy` from World Edit Commands).
+- centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
 
 ## Spawns
 

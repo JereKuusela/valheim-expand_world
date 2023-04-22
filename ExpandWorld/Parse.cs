@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
@@ -54,6 +55,18 @@ public static class Parse
     vector.z = Float(args, index + 1, defaultValue.z);
     vector.y = Float(args, index + 2, defaultValue.y);
     return Quaternion.Euler(vector);
+  }
+  public static List<BlueprintObject> Objects(string[] args)
+  {
+    return args.Select(Parse.Split).Select(split => new BlueprintObject(
+        split[0],
+        Parse.VectorXZY(split, 1),
+        Parse.AngleYXZ(split, 4),
+        Parse.VectorXZY(split, 7, Vector3.one),
+        "",
+        Data.ToZDO(split.Length > 11 ? split[11] : ""),
+        Parse.Float(split, 10, 1f)
+      )).ToList();
   }
   public static string[] Split(string arg) => arg.Split(',').Select(s => s.Trim()).Where(s => s != "").ToArray();
   public static string Name(string arg) => arg.Split(':')[0];

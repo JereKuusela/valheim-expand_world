@@ -40,7 +40,7 @@ public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
   public float Radius = 0f;
-  public void Center(Vector3 offset, string centerPiece = "piece_bpcenterpoint")
+  public void Center(string centerPiece)
   {
     Bounds bounds = new();
     var y = float.MaxValue;
@@ -66,7 +66,6 @@ public class Blueprint
       }
     }
     Radius = Utils.LengthXZ(bounds.extents);
-    center -= offset;
     foreach (var obj in Objects)
       obj.Pos -= center;
     if (rot != Quaternion.identity)

@@ -70,4 +70,6 @@ public class VegetationData
   public float forestTresholdMax = 1f;
   [DefaultValue("")]
   public string data = "";
+  [DefaultValue("piece_bpcenterpoint")]
+  public string centerPiece = "piece_bpcenterpoint";
 }

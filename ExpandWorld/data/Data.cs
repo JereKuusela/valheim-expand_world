@@ -123,8 +123,7 @@ public class Data : MonoBehaviour
   }
   private static void ReloadBlueprint(string name)
   {
-    VegetationManager.ReloadBlueprint(name);
-    LocationManager.ReloadBlueprint(name);
+    BlueprintManager.Reload(name);
   }
   public static void SetupBlueprintWatcher()
   {

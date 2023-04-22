@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 namespace ExpandWorld;
 
 public class RoomManager
@@ -11,6 +12,7 @@ public class RoomManager
   public static string Pattern = "expand_rooms*.yaml";
 
   private static Dictionary<string, DungeonDB.RoomData> Rooms = new();
+  public static Dictionary<string, List<BlueprintObject>> Objects = new();
 
   private static DungeonDB.RoomData Clone(DungeonDB.RoomData roomData)
   {
@@ -64,6 +66,8 @@ public class RoomManager
       connection.m_allowDoor = dataConnection.door == "true";
       connection.m_doorOnlyIfOtherAlsoAllowsDoor = dataConnection.door == "other";
     }
+    if (data.objects != null)
+      Objects[data.name] = Parse.Objects(data.objects);
     return roomData;
   }
   public static RoomData ToData(Room room)
@@ -108,6 +112,7 @@ public class RoomManager
   {
     if (Rooms.Count > 0)
       DungeonDB.instance.m_rooms = Rooms.Values.ToList();
+    Objects.Clear();
     if (yaml == "" || !Configuration.DataRooms) return;
     try
     {

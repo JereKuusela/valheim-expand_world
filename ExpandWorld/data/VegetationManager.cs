@@ -14,18 +14,8 @@ public class VegetationManager
   public static string FileName = "expand_vegetation.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_vegetation*.yaml";
-  public static Dictionary<string, Blueprint> BlueprintFiles = new();
 
-  public static void ReloadBlueprint(string name)
-  {
-    if (!Blueprints.TryGetBluePrint(name, out var bp)) return;
-    name = Path.GetFileNameWithoutExtension(name);
-    var vegs = ZoneSystem.instance.m_vegetation.Where(l => Parse.Name(l.m_prefab.name) == name).ToList();
-    if (vegs.Count == 0) return;
-    ExpandWorld.Log.LogInfo($"Reloading blueprint {name} used by {vegs.Count} vegetationaw  .");
-    foreach (var veg in vegs)
-      BlueprintFiles[veg.m_prefab.name] = bp;
-  }
+
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data)
   {
     var veg = new ZoneSystem.ZoneVegetation();
@@ -44,14 +34,9 @@ public class VegetationManager
     }
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
       veg.m_prefab = obj;
-    else if (Blueprints.TryGetBluePrint(data.prefab, out var bp))
-    {
-      veg.m_prefab = new GameObject();
-      veg.m_prefab.name = data.prefab;
-      BlueprintFiles[data.prefab] = bp;
-    }
     else
-      ExpandWorld.Log.LogWarning($"Vegetation prefab {data.prefab} not found!");
+      BlueprintManager.Load(data.prefab, data.centerPiece);
+
     veg.m_enable = data.enabled;
     veg.m_min = data.min;
     veg.m_max = data.max;
@@ -146,7 +131,6 @@ public class VegetationManager
   public static Dictionary<ZoneSystem.ZoneVegetation, ZDO> ZDO = new();
   private static void Set(string yaml)
   {
-    BlueprintFiles.Clear();
     Scale.Clear();
     ZDO.Clear();
     if (yaml == "" || !Configuration.DataVegetation) return;
@@ -219,7 +203,7 @@ public class PlaceVegetation
     SetData(prefab, position, rotation, Vector3.one);
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     Data.CleanGhostInit(obj);
-    if (VegetationManager.BlueprintFiles.TryGetValue(prefab.name, out var bp))
+    if (BlueprintManager.TryGet(prefab.name, out var bp))
       SpawnBlueprint(bp, position, rotation);
     return obj;
   }
@@ -239,7 +223,7 @@ public class PlaceVegetation
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
     if (!prefab)
     {
-      if (VegetationManager.BlueprintFiles.TryGetValue(obj.Prefab, out var bp))
+      if (BlueprintManager.TryGet(obj.Prefab, out var bp))
       {
         SpawnBlueprint(bp, objPos, objRot);
         return;

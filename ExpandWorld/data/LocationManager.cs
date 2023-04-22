@@ -18,35 +18,34 @@ public class LocationManager
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, LocationData> LocationData = new();
   public static Dictionary<string, string> Dungeons = new();
-  public static Dictionary<string, Blueprint> BlueprintFiles = new();
   public static Dictionary<string, Location> BlueprintLocations = new();
   public static ZoneSystem.ZoneLocation FromData(LocationData data)
   {
     var loc = new ZoneSystem.ZoneLocation();
     LocationData[data.prefab] = data;
+    if (!ZoneLocations.ContainsKey(Parse.Name(data.prefab)))
+      BlueprintManager.Load(data.prefab, data.centerPiece);
+
     if (data.data != "")
       ZDO[data.prefab] = Data.ToZDO(data.data);
     if (data.dungeon != "")
       Dungeons[data.prefab] = data.dungeon;
     if (data.objectSwap != null)
     {
-      ObjectSwaps[data.prefab] = data.objectSwap.Select(Data.ToList)
+      var swaps = data.objectSwap.Select(Data.ToList)
         .ToDictionary(arr => arr[0], arr => ParseTuple(arr.Skip(1)));
+      foreach (var kvp in swaps)
+      {
+        foreach (var swap in kvp.Value)
+          BlueprintManager.Load(swap.Item2, data.centerPiece);
+      }
+      ObjectSwaps[data.prefab] = swaps;
     }
     if (data.objectData != null)
       ObjectData[data.prefab] = data.objectData.Select(Data.ToList).ToDictionary(arr => arr[0], arr => Data.ToZDO(arr[1]));
     if (data.objects != null)
-    {
-      Objects[data.prefab] = data.objects.Select(Parse.Split).Select(split => new BlueprintObject(
-        split[0],
-        Parse.VectorXZY(split, 1),
-        Parse.AngleYXZ(split, 4),
-        Parse.VectorXZY(split, 7, Vector3.one),
-        "",
-        Data.ToZDO(split.Length > 11 ? split[11] : ""),
-        Parse.Float(split, 10, 1f)
-      )).ToList();
-    }
+      Objects[data.prefab] = Parse.Objects(data.objects);
+
     loc.m_prefabName = data.prefab;
     loc.m_enable = data.enabled;
     loc.m_biome = Data.ToBiomes(data.biome);
@@ -73,6 +72,7 @@ public class LocationManager
     loc.m_maxAltitude = data.maxAltitude;
     return loc;
   }
+
   private static List<Tuple<float, string>> ParseTuple(IEnumerable<string> items)
   {
     var total = 0f;
@@ -156,7 +156,6 @@ public class LocationManager
     Dungeons.Clear();
     Objects.Clear();
     LocationData.Clear();
-    BlueprintFiles.Clear();
     if (Configuration.DataLocation && File.Exists(FilePath))
     {
       var missingLocations = SetLocations(FromFile(Data.Read(Pattern)), true);
@@ -238,29 +237,10 @@ public class LocationManager
     return location;
   }
 
-  public static void ReloadBlueprint(string name)
-  {
-    name = Path.GetFileNameWithoutExtension(name);
-    var locs = ZoneSystem.instance.m_locations.Where(l => Parse.Name(l.m_prefabName) == name).ToList();
-    if (locs.Count == 0) return;
-    ExpandWorld.Log.LogInfo($"Reloading blueprint {name} used by {locs.Count} location.");
-    foreach (var loc in locs)
-      SetupBlueprint(loc);
-  }
 
   private static bool SetupBlueprint(ZoneSystem.ZoneLocation location)
   {
-    var name = Parse.Name(location.m_prefabName);
-    if (!Blueprints.TryGetBluePrint(name, out var bp)) return false;
-    Vector3 offset = Vector3.zero;
-    string centerPiece = "piece_bpcenterpoint";
-    if (LocationData.TryGetValue(name, out var data))
-    {
-      offset = Parse.VectorXZY(data.offset);
-      centerPiece = data.centerPiece;
-    }
-    bp.Center(offset, centerPiece);
-    BlueprintFiles[location.m_prefabName] = bp;
+    if (!BlueprintManager.TryGet(location.m_prefabName, out var bp)) return false;
     location.m_prefab = new();
     location.m_location = GetBluePrintLocation(location.m_prefabName);
     ApplyLocationData(location, bp.Radius + 5);
@@ -271,7 +251,7 @@ public class LocationManager
   ///<summary>Copies setup from locations.</summary>
   private static void Setup(ZoneSystem.ZoneLocation item, bool showWarnings)
   {
-    var prefabName = item.m_prefabName.Split(':')[0];
+    var prefabName = Parse.Name(item.m_prefabName);
     item.m_hash = item.m_prefabName.GetStableHashCode();
     if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
     {
@@ -386,63 +366,12 @@ public class FixGhostInit
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SpawnLocation))]
 public class LocationObjectDataAndSwap
 {
-  private static string Location = "";
   static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
   {
     if (mode != ZoneSystem.SpawnMode.Client)
-      Location = location.m_prefabName;
-    return !LocationManager.BlueprintFiles.ContainsKey(location.m_prefabName);
-  }
-  static void SetData(string location, GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
-  {
-    if (data == null)
-    {
-      if (!LocationManager.ObjectData.TryGetValue(location, out var objectData)) return;
-      if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out data)) return;
-    }
-    if (data == null) return;
-    if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, scale, data, view);
-  }
-  static string RandomizeSwap(List<Tuple<float, string>> swaps)
-  {
-    if (swaps.Count == 0)
-      return "";
-    if (swaps.Count == 1)
-      return swaps[0].Item2;
-    var rng = UnityEngine.Random.value;
-    foreach (var swap in swaps)
-    {
-      rng -= swap.Item1;
-      if (rng <= 0f) return swap.Item2;
-    }
-    return swaps[swaps.Count - 1].Item2;
-  }
-  static GameObject Swap(string location, GameObject prefab)
-  {
-    if (!LocationManager.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return prefab;
-    if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swaps)) return prefab;
-    var swap = RandomizeSwap(swaps);
-    return ZNetScene.instance.GetPrefab(swap) ?? prefab;
-  }
-  public static GameObject Instantiate(GameObject prefab, Vector3 position, Quaternion rotation)
-  {
-    prefab = Swap(Location, prefab);
-    return InstantiateWithData(Location, prefab, position, rotation, Vector3.one);
-  }
-  public static GameObject InstantiateWithData(string location, GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
-  {
-    SetData(location, prefab, position, rotation, scale, data);
-    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
-    if (obj.TryGetComponent<DungeonGenerator>(out var dg))
-    {
-      if (LocationManager.Dungeons.TryGetValue(location, out var dungeon))
-        DungeonManager.Override(dg, dungeon);
-      else
-        DungeonManager.Override(dg, Utils.GetPrefabName(obj));
-    }
-    Data.CleanGhostInit(obj);
-    return obj;
+      DungeonSpawning.Location = location;
+    // Blueprints won't have any znetviews to spawn or other logic to handle.
+    return !BlueprintManager.Has(location.m_prefabName);
   }
 
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -450,64 +379,25 @@ public class LocationObjectDataAndSwap
     var instantiator = typeof(UnityEngine.Object).GetMethods().First(m => m.Name == nameof(UnityEngine.Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator))
-      .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_S, 5))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_S, 6))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_1))
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(LocationSpawning.Object).operand)
       .InstructionEnumeration();
   }
 
-  static void SpawnBPO(ZoneSystem __instance, bool flag, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects, BlueprintObject obj)
-  {
-    var objPos = pos + rot * obj.Pos;
-    var objRot = rot * obj.Rot;
-    var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
-    if (!prefab)
-    {
-      if (LocationManager.BlueprintFiles.TryGetValue(obj.Prefab, out var bp))
-      {
-        SpawnBlueprint(bp, __instance, location, objPos, objRot, mode, spawnedGhostObjects);
-        return;
-      }
-      ExpandWorld.Log.LogWarning($"Blueprint prefab {obj.Prefab} not found!");
-      return;
-    }
-    if (mode == ZoneSystem.SpawnMode.Ghost)
-    {
-      ZNetView.StartGhostInit();
-    }
-    var go = InstantiateWithData(location.m_prefabName, prefab, objPos, objRot, obj.Scale, obj.Data);
-    go.GetComponent<ZNetView>().GetZDO().SetPGWVersion(__instance.m_pgwVersion);
-    if (go.TryGetComponent<DungeonGenerator>(out var dg))
-    {
-      if (flag)
-        dg.m_originalPosition = location.m_generatorPosition;
-      dg.Generate(mode);
-    }
-    if (mode == ZoneSystem.SpawnMode.Ghost)
-    {
-      spawnedGhostObjects.Add(go);
-      ZNetView.FinishGhostInit();
-    }
-  }
+
   static void Postfix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
     if (mode == ZoneSystem.SpawnMode.Client) return;
-    var isBluePrint = LocationManager.BlueprintFiles.TryGetValue(location.m_prefabName, out var bp);
+    var isBluePrint = BlueprintManager.TryGet(location.m_prefabName, out var bp);
     if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
       HandleTerrain(pos, location.m_exteriorRadius, isBluePrint, data);
     if (isBluePrint)
-      SpawnBlueprint(bp, __instance, location, pos, rot, mode, spawnedGhostObjects);
-    SpawnCustomObjects(__instance, location, pos, rot, mode, spawnedGhostObjects);
+      LocationSpawning.Blueprint(bp, location, pos, rot, mode, spawnedGhostObjects);
+    LocationSpawning.CustomObjects(location, pos, rot, mode, spawnedGhostObjects);
   }
-  static void SpawnCustomObjects(ZoneSystem zs, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
-  {
-    if (!LocationManager.Objects.TryGetValue(location.m_prefabName, out var objects)) return;
-    var loc = location.m_location;
-    var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
-    foreach (var obj in objects)
-    {
-      if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      SpawnBPO(zs, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
-    }
-  }
+
   static void HandleTerrain(Vector3 pos, float radius, bool isBlueprint, LocationData data)
   {
     var level = false;
@@ -538,37 +428,9 @@ public class LocationObjectDataAndSwap
       }
     });
   }
-  static void SpawnBlueprint(Blueprint bp, ZoneSystem zs, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
-  {
-    var loc = location.m_location;
-    WearNTear.m_randomInitialDamage = loc.m_applyRandomDamage;
-    var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
-    foreach (var obj in bp.Objects)
-    {
-      if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      SpawnBPO(zs, flag, location, pos, rot, mode, spawnedGhostObjects, obj);
-    }
-    WearNTear.m_randomInitialDamage = false;
-  }
 
-  public static IEnumerable<CodeInstruction> TranspileInstantiate(IEnumerable<CodeInstruction> instructions)
-  {
-    var instantiator = typeof(UnityEngine.Object).GetMethods().First(m => m.Name == nameof(UnityEngine.Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
-    return new CodeMatcher(instructions)
-      .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator)).Set(OpCodes.Call, Transpilers.EmitDelegate(LocationObjectDataAndSwap.Instantiate).operand)
-      .InstructionEnumeration();
-  }
-}
 
-[HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode))]
-public class DungeonDataAndSwap
-{
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
-}
-[HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.PlaceDoors))]
-public class DungeonDoorDataAndSwap
-{
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => LocationObjectDataAndSwap.TranspileInstantiate(instructions);
+
 }
 
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GetLocationIcons))]
