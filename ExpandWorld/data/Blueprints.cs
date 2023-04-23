@@ -39,9 +39,12 @@ public class BlueprintObject
 public class Blueprint
 {
   public List<BlueprintObject> Objects = new();
+  public string CenterPiece = "piece_bpcenterpoint";
   public float Radius = 0f;
   public void Center(string centerPiece)
   {
+    if (centerPiece == "")
+      centerPiece = CenterPiece;
     Bounds bounds = new();
     var y = float.MaxValue;
     Quaternion rot = Quaternion.identity;
@@ -127,6 +130,8 @@ public class Blueprints
         piece = false;
       else if (row.StartsWith("#pieces", StringComparison.OrdinalIgnoreCase))
         piece = true;
+      else if (row.StartsWith("#center:", StringComparison.OrdinalIgnoreCase))
+        bp.CenterPiece = row.Split(':')[1];
       else if (row.StartsWith("#", StringComparison.Ordinal))
         continue;
       else if (piece)

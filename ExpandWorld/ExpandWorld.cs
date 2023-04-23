@@ -131,6 +131,7 @@ public class IncreaseTimeout
 {
   static bool Prefix(bool enable)
   {
+    if (Configuration.ServerOnly) return true;
     ZRpc.m_timeout = 300f;
     ZLog.Log(string.Format("ZRpc timeout set to {0}s ", ZRpc.m_timeout));
     return false;

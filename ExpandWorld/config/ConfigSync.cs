@@ -268,7 +268,7 @@ public class ConfigSync
         for (; ; )
         {
           yield return new WaitForSeconds(30);
-          if (!adminList.GetList().SequenceEqual(CurrentList))
+          if (!Configuration.ServerOnly && !adminList.GetList().SequenceEqual(CurrentList))
           {
             CurrentList = new List<string>(adminList.GetList());
 
@@ -785,6 +785,7 @@ public class ConfigSync
     [HarmonyPrefix]
     private static void Prefix(ref Dictionary<Assembly, BufferingSocket>? __state, ZNet __instance, ZRpc rpc)
     {
+      if (Configuration.ServerOnly) return;
       if (__instance.IsServer())
       {
         BufferingSocket bufferingSocket = new(rpc.GetSocket());
@@ -803,6 +804,7 @@ public class ConfigSync
     [HarmonyPostfix]
     private static void Postfix(Dictionary<Assembly, BufferingSocket> __state, ZNet __instance, ZRpc rpc)
     {
+      if (Configuration.ServerOnly) return;
       if (!__instance.IsServer())
       {
         return;
@@ -879,6 +881,7 @@ public class ConfigSync
 
   private void Broadcast(long target, params ConfigEntryBase[] configs)
   {
+    if (Configuration.ServerOnly) return;
     if (!IsLocked || isServer)
     {
       ZPackage package = ConfigsToPackage(configs);
@@ -888,6 +891,7 @@ public class ConfigSync
 
   private void Broadcast(long target, params CustomSyncedValueBase[] customValues)
   {
+    if (Configuration.ServerOnly) return;
     if (!IsLocked || isServer)
     {
       ZPackage package = ConfigsToPackage(customValues: customValues);

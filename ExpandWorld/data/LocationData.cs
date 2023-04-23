@@ -82,6 +82,6 @@ public class LocationData
   public float? paintRadius = null;
   [DefaultValue(null)]
   public float? paintBorder = null;
-  [DefaultValue("piece_bpcenterpoint")]
-  public string centerPiece = "piece_bpcenterpoint";
+  [DefaultValue("")]
+  public string centerPiece = "";
 }

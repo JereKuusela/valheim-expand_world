@@ -95,7 +95,6 @@ public partial class Configuration
   public static ConfigEntry<string> configBlueprintFolder;
   public static string BlueprintGlobalFolder => Path.Combine("BepInEx", "config", configBlueprintFolder.Value);
   public static string BlueprintLocalFolder => Path.Combine(Paths.ConfigPath, configBlueprintFolder.Value);
-
 #nullable enable
   public static void Init(ConfigWrapper wrapper)
   {
