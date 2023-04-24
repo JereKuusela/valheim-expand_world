@@ -285,6 +285,8 @@ Note: Missing locations are automatically added to the file. If you want to disa
 
 Note: Location information is a server side feature. For testing, use single player so that your client has also server side features available.
 
+Note: Each zone (64m x 64m) can only have one size.
+
 See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.
 
 See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md).
@@ -337,6 +339,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
   - data: ZDO data override.
 - applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
 - exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).
+  - Note: Maximum suggested value is 32 meters. Higher values go past the zone border and can cause issues.
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
 - noBuild (default: `false`): If true, players can't build within `exteriorRadius`. If number, player can't build within the given radius.
 - noBuildDungeon (default: `false`): If true, players can't build inside dungeons within `exteriorRadius`. If number, player can't build inside dungeons within the given radius.
@@ -353,6 +356,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 The file `expand_dungeons.yaml` sets dungeon generators.
 
 Command `ew_dungeons` can be used to list available rooms for each dungeon.
+
+Note: Dungeon is always generated within the zone (64m x 64m).
 
 - name: Name of the dungeon generator.
 - algorithm: Type of the dungeon. Possible values are `Dungeon`, `CampGrid` or `CampRadial`.
@@ -411,8 +416,8 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 
 - prefab: Identifier of the object or name of blueprint file.
 - enabled (default: `false`): Quick way to disable this entry.
-- min (default: `1`): Minimum amount (of groups) to be placed.
-- max (default: `1`): Maximum amount (of groups) to be placed. If less than 1, has only a chance to appear.
+- min (default: `1`): Minimum amount (of groups) to be placed per zone (64m x 64m).
+- max (default: `1`): Maximum amount (of groups) to be placed per zone (64m x 64m). If less than 1, has only a chance to appear.
 - forcePlacement (default: `false`): By default, only one attempt is made to find a suitable position for each vegetation. If enabled, 50 attempts are done for each vegetation.
 - scaleMin (default: `1`): Minimum scale. Number or x,z,y (with y being the height).  
 - scaleMax (default: `1`): Maximum scale. Number or x,z,y (with y being the height).
