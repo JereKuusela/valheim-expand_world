@@ -8,8 +8,6 @@
   - Fixes Jewelcrafting boss icons not working.
   - Removes the field `offset` from the `expand_locations.yaml`.
   - Removes network traffic when in "Server side only" mode.
-  - TODO?: swaps working on rooms, first checking room swaps and then location swaps.
-  - TODO?: all in, blueprints as rooms
 
 - v1.32
   - Adds missing location entries automatically to the `expand_locations.yaml` file.

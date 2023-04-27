@@ -21,6 +21,11 @@ See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/ma
 - How to make custom biomes: https://youtu.be/TgFhW0MtYyw (33 minutes, created by StonedProphet)
 - How to use blueprints as locations with custom spawners: https://youtu.be/DXtm-WLF6KE (30 minutes, created by StonedProphet)
 
+# Migration from version 1.32
+
+- If you have used `offset` in locations.yaml, use the center piece feature instead. Sorry...
+
+
 # Credits
 
 Thanks for Azumatt for creating the mod icon!
