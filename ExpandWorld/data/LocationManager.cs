@@ -439,7 +439,7 @@ public class LocationIcons
   static bool Prefix(ZoneSystem __instance, Dictionary<Vector3, string> icons)
   {
     if (!Configuration.DataLocation) return true;
-    if (!ZNet.instance.IsServer()) return false;
+    if (!ZNet.instance.IsServer()) return true;
     foreach (var kvp in __instance.m_locationInstances)
     {
       var loc = kvp.Value.m_location;

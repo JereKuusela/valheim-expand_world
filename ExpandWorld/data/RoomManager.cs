@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace ExpandWorld;
 
@@ -20,8 +21,9 @@ public class RoomManager
     var clone = new DungeonDB.RoomData();
     clone.m_netViews = roomData.m_netViews;
     clone.m_randomSpawns = roomData.m_randomSpawns;
-    clone.m_room = new Room();
-    clone.m_room.name = room.name;
+    // Vanilla name should be used so that clients can find the room.
+    var go = new GameObject(room.name);
+    clone.m_room = go.AddComponent<Room>();
     clone.m_room.m_theme = room.m_theme;
     clone.m_room.m_entrance = room.m_entrance;
     clone.m_room.m_endCap = room.m_endCap;
@@ -120,10 +122,7 @@ public class RoomManager
         Rooms = DungeonDB.instance.m_rooms.ToDictionary(room => room.m_room.name, room => room);
       var rooms = Data.Deserialize<RoomData>(yaml, FileName).Select(FromData).ToList();
       DungeonDB.instance.m_rooms = rooms;
-      DungeonDB.instance.GenerateHashList();
-      // Names should be vanilla so that this can be server side.
-      foreach (var room in rooms)
-        room.m_room.gameObject.name = Parse.Name(room.m_room.gameObject.name);
+      // No need to generate the hashlist because no actual rooms can be added.
       ExpandWorld.Log.LogInfo($"Reloading {rooms.Count} room data.");
     }
     catch (Exception e)
