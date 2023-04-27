@@ -422,17 +422,17 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
 - scaleMin (default: `1`): Minimum scale. Number or x,z,y (with y being the height).  
 - scaleMax (default: `1`): Maximum scale. Number or x,z,y (with y being the height).
 - scaleUniform (default: `true`): If disabled, each axis is scaled independently.
-- randTilt (default: `0` degrees): Random rotation.
-- chanceToUseGroundTilt (default: `0.0`): Chance to set rotation based on terrain angle.
+- randTilt (default: `0` degrees): Random rotation within the degrees.
+- chanceToUseGroundTilt (default: `0.0`): Chance to set rotation based on terrain angle (from 0.0 to 1.0).
 - biome: List of possible biomes.
-- biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome, 4 = unused, leftover from Valheim data).
-- blockCheck (default: `true`): Requires clear ground.
+- biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome, 4 = unused from Valheim data).
+- blockCheck (default: `true`): If enabled, clear ground is required.
 - minAltitude (default: `0` meters): Minimum terrain altitude.
 - maxAltitude (default: `1000` meters): Maximum terrain altitude.
-- minOceanDepth (default: `0` meters): Minimum ocean depth.
-- maxOceanDepth (default: `0` meters): Maximum ocean depth.
-- minVegetation (default: `0`): Minimum vegetation mask.
-- maxVegetation (default: `0`): Maximum vegetation mask.
+- minOceanDepth (default: `0` meters): Minimum ocean depth (interpolated from zone corners so slightly different from `minAltitude`).
+- maxOceanDepth (default: `0` meters): Maximum ocean depth (interpolated from zone corners so slightly different from `maxAltitude`).
+- minVegetation (default: `0`): Minimum vegetation mask (random value from 0.0 to 1.0, only used in Mistlands biome).
+- maxVegetation (default: `0`): Maximum vegetation mask (random value from 0.0 to 1.0, only used in Mistlands biome).
 - minTilt (default: `0` degrees): Minimum terrain angle.
 - maxTilt (default: `90` degrees): Maximum terrain angle.
 - terrainDeltaRadius (default: `0` meters): Radius for terrain delta limits.
@@ -442,11 +442,11 @@ Changes only apply to unexplored areas. Upgrade World mod can be used to reset a
   - Higher values cause the vegetation to be based on slopes.
 - maxTerrainDelta (default: `10` meters): Maximum terrain height change.
   - Lower values cause the vegetation to be based on flatter areas.
-- snapToWater (default: `false`): Placed at the water level instead of the terrain level.
-- snapToStaticSolid (default: `false`): Placed at the top of solid objects instead of terrain.
+- snapToWater (default: `false`): If enabled, placed at the water level instead of the terrain level.
+- snapToStaticSolid (default: `false`): If enabled, placed at the top of solid objects instead of terrain.
 - groundOffset (default: `0` meters): Placed above the ground.
-- groupSizeMin (default: `1`): Minimum amount to be placed at the same time.
-- groupSizeMax (default: `1`): Maximum amount to be placed at the same time.
+- groupSizeMin (default: `1`): Minimum amount to be placed per group.
+- groupSizeMax (default: `1`): Maximum amount to be placed per group.
 - groupRadius (default: `0` meters): Radius for group placement. This should be less than 32 meters to avoid overflowing to adjacent zones.
 - inForest (default: `false`): If enabled, forest thresholds are checked.
   - This creates clusters of vegetation, instead of them being placed evenly.
