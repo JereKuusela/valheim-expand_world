@@ -366,10 +366,14 @@ public class FixGhostInit
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.SpawnLocation))]
 public class LocationObjectDataAndSwap
 {
-  static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode)
+  static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode, ref Vector3 pos)
   {
     if (mode != ZoneSystem.SpawnMode.Client)
+    {
       DungeonSpawning.Location = location;
+      if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
+        pos.y += data.groundOffset;
+    }
     // Blueprints won't have any znetviews to spawn or other logic to handle.
     return !BlueprintManager.Has(location.m_prefabName);
   }
@@ -392,7 +396,11 @@ public class LocationObjectDataAndSwap
     if (mode == ZoneSystem.SpawnMode.Client) return;
     var isBluePrint = BlueprintManager.TryGet(location.m_prefabName, out var bp);
     if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
-      HandleTerrain(pos, location.m_exteriorRadius, isBluePrint, data);
+    {
+      // Remove the applied offset.
+      var surface = pos with { y = pos.y - data.groundOffset };
+      HandleTerrain(surface, location.m_exteriorRadius, isBluePrint, data);
+    }
     if (isBluePrint)
       LocationSpawning.Blueprint(bp, location, pos, rot, mode, spawnedGhostObjects);
     LocationSpawning.CustomObjects(location, pos, rot, mode, spawnedGhostObjects);

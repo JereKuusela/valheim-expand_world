@@ -318,6 +318,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - inForest (default: `false`): Only in forests.
 - forestTresholdMin (default: `0`): Minimum forest value (if only in forests).
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
+- groundOffset (default: `0` meters): Placed above the ground.
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
 - objectSwap: Changes child objects to some other objects, including dungeons.
     - Use format `id, swapid` for a direct swap.
@@ -407,6 +408,13 @@ Completely new rooms can't be created but you can create variants by adding `:su
   - type: Type of the connection.
   - entrance (default: `false`): If true, used for the entrance.
   - door (default: `true`): If true, allows placing door. If other, allows placing door if the other connection also allows placing a door.
+- objects: Extra objects or blueprints. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
+  - id: Prefab name.
+  - posX, posZ, posY: Offset from the location position. Defalt is 0.
+  - rotY, rotX, rotZ: Rotation. Default is 0.
+  - scaleX, scaleZ, scaleY: Scale. Default is 1.
+  - chance: Chance to spawn (from 0 to 1). Default is 1.
+  - data: ZDO data override.
 
 ## Vegetation
 

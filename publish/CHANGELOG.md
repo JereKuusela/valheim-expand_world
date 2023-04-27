@@ -1,3 +1,6 @@
+- v1.34
+  - Adds a new field `groundOffset` to the `expand_locations.yaml`.
+
 - v1.33
   - Adds a new command `ew_dungeons` to print their available rooms.
   - Adds a blueprint support to the field `objectSwap` in the `expand_locations.yaml`.
