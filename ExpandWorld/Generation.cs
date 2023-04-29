@@ -145,6 +145,7 @@ public class WorldGeneration
     if (ClutterSystem.instance)
       ClutterSystem.instance.ClearAll();
     SetupMaterial.Refresh();
+    WaterLayerFix.Refresh(EnvMan.instance);
     if (ct.IsCancellationRequested)
       yield break;
     yield return null;

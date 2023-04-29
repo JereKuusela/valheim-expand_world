@@ -86,6 +86,18 @@ public class SetupMaterial
     obj.m_waterSurface.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
   }
 }
+
+[HarmonyPatch(typeof(EnvMan), nameof(EnvMan.Awake))]
+public class WaterLayerFix
+{
+  public static void Refresh(EnvMan obj)
+  {
+    var water = obj.transform.Find("WaterPlane")?.Find("watersurface");
+    water?.GetComponent<MeshRenderer>()?.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+  }
+  public static void Postfix(EnvMan __instance) => Refresh(__instance);
+}
+
 [HarmonyPatch(typeof(EnvMan), nameof(EnvMan.UpdateWind))]
 public class UpdateWind
 {
