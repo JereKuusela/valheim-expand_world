@@ -1,3 +1,6 @@
+- v1.35
+  - Improves suppport for massive locations (radius larger than 32 meters).
+
 - v1.34
   - Adds a new field `groundOffset` to the `expand_locations.yaml`.
 
