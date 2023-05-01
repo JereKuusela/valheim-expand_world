@@ -1,4 +1,5 @@
 - v1.36
+  - Adds missing vegetation entries automatically to the `expand_vegetation.yaml` file.
   - Changes the location distance meter threshold from 1.0 to 2.0 meters (now only values higher than 2.0 are considered as meters instead of relative to the world size).
   - Fixes conflict with mods that cause client side dungeon regeneration.
   - Fixes the chance field not working on blueprint files.

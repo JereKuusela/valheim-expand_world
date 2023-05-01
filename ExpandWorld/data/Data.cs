@@ -51,7 +51,6 @@ public class InitializeContent
       EventManager.ToFile();
       DungeonManager.ToFile();
       EnvironmentManager.ToFile();
-      VegetationManager.ToFile();
       ClutterManager.ToFile();
 
       EnvironmentManager.FromFile();
@@ -60,7 +59,7 @@ public class InitializeContent
       WorldManager.ToFile();
 
       // These are here to not have to clear location lists (slightly better compatibility).
-      VegetationManager.FromFile();
+      VegetationLoading.Load();
       // Clutter must be here because since SetupLocations adds prefabs to the list.
       ClutterManager.FromFile();
 

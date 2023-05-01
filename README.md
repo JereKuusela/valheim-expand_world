@@ -300,7 +300,7 @@ The file `expand_clutter.yaml` sets the small visual objects.
 
 The file `expand_locations.yaml` sets the available locations and their placement. This is a server side feature, clients don't have access to this data.
 
-Note: Missing locations are automatically added to the file. If you want to disable a location, set `enabled` to `false` instead of removing any entries.
+Note: Missing locations are automatically added to the file. To disable, set `enabled` to `false` instead of removing anything.
 
 Note: Each zone (64m x 64m) can only have one size.
 
@@ -438,6 +438,8 @@ Completely new rooms can't be created but you can create variants by adding `:su
 The file `expand_vegetations.yaml` sets the generated objects. This is a server side feature, clients don't have access to this data.
 
 Changes only apply to unexplored areas. Upgrade World mod can be used to reset areas.
+
+Note: Missing vegetation are automatically added to the file. To disable, set `enabled` to `false` instead of removing anything.
 
 - prefab: Identifier of the object or name of blueprint file.
 - enabled (default: `false`): Quick way to disable this entry.
