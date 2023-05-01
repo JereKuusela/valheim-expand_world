@@ -76,7 +76,7 @@ public class EventManager
     {
       EventToRequirentEnvironment.Clear();
       var data = Data.Deserialize<EventData>(yaml, FileName).Select(FromData).ToList();
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} event data.");
+      ExpandWorld.Log.LogInfo($"Reloading event data ({data.Count} entries).");
       RandEventSystem.instance.m_events = data;
     }
     catch (Exception e)

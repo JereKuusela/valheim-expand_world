@@ -120,7 +120,7 @@ public class ClutterManager
         ExpandWorld.Log.LogWarning($"Failed to load any clutter data.");
         return;
       }
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} clutter data.");
+      ExpandWorld.Log.LogInfo($"Reloading clutter data ({data.Count} entries).");
       ClutterSystem.instance.m_clutter.Clear();
       foreach (var clutter in data)
         ClutterSystem.instance.m_clutter.Add(clutter);

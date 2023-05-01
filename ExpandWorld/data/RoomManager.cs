@@ -123,7 +123,7 @@ public class RoomManager
       var rooms = Data.Deserialize<RoomData>(yaml, FileName).Select(FromData).ToList();
       DungeonDB.instance.m_rooms = rooms;
       // No need to generate the hashlist because no actual rooms can be added.
-      ExpandWorld.Log.LogInfo($"Reloading {rooms.Count} room data.");
+      ExpandWorld.Log.LogInfo($"Reloading room data ({rooms.Count} entries).");
     }
     catch (Exception e)
     {

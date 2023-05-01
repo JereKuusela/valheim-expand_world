@@ -69,14 +69,10 @@ public class InitializeContent
       // Room data is handled elsewhere.
       // Spawn data is handled elsewhere.
     }
-    // Overwrite location setup with our stuff.
-    LocationManager.DefaultItems = ZoneSystem.instance.m_locations;
-    LocationManager.SetupLocations(ZoneSystem.instance.m_locations);
+    ZoneSystem.instance.m_locations = LocationSetup.CleanUpLocations(ZoneSystem.instance.m_locations);
+    LocationSetup.SetupExtraLocations(ZoneSystem.instance.m_locations);
     if (Helper.IsServer())
-      LocationManager.Load();
-    else
-      // Client doesn't need any real data.
-      LocationManager.SetLocations(new(), false);
+      LocationLoading.Load();
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]

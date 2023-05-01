@@ -133,7 +133,7 @@ public class WorldManager
         ExpandWorld.Log.LogWarning($"Failed to load any world data.");
         return;
       }
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} world data.");
+      ExpandWorld.Log.LogInfo($"Reloading world data ({data.Count} entries).");
       GetBiome.Data = data;
       GetBiome.CheckAngles = data.Any(x => x.minSector != 0f || x.maxSector != 1f);
       Generate.World();

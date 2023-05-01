@@ -178,7 +178,7 @@ public partial class Configuration
     configDataWorld = wrapper.Bind(section, "World data", true, true, "Use world data");
     configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(valueWorldData.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");
-    configDataLocation.SettingChanged += (s, e) => LocationManager.Load();
+    configDataLocation.SettingChanged += (s, e) => LocationLoading.Load();
     configDataVegetation = wrapper.Bind(section, "Vegetation data", true, false, "Use vegetation data");
     configDataVegetation.SettingChanged += (s, e) => VegetationLoading.Load();
     configDataEvents = wrapper.Bind(section, "Event data", true, false, "Use event data");

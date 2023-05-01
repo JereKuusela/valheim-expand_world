@@ -132,7 +132,7 @@ public class BiomeManager
   {
     var rawData = Parse(yaml);
     if (rawData.Count > 0)
-      ExpandWorld.Log.LogInfo($"Preloading {rawData.Count} biome names.");
+      ExpandWorld.Log.LogInfo($"Preloading biome names ({rawData.Count} entries).");
     var originalNames = OriginalBiomes.Select(kvp => kvp.Key.ToLower()).ToHashSet();
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
@@ -151,7 +151,7 @@ public class BiomeManager
     if (yaml == "" || !Configuration.DataBiome) return;
     var rawData = Parse(yaml);
     if (rawData.Count > 0)
-      ExpandWorld.Log.LogInfo($"Reloading {rawData.Count} biome data.");
+      ExpandWorld.Log.LogInfo($"Reloading biome data ({rawData.Count} entries).");
     BiomeToData.Clear();
     BiomeToColor.Clear();
     NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);

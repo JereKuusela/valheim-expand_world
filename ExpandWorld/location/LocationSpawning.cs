@@ -13,7 +13,7 @@ public class LocationSpawning
   {
     if (data == null)
     {
-      if (!LocationManager.ObjectData.TryGetValue(location, out var objectData)) return;
+      if (!LocationLoading.ObjectData.TryGetValue(location, out var objectData)) return;
       if (!objectData.TryGetValue(Utils.GetPrefabName(prefab), out data)) return;
     }
     if (data == null) return;
@@ -37,7 +37,7 @@ public class LocationSpawning
   public static bool TryGetSwap(string location, GameObject prefab, out string swapped)
   {
     swapped = "";
-    if (!LocationManager.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return false;
+    if (!LocationLoading.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return false;
     if (!objectSwaps.TryGetValue(Utils.GetPrefabName(prefab), out var swaps)) return false;
     swapped = RandomizeSwap(swaps);
     return true;
@@ -69,7 +69,7 @@ public class LocationSpawning
     var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     if (obj.TryGetComponent<DungeonGenerator>(out var dg))
     {
-      if (LocationManager.Dungeons.TryGetValue(location, out var dungeon))
+      if (LocationLoading.Dungeons.TryGetValue(location, out var dungeon))
         DungeonManager.Override(dg, dungeon);
       else
         DungeonManager.Override(dg, Utils.GetPrefabName(obj));
@@ -131,7 +131,7 @@ public class LocationSpawning
   public static void CustomObjects(ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
     var zs = ZoneSystem.instance;
-    if (!LocationManager.Objects.TryGetValue(location.m_prefabName, out var objects)) return;
+    if (!LocationLoading.Objects.TryGetValue(location.m_prefabName, out var objects)) return;
     var loc = location.m_location;
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     foreach (var obj in objects)

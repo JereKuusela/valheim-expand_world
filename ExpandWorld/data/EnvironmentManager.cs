@@ -147,7 +147,7 @@ public class EnvironmentManager
         ExpandWorld.Log.LogWarning($"Failed to load any environment data.");
         return;
       }
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} environment data.");
+      ExpandWorld.Log.LogInfo($"Reloading environment data ({data.Count} entries).");
       foreach (var list in LocationList.m_allLocationLists)
         list.m_environments.Clear();
       var em = EnvMan.instance;

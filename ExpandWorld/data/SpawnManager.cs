@@ -149,7 +149,7 @@ public class SpawnManager
         ExpandWorld.Log.LogWarning($"Failed to load any spawn data.");
         return;
       }
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} spawn data.");
+      ExpandWorld.Log.LogInfo($"Reloading spawn data ({data.Count} entries).");
       HandleSpawnData.Override = data;
       foreach (var system in SpawnSystem.m_instances)
       {

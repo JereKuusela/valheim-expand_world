@@ -119,7 +119,7 @@ public class DungeonManager
     {
       RoomNames = DungeonDB.instance.m_rooms.ToDictionary(room => room.m_room.name.ToLowerInvariant(), room => room.m_room.name);
       Generators = Data.Deserialize<DungeonData>(yaml, FileName).ToDictionary(data => data.name, FromData);
-      ExpandWorld.Log.LogInfo($"Reloading {Generators.Count} dungeon data.");
+      ExpandWorld.Log.LogInfo($"Reloading dungeon data ({Generators.Count} entries).");
     }
     catch (Exception e)
     {

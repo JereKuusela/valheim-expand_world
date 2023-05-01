@@ -7,7 +7,7 @@ using HarmonyLib;
 using UnityEngine;
 namespace ExpandWorld;
 
-public class LocationManager
+public class LocationLoading
 {
   public static string FileName = "expand_locations.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
@@ -23,7 +23,7 @@ public class LocationManager
   {
     var loc = new ZoneSystem.ZoneLocation();
     LocationData[data.prefab] = data;
-    if (!ZoneLocations.ContainsKey(Parse.Name(data.prefab)))
+    if (!DefaultEntries.ContainsKey(Parse.Name(data.prefab)))
       BlueprintManager.Load(data.prefab, data.centerPiece);
 
     if (data.data != "")
@@ -148,17 +148,17 @@ public class LocationManager
     // Directly appending is risky if something goes wrong (like missing a linebreak).
     File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
   }
-
   public static void Load()
   {
     if (Helper.IsClient()) return;
+    if (DefaultEntries.Count == 0) DefaultEntries = ZoneSystem.instance.m_locations.ToDictionary(l => l.m_prefabName, l => l);
     ZDO.Clear();
     ObjectSwaps.Clear();
     ObjectData.Clear();
     Dungeons.Clear();
     Objects.Clear();
     LocationData.Clear();
-    ZoneSystem.instance.m_locations = DefaultItems;
+    ZoneSystem.instance.m_locations = DefaultEntries.Values.ToList();
     if (Configuration.DataLocation)
     {
       if (!File.Exists(FilePath))
@@ -171,6 +171,7 @@ public class LocationManager
       if (data.Count == 0)
       {
         ExpandWorld.Log.LogWarning($"Failed to load any location data.");
+        ExpandWorld.Log.LogInfo($"Reloading default location data ({DefaultEntries.Count} entries).");
       }
       else
       {
@@ -180,11 +181,13 @@ public class LocationManager
           return;
         }
         ZoneSystem.instance.m_locations = data;
-
+        ExpandWorld.Log.LogInfo($"Reloading location data ({data.Count} entries).");
       }
     }
-    var showWarnings = ZoneSystem.instance.m_locations != DefaultItems;
-    SetLocations(ZoneSystem.instance.m_locations, showWarnings);
+    else
+      ExpandWorld.Log.LogInfo($"Reloading default location data ({DefaultEntries.Count} entries).");
+    foreach (var item in ZoneSystem.instance.m_locations) Setup(item);
+    LocationSetup.UpdateHashes();
     UpdateInstances();
     NoBuildManager.UpdateData();
     ZoneSystem.instance.SendLocationIcons(ZRoutedRpc.Everybody);
@@ -210,10 +213,10 @@ public class LocationManager
       instances[zone] = value;
     }
   }
-  public static List<ZoneSystem.ZoneLocation> DefaultItems = new();
+  private static Dictionary<string, ZoneSystem.ZoneLocation> DefaultEntries = new();
   private static bool AddMissingEntries(List<ZoneSystem.ZoneLocation> items)
   {
-    var missing = ZoneLocations.Where(def => !items.Any(item => item.m_prefabName == def.Key)).ToList();
+    var missing = DefaultEntries.Where(loc => !items.Any(item => item.m_prefabName == loc.Key)).ToList();
     if (missing.Count == 0) return false;
     ExpandWorld.Log.LogWarning($"Adding {missing.Count} missing locations to the expand_locations.yaml file.");
     foreach (var loc in missing)
@@ -230,10 +233,8 @@ public class LocationManager
     try
     {
       var yaml = Data.Read(Pattern);
-      var data = Data.Deserialize<LocationData>(yaml, FileName)
+      return Data.Deserialize<LocationData>(yaml, FileName)
         .Select(FromData).ToList();
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} location data.");
-      return data;
     }
     catch (Exception e)
     {
@@ -256,12 +257,12 @@ public class LocationManager
   }
   public static Location GetBluePrintLocation(string prefab)
   {
-    if (!LocationManager.BlueprintLocations.TryGetValue(prefab, out var location))
+    if (!LocationLoading.BlueprintLocations.TryGetValue(prefab, out var location))
     {
       var obj = new GameObject();
       obj.name = "Blueprint";
       location = obj.AddComponent<Location>();
-      LocationManager.BlueprintLocations.Add(prefab, location);
+      LocationLoading.BlueprintLocations.Add(prefab, location);
     }
     return location;
   }
@@ -278,15 +279,14 @@ public class LocationManager
     return true;
   }
   ///<summary>Copies setup from locations.</summary>
-  private static void Setup(ZoneSystem.ZoneLocation item, bool showWarnings)
+  private static void Setup(ZoneSystem.ZoneLocation item)
   {
     var prefabName = Parse.Name(item.m_prefabName);
     item.m_hash = item.m_prefabName.GetStableHashCode();
-    if (!ZoneLocations.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
+    if (!DefaultEntries.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
     {
       if (SetupBlueprint(item)) return;
-      if (showWarnings)
-        ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
+      ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");
       return;
     }
     item.m_prefab = zoneLocation.m_prefab;
@@ -299,68 +299,10 @@ public class LocationManager
     item.m_netViews = zoneLocation.m_netViews;
     item.m_randomSpawns = zoneLocation.m_randomSpawns;
   }
-  ///<summary>Sets zone location entries (ensures that all locations have an entry).</summary>
-  public static void SetLocations(List<ZoneSystem.ZoneLocation> items, bool showWarnings)
-  {
-    var zs = ZoneSystem.instance;
-    var remaining = ZoneLocations.Keys.ToHashSet();
-    foreach (var item in items)
-    {
-      Setup(item, showWarnings);
-      remaining.Remove(item.m_prefabName);
-    }
-    zs.m_locations = items;
-    zs.m_locations.AddRange(remaining.Select(name => ZoneLocations[name]));
-    ExpandWorld.Log.LogDebug($"Loaded {zs.m_locations.Count} zone locations.");
-    UpdateHashes();
-  }
-  private static Dictionary<string, ZoneSystem.ZoneLocation> ZoneLocations = new();
-  ///<summary>Vanilla only loads enabled locations. To allow extra ones, simply do setup for all content.</summary>
-  public static void SetupLocations(List<ZoneSystem.ZoneLocation> initialized)
-  {
-    ZoneLocations = initialized.Where(loc => loc.m_prefab).ToDictionary(kvp => kvp.m_prefabName, kvp => kvp);
-    var array = Resources.FindObjectsOfTypeAll<GameObject>();
-    foreach (var obj in array)
-    {
-      if (obj.name != "_Locations") continue;
-      var locations = obj.GetComponentsInChildren<Location>(true);
-      var missingLocations = locations.Where(loc => !ZoneLocations.ContainsKey(loc.gameObject.name)).ToArray();
-      ExpandWorld.Log.LogDebug($"Enabled {missingLocations.Length} extra locations.");
-      foreach (var location in missingLocations)
-        SetupLocation(location);
-    }
-    ExpandWorld.Log.LogDebug($"Loaded {ZoneLocations.Count} locations.");
-  }
 
-  public static void UpdateHashes()
-  {
-    var zs = ZoneSystem.instance;
-    foreach (ZoneSystem.ZoneLocation zoneLocation in zs.m_locations)
-      zs.m_locationsByHash[zoneLocation.m_hash] = zoneLocation;
-    ExpandWorld.Log.LogDebug($"Loaded {zs.m_locationsByHash.Count} zone hashes.");
-  }
-  ///<summary>Initializes a zone location.</summary>
-  private static void SetupLocation(Location location)
-  {
-    ZoneSystem.ZoneLocation zoneLocation = new();
-    zoneLocation.m_enable = false;
-    zoneLocation.m_maxTerrainDelta = 10f;
-    zoneLocation.m_randomRotation = false;
-    zoneLocation.m_prefab = location.gameObject;
-    zoneLocation.m_prefabName = zoneLocation.m_prefab.name;
-    zoneLocation.m_hash = zoneLocation.m_prefabName.GetStableHashCode();
-    zoneLocation.m_location = location;
-    zoneLocation.m_interiorRadius = (location.m_hasInterior ? location.m_interiorRadius : 0f);
-    zoneLocation.m_exteriorRadius = location.m_exteriorRadius;
-    if (location.m_interiorTransform && location.m_generator)
-    {
-      zoneLocation.m_interiorPosition = location.m_interiorTransform.localPosition;
-      zoneLocation.m_generatorPosition = location.m_generator.transform.localPosition;
-    }
-    ZoneSystem.PrepareNetViews(zoneLocation.m_prefab, zoneLocation.m_netViews);
-    ZoneSystem.PrepareRandomSpawns(zoneLocation.m_prefab, zoneLocation.m_randomSpawns);
-    ZoneLocations[location.gameObject.name] = zoneLocation;
-  }
+
+
+
 
   public static void SetupWatcher()
   {
@@ -372,7 +314,7 @@ public class LocationZDO
 {
   static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation, ZoneSystem.SpawnMode mode)
   {
-    if (!LocationManager.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
+    if (!LocationLoading.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
     if (data != null) Data.InitZDO(pos, rotation, Vector3.one, data, view);
   }
@@ -399,7 +341,7 @@ public class LocationObjectDataAndSwap
     if (mode != ZoneSystem.SpawnMode.Client)
     {
       DungeonSpawning.Location = location;
-      if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
+      if (LocationLoading.LocationData.TryGetValue(location.m_prefabName, out var data))
         pos.y += data.groundOffset;
     }
     // Blueprints won't have any znetviews to spawn or other logic to handle.
@@ -423,7 +365,7 @@ public class LocationObjectDataAndSwap
   {
     if (mode == ZoneSystem.SpawnMode.Client) return;
     var isBluePrint = BlueprintManager.TryGet(location.m_prefabName, out var bp);
-    if (LocationManager.LocationData.TryGetValue(location.m_prefabName, out var data))
+    if (LocationLoading.LocationData.TryGetValue(location.m_prefabName, out var data))
     {
       // Remove the applied offset.
       var surface = pos with { y = pos.y - data.groundOffset };
@@ -482,7 +424,7 @@ public class LocationIcons
       var loc = kvp.Value.m_location;
       var pos = kvp.Value.m_position;
       if (loc == null) continue;
-      if (LocationManager.LocationData.TryGetValue(loc.m_prefabName, out var data))
+      if (LocationLoading.LocationData.TryGetValue(loc.m_prefabName, out var data))
       {
         var placed = data.iconPlaced == "true" ? loc.m_prefabName : data.iconPlaced == "false" ? "" : data.iconPlaced;
         if (kvp.Value.m_placed && placed != "")

@@ -25,7 +25,7 @@ public class NoBuildManager
     {
       var noBuild = "true";
       var noBuildDungeon = "false";
-      if (LocationManager.LocationData.TryGetValue(loc.m_location.m_prefabName, out var locationData))
+      if (LocationLoading.LocationData.TryGetValue(loc.m_location.m_prefabName, out var locationData))
       {
         noBuild = locationData.noBuild;
         noBuildDungeon = locationData.noBuildDungeon;
@@ -72,7 +72,7 @@ public class NoBuildManager
     try
     {
       var data = Data.Deserialize<NoBuildData>(yaml, "");
-      ExpandWorld.Log.LogInfo($"Reloading {data.Count} no build data.");
+      ExpandWorld.Log.LogInfo($"Reloading no build data ({data.Count} entries).");
       NoBuild = data.ToDictionary(data => ZoneSystem.instance.GetZone(new(data.X, 0, data.Z)));
     }
     catch (Exception e)

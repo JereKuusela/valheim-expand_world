@@ -43,7 +43,7 @@ public class ExpandWorld : BaseUnityPlugin
 
       SetupWatcher();
       BiomeManager.SetupWatcher();
-      LocationManager.SetupWatcher();
+      LocationLoading.SetupWatcher();
       VegetationLoading.SetupWatcher();
       EventManager.SetupWatcher();
       SpawnManager.SetupWatcher();
