@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HarmonyLib;
-using UnityEngine;
 
 namespace ExpandWorld;
 
@@ -14,19 +13,19 @@ public class DungeonManager
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_dungeons*.yaml";
 
-  public static Dictionary<string, DungeonGenerator> Generators = new();
+  public static Dictionary<string, FakeDungeonGenerator> Generators = new();
   private static Dictionary<string, DungeonData> DungeonData = new();
   // To make them case insensitive.
   private static Dictionary<string, string> RoomNames = new();
-  public static DungeonGenerator FromData(DungeonData data)
+  public static FakeDungeonGenerator FromData(DungeonData data)
   {
-    var obj = new GameObject(data.name);
-    var dg = obj.AddComponent<DungeonGenerator>();
+    FakeDungeonGenerator dg = new();
     if (Enum.TryParse<DungeonGenerator.Algorithm>(data.algorithm, true, out var algorithm))
       dg.m_algorithm = algorithm;
     else
       ExpandWorld.Log.LogWarning($"Failed to find dungeon algorithm {data.algorithm}.");
     DungeonData[data.name] = data;
+    dg.name = data.name;
     dg.m_alternativeFunctionality = data.alternative;
     dg.m_campRadiusMax = data.campRadiusMax;
     dg.m_campRadiusMin = data.campRadiusMin;
@@ -46,6 +45,7 @@ public class DungeonManager
     dg.m_themes = Data.ToEnum<Room.Theme>(data.themes);
     dg.m_tileWidth = data.tileWidth;
     dg.m_spawnChance = data.spawnChance;
+    dg.m_gridSize = data.gridSize;
     dg.m_perimeterSections = data.perimeterSections;
     dg.m_perimeterBuffer = data.perimeterBuffer;
     dg.m_useCustomInteriorTransform = data.interiorTransform;
@@ -133,26 +133,27 @@ public class DungeonManager
 
   public static void Override(DungeonGenerator dg, string name)
   {
-    if (!Generators.TryGetValue(name, out var value)) return;
+    if (!Generators.TryGetValue(name, out var data)) return;
     dg.gameObject.name = name;
-    dg.m_algorithm = value.m_algorithm;
-    dg.m_alternativeFunctionality = value.m_alternativeFunctionality;
-    dg.m_campRadiusMax = value.m_campRadiusMax;
-    dg.m_campRadiusMin = value.m_campRadiusMin;
-    dg.m_doorChance = value.m_doorChance;
-    dg.m_doorTypes = value.m_doorTypes;
-    dg.m_maxRooms = value.m_maxRooms;
-    dg.m_minRooms = value.m_minRooms;
-    dg.m_maxTilt = value.m_maxTilt;
-    dg.m_minAltitude = value.m_minAltitude;
-    dg.m_minRequiredRooms = value.m_minRequiredRooms;
-    dg.m_requiredRooms = value.m_requiredRooms;
-    dg.m_themes = value.m_themes;
-    dg.m_tileWidth = value.m_tileWidth;
-    dg.m_spawnChance = value.m_spawnChance;
-    dg.m_perimeterSections = value.m_perimeterSections;
-    dg.m_perimeterBuffer = value.m_perimeterBuffer;
-    dg.m_useCustomInteriorTransform = value.m_useCustomInteriorTransform;
+    dg.m_algorithm = data.m_algorithm;
+    dg.m_alternativeFunctionality = data.m_alternativeFunctionality;
+    dg.m_campRadiusMax = data.m_campRadiusMax;
+    dg.m_campRadiusMin = data.m_campRadiusMin;
+    dg.m_doorChance = data.m_doorChance;
+    dg.m_doorTypes = data.m_doorTypes;
+    dg.m_maxRooms = data.m_maxRooms;
+    dg.m_minRooms = data.m_minRooms;
+    dg.m_maxTilt = data.m_maxTilt;
+    dg.m_minAltitude = data.m_minAltitude;
+    dg.m_minRequiredRooms = data.m_minRequiredRooms;
+    dg.m_requiredRooms = data.m_requiredRooms;
+    dg.m_themes = data.m_themes;
+    dg.m_gridSize = data.m_gridSize;
+    dg.m_tileWidth = data.m_tileWidth;
+    dg.m_spawnChance = data.m_spawnChance;
+    dg.m_perimeterSections = data.m_perimeterSections;
+    dg.m_perimeterBuffer = data.m_perimeterBuffer;
+    dg.m_useCustomInteriorTransform = data.m_useCustomInteriorTransform;
   }
   [HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
   public static void SetupAvailableRooms(DungeonGenerator __instance)
