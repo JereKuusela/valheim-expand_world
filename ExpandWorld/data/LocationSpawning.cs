@@ -145,9 +145,13 @@ public class LocationSpawning
 [HarmonyPatch(typeof(DungeonGenerator))]
 public class DungeonSpawning
 {
-  public static ZoneSystem.ZoneLocation Location = new();
+  public static ZoneSystem.ZoneLocation? Location = null;
   public static GameObject Object(GameObject prefab, Vector3 position, Quaternion rotation, ZoneSystem.SpawnMode mode)
   {
+    // Some mods cause client side dungeon reloading.
+    // In this case location information is not available.
+    // Revert to the default behaviour as fail safe.
+    if (Location == null) return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     var locName = Location.m_prefabName;
     if (LocationSpawning.TryGetSwap(locName, prefab, out var objName))
       prefab = ZNetScene.instance.GetPrefab(objName);

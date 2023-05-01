@@ -114,6 +114,8 @@ Each file can be disabled from the main .cfg file to improve compatibility and p
 
 Data can be split to multiple files. The files are loaded alphabetically in reverse order. For example `expand_biomes_custom.yaml` would be loaded first and then `expand_biomes.yaml`.
 
+Note: Some files are server side only. Use single player for testing so that your client has access to all of the information. Mods that cause clients to regenerate dungeons or locations may not work correctly.
+
 ## Biomes
 
 The file `expand_biomes.yaml` sets available biomes and their configuration.
@@ -279,11 +281,9 @@ The file `expand_clutter.yaml` sets the small visual objects.
 
 ## Locations
 
-The file `expand_locations.yaml` sets the available locations and their placement.
+The file `expand_locations.yaml` sets the available locations and their placement. This is a server side feature, clients don't have access to this data.
 
 Note: Missing locations are automatically added to the file. If you want to disable a location, set `enabled` to `false` instead of removing any entries.
-
-Note: Location information is a server side feature. For testing, use single player so that your client has also server side features available.
 
 Note: Each zone (64m x 64m) can only have one size.
 
@@ -354,7 +354,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 
 ## Dungeons
 
-The file `expand_dungeons.yaml` sets dungeon generators.
+The file `expand_dungeons.yaml` sets dungeon generators. This is a server side feature, clients don't have access to this data.
 
 Command `ew_dungeons` can be used to list available rooms for each dungeon.
 
@@ -387,7 +387,7 @@ Note: Dungeon is always generated within the zone (64m x 64m).
 
 ## Rooms
 
-The file `expand_rooms.yaml` sets available dungeon rooms.
+The file `expand_rooms.yaml` sets available dungeon rooms. This is a server side feature, clients don't have access to this data.
 
 Completely new rooms can't be created but you can create variants by adding `:suffix` to the name (not tested at all, may not work).
 
@@ -418,7 +418,7 @@ Completely new rooms can't be created but you can create variants by adding `:su
 
 ## Vegetation
 
-The file `expand_vegetations.yaml` sets the generated objects.
+The file `expand_vegetations.yaml` sets the generated objects. This is a server side feature, clients don't have access to this data.
 
 Changes only apply to unexplored areas. Upgrade World mod can be used to reset areas.
 

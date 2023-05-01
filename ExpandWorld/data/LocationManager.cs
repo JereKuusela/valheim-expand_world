@@ -404,6 +404,7 @@ public class LocationObjectDataAndSwap
     if (isBluePrint)
       LocationSpawning.Blueprint(bp, location, pos, rot, mode, spawnedGhostObjects);
     LocationSpawning.CustomObjects(location, pos, rot, mode, spawnedGhostObjects);
+    DungeonSpawning.Location = null;
   }
 
   static void HandleTerrain(Vector3 pos, float radius, bool isBlueprint, LocationData data)
