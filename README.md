@@ -116,6 +116,23 @@ Data can be split to multiple files. The files are loaded alphabetically in reve
 
 Note: Some files are server side only. Use single player for testing so that your client has access to all of the information. Mods that cause clients to regenerate dungeons or locations may not work correctly.
 
+### Blueprints
+
+Dungeons, locations and vegetation support using blueprints to spawn multiple objects. Both PlanBuild .blueprint and BuildShare .vbuild files are supported (however PlanBuild files are preferred).
+
+The file format is slightly modified from the usual:
+
+- Two new fields are added to both .blueprint and .vbuild files.
+  - zdoData initializes the object with a specific data. Infinity Hammer automatically saves this when creating .blueprint files.
+  - chance is a number between 0 and 1. These must be added manually to the file.
+  - .blueprint format: name;posX;posY;posZ;rotX;rotT;rotZ;rotW;info;scaleX;scaleY;scaleZ;zdoData;chance
+  - .vbuild format: name;rotX;rotT;rotZ;rotW;posX;posY;posZ;zdoData;chance
+- Blueprints can contain other blueprints as objects. These must added manually to the file.
+- Center piece (bottom center of the blueprint) can be set to a certain object. This object is never spawned to the world.
+  - Infinity Hammer saves this information to .blueprint files.
+  - Center piece can also be set in the .yaml files.
+  - If a blueprint is used multiple times, it should always use the same center piece.
+
 ## Biomes
 
 The file `expand_biomes.yaml` sets available biomes and their configuration.
@@ -299,8 +316,8 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome).
 - dungeon: Overrides the default dungeon generator with a custom one from `expand_dungeons.yaml`.
 - quantity: Maximum amount. Actual amount is determined if enough suitable positions are found. The base .cfg has a setting to multiply these.
-- minDistance (default: `0.0` of world radius): Minimum distance from the world center. Values higher than 1.0 are considered meters and are automatically scaled with the world radius.
-- maxDistance (default: `1.0` of world radius): Maximum distance from the world center. Values higher than 1.0 are considered meters and are automatically scaled with the world radius.
+- minDistance (default: `0.0` of world radius): Minimum distance from the world center. Values over 2.0 are considered as meters.
+- maxDistance (default: `1.0` of world radius): Maximum distance from the world center. Values over 2.0 are considered as meters.
 - minAltitude (default: `0`): Minimum altitude.
 - maxAltitude (default: `1000`): Maximum altitude.
 - prioritized (default: `false`): Generated first with more attempts.

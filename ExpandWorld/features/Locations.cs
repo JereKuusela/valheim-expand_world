@@ -77,9 +77,7 @@ public class GenerateLocationsMax
   static void Prefix(ZoneSystem.ZoneLocation location, ref float __state)
   {
     __state = location.m_maxDistance;
-    if (location.m_maxDistance > 1f)
-      location.m_maxDistance *= Configuration.WorldRadius / 10000f;
-    else
+    if (location.m_maxDistance <= 2f)
       location.m_maxDistance *= Configuration.WorldRadius;
   }
   static void Postfix(ZoneSystem.ZoneLocation location, float __state)

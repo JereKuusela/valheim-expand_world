@@ -16,7 +16,7 @@ public class BlueprintObject
   public string ExtraInfo;
   public ZDO? Data;
   public float Chance = 1f;
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data, float chance = 1f)
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data, float chance)
   {
     Prefab = name;
     Pos = pos;
@@ -256,6 +256,7 @@ public class Blueprints
     var scaleY = InvariantFloat(split, 11, 1f);
     var scaleZ = InvariantFloat(split, 12, 1f);
     var data = split.Length > 13 ? split[13] : "";
+    var chance = split.Length > 14 ? InvariantFloat(split, 14, 1f) : 1f;
     ZDO? zdo = null;
     if (data != "")
     {
@@ -263,7 +264,7 @@ public class Blueprints
       ZPackage pkg = new(data);
       Deserialize(zdo, pkg);
     }
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), info, zdo);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), info, zdo, chance);
   }
   private static Vector3 GetPlanBuildSnapPoint(string row)
   {
@@ -291,7 +292,16 @@ public class Blueprints
     var posX = InvariantFloat(split, 5);
     var posY = InvariantFloat(split, 6);
     var posZ = InvariantFloat(split, 7);
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, "", null);
+    var data = split.Length > 8 ? split[8] : "";
+    var chance = split.Length > 9 ? InvariantFloat(split, 9, 1f) : 1f;
+    ZDO? zdo = null;
+    if (data != "")
+    {
+      zdo = new();
+      ZPackage pkg = new(data);
+      Deserialize(zdo, pkg);
+    }
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, "", zdo, chance);
   }
   private static float InvariantFloat(string[] row, int index, float defaultValue = 0f)
   {
