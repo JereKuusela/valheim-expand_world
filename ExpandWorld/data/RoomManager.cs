@@ -119,7 +119,7 @@ public class RoomManager
     try
     {
       if (Rooms.Count == 0)
-        Rooms = DungeonDB.instance.m_rooms.ToDictionary(room => room.m_room.name, room => room);
+        Rooms = Helper.ToDict(DungeonDB.instance.m_rooms, room => room.m_room.name, room => room);
       var rooms = Data.Deserialize<RoomData>(yaml, FileName).Select(FromData).ToList();
       DungeonDB.instance.m_rooms = rooms;
       // No need to generate the hashlist because no actual rooms can be added.

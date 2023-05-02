@@ -9,15 +9,15 @@ public class BlueprintManager
   public static bool TryGet(string name, out Blueprint bp) => BlueprintFiles.TryGetValue(Parse.Name(name), out bp);
   public static Dictionary<string, Blueprint> BlueprintFiles = new();
   private static Dictionary<string, string> CenterPieces = new();
-  public static void Load(string name, string centerPiece)
+  public static bool Load(string name, string centerPiece)
   {
     var hash = name.GetStableHashCode();
-    if (ZNetScene.instance.m_namedPrefabs.ContainsKey(hash)) return;
+    if (ZNetScene.instance.m_namedPrefabs.ContainsKey(hash)) return true;
     if (Blueprints.TryGetBluePrint(name, out var bp))
     {
       // Already loaded so no point to check again.
       // Center piece could be different but that would cause problems anyway.
-      if (BlueprintFiles.ContainsKey(name)) return;
+      if (BlueprintFiles.ContainsKey(name)) return true;
       CenterPieces[name] = centerPiece;
       bp.Center(centerPiece);
       BlueprintFiles[name] = bp;
@@ -26,9 +26,10 @@ public class BlueprintManager
         if (obj.Chance == 0) continue;
         Load(obj.Prefab, centerPiece);
       }
+      return true;
     }
-    else
-      ExpandWorld.Log.LogWarning($"Object / blueprint {name} not found!");
+    ExpandWorld.Log.LogWarning($"Object / blueprint {name} not found!");
+    return false;
   }
 
   public static void Reload(string name)

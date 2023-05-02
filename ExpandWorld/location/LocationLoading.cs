@@ -23,8 +23,12 @@ public class LocationLoading
   {
     var loc = new ZoneSystem.ZoneLocation();
     LocationData[data.prefab] = data;
-    if (!DefaultEntries.ContainsKey(Parse.Name(data.prefab)))
-      BlueprintManager.Load(data.prefab, data.centerPiece);
+    loc.m_prefabName = data.prefab;
+    if (!Locations.ContainsKey(Parse.Name(data.prefab)))
+    {
+      if (!BlueprintManager.Load(data.prefab, data.centerPiece))
+        loc.m_prefabName = "";
+    }
 
     if (data.data != "")
       ZDO[data.prefab] = Data.ToZDO(data.data);
@@ -46,7 +50,6 @@ public class LocationLoading
     if (data.objects != null)
       Objects[data.prefab] = Parse.Objects(data.objects);
 
-    loc.m_prefabName = data.prefab;
     loc.m_enable = data.enabled;
     loc.m_biome = Data.ToBiomes(data.biome);
     loc.m_biomeArea = Data.ToBiomeAreas(data.biomeArea);
@@ -151,14 +154,15 @@ public class LocationLoading
   public static void Load()
   {
     if (Helper.IsClient()) return;
-    if (DefaultEntries.Count == 0) DefaultEntries = ZoneSystem.instance.m_locations.ToDictionary(l => l.m_prefabName, l => l);
+    if (DefaultEntries.Count == 0) DefaultEntries = ZoneSystem.instance.m_locations;
+    if (Locations.Count == 0) Locations = Helper.ToDict(DefaultEntries, l => l.m_prefabName, l => l);
     ZDO.Clear();
     ObjectSwaps.Clear();
     ObjectData.Clear();
     Dungeons.Clear();
     Objects.Clear();
     LocationData.Clear();
-    ZoneSystem.instance.m_locations = DefaultEntries.Values.ToList();
+    ZoneSystem.instance.m_locations = DefaultEntries;
     if (Configuration.DataLocation)
     {
       if (!File.Exists(FilePath))
@@ -213,17 +217,24 @@ public class LocationLoading
       instances[zone] = value;
     }
   }
-  private static Dictionary<string, ZoneSystem.ZoneLocation> DefaultEntries = new();
+  // Dictionary can't be used because some mods might have multiple entries for the same location.
+  private static List<ZoneSystem.ZoneLocation> DefaultEntries = new();
+  // Used to optimize missing entries check (to avoid n^2 loop).
+  // Also used to quickly check if a location is blueprint or not.
+  private static Dictionary<string, ZoneSystem.ZoneLocation> Locations = new();
   private static bool AddMissingEntries(List<ZoneSystem.ZoneLocation> items)
   {
-    var missing = DefaultEntries.Where(loc => !items.Any(item => item.m_prefabName == loc.Key)).ToList();
-    if (missing.Count == 0) return false;
+    var missingKeys = Locations.Keys.ToHashSet();
+    foreach (var item in items)
+      missingKeys.Remove(item.m_prefabName);
+    if (missingKeys.Count == 0) return false;
+    var missing = DefaultEntries.Where(loc => missingKeys.Contains(loc.m_prefabName)).ToList();
     ExpandWorld.Log.LogWarning($"Adding {missing.Count} missing locations to the expand_locations.yaml file.");
-    foreach (var loc in missing)
-      ExpandWorld.Log.LogWarning(loc.Key);
+    foreach (var item in missing)
+      ExpandWorld.Log.LogWarning(item);
     var yaml = File.ReadAllText(FilePath);
     var data = Data.Deserialize<LocationData>(yaml, FileName).ToList();
-    data.AddRange(missing.Select(kvp => ToData(kvp.Value)));
+    data.AddRange(missing.Select(ToData));
     // Directly appending is risky if something goes wrong (like missing a linebreak).
     File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
     return true;
@@ -233,8 +244,8 @@ public class LocationLoading
     try
     {
       var yaml = Data.Read(Pattern);
-      return Data.Deserialize<LocationData>(yaml, FileName)
-        .Select(FromData).ToList();
+      return Data.Deserialize<LocationData>(yaml, FileName).Select(FromData)
+        .Where(loc => !string.IsNullOrEmpty(loc.m_prefabName)).ToList();
     }
     catch (Exception e)
     {
@@ -283,7 +294,7 @@ public class LocationLoading
   {
     var prefabName = Parse.Name(item.m_prefabName);
     item.m_hash = item.m_prefabName.GetStableHashCode();
-    if (!DefaultEntries.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
+    if (!Locations.TryGetValue(prefabName, out var zoneLocation) || zoneLocation.m_prefab == null || zoneLocation.m_location == null)
     {
       if (SetupBlueprint(item)) return;
       ExpandWorld.Log.LogWarning($"Location prefab {prefabName} not found!");

@@ -28,7 +28,7 @@ public class LocationSetup
   public static void UpdateHashes()
   {
     var zs = ZoneSystem.instance;
-    zs.m_locationsByHash = zs.m_locations.ToDictionary(loc => loc.m_hash, loc => loc);
+    zs.m_locationsByHash = Helper.ToDict(zs.m_locations, loc => loc.m_hash, loc => loc);
     ExpandWorld.Log.LogDebug($"Loaded {zs.m_locationsByHash.Count} zone hashes.");
   }
   // Copy paste from vanilla code.

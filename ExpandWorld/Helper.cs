@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
@@ -82,11 +84,24 @@ public static class Helper
     return range.Min.normalized != Vector3.one || range.Max.normalized != Vector3.one;
   }
 
-  public static string Print(float value) {
+  public static string Print(float value)
+  {
     return value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
   }
-  public static string Print(Vector3 vec) {
+  public static string Print(Vector3 vec)
+  {
     return $"{Print(vec.x)},{Print(vec.z)},{Print(vec.y)}";
+  }
+
+  ///<summary>Converts a list of items to a dictionary, merges duplicates.</summary>
+  public static Dictionary<K, V> ToDict<T, K, V>(IEnumerable<T> items, Func<T, K> key, Func<T, V> value)
+  {
+    return items.ToLookup(key, value).ToDictionary(kvp => kvp.Key, kvp => kvp.First());
+  }
+  ///<summary>Converts a list of items to a dictionary, merges duplicates.</summary>
+  public static HashSet<K> ToSet<T, K>(IEnumerable<T> items, Func<T, K> key)
+  {
+    return items.Select(key).Distinct().ToHashSet();
   }
 }
 

@@ -58,8 +58,8 @@ public class VegetationLoading
     try
     {
       var yaml = Data.Read(Pattern);
-      return Data.Deserialize<VegetationData>(yaml, FileName)
-      .Select(FromData).Where(veg => veg.m_prefab).ToList();
+      return Data.Deserialize<VegetationData>(yaml, FileName).Select(FromData)
+        .Where(veg => !string.IsNullOrEmpty(veg.m_name)).ToList();
     }
     catch (Exception e)
     {
@@ -70,15 +70,26 @@ public class VegetationLoading
   ///<summary>Cleans up default vegetation data and stores it to track missing entries.</summary>
   private static void SetDefaultEntries()
   {
-    ZoneSystem.instance.m_vegetation = ZoneSystem.instance.m_vegetation.Where(IsValid).Where(veg => veg.m_enable && veg.m_biome != 0).ToList();
+    ZoneSystem.instance.m_vegetation = ZoneSystem.instance.m_vegetation
+      .Where(veg => veg.m_prefab)
+      .Where(veg => ZNetScene.instance.m_namedPrefabs.ContainsKey(veg.m_prefab.name.GetStableHashCode()))
+      .Where(veg => veg.m_enable && veg.m_biome != 0 && veg.m_max > 0f).ToList();
     DefaultEntries = ZoneSystem.instance.m_vegetation;
+    DefaultKeys = Helper.ToSet(DefaultEntries, veg => veg.m_prefab.name);
   }
+  // Used to optimize missing entries check (to avoid n^2 loop).
+  private static HashSet<string> DefaultKeys = new();
+
   ///<summary>Detects missing entries and adds them back to the main yaml file. Returns true if anything was added.</summary>
   // Note: This is needed people add new content mods and then complain that Expand World doesn't spawn them.
   private static bool AddMissingEntries(List<ZoneSystem.ZoneVegetation> items)
   {
-    var missing = DefaultEntries.Where(def => !items.Any(item => item.m_prefab.name == def.m_prefab.name)).ToList();
-    if (missing.Count == 0) return false;
+    var missingKeys = DefaultKeys.ToHashSet();
+    foreach (var item in items)
+      missingKeys.Remove(item.m_name); // Our data always has m_name set properly, while prefab is missing for blueprints.
+    if (missingKeys.Count == 0) return false;
+    // But for original data, m_name can be anything but the prefab name should always be valid.
+    var missing = DefaultEntries.Where(veg => missingKeys.Contains(veg.m_prefab.name)).ToList();
     ExpandWorld.Log.LogWarning($"Adding {missing.Count} missing vegetation to the expand_vegetation.yaml file.");
     foreach (var veg in missing)
       ExpandWorld.Log.LogWarning(veg.m_prefab.name);
@@ -108,10 +119,14 @@ public class VegetationLoading
       VegetationSpawning.ZDO[veg] = zdo;
     }
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
+    {
+      veg.m_name = data.prefab;
       veg.m_prefab = obj;
-    else
-      BlueprintManager.Load(data.prefab, data.centerPiece);
-
+    }
+    else if (BlueprintManager.Load(data.prefab, data.centerPiece))
+    {
+      veg.m_name = data.prefab;
+    }
     veg.m_enable = data.enabled;
     veg.m_min = data.min;
     veg.m_max = data.max;
@@ -145,7 +160,6 @@ public class VegetationLoading
     veg.m_forestTresholdMax = data.forestTresholdMax;
     return veg;
   }
-  public static bool IsValid(ZoneSystem.ZoneVegetation veg) => veg.m_prefab && veg.m_prefab.GetComponent<ZNetView>() != null;
   public static VegetationData ToData(ZoneSystem.ZoneVegetation veg)
   {
     VegetationData data = new();

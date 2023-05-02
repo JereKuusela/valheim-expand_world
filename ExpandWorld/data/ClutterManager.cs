@@ -16,9 +16,7 @@ public class ClutterManager
   static void LoadPrefabs()
   {
     if (!ZNet.instance) return;
-    Prefabs = ClutterSystem.instance.m_clutter
-      .ToLookup(item => item.m_prefab.name, item => item.m_prefab)
-      .ToDictionary(kvp => kvp.Key, kvp => kvp.First());
+    Prefabs = Helper.ToDict(ClutterSystem.instance.m_clutter, item => item.m_prefab.name, item => item.m_prefab);
   }
   public static ClutterSystem.Clutter FromData(ClutterData data)
   {

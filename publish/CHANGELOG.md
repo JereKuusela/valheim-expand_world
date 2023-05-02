@@ -1,3 +1,6 @@
+- v1.37
+  - Further improves the location and vegetation loading logic to deal with edge cases and bad data.
+
 - v1.36
   - Adds missing vegetation entries automatically to the `expand_vegetation.yaml` file.
   - Changes the location distance meter threshold from 1.0 to 2.0 meters (now only values higher than 2.0 are considered as meters instead of relative to the world size).
