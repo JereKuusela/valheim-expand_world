@@ -1,5 +1,6 @@
 - v1.37
   - Further improves the location and vegetation loading logic to deal with edge cases and bad data.
+  - Fixes blueprint terrain leveling creating holes at zone edges.
 
 - v1.36
   - Adds missing vegetation entries automatically to the `expand_vegetation.yaml` file.

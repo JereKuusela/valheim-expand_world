@@ -45,9 +45,10 @@ public partial class Terrain
   {
     if (radius == 0f) return;
     var max = compiler.m_width + 1;
-    for (int x = 0; x < max; x++)
+    // Never return edges as they overlap with other zones.
+    for (int x = 1; x < max - 1; x++)
     {
-      for (int z = 0; z < max; z++)
+      for (int z = 1; z < max - 1; z++)
       {
         var nodePos = VertexToWorld(compiler.m_hmap, x, z);
         var dx = nodePos.x - centerPos.x;
