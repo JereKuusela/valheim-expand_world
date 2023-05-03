@@ -59,7 +59,7 @@ public class VegetationLoading
     {
       var yaml = Data.Read(Pattern);
       return Data.Deserialize<VegetationData>(yaml, FileName).Select(FromData)
-        .Where(veg => !string.IsNullOrEmpty(veg.m_name)).ToList();
+        .Where(veg => veg.m_name != "").ToList();
     }
     catch (Exception e)
     {
@@ -118,6 +118,7 @@ public class VegetationLoading
       Data.Deserialize(zdo, pkg);
       VegetationSpawning.ZDO[veg] = zdo;
     }
+    veg.m_name = "";
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
     {
       veg.m_name = data.prefab;

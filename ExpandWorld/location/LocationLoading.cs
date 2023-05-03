@@ -245,7 +245,7 @@ public class LocationLoading
     {
       var yaml = Data.Read(Pattern);
       return Data.Deserialize<LocationData>(yaml, FileName).Select(FromData)
-        .Where(loc => !string.IsNullOrEmpty(loc.m_prefabName)).ToList();
+        .Where(loc => loc.m_prefabName != "").ToList();
     }
     catch (Exception e)
     {

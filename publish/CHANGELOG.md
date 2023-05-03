@@ -1,3 +1,6 @@
+- v1.38
+  - Fixes invalid vegetation not being removed from the game system.
+
 - v1.37
   - Further improves the location and vegetation loading logic to deal with edge cases and bad data.
   - Fixes blueprint terrain leveling creating holes at zone edges.
