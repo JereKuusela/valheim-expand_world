@@ -32,8 +32,10 @@ Note: Pay extra attention when loading old worlds. Certain configurations can ca
 
 This mod can be used server only, without requiring clients to have it. However only following files can be configured:
 
+- `expand_dungeons.yaml`: All fields.
 - `expand_events.yaml`: Fields enabled, duration, nearBaseOnly, biome, requiredGlobalKeys, notRequiredGlobalKeys, pauseIfNoPlayerInArea, random. 
-- `expand_locations.yaml`: Only normally available or disabled [prefabs](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) can be used.
+- `expand_locations.yaml`: All fields, but some disabled locations won't work.
+- `expand_rooms.yaml`: All fields.
 - `expand_vegetation.yaml`: All fields.
 - `expand_world.cfg`: Only settings Location multiplier, Random event chance, Random event interval and Zone spawners.
 
