@@ -1,5 +1,6 @@
 - v1.38
   - Fixes invalid vegetation not being removed from the game system.
+  - Fixes blueprint vegetation not working.
 
 - v1.37
   - Further improves the location and vegetation loading logic to deal with edge cases and bad data.
@@ -30,7 +31,3 @@
   - Fixes Jewelcrafting boss icons not working.
   - Removes the field `offset` from the `expand_locations.yaml`.
   - Removes network traffic when in "Server side only" mode.
-
-- v1.32
-  - Adds missing location entries automatically to the `expand_locations.yaml` file.
-  - Fixes configs not loading correctly on the first run.

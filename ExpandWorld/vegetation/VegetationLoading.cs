@@ -59,7 +59,7 @@ public class VegetationLoading
     {
       var yaml = Data.Read(Pattern);
       return Data.Deserialize<VegetationData>(yaml, FileName).Select(FromData)
-        .Where(veg => veg.m_name != "").ToList();
+        .Where(veg => veg.m_prefab).ToList();
     }
     catch (Exception e)
     {
@@ -86,9 +86,9 @@ public class VegetationLoading
   {
     var missingKeys = DefaultKeys.ToHashSet();
     foreach (var item in items)
-      missingKeys.Remove(item.m_name); // Our data always has m_name set properly, while prefab is missing for blueprints.
+      missingKeys.Remove(item.m_prefab.name);
     if (missingKeys.Count == 0) return false;
-    // But for original data, m_name can be anything but the prefab name should always be valid.
+    // Don't use m_name because it can be anything for original items.
     var missing = DefaultEntries.Where(veg => missingKeys.Contains(veg.m_prefab.name)).ToList();
     ExpandWorld.Log.LogWarning($"Adding {missing.Count} missing vegetation to the expand_vegetation.yaml file.");
     foreach (var veg in missing)
@@ -118,15 +118,13 @@ public class VegetationLoading
       Data.Deserialize(zdo, pkg);
       VegetationSpawning.ZDO[veg] = zdo;
     }
-    veg.m_name = "";
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
     {
-      veg.m_name = data.prefab;
       veg.m_prefab = obj;
     }
     else if (BlueprintManager.Load(data.prefab, data.centerPiece))
     {
-      veg.m_name = data.prefab;
+      veg.m_prefab = new GameObject(data.prefab);
     }
     veg.m_enable = data.enabled;
     veg.m_min = data.min;
