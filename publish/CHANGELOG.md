@@ -1,3 +1,6 @@
+- v1.39
+  - Fixes corrupted or missing locations possibly causing an error during the gameplay.
+
 - v1.38
   - Fixes invalid vegetation not being removed from the game system.
   - Fixes blueprint vegetation not working.
