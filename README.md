@@ -408,7 +408,7 @@ Note: Dungeon is always generated within the zone (64m x 64m).
 
 The file `expand_rooms.yaml` sets available dungeon rooms. This is a server side feature, clients don't have access to this data.
 
-Completely new rooms can't be created but you can create variants by adding `:suffix` to the name (not tested at all, may not work).
+Completely new rooms can't be created but you can create variants by adding `:suffix` to the name.
 
 - name: Name of the room prefab.
 - theme: Determines in which dungeons this room can appear. See dungeons for available values.

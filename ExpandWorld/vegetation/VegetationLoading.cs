@@ -63,6 +63,7 @@ public class VegetationLoading
     }
     catch (Exception e)
     {
+      ExpandWorld.Log.LogError(e.Message);
       ExpandWorld.Log.LogError(e.StackTrace);
     }
     return new();
@@ -82,11 +83,11 @@ public class VegetationLoading
 
   ///<summary>Detects missing entries and adds them back to the main yaml file. Returns true if anything was added.</summary>
   // Note: This is needed people add new content mods and then complain that Expand World doesn't spawn them.
-  private static bool AddMissingEntries(List<ZoneSystem.ZoneVegetation> items)
+  private static bool AddMissingEntries(List<ZoneSystem.ZoneVegetation> entries)
   {
     var missingKeys = DefaultKeys.ToHashSet();
-    foreach (var item in items)
-      missingKeys.Remove(item.m_prefab.name);
+    foreach (var entry in entries)
+      missingKeys.Remove(entry.m_prefab.name);
     if (missingKeys.Count == 0) return false;
     // Don't use m_name because it can be anything for original items.
     var missing = DefaultEntries.Where(veg => missingKeys.Contains(veg.m_prefab.name)).ToList();

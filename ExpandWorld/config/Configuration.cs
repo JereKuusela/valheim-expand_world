@@ -174,7 +174,7 @@ public partial class Configuration
     configDataDungeons = wrapper.Bind(section, "Dungeon data", true, false, "Use dungeon data");
     configDataDungeons.SettingChanged += (s, e) => DungeonManager.FromFile();
     configDataRooms = wrapper.Bind(section, "Room data", true, false, "Use dungeon room data");
-    configDataRooms.SettingChanged += (s, e) => RoomManager.FromFile();
+    configDataRooms.SettingChanged += (s, e) => RoomLoading.Load();
     configDataWorld = wrapper.Bind(section, "World data", true, true, "Use world data");
     configDataWorld.SettingChanged += (s, e) => WorldManager.FromSetting(valueWorldData.Value);
     configDataLocation = wrapper.Bind(section, "Location data", true, false, "Use location data");

@@ -21,8 +21,7 @@ public class InitializeRooms
   {
     if (ZNet.instance.IsServer())
     {
-      RoomManager.FromFile();
-      RoomManager.ToFile();
+      RoomLoading.Load();
     }
   }
 }

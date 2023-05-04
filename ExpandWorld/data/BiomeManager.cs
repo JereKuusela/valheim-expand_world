@@ -117,6 +117,7 @@ public class BiomeManager
       catch (Exception e)
       {
         ExpandWorld.Log.LogWarning($"Failed to load any biome data.");
+        ExpandWorld.Log.LogError(e.Message);
         ExpandWorld.Log.LogError(e.StackTrace);
       }
     }

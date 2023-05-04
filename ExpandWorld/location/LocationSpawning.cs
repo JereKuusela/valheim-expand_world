@@ -187,7 +187,7 @@ public class DungeonSpawning
   static void DungeonCustomObjects(DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
     if (mode == ZoneSystem.SpawnMode.Client) return;
-    if (!RoomManager.Objects.TryGetValue(room.m_room.name, out var objects)) return;
+    if (!RoomSpawning.Objects.TryGetValue(room.m_room.name, out var objects)) return;
     int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
     UnityEngine.Random.State state = UnityEngine.Random.state;
     UnityEngine.Random.InitState(seed);

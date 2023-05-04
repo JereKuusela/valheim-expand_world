@@ -249,6 +249,7 @@ public class LocationLoading
     }
     catch (Exception e)
     {
+      ExpandWorld.Log.LogError(e.Message);
       ExpandWorld.Log.LogError(e.StackTrace);
     }
     return new();

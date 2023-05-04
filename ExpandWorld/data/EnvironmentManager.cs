@@ -161,6 +161,7 @@ public class EnvironmentManager
     }
     catch (Exception e)
     {
+      ExpandWorld.Log.LogError(e.Message);
       ExpandWorld.Log.LogError(e.StackTrace);
     }
   }
