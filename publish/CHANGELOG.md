@@ -1,6 +1,7 @@
 - v1.39
   - Fixes corrupted or missing locations possibly causing an error during the gameplay.
   - Fixes dungeon room variants not working.
+  - Fixes vegetation loading not working if mods overrode the vegetation prefab (now works with Krumpac Reforged mod).
 
 - v1.38
   - Fixes invalid vegetation not being removed from the game system.

@@ -86,10 +86,11 @@ public class VegetationLoading
   private static bool AddMissingEntries(List<ZoneSystem.ZoneVegetation> entries)
   {
     var missingKeys = DefaultKeys.ToHashSet();
+    // Some mods override prefabs so the m_prefab.name is not reliable.
     foreach (var entry in entries)
-      missingKeys.Remove(entry.m_prefab.name);
+      missingKeys.Remove(entry.m_name);
     if (missingKeys.Count == 0) return false;
-    // Don't use m_name because it can be anything for original items.
+    // But don't use m_name because it can be anything for original items.
     var missing = DefaultEntries.Where(veg => missingKeys.Contains(veg.m_prefab.name)).ToList();
     ExpandWorld.Log.LogWarning($"Adding {missing.Count} missing vegetation to the expand_vegetation.yaml file.");
     foreach (var veg in missing)
@@ -106,6 +107,7 @@ public class VegetationLoading
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data)
   {
     var veg = new ZoneSystem.ZoneVegetation();
+    veg.m_name = data.prefab;
     var hash = data.prefab.GetStableHashCode();
     Range<Vector3> scale = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
     scale.Uniform = data.scaleUniform;
