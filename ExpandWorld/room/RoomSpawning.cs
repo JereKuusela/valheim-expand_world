@@ -28,6 +28,7 @@ public class RoomSpawning
       room.m_roomConnections = baseRoom.m_room.GetConnections().Select(c =>
       {
         var connection = new GameObject(c.name).AddComponent<RoomConnection>();
+        connection.transform.parent = room.transform;
         connection.transform.localPosition = c.transform.localPosition;
         return connection;
       }).ToArray();
@@ -53,50 +54,38 @@ public class RoomSpawning
     to.m_perimeter = from.m_perimeter;
     to.m_endCapPrio = from.m_endCapPrio;
     to.m_perimeter = from.m_perimeter;
-    to.m_roomConnections = from.m_roomConnections;
+    var connFrom = from.GetConnections();
+    var connTo = to.GetConnections();
+    for (var i = 0; i < connFrom.Length && i < connTo.Length; i++)
+    {
+      var cFrom = connFrom[i];
+      var cTo = connTo[i];
+      cTo.transform.localPosition = cFrom.transform.localPosition;
+      cTo.m_type = cFrom.m_type;
+      cTo.m_entrance = cFrom.m_entrance;
+      cTo.m_allowDoor = cFrom.m_allowDoor;
+      cTo.m_doorOnlyIfOtherAlsoAllowsDoor = cFrom.m_doorOnlyIfOtherAlsoAllowsDoor;
+    }
     return to;
   }
 
-  static DungeonDB.RoomData OverrideRoomData(DungeonDB.RoomData result)
+  [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
+  static void ReplaceRoom(ref DungeonDB.RoomData room)
   {
-    if (!Configuration.DataRooms) return result;
-#nullable disable
-    if (result == null) return result;
-#nullable enable
-    var room = result.m_room;
-    var name = result.m_room.name;
-    var baseName = Parse.Name(name);
+    if (!Configuration.DataRooms) return;
+    if (room.m_netViews.Count > 0) return;
+    var parameters = room.m_room;
+    var baseName = Parse.Name(parameters.name);
     // Combine the base room prefab and the room parameters.
     if (RoomPrefabs.TryGetValue(baseName, out var roomData))
     {
       // The proxy shouldn't be modified, or entries will get reference to the same room.
-      result = new();
-      result.m_room = OverrideParameters(roomData.m_room, room);
-      result.m_netViews = roomData.m_netViews;
-      result.m_randomSpawns = roomData.m_randomSpawns;
+      room = new();
+      room.m_room = OverrideParameters(parameters, roomData.m_room);
+      room.m_netViews = roomData.m_netViews;
+      room.m_randomSpawns = roomData.m_randomSpawns;
     }
-    return result;
   }
-  [HarmonyPatch(nameof(DungeonGenerator.FindEndCap)), HarmonyPostfix]
-  static DungeonDB.RoomData FindEndCap(DungeonDB.RoomData result) => OverrideRoomData(result);
-
-  [HarmonyPatch(nameof(DungeonGenerator.GetRandomWeightedRoom), typeof(bool)), HarmonyPostfix]
-  static DungeonDB.RoomData GetRandomWeightedRoom1(DungeonDB.RoomData result) => OverrideRoomData(result);
-
-
-  [HarmonyPatch(nameof(DungeonGenerator.GetRandomWeightedRoom), typeof(RoomConnection)), HarmonyPostfix]
-  static DungeonDB.RoomData GetRandomWeightedRoom2(DungeonDB.RoomData result) => OverrideRoomData(result);
-
-
-  [HarmonyPatch(nameof(DungeonGenerator.GetWeightedRoom)), HarmonyPostfix]
-  static DungeonDB.RoomData GetWeightedRoom(DungeonDB.RoomData result) => OverrideRoomData(result);
-
-
-  [HarmonyPatch(nameof(DungeonGenerator.GetRandomRoom)), HarmonyPostfix]
-  static DungeonDB.RoomData GetRandomRoom(DungeonDB.RoomData result) => OverrideRoomData(result);
-
-  [HarmonyPatch(nameof(DungeonGenerator.FindStartRoom)), HarmonyPostfix]
-  static DungeonDB.RoomData FindStartRoom(DungeonDB.RoomData result) => OverrideRoomData(result);
 }
 
 // Hash is used to save the generated room.
