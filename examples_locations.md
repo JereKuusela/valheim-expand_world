@@ -83,14 +83,33 @@ Spawner_DraugrPile:-5,0,-6,... -> 4.5,0,-4.5
 
 ## Location: Custom data for objects with Spawner Tweaks mod
 
-1. Use the example above (`StoneTowerRuins05:Draugr`).
-2. Use `tweak_spawner maxnear=20` on one of the spawners.
-3. Add to the `objectData` field.
+1. Spawner Tweaks mod is required for all clients.
+2. Use the example above (`StoneTowerRuins05:Draugr`).
+3. Use `tweak_spawner maxnear=20` on one of the spawners.
+4. Copy the data with `object copy`.
+5. Add to the `objectData` field.
 ```
 # Replaces the spawn limit with 20.
   objectData:
     - Spawner_DraugrPile, CAAAAAECXKVYFAAAAA==
 ```
+
+## Location: Edit dungeon vegvisirs with Structure Tweaks mod
+
+1. Structure Tweaks mod is required for all clients.
+2. Use `tweak_runestone name=Find discover=AbandonedLogCabin02,Cabin!,Bed` on any object.
+3. Copy the data with `object copy=override_name,override_discover`
+  - Don't use just `object copy` because it will save all of the data.
+  - For dungeons this would include the room layout.
+  - For other objects this would include things like health or creator id.
+  - Only a pre-existing runestone wouldn't have any extra data.
+4. Apply the data to the dungeon generator object.
+```
+- prefab: Crypt2
+  objectData:
+    - DG_ForestCrypt, EAAAAAJ4MbkQHUFiYW5kb25lZExvZ0NhYmluMDIsQ2FiaW4sQmVkCE8E2AdDYWJpbnMh
+```
+
 
 ## Location: Blueprint
 
