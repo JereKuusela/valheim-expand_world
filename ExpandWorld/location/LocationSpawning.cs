@@ -226,7 +226,7 @@ public class DungeonSpawning
       ZNetView.FinishGhostInit();
     }
   }
-  static void Blueprint(Blueprint bp, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
+  public static void Blueprint(Blueprint bp, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
     foreach (var obj in bp.Objects)
     {

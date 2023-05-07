@@ -1,3 +1,6 @@
+- v1.40
+  - Fixes dungeons not working when first starting a single player world and then joining a multiplayer world.
+
 - v1.39
   - Fixes corrupted or missing locations possibly causing an error during the gameplay.
   - Fixes dungeon room variants not working.

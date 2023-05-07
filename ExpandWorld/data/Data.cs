@@ -17,13 +17,7 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(DungeonDB), nameof(DungeonDB.Start)), HarmonyPriority(Priority.VeryLow)]
 public class InitializeRooms
 {
-  static void Postfix()
-  {
-    if (ZNet.instance.IsServer())
-    {
-      RoomLoading.Load();
-    }
-  }
+  static void Postfix() => RoomLoading.Initialize();
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.VersionSetup)), HarmonyPriority(Priority.VeryLow)]

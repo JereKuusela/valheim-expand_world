@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace ExpandWorld;
 
@@ -13,9 +14,16 @@ public class RoomLoading
 
   private static List<DungeonDB.RoomData> DefaultEntries = new();
 
-
+  public static void Initialize()
+  {
+    DefaultEntries.Clear();
+    RoomSpawning.Prefabs.Clear();
+    RoomSpawning.Objects.Clear();
+    Load();
+  }
   public static void Load()
   {
+    if (!ZNet.instance.IsServer()) return;
     if (DefaultEntries.Count == 0) SetDefaultEntries();
     RoomSpawning.Objects.Clear();
     DungeonDB.instance.m_rooms = DefaultEntries;
@@ -47,12 +55,17 @@ public class RoomLoading
     DungeonDB.instance.m_rooms = data;
   }
 
-  // To avoid recreating game objects each reload.
-  private static Dictionary<string, DungeonDB.RoomData> Cache = new();
+  public static DungeonDB.RoomData CreateProxy(string name)
+  {
+    DungeonDB.RoomData roomData = new();
+    roomData.m_room = new GameObject(name).AddComponent<Room>();
+    if (!RoomSpawning.Prefabs.ContainsKey(Parse.Name(name)))
+      BlueprintManager.Load(name, "");
+    return roomData;
+  }
   private static DungeonDB.RoomData FromData(RoomData data)
   {
-    DungeonDB.RoomData roomData = Cache.TryGetValue(data.name, out var cached) ? cached : new();
-    roomData.m_room ??= RoomSpawning.CreateRoomProxy(data.name);
+    var roomData = CreateProxy(data.name);
     var room = roomData.m_room;
     room.m_theme = Data.ToEnum<Room.Theme>(data.theme);
     room.m_entrance = data.entrance;
@@ -66,18 +79,17 @@ public class RoomLoading
     room.m_faceCenter = data.faceCenter;
     room.m_perimeter = data.perimeter;
     room.m_endCapPrio = data.endCapPriority;
-    var connections = room.GetConnections();
-    for (var i = 0; i < connections.Length && i < data.connections.Length; i++)
-    {
-      var connection = connections[i];
-      var dataConnection = data.connections[i];
-      connection.transform.localPosition = Parse.VectorXZY(dataConnection.position);
-      connection.m_type = dataConnection.type;
-      connection.m_entrance = dataConnection.entrance;
-      connection.m_allowDoor = dataConnection.door == "true";
-      connection.m_doorOnlyIfOtherAlsoAllowsDoor = dataConnection.door == "other";
-    }
-    Cache[data.name] = roomData;
+    room.m_roomConnections = data.connections.Select(item =>
+      {
+        var conn = new GameObject().AddComponent<RoomConnection>();
+        conn.transform.parent = room.transform;
+        conn.transform.localPosition = Parse.VectorXZY(item.position);
+        conn.m_type = item.type;
+        conn.m_entrance = item.entrance;
+        conn.m_allowDoor = item.door == "true";
+        conn.m_doorOnlyIfOtherAlsoAllowsDoor = item.door == "other";
+        return conn;
+      }).ToArray();
     if (data.objects != null)
       RoomSpawning.Objects[data.name] = Parse.Objects(data.objects);
     return roomData;
@@ -125,7 +137,7 @@ public class RoomLoading
   private static void SetDefaultEntries()
   {
     DefaultEntries = DungeonDB.instance.m_rooms.Where(room => room.m_room).ToList();
-    RoomSpawning.RoomPrefabs = DefaultEntries.ToDictionary(entry => entry.m_room.name, entry => entry);
+    RoomSpawning.Prefabs = DefaultEntries.ToDictionary(entry => entry.m_room.name, entry => entry);
   }
   private static bool AddMissingEntries(List<DungeonDB.RoomData> entries)
   {

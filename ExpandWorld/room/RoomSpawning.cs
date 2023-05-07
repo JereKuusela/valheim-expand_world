@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 
@@ -13,29 +12,9 @@ namespace ExpandWorld;
 public class RoomSpawning
 {
   // Note: OverrideRoomData will change the parameters of the room prefab. Don't use them for anything.
-  public static Dictionary<string, DungeonDB.RoomData> RoomPrefabs = new();
+  public static Dictionary<string, DungeonDB.RoomData> Prefabs = new();
 
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
-  // Proxy should be created even for the default rooms because the prefab parameters can't be trusted.
-  public static Room CreateRoomProxy(string name)
-  {
-    var room = new GameObject(name).AddComponent<Room>();
-    if (RoomPrefabs.TryGetValue(Parse.Name(name), out var baseRoom))
-    {
-      room.transform.localPosition = baseRoom.m_room.transform.localPosition;
-      // New connection objects are needed to override them separately for each room.
-      // The data itself can be anything because of OverrideRoomData.
-      room.m_roomConnections = baseRoom.m_room.GetConnections().Select(c =>
-      {
-        var connection = new GameObject(c.name).AddComponent<RoomConnection>();
-        connection.transform.parent = room.transform;
-        connection.transform.localPosition = c.transform.localPosition;
-        return connection;
-      }).ToArray();
-    }
-    return room;
-  }
-
 
   private static Room OverrideParameters(Room from, Room to)
   {
@@ -70,21 +49,27 @@ public class RoomSpawning
   }
 
   [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
-  static void ReplaceRoom(ref DungeonDB.RoomData room)
+  static bool ReplaceRoom(ref DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
-    if (!Configuration.DataRooms) return;
-    if (room.m_netViews.Count > 0) return;
+    if (!Configuration.DataRooms) return true;
+    // Clients already have proper rooms.
+    // Also works as a failsafe if an actual room came through for some reason.
+    if (room.m_netViews.Count > 0) return true;
     var parameters = room.m_room;
     var baseName = Parse.Name(parameters.name);
     // Combine the base room prefab and the room parameters.
-    if (RoomPrefabs.TryGetValue(baseName, out var roomData))
+    if (Prefabs.TryGetValue(baseName, out var roomData))
     {
       // The proxy shouldn't be modified, or entries will get reference to the same room.
       room = new();
       room.m_room = OverrideParameters(parameters, roomData.m_room);
       room.m_netViews = roomData.m_netViews;
       room.m_randomSpawns = roomData.m_randomSpawns;
+      return true;
     }
+    if (BlueprintManager.TryGet(parameters.name, out var bp))
+      DungeonSpawning.Blueprint(bp, pos, rot, mode);
+    return false;
   }
 }
 

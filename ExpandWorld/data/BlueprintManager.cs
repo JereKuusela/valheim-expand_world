@@ -31,7 +31,6 @@ public class BlueprintManager
     ExpandWorld.Log.LogWarning($"Object / blueprint {name} not found!");
     return false;
   }
-
   public static void Reload(string name)
   {
     if (!Blueprints.TryGetBluePrint(name, out var bp)) return;
