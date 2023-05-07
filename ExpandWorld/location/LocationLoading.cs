@@ -365,7 +365,6 @@ public class LocationObjectDataAndSwap
     var instantiator = typeof(UnityEngine.Object).GetMethods().First(m => m.Name == nameof(UnityEngine.Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_S, 5))
       .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_S, 6))
       .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_1))
       .Set(OpCodes.Call, Transpilers.EmitDelegate(LocationSpawning.Object).operand)
@@ -383,9 +382,13 @@ public class LocationObjectDataAndSwap
       var surface = pos with { y = pos.y - data.groundOffset };
       HandleTerrain(surface, location.m_exteriorRadius, isBluePrint, data);
     }
+    if (mode == ZoneSystem.SpawnMode.Ghost)
+      ZNetView.StartGhostInit();
     if (isBluePrint)
-      LocationSpawning.Blueprint(bp, location, pos, rot, mode, spawnedGhostObjects);
-    LocationSpawning.CustomObjects(location, pos, rot, mode, spawnedGhostObjects);
+      LocationSpawning.Blueprint(bp, location, pos, rot, spawnedGhostObjects);
+    LocationSpawning.CustomObjects(location, pos, rot, spawnedGhostObjects);
+    if (mode == ZoneSystem.SpawnMode.Ghost)
+      ZNetView.FinishGhostInit();
     DungeonSpawning.Location = null;
   }
 

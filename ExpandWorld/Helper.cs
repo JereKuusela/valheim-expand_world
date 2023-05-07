@@ -92,6 +92,14 @@ public static class Helper
   {
     return $"{Print(vec.x)},{Print(vec.z)},{Print(vec.y)}";
   }
+  public static string Print(Quaternion quat)
+  {
+    var euler = quat.eulerAngles;
+    if (euler.x == 0f && euler.z == 0f)
+      return Print(euler.y);
+    else
+      return $"{Print(euler.y)},{Print(euler.x)},{Print(euler.z)}";
+  }
 
   ///<summary>Converts a list of items to a dictionary, merges duplicates.</summary>
   public static Dictionary<K, V> ToDict<T, K, V>(IEnumerable<T> items, Func<T, K> key, Func<T, V> value)

@@ -1,8 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 
 namespace ExpandWorld;
+
+// Note: 
+// Ghost init is already set by ZoneSystem.SpawnObject.
+// So no need to check here for it.
 
 // Room variants are tricky to implement because the room prefab and room parameters are in the same component.
 // New entries can't be directly created because the room prefab can't be copied.
@@ -13,6 +18,8 @@ public class RoomSpawning
 {
   // Note: OverrideRoomData will change the parameters of the room prefab. Don't use them for anything.
   public static Dictionary<string, DungeonDB.RoomData> Prefabs = new();
+
+  public static Dictionary<string, RoomData> Data = new();
 
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
 
@@ -40,6 +47,7 @@ public class RoomSpawning
       var cFrom = connFrom[i];
       var cTo = connTo[i];
       cTo.transform.localPosition = cFrom.transform.localPosition;
+      cTo.transform.localRotation = cFrom.transform.localRotation;
       cTo.m_type = cFrom.m_type;
       cTo.m_entrance = cFrom.m_entrance;
       cTo.m_allowDoor = cFrom.m_allowDoor;
@@ -53,8 +61,7 @@ public class RoomSpawning
   {
     if (!Configuration.DataRooms) return true;
     // Clients already have proper rooms.
-    // Also works as a failsafe if an actual room came through for some reason.
-    if (room.m_netViews.Count > 0) return true;
+    if (mode == ZoneSystem.SpawnMode.Client) return true;
     var parameters = room.m_room;
     var baseName = Parse.Name(parameters.name);
     // Combine the base room prefab and the room parameters.
@@ -67,19 +74,66 @@ public class RoomSpawning
       room.m_randomSpawns = roomData.m_randomSpawns;
       return true;
     }
+    ExpandWorld.Log.LogInfo($"Spawning : {parameters.name}");
     if (BlueprintManager.TryGet(parameters.name, out var bp))
-      DungeonSpawning.Blueprint(bp, pos, rot, mode);
-    return false;
+      DungeonSpawning.Blueprint(bp, pos, rot);
+    return true;
   }
-}
 
-// Hash is used to save the generated room.
-// Use the base room name to allow it work for vanilla clients.
-[HarmonyPatch(typeof(Room), nameof(Room.GetHash))]
-public class RoomSaving
-{
-  static int Postfix(int result, Room __instance)
+
+  [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPostfix]
+  static void PlaceRoomCustomObjects(DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
-    return Parse.Name(Utils.GetPrefabName(__instance.gameObject)).GetStableHashCode();
+    if (mode == ZoneSystem.SpawnMode.Client) return;
+    if (!Objects.TryGetValue(room.m_room.name, out var objects)) return;
+    int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
+    UnityEngine.Random.State state = UnityEngine.Random.state;
+    UnityEngine.Random.InitState(seed);
+    foreach (var obj in objects)
+    {
+      if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
+      DungeonSpawning.BPO(pos, rot, obj);
+    }
+    UnityEngine.Random.state = state;
+  }
+
+  private static bool IsBaseRoom(Room room)
+  {
+    var baseName = Parse.Name(room.name);
+    return Prefabs.ContainsKey(baseName);
+  }
+
+  [HarmonyPatch(nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
+  static void SetupAvailableRooms()
+  {
+    // To support live reloading for blueprints, the connections must be refreshed every time.
+    foreach (var roomData in DungeonGenerator.m_availableRooms)
+    {
+      var room = roomData.m_room;
+      if (IsBaseRoom(room)) continue;
+      if (BlueprintManager.TryGet(room.name, out var bp))
+      {
+        if (Data.TryGetValue(room.name, out var data) && data.size == "")
+          room.m_size = new((int)Mathf.Ceil(bp.Size.x), (int)Mathf.Ceil(bp.Size.y), (int)Mathf.Ceil(bp.Size.z));
+        ExpandWorld.Log.LogInfo($"SetupAvailableRooms: {room.name} {room.m_size}");
+        for (var i = 0; i < bp.SnapPoints.Count && i < room.m_roomConnections.Length; i++)
+        {
+          var conn = room.m_roomConnections[i];
+          conn.transform.localPosition = bp.SnapPoints[i].Pos;
+          conn.transform.localRotation = bp.SnapPoints[i].Rot;
+          ExpandWorld.Log.LogInfo($"Conn {i}: {conn.m_type} {conn.transform.localPosition}");
+        }
+      }
+    }
+  }
+
+  [HarmonyPatch(nameof(DungeonGenerator.Save)), HarmonyPrefix]
+  static void CleanRoomsForSaving()
+  {
+    // Blueprints add a dummy room which shouldn't be saved.
+    DungeonGenerator.m_placedRooms = DungeonGenerator.m_placedRooms.Where(IsBaseRoom).ToList();
+    // Restore base names to save the rooms as vanilla compatible.
+    foreach (var room in DungeonGenerator.m_placedRooms)
+      room.name = Parse.Name(room.name);
   }
 }

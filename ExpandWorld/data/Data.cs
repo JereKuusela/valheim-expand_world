@@ -111,7 +111,7 @@ public class Data : MonoBehaviour
   }
   private static void ReloadBlueprint(string name)
   {
-    BlueprintManager.Reload(name);
+    BlueprintManager.Reload(Path.GetFileNameWithoutExtension(name));
   }
   public static void SetupBlueprintWatcher()
   {

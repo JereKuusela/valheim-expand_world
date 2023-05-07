@@ -51,9 +51,9 @@ public static class Parse
   public static Quaternion AngleYXZ(string[] args, int index, Vector3 defaultValue)
   {
     var vector = Vector3.zero;
-    vector.x = Float(args, index, defaultValue.x);
-    vector.z = Float(args, index + 1, defaultValue.z);
-    vector.y = Float(args, index + 2, defaultValue.y);
+    vector.y = Float(args, index, defaultValue.y);
+    vector.x = Float(args, index + 1, defaultValue.x);
+    vector.z = Float(args, index + 2, defaultValue.z);
     return Quaternion.Euler(vector);
   }
   public static List<BlueprintObject> Objects(string[] args)

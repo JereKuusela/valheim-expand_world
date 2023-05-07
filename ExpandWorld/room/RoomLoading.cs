@@ -18,6 +18,7 @@ public class RoomLoading
   {
     DefaultEntries.Clear();
     RoomSpawning.Prefabs.Clear();
+    RoomSpawning.Data.Clear();
     RoomSpawning.Objects.Clear();
     Load();
   }
@@ -26,6 +27,7 @@ public class RoomLoading
     if (!ZNet.instance.IsServer()) return;
     if (DefaultEntries.Count == 0) SetDefaultEntries();
     RoomSpawning.Objects.Clear();
+    RoomSpawning.Data.Clear();
     DungeonDB.instance.m_rooms = DefaultEntries;
     if (!Configuration.DataRooms)
     {
@@ -55,17 +57,73 @@ public class RoomLoading
     DungeonDB.instance.m_rooms = data;
   }
 
-  public static DungeonDB.RoomData CreateProxy(string name)
+  public static DungeonDB.RoomData CreateProxy(string name, string[] snapPieces)
   {
     DungeonDB.RoomData roomData = new();
-    roomData.m_room = new GameObject(name).AddComponent<Room>();
-    if (!RoomSpawning.Prefabs.ContainsKey(Parse.Name(name)))
-      BlueprintManager.Load(name, "");
+    var room = new GameObject(name).AddComponent<Room>();
+    roomData.m_room = room;
+    if (RoomSpawning.Prefabs.TryGetValue(Parse.Name(name), out var baseRoom))
+    {
+      var connections = baseRoom.m_room.GetConnections();
+      if (connections.Length != snapPieces.Length)
+        ExpandWorld.Log.LogWarning($"Room {name} has {snapPieces.Length} connections, but base room {baseRoom.m_room.name} has {connections.Length} connections.");
+      // Initialize with base connections to allow data missing from the yaml.
+      room.m_roomConnections = connections.Select(c =>
+        {
+          var conn = new GameObject(c.name).AddComponent<RoomConnection>();
+          conn.transform.parent = room.transform;
+          conn.transform.localPosition = c.transform.localPosition;
+          conn.transform.localRotation = c.transform.localRotation;
+          conn.m_type = c.m_type;
+          conn.m_entrance = c.m_entrance;
+          conn.m_allowDoor = c.m_allowDoor;
+          conn.m_doorOnlyIfOtherAlsoAllowsDoor = c.m_doorOnlyIfOtherAlsoAllowsDoor;
+          return conn;
+        }).ToArray();
+    }
+    else if (BlueprintManager.Load(name, "", snapPieces))
+    {
+      room.m_roomConnections = snapPieces.Select(c =>
+        {
+          var conn = new GameObject("").AddComponent<RoomConnection>();
+          conn.transform.parent = room.transform;
+          return conn;
+        }).ToArray();
+    }
     return roomData;
+  }
+  private static void UpdateConnections(Room room, RoomConnectionData[] data)
+  {
+    for (var i = 0; i < data.Length; ++i)
+    {
+      var connData = data[i];
+      if (i >= room.m_roomConnections.Length)
+      {
+        var newConn = new GameObject(connData.type).AddComponent<RoomConnection>();
+        newConn.transform.parent = room.transform;
+        room.m_roomConnections = room.m_roomConnections.Append(newConn).ToArray();
+      }
+      var conn = room.m_roomConnections[i];
+      if (conn.name == "")
+        conn.name = connData.type;
+      conn.m_type = connData.type;
+      conn.m_entrance = connData.entrance;
+      conn.m_allowDoor = connData.door == "true";
+      conn.m_doorOnlyIfOtherAlsoAllowsDoor = connData.door == "other";
+      // Old yamls won't have rotation set so this is important to keep them working.
+      // Also it doesn't hurt that the position can be missing as well.
+      var split = Parse.Split(connData.position);
+      if (split.Length > 2)
+        conn.transform.localPosition = Parse.VectorXZY(split, 0);
+      if (split.Length > 3)
+        conn.transform.localRotation = Parse.AngleYXZ(split, 3);
+    }
   }
   private static DungeonDB.RoomData FromData(RoomData data)
   {
-    var roomData = CreateProxy(data.name);
+    RoomSpawning.Data[data.name] = data;
+    var snapPieces = data.connections.Select(c => c.position).ToArray();
+    var roomData = CreateProxy(data.name, snapPieces);
     var room = roomData.m_room;
     room.m_theme = Data.ToEnum<Room.Theme>(data.theme);
     room.m_entrance = data.entrance;
@@ -79,17 +137,7 @@ public class RoomLoading
     room.m_faceCenter = data.faceCenter;
     room.m_perimeter = data.perimeter;
     room.m_endCapPrio = data.endCapPriority;
-    room.m_roomConnections = data.connections.Select(item =>
-      {
-        var conn = new GameObject().AddComponent<RoomConnection>();
-        conn.transform.parent = room.transform;
-        conn.transform.localPosition = Parse.VectorXZY(item.position);
-        conn.m_type = item.type;
-        conn.m_entrance = item.entrance;
-        conn.m_allowDoor = item.door == "true";
-        conn.m_doorOnlyIfOtherAlsoAllowsDoor = item.door == "other";
-        return conn;
-      }).ToArray();
+    UpdateConnections(room, data.connections);
     if (data.objects != null)
       RoomSpawning.Objects[data.name] = Parse.Objects(data.objects);
     return roomData;
@@ -112,7 +160,7 @@ public class RoomLoading
     data.endCapPriority = room.m_endCapPrio;
     data.connections = room.GetConnections().Select(connection => new RoomConnectionData
     {
-      position = Helper.Print(connection.transform.localPosition),
+      position = $"{Helper.Print(connection.transform.localPosition)},{Helper.Print(connection.transform.localRotation)}",
       type = connection.m_type,
       entrance = connection.m_entrance,
       door = connection.m_allowDoor ? "true" : connection.m_doorOnlyIfOtherAlsoAllowsDoor ? "other" : "false"

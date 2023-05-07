@@ -15,8 +15,7 @@ public class BlueprintObject
   public Vector3 Scale;
   public string ExtraInfo;
   public ZDO? Data;
-  public float Chance = 1f;
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data, float chance)
+  public float Chance = 1f; public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data, float chance)
   {
     Prefab = name;
     Pos = pos;
@@ -36,11 +35,64 @@ public class BlueprintObject
     Data = null;
   }
 }
+
+public class SnapPoint
+{
+  public Vector3 Pos;
+  public Quaternion Rot;
+  public SnapPoint(Vector3 pos, Quaternion rot)
+  {
+    Pos = pos;
+    Rot = rot;
+  }
+}
 public class Blueprint
 {
+  public string Name;
   public List<BlueprintObject> Objects = new();
   public string CenterPiece = "piece_bpcenterpoint";
   public float Radius = 0f;
+  public List<SnapPoint> SnapPoints = new();
+  public Vector3 Size = Vector3.one;
+
+  public Blueprint(string name)
+  {
+    Name = name;
+  }
+  private void AddSnapPoint(Vector3 pos, Quaternion rot, int index)
+  {
+    if (SnapPoints.Count <= index)
+      SnapPoints.Add(new(pos, rot));
+    else
+      SnapPoints[index] = new(pos, rot);
+  }
+  // Provides a way to override or load snap points from pieces or coordinates.
+  // Snap point system is used for dungeon room connections.
+  public void LoadSnapPoints(string[] snapPieces)
+  {
+    for (var i = 0; i < snapPieces.Length; i++)
+    {
+      var piece = snapPieces[i];
+      if (piece.Split(',').Length == 3)
+      {
+        var pos = Parse.VectorXZY(piece);
+        AddSnapPoint(pos, Quaternion.identity, i);
+        continue;
+      }
+      var success = false;
+      foreach (var obj in Objects)
+      {
+        if (obj.Prefab != piece) continue;
+        if (obj.Chance == 0f) continue;
+        obj.Chance = 0f;
+        AddSnapPoint(obj.Pos, obj.Rot, i);
+        success = true;
+        break;
+      }
+      if (!success)
+        ExpandWorld.Log.LogWarning($"Snap point piece {piece} not found in blueprint {Name}.");
+    }
+  }
   public void Center(string centerPiece)
   {
     if (centerPiece == "")
@@ -55,7 +107,7 @@ public class Blueprint
     }
     // Slightly towards the ground to prevent gaps.
     y += 0.05f;
-
+    Size = bounds.size;
     Vector3 center = new(bounds.center.x, y, bounds.center.z);
     foreach (var obj in Objects)
     {
@@ -104,7 +156,7 @@ public class Blueprints
   private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
   public static bool TryGetBluePrint(string name, out Blueprint blueprint)
   {
-    blueprint = new();
+    blueprint = new("Invalid");
     var bp = GetBluePrint(name);
     if (bp == null) return false;
     blueprint = bp;
@@ -112,11 +164,12 @@ public class Blueprints
   }
   public static Blueprint? GetBluePrint(string name)
   {
+    name = name.Replace(" ", "_");
     var path = Files().FirstOrDefault(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_") == name);
     if (path == null) return null;
     var rows = File.ReadAllLines(path);
     var extension = Path.GetExtension(path);
-    Blueprint bp = new();
+    Blueprint bp = new(name);
     if (extension == ".vbuild") return GetBuildShare(bp, rows);
     if (extension == ".blueprint") return GetPlanBuild(bp, rows);
     throw new InvalidOperationException("Unknown file format.");
@@ -136,6 +189,8 @@ public class Blueprints
         continue;
       else if (piece)
         bp.Objects.Add(GetPlanBuildObject(row));
+      else
+        bp.SnapPoints.Add(new(GetPlanBuildSnapPoint(row), Quaternion.identity));
     }
     return bp;
   }
