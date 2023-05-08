@@ -18,7 +18,7 @@ Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/
 
 ## Creating the entrance
 
-1. Use `base 1,1` and place the ice floor. The floor is intended to give structural stability and a surface to build on.
+1. Use `base 1 1` and place the ice floor. The floor is intended to give structural stability and a surface to build on.
   - Many other objects work for this as well.
   - If you are up in the air, hit Numpad 0 to freeze the placement. Your console probably gets filled with "Look rotation viewing vector is zero" but that is ok.
 2. Build your room on top of it, for example 4 wood floors and some 1x1 walls. Leave 2 meter gap for the doors.
@@ -61,7 +61,7 @@ Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/
 
 ## Corridor
 
-1. Use `base 1,0.5` to create a small corridor. For example with 2 wood floors and doors on both ends.
+1. Use `base 1 0.5` to create a small corridor. For example with 2 wood floors and doors on both ends.
 2. Use `door` to place connection markers.
   - Use Alt + Right Arrow to position the door at middle fo the floor.
 3. Use `center` to place the center marker.
@@ -84,7 +84,7 @@ Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/
 
 ## End cap
 
-1. Use `base 0,5.0,5`, `door` and `center` to create a room with a single door.
+1. Use `base 0.5 0.5`, `door` and `center` to create a room with a single door.
 2. Add to `expand_rooms.yaml`: 
 ```
 - name: End
@@ -118,7 +118,7 @@ Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/
 
 ## Stairs
 
-1. Use `base 1.0,5`, `door` and `center` to create a room with two stairs and two doors at tne ends.
+1. Use `base 1 0.5`, `door` and `center` to create a room with two stairs and two doors at tne ends.
 2. Add to `expand_rooms.yaml`: 
 ```
 - name: Stairs
