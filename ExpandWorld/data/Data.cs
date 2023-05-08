@@ -52,7 +52,7 @@ public class InitializeContent
       WorldManager.ToFile();
 
       // These are here to not have to clear location lists (slightly better compatibility).
-      VegetationLoading.Load();
+      VegetationLoading.Initialize();
       // Clutter must be here because since SetupLocations adds prefabs to the list.
       ClutterManager.FromFile();
 
@@ -64,8 +64,7 @@ public class InitializeContent
     }
     ZoneSystem.instance.m_locations = LocationSetup.CleanUpLocations(ZoneSystem.instance.m_locations);
     LocationSetup.SetupExtraLocations(ZoneSystem.instance.m_locations);
-    if (Helper.IsServer())
-      LocationLoading.Load();
+    LocationLoading.Initialize();
   }
 }
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.Awake))]
@@ -386,17 +385,37 @@ public class Data : MonoBehaviour
     }
     zdo.ReleaseByteArrays();
   }
-  public static void InitZDO(Vector3 position, Quaternion rotation, Vector3 scale, ZDO data, ZNetView view)
+  public static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot, Vector3 sc, ZDO? data)
   {
-    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(position);
+    Data.InitZDO(pos, rot, sc, data, prefab);
+    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, rot);
+    Data.CleanGhostInit(obj);
+    return obj;
+  }
+  public static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot, ZDO? data)
+  {
+    Data.InitZDO(pos, rot, Vector3.one, data, prefab);
+    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, rot);
+    Data.CleanGhostInit(obj);
+    return obj;
+  }
+  public static void InitZDO(Vector3 pos, Quaternion rot, Vector3 sc, ZDO? data, GameObject obj)
+  {
+    if (data == null) return;
+    if (!obj.TryGetComponent<ZNetView>(out var view)) return;
+    InitZDO(pos, rot, sc, data, view);
+  }
+  public static void InitZDO(Vector3 pos, Quaternion rot, Vector3 sc, ZDO data, ZNetView view)
+  {
+    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(pos);
     Data.CopyData(data.Clone(), ZNetView.m_initZDO);
-    ZNetView.m_initZDO.m_rotation = rotation;
+    ZNetView.m_initZDO.m_rotation = rot;
     ZNetView.m_initZDO.m_type = view.m_type;
     ZNetView.m_initZDO.m_distant = view.m_distant;
     ZNetView.m_initZDO.m_persistent = view.m_persistent;
     ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
-    if (view.m_syncInitialScale && scale != Vector3.one)
-      ZNetView.m_initZDO.Set("scale", scale);
+    if (view.m_syncInitialScale && sc != Vector3.one)
+      ZNetView.m_initZDO.Set("scale", sc);
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
   public static void CleanGhostInit(GameObject obj)

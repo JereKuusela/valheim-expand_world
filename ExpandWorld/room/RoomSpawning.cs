@@ -56,6 +56,7 @@ public class RoomSpawning
     return to;
   }
 
+  private static ZDO? DataOverride(string location, string prefab) => LocationSpawning.DataOverride(location, prefab);
   [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
   static bool ReplaceRoom(ref DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
@@ -76,7 +77,10 @@ public class RoomSpawning
     }
     ExpandWorld.Log.LogInfo($"Spawning : {parameters.name}");
     if (BlueprintManager.TryGet(parameters.name, out var bp))
-      DungeonSpawning.Blueprint(bp, pos, rot);
+    {
+      var locName = DungeonSpawning.Location?.m_prefabName ?? "";
+      Spawn.Blueprint(locName, bp, pos, rot, DataOverride, null);
+    }
     return true;
   }
 
@@ -89,10 +93,11 @@ public class RoomSpawning
     int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
     UnityEngine.Random.State state = UnityEngine.Random.state;
     UnityEngine.Random.InitState(seed);
+    var locName = DungeonSpawning.Location?.m_prefabName ?? "";
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      DungeonSpawning.BPO(pos, rot, obj);
+      Spawn.BPO(locName, obj, pos, rot, DataOverride, null);
     }
     UnityEngine.Random.state = state;
   }
@@ -124,6 +129,7 @@ public class RoomSpawning
       }
     }
   }
+
 
   [HarmonyPatch(nameof(DungeonGenerator.Save)), HarmonyPrefix]
   static void CleanRoomsForSaving()

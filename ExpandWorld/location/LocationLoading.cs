@@ -151,17 +151,26 @@ public class LocationLoading
     // Directly appending is risky if something goes wrong (like missing a linebreak).
     File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
   }
+  public static void Initialize()
+  {
+    DefaultEntries.Clear();
+    Locations.Clear();
+    if (Helper.IsServer())
+    {
+      DefaultEntries = ZoneSystem.instance.m_locations;
+      Locations = Helper.ToDict(DefaultEntries, l => l.m_prefabName, l => l);
+    }
+    Load();
+  }
   public static void Load()
   {
-    if (Helper.IsClient()) return;
-    if (DefaultEntries.Count == 0) DefaultEntries = ZoneSystem.instance.m_locations;
-    if (Locations.Count == 0) Locations = Helper.ToDict(DefaultEntries, l => l.m_prefabName, l => l);
     ZDO.Clear();
     ObjectSwaps.Clear();
     ObjectData.Clear();
     Dungeons.Clear();
     Objects.Clear();
     LocationData.Clear();
+    if (Helper.IsClient()) return;
     ZoneSystem.instance.m_locations = DefaultEntries;
     if (Configuration.DataLocation)
     {
@@ -350,6 +359,11 @@ public class LocationObjectDataAndSwap
 {
   static bool Prefix(ZoneSystem.ZoneLocation location, ZoneSystem.SpawnMode mode, ref Vector3 pos)
   {
+    var loc = location.m_location;
+    var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
+    if (flag)
+      Spawn.DungeonGeneratorPos = location.m_generatorPosition;
+    DungeonSpawning.Location = null;
     if (mode != ZoneSystem.SpawnMode.Client)
     {
       DungeonSpawning.Location = location;
@@ -374,22 +388,25 @@ public class LocationObjectDataAndSwap
 
   static void Postfix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
-    if (mode == ZoneSystem.SpawnMode.Client) return;
-    var isBluePrint = BlueprintManager.TryGet(location.m_prefabName, out var bp);
-    if (LocationLoading.LocationData.TryGetValue(location.m_prefabName, out var data))
+    if (mode != ZoneSystem.SpawnMode.Client)
     {
-      // Remove the applied offset.
-      var surface = pos with { y = pos.y - data.groundOffset };
-      HandleTerrain(surface, location.m_exteriorRadius, isBluePrint, data);
+      var isBluePrint = BlueprintManager.TryGet(location.m_prefabName, out var bp);
+      if (LocationLoading.LocationData.TryGetValue(location.m_prefabName, out var data))
+      {
+        // Remove the applied offset.
+        var surface = pos with { y = pos.y - data.groundOffset };
+        HandleTerrain(surface, location.m_exteriorRadius, isBluePrint, data);
+      }
+      if (mode == ZoneSystem.SpawnMode.Ghost)
+        ZNetView.StartGhostInit();
+      if (isBluePrint)
+        Spawn.Blueprint(location.m_prefabName, bp, pos, rot, LocationSpawning.DataOverride, spawnedGhostObjects);
+      LocationSpawning.CustomObjects(location, pos, rot, spawnedGhostObjects);
+      if (mode == ZoneSystem.SpawnMode.Ghost)
+        ZNetView.FinishGhostInit();
     }
-    if (mode == ZoneSystem.SpawnMode.Ghost)
-      ZNetView.StartGhostInit();
-    if (isBluePrint)
-      LocationSpawning.Blueprint(bp, location, pos, rot, spawnedGhostObjects);
-    LocationSpawning.CustomObjects(location, pos, rot, spawnedGhostObjects);
-    if (mode == ZoneSystem.SpawnMode.Ghost)
-      ZNetView.FinishGhostInit();
     DungeonSpawning.Location = null;
+    Spawn.DungeonGeneratorPos = null;
   }
 
   static void HandleTerrain(Vector3 pos, float radius, bool isBlueprint, LocationData data)

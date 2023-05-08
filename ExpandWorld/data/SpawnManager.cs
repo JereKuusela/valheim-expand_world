@@ -190,43 +190,14 @@ public class SpawnZDO
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
 
+  static ZDO? DataOverride(string source, string prefab) => null;
   static void Postfix(SpawnSystem.SpawnData critter, Vector3 spawnPoint)
   {
     if (!SpawnManager.Objects.TryGetValue(critter, out var objects)) return;
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      SpawnBPO(spawnPoint, Quaternion.identity, obj);
+      Spawn.BPO("", obj, spawnPoint, Quaternion.identity, DataOverride, null);
     }
-  }
-
-  static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
-  {
-    if (data == null) return;
-    if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, scale, data, view);
-  }
-  static GameObject InstantiateWithData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
-  {
-    SetData(prefab, position, rotation, scale, data);
-    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
-    Data.CleanGhostInit(obj);
-    return obj;
-  }
-  static void SpawnBPO(Vector3 pos, Quaternion rot, BlueprintObject obj)
-  {
-    var objPos = pos + rot * obj.Pos;
-    var objRot = rot * obj.Rot;
-    var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
-    if (!prefab)
-    {
-      ExpandWorld.Log.LogWarning($"Extra spawn prefab {obj.Prefab} not found!");
-      return;
-    }
-    var solid = ZoneSystem.instance.GetSolidHeight(objPos);
-    // Prevent spawning on top of tall objects like trees.
-    if (solid > objPos.y + 10f) return;
-    objPos.y = solid;
-    InstantiateWithData(prefab, objPos, objRot, obj.Scale, obj.Data);
   }
 }

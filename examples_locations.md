@@ -104,6 +104,7 @@ Spawner_DraugrPile:-5,0,-6,... -> 4.5,0,-4.5
   - For other objects this would include things like health or creator id.
   - Only a pre-existing runestone wouldn't have any extra data.
 4. Apply the data to the dungeon generator object.
+  - Use DG_ForestCrypt even with custom dungeon generator since that is the object that will be spawned.
 ```
 - prefab: Crypt2
   objectData:

@@ -16,12 +16,19 @@ public class VegetationLoading
 
   // Default items are stored to track missing entries.
   private static List<ZoneSystem.ZoneVegetation> DefaultEntries = new();
+  public static void Initialize()
+  {
+    DefaultEntries.Clear();
+    DefaultKeys.Clear();
+    if (Helper.IsServer())
+      SetDefaultEntries();
+    Load();
+  }
   public static void Load()
   {
-    if (!Helper.IsServer()) return;
-    if (DefaultEntries.Count == 0) SetDefaultEntries();
     VegetationSpawning.Scale.Clear();
     VegetationSpawning.ZDO.Clear();
+    if (Helper.IsClient()) return;
     ZoneSystem.instance.m_vegetation = DefaultEntries;
     if (!Configuration.DataVegetation)
     {

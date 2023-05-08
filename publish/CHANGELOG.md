@@ -2,6 +2,7 @@
   - Adds blueprint dungeons rooms.
   - Fixes dungeons not working when first starting a single player world and then joining a multiplayer world.
   - Fixes the blueprint live reload system not working.
+  - Fixes dungeons being blocked sometimes.
 
 - v1.39
   - Fixes corrupted or missing locations possibly causing an error during the gameplay.
