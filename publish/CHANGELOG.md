@@ -1,4 +1,5 @@
 - v1.40
+  - Adds blueprint dungeons rooms.
   - Fixes dungeons not working when first starting a single player world and then joining a multiplayer world.
   - Fixes the blueprint live reload system not working.
 

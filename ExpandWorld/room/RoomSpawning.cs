@@ -115,13 +115,11 @@ public class RoomSpawning
       {
         if (Data.TryGetValue(room.name, out var data) && data.size == "")
           room.m_size = new((int)Mathf.Ceil(bp.Size.x), (int)Mathf.Ceil(bp.Size.y), (int)Mathf.Ceil(bp.Size.z));
-        ExpandWorld.Log.LogInfo($"SetupAvailableRooms: {room.name} {room.m_size}");
         for (var i = 0; i < bp.SnapPoints.Count && i < room.m_roomConnections.Length; i++)
         {
           var conn = room.m_roomConnections[i];
           conn.transform.localPosition = bp.SnapPoints[i].Pos;
           conn.transform.localRotation = bp.SnapPoints[i].Rot;
-          ExpandWorld.Log.LogInfo($"Conn {i}: {conn.m_type} {conn.transform.localPosition}");
         }
       }
     }

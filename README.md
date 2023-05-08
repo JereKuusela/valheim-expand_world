@@ -408,6 +408,8 @@ Note: Dungeon is always generated within the zone (64m x 64m).
 
 The file `expand_rooms.yaml` sets available dungeon rooms. This is a server side feature, clients don't have access to this data.
 
+See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_room_blueprints.md).
+
 Completely new rooms can't be created but you can create variants by adding `:suffix` to the name.
 
 - name: Name of the room prefab.
