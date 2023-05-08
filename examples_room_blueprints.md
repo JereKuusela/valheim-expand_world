@@ -10,9 +10,9 @@ Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/
 2. Download [Upgrade World](https://valheim.thunderstore.io/package/JereKuusela/Upgrade_World/) mod.
 3. Setup commands for easier usage:
  - `alias rs zones_reset zone start force` so that you can just use `rs` command to regenerate the current zone.
- - `alias door hammer dungeon_forestcrypt_door` to select the door prefab more easily.
- - `alias center hammer GlowingMushroom scale=0.25` to select the door prefab more easily.
- - `alias base hammer Ice_floor scale=$$,$$,0.25` to select the door prefab more easily.
+ - `alias door hammer dungeon_forestcrypt_door` to select the door more easily.
+ - `alias center hammer GlowingMushroom scale=0.25` to select the center piece more easily.
+ - `alias base hammer Ice_floor scale=$$,$$,0.25` to select the base more easily.
 4. Use command `find Crypt2` to find the nearest crypt and go inside.
 
 
