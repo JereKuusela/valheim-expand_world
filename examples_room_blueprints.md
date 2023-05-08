@@ -35,12 +35,11 @@ Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/
 
 ## Creating the dungeon
 
-1. Edit `expand_rooms.yaml`.
-2. Determine the size of your room.
+1. Determine the size of your room.
   - Expand World tries to calculate the size automatically but it's not reliable.
   - Too small size means the rooms will overlap with each other.
   - Too big size means that the dungeon fails to generate because rooms take too much space.
-3. Create a new entry with:
+2. Add to `expand_rooms.yaml`: 
 ```
 - name: Entrance
   entrance: true
