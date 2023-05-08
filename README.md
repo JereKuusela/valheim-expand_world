@@ -312,7 +312,7 @@ See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/exa
 
 Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored areas, you need to use Upgrade World mod.
 
-- prefab: Identifier of the location object or name of blueprint file. Check wiki for available locations. Hidden ones work too. To create a variant of an existing location, add `:text` to the prefab. For example "Dolmen01:Ghost".
+- prefab: Identifier of the location object or name of blueprint file. Check wiki for available locations. Hidden ones work too. To create a clone of an existing location, add `:text` to the prefab. For example "Dolmen01:Ghost".
 - enabled (default: `true`): Quick way to disable this entry.
 - biome: List of possible biomes.
 - biomeArea: List of possible biome areas (edge = zones with multiple biomes, median = zones with only a single biome).
@@ -387,7 +387,9 @@ Note: Dungeon is always generated within the zone (64m x 64m).
 - minRequiredRooms (default: `1`): Minimum amount of rooms in the required list. Only for Dungeon and CampRadial.
 - requiredRooms: List of required rooms. Generator stops after required rooms and minimum amount of rooms are placed. Use command `ew_rooms` to print list of rooms.
 - excludedRooms: List of rooms removed from the available rooms.
-- alternative (default: `false`): If true, can place random rooms as the end caps (possibly leading to bigger dungeons?). Only for Dungeon.
+- roomWeights (default: `false`): Changes how rooms are randomly selected. Only for Dungeon.
+  - If false, every room has the same chance to be selected (`weight` field is ignored).
+  - If false, end cap is selected based on the highest `endCapPriority` field (`weight` field is not used).
 - doorChance (default: `0`): Chance for a door to be placed. Only for Dungeon.
 - doorTypes: List of possible doors. Each door has the same chance of being selected.
   - prefab: Identifier of the door object.
@@ -410,25 +412,38 @@ The file `expand_rooms.yaml` sets available dungeon rooms. This is a server side
 
 See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_room_blueprints.md).
 
-Completely new rooms can't be created but you can create variants by adding `:suffix` to the name.
+New rooms can be created from blueprints or cloning an existing room by adding `:suffix` to the name.
 
 - name: Name of the room prefab.
 - theme: Determines in which dungeons this room can appear. See dungeons for available values.
 - enabled (default `true`): Quick way to disable this room.
-- entrance (default `false`): If true, this room is used as an entrance (whatever that means).
-- endCap (default `false`): If true, this room is used to seal open ends.
-- divider (default `false`): If true, this room is used as a divider (whatever that means).
-- endCapPriority (default `0`): Rooms with a higher priority are preferred as end caps.
+- entrance (default `false`): If true, this room is used only as the first room.
+  - At least one entrance room is required. If multiple exist, one is randomly selected (`weight` field is never used).
+  - One of the connections must be set as `entrance`. Even if multiple exist, the first one is used.
+- endCap (default `false`): If true, this room is used to seal open ends at end of the generation.
+  - These rooms should only have one connection, so that no open ends are left.
+  - Each connection type should have a corresponding end cap, so that each connection can be sealed.
+- divider (default `false`): If true, this room is used to seal mismatching connections.
+  - The generator can create cycles so that two open connections are in the same position.
+    - If the connection types are the same, nothing is done.
+    - However if the types are different, a divider room is used to seal the connection.
+  - These rooms should only have one connection, so that no open ends are left. The connection type doesn't matter.
+  - These rooms should be very small (probably just a single wall).
+- endCapPriority (default `0`): Rooms with a higher priority are attempted first, unless `roomWeights` is enabled.
 - minPlaceOrder (default `0`): Minimum amount of rooms between this room and the entrance.
-- weight (default: `1`): Chance of this room being selected (relative to other weights).
+- weight (default: `1`): Chance of this room being selected (relative to other weights), unless `roomWeights` is disabled.
 - faceCenter (default: `false`): If true, the room is always rotated towards the camp center. If false, the room is randomly rotated.
 - perimeter (default: `false`): If true, this room is placed on the camp perimeter (edge).
-- size: Format `x,z,y`. Size of this room in meters. Only integers. Probably no reason to change this.
-- connections: List of doorways of this room.
-  - position: Format `x,z,y`. Position relative to the room.
-  - type: Type of the connection.
+- size: Format `x,z,y`. Size of this room in meters. Only integers.
+  - Probably no reason to change this for existing rooms.
+  - For blueprints, this is automatically calculated but recommended to be set manually.
+- connections: List of doorways.
+  - position: Format `posX,posZ,posY,rotY,rotX,rotZ` or `id` for blueprints. Position relative to the room.
+    - If missing, the base room position is used.
+    - For blueprints, this must be set. The easiest way is to mark the position with an object and use the `id`.
+  - type: Type of the connection. Only connections with the same type are connected.
   - entrance (default: `false`): If true, used for the entrance.
-  - door (default: `true`): If true, allows placing door. If other, allows placing door if the other connection also allows placing a door.
+  - door (default: `true`): If true, allows placing door. If `other`, allows placing door if the other connection also allows placing a door.
 - objects: Extra objects or blueprints. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
   - id: Prefab name.
   - posX, posZ, posY: Offset from the location position. Defalt is 0.

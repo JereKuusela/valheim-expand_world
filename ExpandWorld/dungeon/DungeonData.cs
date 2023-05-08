@@ -20,6 +20,8 @@ public class DungeonData
   public string excludedRooms = "";
   [DefaultValue(false)]
   public bool alternative = false;
+  [DefaultValue(false)]
+  public bool roomWeights = false;
   [DefaultValue("")]
   public string themes = "";
   public DungeonDoorData[] doorTypes = new DungeonDoorData[0];

@@ -26,7 +26,7 @@ public class DungeonManager
       ExpandWorld.Log.LogWarning($"Failed to find dungeon algorithm {data.algorithm}.");
     DungeonData[data.name] = data;
     dg.name = data.name;
-    dg.m_alternativeFunctionality = data.alternative;
+    dg.m_alternativeFunctionality = data.alternative || data.roomWeights;
     dg.m_campRadiusMax = data.campRadiusMax;
     dg.m_campRadiusMin = data.campRadiusMin;
     dg.m_doorChance = data.doorChance;
@@ -71,7 +71,7 @@ public class DungeonManager
       data.minRequiredRooms = dg.m_minRequiredRooms;
       data.minRooms = dg.m_minRooms;
       data.requiredRooms = Data.FromList(dg.m_requiredRooms);
-      data.alternative = dg.m_alternativeFunctionality;
+      data.roomWeights = dg.m_alternativeFunctionality;
     }
     if (dg.m_algorithm == DungeonGenerator.Algorithm.CampRadial)
     {
