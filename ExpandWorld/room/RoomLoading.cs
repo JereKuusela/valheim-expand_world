@@ -12,6 +12,7 @@ public class RoomLoading
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_rooms*.yaml";
 
+
   private static List<DungeonDB.RoomData> DefaultEntries = new();
 
 
@@ -31,12 +32,30 @@ public class RoomLoading
     var yaml = Data.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
+
+  private static Dictionary<string, Room.Theme> DefaultNameToTheme = new() {
+    {"Crypt", Room.Theme.Crypt},
+    {"SunkenCrypt", Room.Theme.SunkenCrypt},
+    {"Cave", Room.Theme.Cave},
+    {"ForestCrypt", Room.Theme.ForestCrypt},
+    {"GoblinCamp", Room.Theme.GoblinCamp},
+    {"MeadowsVillage", Room.Theme.MeadowsVillage},
+    {"MeadowsFarm", Room.Theme.MeadowsFarm},
+    {"DvergerTown", Room.Theme.DvergerTown},
+    {"DvergerBoss", Room.Theme.DvergerBoss}
+  };
+  // For extra custom room themes.
+  public static Dictionary<string, Room.Theme> NameToTheme = DefaultNameToTheme.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
+  public static Dictionary<Room.Theme, string> ThemeToName = DefaultNameToTheme.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+  public static bool TryGetTheme(string name, out Room.Theme theme) => NameToTheme.TryGetValue(name.ToLower(), out theme);
+
   public static void Load()
   {
-    RoomSpawning.Prefabs.Clear();
     RoomSpawning.Data.Clear();
     RoomSpawning.Objects.Clear();
     RoomSpawning.ObjectSwaps.Clear();
+    NameToTheme = DefaultNameToTheme.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
+    ThemeToName = DefaultNameToTheme.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     if (Helper.IsClient()) return;
     if (!Configuration.DataRooms)
     {
@@ -60,6 +79,7 @@ public class RoomLoading
       // Watcher triggers reload.
       return;
     }
+    ExpandWorld.Log.LogInfo($"Reloading room themes ({NameToTheme.Count} entries).");
     ExpandWorld.Log.LogInfo($"Reloading room data ({data.Count} entries).");
 
     RoomNames = data.ToDictionary(room => room.m_room.name.ToLowerInvariant(), room => room.m_room.name);
@@ -134,6 +154,13 @@ public class RoomLoading
     var snapPieces = data.connections.Select(c => c.position).ToArray();
     var roomData = CreateProxy(data.name, snapPieces);
     var room = roomData.m_room;
+    var missingThemes = Data.ToList(data.theme).Where(s => !NameToTheme.ContainsKey(s.ToLowerInvariant())).ToArray();
+    foreach (var theme in missingThemes)
+    {
+      var nextValue = (Room.Theme)(2 * (int)NameToTheme.Values.Max());
+      NameToTheme[theme.ToLowerInvariant()] = nextValue;
+      ThemeToName[nextValue] = theme;
+    }
     room.m_theme = Data.ToEnum<Room.Theme>(data.theme);
     room.m_entrance = data.entrance;
     room.m_endCap = data.endCap;

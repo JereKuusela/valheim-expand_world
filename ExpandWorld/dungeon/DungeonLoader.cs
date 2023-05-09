@@ -6,8 +6,9 @@ using HarmonyLib;
 
 namespace ExpandWorld.Dungeon;
 
-// Dungeons don't have configuration, instead each generator is a prefab.
-// So the data is loaded to custom classes and then applied to the prefabs. 
+// Dungeons don't have configuration and appear as part of locations.
+// So compared to other data,  the default dungeon generators are never removed.
+// So handling missing entries isn't very important but can be added later.
 [HarmonyPatch]
 public partial class Loader
 {

@@ -38,7 +38,7 @@ public partial class Loader
     dg.m_minRequiredRooms = data.minRequiredRooms;
     dg.m_excludedRooms = RoomLoading.ParseRooms(data.excludedRooms).ToHashSet();
     dg.m_requiredRooms = RoomLoading.ParseRooms(data.requiredRooms);
-    dg.m_themes = global::ExpandWorld.Data.ToEnum<Room.Theme>(data.themes);
+    dg.m_themes = Data.ToList(data.themes);
     dg.m_tileWidth = data.tileWidth;
     dg.m_spawnChance = data.spawnChance;
     dg.m_gridSize = data.gridSize;

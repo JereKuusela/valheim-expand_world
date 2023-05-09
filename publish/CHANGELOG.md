@@ -1,6 +1,7 @@
 - v1.41
   - Adds new fields `bounds` and `objectSwap` to the `expand_dungeons.yaml` file.
   - Adds new fields `objectData` and `objectSwap` to the `expand_dungeons.yaml` file.
+  - Adds support for custom room themes.
   - Changes the fields `objectSwap` and `objectData` in the `expand_locations.yaml` to not affect dungeons.
   - Fixes custom dungeons not working.
   

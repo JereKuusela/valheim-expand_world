@@ -33,7 +33,7 @@ public class Spawner
   }
 
   ///<summary>Implements object data and swapping from location data.</summary>
-  static GameObject CustomObject(DungeonGenerator dg, GameObject prefab, Vector3 position, Quaternion rotation)
+  static GameObject CustomObject(GameObject prefab, Vector3 position, Quaternion rotation, DungeonGenerator dg)
   {
     // Some mods cause client side dungeon reloading. In this case, no data is available.
     // Revert to the default behaviour as a fail safe.
@@ -79,6 +79,7 @@ public class Spawner
   }
 
 
+  // The dungeon prefab is only used for generating, so the properties can be just overwritten.
   public static void Override(DungeonGenerator dg, string name)
   {
     if (!Generators.TryGetValue(name, out var data)) return;
@@ -96,7 +97,7 @@ public class Spawner
     dg.m_minAltitude = data.m_minAltitude;
     dg.m_minRequiredRooms = data.m_minRequiredRooms;
     dg.m_requiredRooms = data.m_requiredRooms;
-    dg.m_themes = data.m_themes;
+    dg.m_themes = Data.ToEnum<Room.Theme>(data.m_themes);
     dg.m_gridSize = data.m_gridSize;
     dg.m_tileWidth = data.m_tileWidth;
     dg.m_spawnChance = data.m_spawnChance;

@@ -51,6 +51,10 @@ public class DungeonData
 
 }
 
+// Dungeon generators don't have a separate class for configuration.
+// Instead the parameters are in the prefab itself.
+// Technically the same component could be used but dungeon reset mods error out if there isn't ZNetView.
+// So a separate class is used to store the parameters.
 public class FakeDungeonGenerator
 {
   public string name = "";
@@ -62,7 +66,7 @@ public class FakeDungeonGenerator
   public HashSet<string> m_excludedRooms = new();
   public List<string> m_requiredRooms = new();
   public bool m_alternativeFunctionality = false;
-  public Room.Theme m_themes = Room.Theme.Cave;
+  public List<string> m_themes = new();
   public List<DungeonGenerator.DoorDef> m_doorTypes = new();
   public float m_doorChance;
   public float m_maxTilt;

@@ -223,9 +223,10 @@ public class Data : MonoBehaviour
     }
     return FromList(names);
   }
-  public static T ToEnum<T>(string str) where T : struct, Enum
+  public static T ToEnum<T>(string str) where T : struct, Enum => ToEnum<T>(ToList(str));
+  public static T ToEnum<T>(List<string> list) where T : struct, Enum
   {
-    var list = ToList(str);
+
     int value = 0;
     foreach (var item in list)
     {
