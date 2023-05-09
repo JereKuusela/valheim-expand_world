@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-namespace ExpandWorld;
+using UnityEngine;
+
+namespace ExpandWorld.Dungeon;
 public class DungeonDoorData
 {
   public string prefab = "";
@@ -39,6 +42,12 @@ public class DungeonData
   public float perimeterBuffer;
   [DefaultValue(false)]
   public bool interiorTransform = false;
+  [DefaultValue("")]
+  public string bounds = "";
+  [DefaultValue(null)]
+  public string[]? objectData = null;
+  [DefaultValue(null)]
+  public string[]? objectSwap = null;
 
 }
 
@@ -46,9 +55,11 @@ public class FakeDungeonGenerator
 {
   public string name = "";
   public DungeonGenerator.Algorithm m_algorithm = DungeonGenerator.Algorithm.Dungeon;
+  public Vector3 m_zoneSize = new Vector3(64f, 64f, 64f);
   public int m_maxRooms = 1;
   public int m_minRooms = 1;
   public int m_minRequiredRooms = 1;
+  public HashSet<string> m_excludedRooms = new();
   public List<string> m_requiredRooms = new();
   public bool m_alternativeFunctionality = false;
   public Room.Theme m_themes = Room.Theme.Cave;
@@ -64,5 +75,6 @@ public class FakeDungeonGenerator
   public int m_perimeterSections;
   public float m_perimeterBuffer;
   public bool m_useCustomInteriorTransform;
-
+  public Dictionary<string, List<Tuple<float, string>>> m_objectSwaps = new();
+  public Dictionary<string, ZDO?> m_objectData = new();
 }

@@ -17,7 +17,12 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(DungeonDB), nameof(DungeonDB.Start)), HarmonyPriority(Priority.VeryLow)]
 public class InitializeRooms
 {
-  static void Postfix() => RoomLoading.Initialize();
+  static void Postfix()
+  {
+    RoomLoading.Initialize();
+    // Dungeons require room names to be loaded.
+    Dungeon.Loader.Initialize();
+  }
 }
 
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.VersionSetup)), HarmonyPriority(Priority.VeryLow)]
@@ -42,7 +47,6 @@ public class InitializeContent
     if (ZNet.instance.IsServer())
     {
       EventManager.ToFile();
-      DungeonManager.ToFile();
       EnvironmentManager.ToFile();
       ClutterManager.ToFile();
 
@@ -58,8 +62,7 @@ public class InitializeContent
 
       EventManager.FromFile();
       SpawnManager.FromFile();
-      DungeonManager.FromFile();
-      // Room data is handled elsewhere.
+      // Dungeon and room data is handled elsewhere.
       // Spawn data is handled elsewhere.
     }
     ZoneSystem.instance.m_locations = LocationSetup.CleanUpLocations(ZoneSystem.instance.m_locations);

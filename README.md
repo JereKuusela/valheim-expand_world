@@ -339,13 +339,13 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
 - groundOffset (default: `0` meters): Placed above the ground.
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
-- objectSwap: Changes child objects to some other objects, including dungeons.
+- objectSwap: Changes location objects to other objects, doesn't include dungeons.
     - Use format `id, swapid` for a direct swap.
     - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
     - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
     - Empty id can be used to spawn nothing.
     - Blueprints are supported.
-    - Use command `ew_locations` and `ew_rooms` to print location and room contents.
+    - Use command `ew_locations` to print location contents.
     - [Example](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md#location-adding-new-objects)
 - objectData: List to set child object data. Format is `id,data`.
   - id: Prefab name.
@@ -377,10 +377,12 @@ The file `expand_dungeons.yaml` sets dungeon generators. This is a server side f
 
 Command `ew_dungeons` can be used to list available rooms for each dungeon.
 
-Note: Dungeon is always generated within the zone (64m x 64m).
-
 - name: Name of the dungeon generator.
 - algorithm: Type of the dungeon. Possible values are `Dungeon`, `CampGrid` or `CampRadial`.
+- bounds (default: `64`): Maximum size of the dungeon in meters. Format is `x,z,y` or a single number for all directions.
+  - Note: Zone size is 64m x 64m. So values above that causes overflow to the adjacent zones.
+  - Note: Dungeons have an environment cube that is within the zone. Currently going past will cause a visual glitch.
+  - Reasonable maximum is 3 zones which is 192 meters.
 - themes: List of available room sets. Possible values are `Crypt`, `SunkenCrypt`, `Cave`, `ForestCrypt`, `GoblinCamp`, `MeadowsVillage`, `MeadowsFarm`, `DvergerTown`, `DvergerBoss`. For example `MeadowsVillage,MeadowsFarm` would use both sets.
 - maxRooms (default: `1`): Maximum amount of rooms. Only for Dungeon and CampRadial.
 - minRooms (default: `1`): Minimum amount of rooms. Only for Dungeon and CampRadial.
@@ -405,6 +407,16 @@ Note: Dungeon is always generated within the zone (64m x 64m).
 - tileWidth (default: `0` meters): Size of a single tile. Only for CampGrid.
 - spawnChance (default: `1`): Chance for each tile to spawn. Only for CampGrid.
 - interiorTransform (default: `false`): Some locations may require this being true. If you notice weird warnings, try setting this to true.
+- objectData: List to set dungeon object data. Format is `id,data`.
+  - id: Prefab name.
+  - data: ZDO data override.
+- objectSwap: Changes dungeon objects to other objects.
+    - Use format `id, swapid` for a direct swap.
+    - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
+    - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
+    - Empty id can be used to spawn nothing.
+    - Blueprints are supported.
+    - Use command `ew_rooms` to print room contents.
 
 ## Rooms
 
@@ -451,6 +463,14 @@ New rooms can be created from blueprints or cloning an existing room by adding `
   - scaleX, scaleZ, scaleY: Scale. Default is 1.
   - chance: Chance to spawn (from 0 to 1). Default is 1.
   - data: ZDO data override.
+- objectSwap: Changes room objects to other objects.
+    - Use format `id, swapid` for a direct swap.
+    - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
+    - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
+    - Empty id can be used to spawn nothing.
+    - Blueprints are supported.
+    - Use command `ew_rooms` to print room contents.
+    - Note: If dungeon has object swaps, those are applied first.
 
 ## Vegetation
 

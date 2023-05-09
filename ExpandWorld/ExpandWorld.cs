@@ -13,7 +13,7 @@ public class ExpandWorld : BaseUnityPlugin
 {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.40";
+  public const string VERSION = "1.41";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -50,7 +50,7 @@ public class ExpandWorld : BaseUnityPlugin
       WorldManager.SetupWatcher();
       ClutterManager.SetupWatcher();
       EnvironmentManager.SetupWatcher();
-      DungeonManager.SetupWatcher();
+      Dungeon.Loader.SetupWatcher();
       RoomLoading.SetupWatcher();
       Data.SetupBlueprintWatcher();
     }

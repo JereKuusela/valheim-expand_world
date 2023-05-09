@@ -35,18 +35,9 @@ public class LocationLoading
     if (data.dungeon != "")
       Dungeons[data.prefab] = data.dungeon;
     if (data.objectSwap != null)
-    {
-      var swaps = data.objectSwap.Select(Data.ToList)
-        .ToDictionary(arr => arr[0], arr => ParseTuple(arr.Skip(1)));
-      foreach (var kvp in swaps)
-      {
-        foreach (var swap in kvp.Value)
-          BlueprintManager.Load(swap.Item2, data.centerPiece);
-      }
-      ObjectSwaps[data.prefab] = swaps;
-    }
+      ObjectSwaps[data.prefab] = Spawn.LoadSwaps(data.objectSwap);
     if (data.objectData != null)
-      ObjectData[data.prefab] = data.objectData.Select(Data.ToList).ToDictionary(arr => arr[0], arr => Data.ToZDO(arr[1]));
+      ObjectData[data.prefab] = Spawn.LoadData(data.objectData);
     if (data.objects != null)
       Objects[data.prefab] = Parse.Objects(data.objects);
 
@@ -76,16 +67,7 @@ public class LocationLoading
     return loc;
   }
 
-  private static List<Tuple<float, string>> ParseTuple(IEnumerable<string> items)
-  {
-    var total = 0f;
-    return items.Select(s => s.Split(':')).Select(s =>
-    {
-      var weight = Parse.Float(s, 1, 1f);
-      total += weight;
-      return Tuple.Create(weight, s[0]);
-    }).ToList().Select(t => Tuple.Create(t.Item1 / total, t.Item2)).ToList();
-  }
+
   public static LocationData ToData(ZoneSystem.ZoneLocation loc)
   {
     LocationData data = new();
@@ -363,10 +345,10 @@ public class LocationObjectDataAndSwap
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     if (flag)
       Spawn.DungeonGeneratorPos = location.m_generatorPosition;
-    DungeonSpawning.Location = null;
+    Dungeon.Spawner.Location = null;
     if (mode != ZoneSystem.SpawnMode.Client)
     {
-      DungeonSpawning.Location = location;
+      Dungeon.Spawner.Location = location;
       if (LocationLoading.LocationData.TryGetValue(location.m_prefabName, out var data))
         pos.y += data.groundOffset;
     }
@@ -405,7 +387,7 @@ public class LocationObjectDataAndSwap
       if (mode == ZoneSystem.SpawnMode.Ghost)
         ZNetView.FinishGhostInit();
     }
-    DungeonSpawning.Location = null;
+    Dungeon.Spawner.Location = null;
     Spawn.DungeonGeneratorPos = null;
   }
 

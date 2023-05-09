@@ -172,7 +172,7 @@ public partial class Configuration
     configDataClutter = wrapper.Bind(section, "Clutter data", true, false, "Use clutter data");
     configDataClutter.SettingChanged += (s, e) => ClutterManager.FromSetting(valueClutterData.Value);
     configDataDungeons = wrapper.Bind(section, "Dungeon data", true, false, "Use dungeon data");
-    configDataDungeons.SettingChanged += (s, e) => DungeonManager.FromFile();
+    configDataDungeons.SettingChanged += (s, e) => Dungeon.Loader.Load();
     configDataRooms = wrapper.Bind(section, "Room data", true, false, "Use dungeon room data");
     configDataRooms.SettingChanged += (s, e) => RoomLoading.Load();
     configDataWorld = wrapper.Bind(section, "World data", true, true, "Use world data");

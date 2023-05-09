@@ -70,7 +70,8 @@ public static class Parse
   }
   public static string[] Split(string arg) => arg.Split(',').Select(s => s.Trim()).Where(s => s != "").ToArray();
   public static string Name(string arg) => arg.Split(':')[0];
-  public static Vector3 VectorXZY(string arg) => VectorXZY(Split(arg), 0, Vector3.zero);
+  public static Vector3 VectorXZY(string arg) => VectorXZY(arg, Vector3.zero);
+  public static Vector3 VectorXZY(string arg, Vector3 defaultValue) => VectorXZY(Split(arg), 0, defaultValue);
 
   ///<summary>Parses YXZ vector starting at given index. Zero is used for missing values.</summary>
   public static Vector3 VectorXZY(string[] args, int index) => VectorXZY(args, index, Vector3.zero);

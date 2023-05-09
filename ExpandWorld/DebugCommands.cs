@@ -122,9 +122,9 @@ public class DebugCommands
       if (!zs) return;
       GameObject obj = new();
       var dg = obj.AddComponent<DungeonGenerator>();
-      var dgs = DungeonManager.Generators.Select(kvp =>
+      var dgs = Dungeon.Spawner.Generators.Select(kvp =>
       {
-        DungeonManager.Override(dg, kvp.Key);
+        Dungeon.Spawner.Override(dg, kvp.Key);
         dg.SetupAvailableRooms();
         var rooms = DungeonGenerator.m_availableRooms.Select(room => room.m_room.name);
         return $"{kvp.Key}: {string.Join(", ", rooms)}";

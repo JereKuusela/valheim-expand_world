@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
@@ -22,6 +23,7 @@ public class RoomSpawning
   public static Dictionary<string, RoomData> Data = new();
 
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
+  public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
 
   private static Room OverrideParameters(Room from, Room to)
   {
@@ -64,6 +66,7 @@ public class RoomSpawning
     // Clients already have proper rooms.
     if (mode == ZoneSystem.SpawnMode.Client) return true;
     var parameters = room.m_room;
+    Dungeon.Spawner.RoomName = parameters.name;
     var baseName = Parse.Name(parameters.name);
     // Combine the base room prefab and the room parameters.
     if (Prefabs.TryGetValue(baseName, out var roomData))
@@ -75,10 +78,9 @@ public class RoomSpawning
       room.m_randomSpawns = roomData.m_randomSpawns;
       return true;
     }
-    ExpandWorld.Log.LogInfo($"Spawning : {parameters.name}");
     if (BlueprintManager.TryGet(parameters.name, out var bp))
     {
-      var locName = DungeonSpawning.Location?.m_prefabName ?? "";
+      var locName = Dungeon.Spawner.Location?.m_prefabName ?? "";
       Spawn.Blueprint(locName, bp, pos, rot, DataOverride, null);
     }
     return true;
@@ -88,12 +90,13 @@ public class RoomSpawning
   [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPostfix]
   static void PlaceRoomCustomObjects(DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
+    Dungeon.Spawner.RoomName = "";
     if (mode == ZoneSystem.SpawnMode.Client) return;
     if (!Objects.TryGetValue(room.m_room.name, out var objects)) return;
     int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
     UnityEngine.Random.State state = UnityEngine.Random.state;
     UnityEngine.Random.InitState(seed);
-    var locName = DungeonSpawning.Location?.m_prefabName ?? "";
+    var locName = Dungeon.Spawner.Location?.m_prefabName ?? "";
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
@@ -130,7 +133,6 @@ public class RoomSpawning
     }
   }
 
-
   [HarmonyPatch(nameof(DungeonGenerator.Save)), HarmonyPrefix]
   static void CleanRoomsForSaving()
   {
@@ -139,5 +141,14 @@ public class RoomSpawning
     // Restore base names to save the rooms as vanilla compatible.
     foreach (var room in DungeonGenerator.m_placedRooms)
       room.name = Parse.Name(room.name);
+  }
+
+  public static bool TryGetSwap(string room, string prefab, out string swapped)
+  {
+    swapped = "";
+    if (!ObjectSwaps.TryGetValue(room, out var objectSwaps)) return false;
+    if (!objectSwaps.TryGetValue(prefab, out var swaps)) return false;
+    swapped = Spawn.RandomizeSwap(swaps);
+    return true;
   }
 }

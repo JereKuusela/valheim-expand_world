@@ -14,21 +14,30 @@ public class RoomLoading
 
   private static List<DungeonDB.RoomData> DefaultEntries = new();
 
+
+  // For finding rooms with wrong case.
+  private static Dictionary<string, string> RoomNames = new();
+  public static List<string> ParseRooms(string names) => Data.ToList(names).Select(s => RoomLoading.RoomNames.TryGetValue(s, out var name) ? name : s).ToList();
   public static void Initialize()
   {
     DefaultEntries.Clear();
     RoomSpawning.Prefabs.Clear();
-    RoomSpawning.Data.Clear();
-    RoomSpawning.Objects.Clear();
+    if (Helper.IsServer())
+      SetDefaultEntries();
     Load();
+  }
+  private static void ToFile()
+  {
+    var yaml = Data.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
+    File.WriteAllText(FilePath, yaml);
   }
   public static void Load()
   {
-    if (!ZNet.instance.IsServer()) return;
-    if (DefaultEntries.Count == 0) SetDefaultEntries();
-    RoomSpawning.Objects.Clear();
+    RoomSpawning.Prefabs.Clear();
     RoomSpawning.Data.Clear();
-    DungeonDB.instance.m_rooms = DefaultEntries;
+    RoomSpawning.Objects.Clear();
+    RoomSpawning.ObjectSwaps.Clear();
+    if (Helper.IsClient()) return;
     if (!Configuration.DataRooms)
     {
       ExpandWorld.Log.LogInfo($"Reloading default room data ({DefaultEntries.Count} entries).");
@@ -36,10 +45,8 @@ public class RoomLoading
     }
     if (!File.Exists(FilePath))
     {
-      var yaml = Data.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
-      File.WriteAllText(FilePath, yaml);
-      // Watcher triggers reload.
-      return;
+      ToFile();
+      return; // Watcher triggers reload.
     }
     var data = FromFile();
     if (data.Count == 0)
@@ -54,6 +61,8 @@ public class RoomLoading
       return;
     }
     ExpandWorld.Log.LogInfo($"Reloading room data ({data.Count} entries).");
+
+    RoomNames = data.ToDictionary(room => room.m_room.name.ToLowerInvariant(), room => room.m_room.name);
     DungeonDB.instance.m_rooms = data;
   }
 
@@ -140,6 +149,8 @@ public class RoomLoading
     UpdateConnections(room, data.connections);
     if (data.objects != null)
       RoomSpawning.Objects[data.name] = Parse.Objects(data.objects);
+    if (data.objectSwap != null)
+      RoomSpawning.ObjectSwaps[data.name] = Spawn.LoadSwaps(data.objectSwap);
     return roomData;
   }
   private static RoomData ToData(DungeonDB.RoomData roomData)

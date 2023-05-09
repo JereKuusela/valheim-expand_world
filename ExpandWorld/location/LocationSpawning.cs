@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,26 +11,13 @@ public class LocationSpawning
     if (!objectData.TryGetValue(prefab, out var data)) return null;
     return data;
   }
-  static string RandomizeSwap(List<Tuple<float, string>> swaps)
-  {
-    if (swaps.Count == 0)
-      return "";
-    if (swaps.Count == 1)
-      return swaps[0].Item2;
-    var rng = UnityEngine.Random.value;
-    foreach (var swap in swaps)
-    {
-      rng -= swap.Item1;
-      if (rng <= 0f) return swap.Item2;
-    }
-    return swaps[swaps.Count - 1].Item2;
-  }
+
   public static bool TryGetSwap(string location, string prefab, out string swapped)
   {
     swapped = "";
     if (!LocationLoading.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return false;
     if (!objectSwaps.TryGetValue(prefab, out var swaps)) return false;
-    swapped = RandomizeSwap(swaps);
+    swapped = Spawn.RandomizeSwap(swaps);
     return true;
   }
   static string DummyObj = "vfx_auto_pickup";

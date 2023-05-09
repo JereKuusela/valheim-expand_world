@@ -37,5 +37,7 @@ public class RoomData
   public string size = "";
   public RoomConnectionData[] connections = new RoomConnectionData[0];
   [DefaultValue(null)]
+  public string[]? objectSwap = null;
+  [DefaultValue(null)]
   public string[]? objects = null;
 }
