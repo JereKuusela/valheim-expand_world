@@ -10,7 +10,7 @@ namespace ExpandWorld.Dungeon;
 public class Spawner
 {
   ///<summary>Dungeon doesn't know its location so it must be tracked manually.</summary>
-  public static ZoneSystem.ZoneLocation? Location = null;
+  public static string LocationName = "";
 
   public static Dictionary<string, FakeDungeonGenerator> Generators = new();
   public static string RoomName = "";
@@ -70,10 +70,9 @@ public class Spawner
   [HarmonyPatch(nameof(DungeonGenerator.Generate), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
   static void Generate(DungeonGenerator __instance)
   {
-    if (Location == null) return;
+    if (LocationName == "") return;
     var dungeonName = Utils.GetPrefabName(__instance.gameObject);
-    var locName = Location?.m_prefabName ?? "";
-    if (LocationLoading.LocationData.TryGetValue(locName, out var data) && data.dungeon != "")
+    if (LocationLoading.LocationData.TryGetValue(LocationName, out var data) && data.dungeon != "")
       dungeonName = data.dungeon;
     Override(__instance, dungeonName);
   }
@@ -105,7 +104,7 @@ public class Spawner
     dg.m_perimeterBuffer = data.m_perimeterBuffer;
     dg.m_useCustomInteriorTransform = data.m_useCustomInteriorTransform;
   }
-  [HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
+  [HarmonyPatch(nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
   public static void SetupAvailableRooms(DungeonGenerator __instance)
   {
     var name = Utils.GetPrefabName(__instance.gameObject);
@@ -113,5 +112,56 @@ public class Spawner
     if (gen.m_excludedRooms.Count == 0) return;
     DungeonGenerator.m_availableRooms = DungeonGenerator.m_availableRooms.Where(room => !gen.m_excludedRooms.Contains(room.m_room.name)).ToList();
 
+  }
+
+}
+
+// Client side tweak to make the dungeon environment box extend to the whole dungeon.
+[HarmonyPatch]
+public class EnvironmentBox
+{
+
+  // Not fully sure if the generator or location loads first.
+  public static Dictionary<Vector2i, Vector3> Cache = new();
+
+
+  private static void TryScale(Location loc)
+  {
+    var zone = ZoneSystem.instance.GetZone(loc.transform.position);
+    if (!Cache.TryGetValue(zone, out var size)) return;
+    // Only interior locations can have the environment box.
+    if (!loc.m_hasInterior) return;
+    var envZone = loc.GetComponentInChildren<EnvZone>();
+    if (!envZone) return;
+    // Don't shrink from the default so that people can build there more easily.
+    // Otherwise for small dungeons the box would be very small.
+    var origSize = envZone.transform.localScale;
+    // Also leave some margins just in case so that the box doesn't clip through the walls.
+    size.x = Mathf.Max(size.x + 10f, origSize.x);
+    size.y = Mathf.Max(size.y + 10f, origSize.y);
+    size.z = Mathf.Max(size.z + 10f, origSize.z);
+    envZone.transform.localScale = size;
+  }
+
+  [HarmonyPatch(typeof(DungeonGenerator), nameof(DungeonGenerator.Load)), HarmonyPostfix]
+  static void ScaleEnvironmentBox1(DungeonGenerator __instance)
+  {
+    var pos = __instance.transform.position;
+    var zone = ZoneSystem.instance.GetZone(pos);
+    var colliders = __instance.GetComponentsInChildren<Collider>();
+    Bounds bounds = new();
+    foreach (var collider in colliders)
+      bounds.Encapsulate(collider.bounds);
+    var size = bounds.size;
+    Cache[zone] = size;
+    var locsInZone = Location.m_allLocations.Where(loc => ZoneSystem.instance.GetZone(loc.transform.position) == zone).ToArray();
+    foreach (var loc in locsInZone)
+      TryScale(loc);
+  }
+
+  [HarmonyPatch(typeof(Location), nameof(Location.Awake)), HarmonyPostfix]
+  static void ScaleEnvironmentBox2(Location __instance)
+  {
+    TryScale(__instance);
   }
 }

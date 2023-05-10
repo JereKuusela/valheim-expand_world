@@ -80,8 +80,7 @@ public class RoomSpawning
     }
     if (BlueprintManager.TryGet(parameters.name, out var bp))
     {
-      var locName = Dungeon.Spawner.Location?.m_prefabName ?? "";
-      Spawn.Blueprint(locName, bp, pos, rot, DataOverride, null);
+      Spawn.Blueprint(Dungeon.Spawner.LocationName, bp, pos, rot, DataOverride, null);
     }
     return true;
   }
@@ -96,11 +95,10 @@ public class RoomSpawning
     int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
     UnityEngine.Random.State state = UnityEngine.Random.state;
     UnityEngine.Random.InitState(seed);
-    var locName = Dungeon.Spawner.Location?.m_prefabName ?? "";
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      Spawn.BPO(locName, obj, pos, rot, DataOverride, null);
+      Spawn.BPO(Dungeon.Spawner.LocationName, obj, pos, rot, DataOverride, null);
     }
     UnityEngine.Random.state = state;
   }

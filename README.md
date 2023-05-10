@@ -362,7 +362,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
   - Note: Maximum suggested value is 32 meters. Higher values go past the zone border and can cause issues.
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
 - noBuild (default: `false`): If true, players can't build within `exteriorRadius`. If number, player can't build within the given radius.
-- noBuildDungeon (default: `false`): If true, players can't build inside dungeons within `exteriorRadius`. If number, player can't build inside dungeons within the given radius.
+- noBuildDungeon (default: `false`): If true, players can't build inside dungeons within the whole zone. If number, player can't build inside dungeons within the given radius.
 - levelArea (default: `true` for blueprints): Flattens the area.
 - levelRadius (default: half of `exteriorRadius`): Size of the leveled area.
 - levelBorder (default: half of `exteriorRadius`): Adds a smooth transition around the `levelRadius`.
@@ -380,9 +380,9 @@ Command `ew_dungeons` can be used to list available rooms for each dungeon.
 - name: Name of the dungeon generator.
 - algorithm: Type of the dungeon. Possible values are `Dungeon`, `CampGrid` or `CampRadial`.
 - bounds (default: `64`): Maximum size of the dungeon in meters. Format is `x,z,y` or a single number for all directions.
-  - Note: Zone size is 64m x 64m. So values above that causes overflow to the adjacent zones.
-  - Note: Dungeons have an environment cube that is within the zone. Currently going past will cause a visual glitch.
   - Reasonable maximum is 3 zones which is 192 meters.
+  - Note: Zone size is 64m x 64m. So values above that causes overflow to the adjacent zones.
+  - Note: Dungeons have an environment cube that has 64 meter size. This is automatically scaled, unless running in the server side only mode.
 - themes: List of available room sets. Possible values are `Crypt`, `SunkenCrypt`, `Cave`, `ForestCrypt`, `GoblinCamp`, `MeadowsVillage`, `MeadowsFarm`, `DvergerTown`, `DvergerBoss`. For example `MeadowsVillage,MeadowsFarm` would use both sets.
 - maxRooms (default: `1`): Maximum amount of rooms. Only for Dungeon and CampRadial.
 - minRooms (default: `1`): Minimum amount of rooms. Only for Dungeon and CampRadial.

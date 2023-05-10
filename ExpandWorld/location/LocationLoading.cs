@@ -345,10 +345,10 @@ public class LocationObjectDataAndSwap
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     if (flag)
       Spawn.DungeonGeneratorPos = location.m_generatorPosition;
-    Dungeon.Spawner.Location = null;
+    Dungeon.Spawner.LocationName = "";
     if (mode != ZoneSystem.SpawnMode.Client)
     {
-      Dungeon.Spawner.Location = location;
+      Dungeon.Spawner.LocationName = location.m_prefabName;
       if (LocationLoading.LocationData.TryGetValue(location.m_prefabName, out var data))
         pos.y += data.groundOffset;
     }
@@ -387,7 +387,7 @@ public class LocationObjectDataAndSwap
       if (mode == ZoneSystem.SpawnMode.Ghost)
         ZNetView.FinishGhostInit();
     }
-    Dungeon.Spawner.Location = null;
+    Dungeon.Spawner.LocationName = "";
     Spawn.DungeonGeneratorPos = null;
   }
 

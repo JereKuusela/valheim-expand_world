@@ -32,7 +32,8 @@ public class NoBuildManager
       }
 
       var radius = noBuild == "true" ? loc.m_location.m_location.GetMaxRadius() : Parse.Float(noBuild);
-      var dungeon = noBuildDungeon == "true" ? loc.m_location.m_location.GetMaxRadius() : Parse.Float(noBuildDungeon);
+      // Negative value means the whole zone.
+      var dungeon = noBuildDungeon == "true" ? -1f : Parse.Float(noBuildDungeon);
       return new NoBuildData()
       {
         X = loc.m_position.x,
@@ -54,6 +55,9 @@ public class NoBuildManager
       {
         if (!NoBuild.TryGetValue(new Vector2i(i, j), out var noBuild)) continue;
         if (point.y <= 3000 && Utils.DistanceXZ(new(noBuild.X, 0, noBuild.Z), point) < noBuild.radius)
+          return true;
+        // Negative value means the whole zone.
+        if (noBuild.dungeon < 0f && point.y > 3000 && i == zone.x && j == zone.y)
           return true;
         if (point.y > 3000 && Utils.DistanceXZ(new(noBuild.X, 0, noBuild.Z), point) < noBuild.dungeon)
           return true;

@@ -18,6 +18,7 @@ public partial class Loader
 
   public static void Initialize()
   {
+    Dungeon.EnvironmentBox.Cache.Clear();
     Load();
   }
 
