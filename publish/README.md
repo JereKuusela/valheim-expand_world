@@ -12,9 +12,9 @@ Some features are available also as server only mode.
 
 See [documentation](https://github.com/JereKuusela/valheim-expand_world/blob/main/README.md).
 
-See [location examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md).
+See [location examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples/examples_locations.md).
 
-See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples.md).
+See [other examples](https://github.com/JereKuusela/valheim-expand_world/blob/examples/main/examples.md).
 
 # Tutorials
 

@@ -94,24 +94,6 @@ Spawner_DraugrPile:-5,0,-6,... -> 4.5,0,-4.5
     - Spawner_DraugrPile, CAAAAAECXKVYFAAAAA==
 ```
 
-## Location: Edit dungeon vegvisirs with Structure Tweaks mod
-
-1. Structure Tweaks mod is required for all clients.
-2. Use `tweak_runestone name=Find discover=AbandonedLogCabin02,Cabin!,Bed` on any object.
-3. Copy the data with `object copy=override_name,override_discover`
-  - Don't use just `object copy` because it will save all of the data.
-  - For dungeons this would include the room layout.
-  - For other objects this would include things like health or creator id.
-  - Only a pre-existing runestone wouldn't have any extra data.
-4. Apply the data to the dungeon generator object.
-  - Use DG_ForestCrypt even with custom dungeon generator since that is the object that will be spawned.
-```
-- prefab: Crypt2
-  objectData:
-    - DG_ForestCrypt, EAAAAAJ4MbkQHUFiYW5kb25lZExvZ0NhYmluMDIsQ2FiaW4sQmVkCE8E2AdDYWJpbnMh
-```
-
-
 ## Location: Blueprint
 
 1. Use PlanBuild mod or `hammer_save` to create a blueprint.

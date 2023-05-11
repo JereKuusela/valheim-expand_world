@@ -2,7 +2,28 @@
 
 This example shows how to build a custom dungeon entirely from blueprints. It is important to do everything exactly as shown here. Any mistake can make the dungeon not work properly.
 
-Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/room_blueprints.zip).
+Used [blueprints](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples/room_blueprints.zip).
+
+Blueprints must satisfy the following requirements:
+- The room center must be marked with a center piece. This piece is never spawned in the dungeon.
+  - By default, the `piece_bpcenterpoint` from PlanBuild mod is used.
+  - However any object works for this. Recommended to use `GlowingMushroom` because it can be scaled to any size.
+  - Blueprints made with Infinity Hammer include the center piece information, so it doesn't have to be added manually.
+  - For other blueprints, you may need to set the `centerPiece` parameter.
+- The center piece should be close to the actual center, but it doesn't have to be exact.
+  - The position is used for collision checks which become less accurate the further away the center is.
+  - Offset feature of Infinity Hammer can be used to accurately place the center piece (arrow keys and Page Up/Down).
+- The center piece rotation must align with the room shape.
+  - The rotation is used for collision checks. The room bounds become less accurate if the rotation is off.
+  - For rectangular rooms, the rotation should align with one of the walls.
+  - For more circular rooms, the rotation doesn't matter that much.
+- The room connections must be marked with connection pieces. These pieces are never spawned in the dungeon.
+  - Any object works for this but you must know the origin point. The origin point must be placed at the floor level.
+  - Recommended to use objects that have their origin point at the bottom becase their place will visually match the floor.
+  - Note: Most building pieces have their origin point at the center, and won't be suitable for this.
+- The connecting pieces must be rotated to point towards the room.
+  - This is indicated by a small red arrow during the placement.
+  - Recommended to use objects that clearly show their rotation.
 
 ## General setup
 

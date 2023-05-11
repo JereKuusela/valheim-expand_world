@@ -5,6 +5,7 @@
   - Changes the fields `objectSwap` and `objectData` in the `expand_locations.yaml` to not affect dungeons.
   - Changes the field `noBuildDungeon` in the `expand_locations.yaml` to affect the whole zone when set to true.
   - Fixes custom dungeons not working.
+  - Fixes the default door spawn change being 1 instead of 0 (too many doors appeared for some dungeons).
   - Removes creator information automatically from blueprints and data values (so that things don't appear player built).
   
 - v1.40

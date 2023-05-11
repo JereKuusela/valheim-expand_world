@@ -8,7 +8,7 @@ public class DungeonDoorData
 {
   public string prefab = "";
   public string connectionType = "";
-  public float chance = 1f;
+  public float chance = 0f;
 }
 public class DungeonData
 {

@@ -308,7 +308,7 @@ Note: Each zone (64m x 64m) can only have one size.
 
 See the [wiki](https://valheim.fandom.com/wiki/Points_of_Interest_(POI)) for more info.
 
-See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md).
+See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples/examples_locations.md).
 
 Locations are pregenerated at world generation. You must use `genloc` command to redistribute them on unexplored areas after making any changes. For already explored areas, you need to use Upgrade World mod.
 
@@ -346,7 +346,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
     - Empty id can be used to spawn nothing.
     - Blueprints are supported.
     - Use command `ew_locations` to print location contents.
-    - [Example](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples_locations.md#location-adding-new-objects)
+    - [Example](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples/examples_locations.md#location-adding-new-objects)
 - objectData: List to set child object data. Format is `id,data`.
   - id: Prefab name.
   - data: ZDO data override.
@@ -363,6 +363,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
 - noBuild (default: `false`): If true, players can't build within `exteriorRadius`. If number, player can't build within the given radius.
 - noBuildDungeon (default: `false`): If true, players can't build inside dungeons within the whole zone. If number, player can't build inside dungeons within the given radius.
+  - Note: For bigger dungeons, the number should be set manually (dungeon `bounds` divided by sqrt 2).
 - levelArea (default: `true` for blueprints): Flattens the area.
 - levelRadius (default: half of `exteriorRadius`): Size of the leveled area.
 - levelBorder (default: half of `exteriorRadius`): Adds a smooth transition around the `levelRadius`.
@@ -370,6 +371,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - paintRadius (default: `exteriorRadius`): Size of the painted area.
 - paintBorder (default: `5`): Adds a smooth transition around the `paintRadius`.
 - centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
+  - Infinity Hammer mod saves the center point to the blueprint. This is automatically used if available.
 
 ## Dungeons
 
@@ -396,7 +398,7 @@ Command `ew_dungeons` can be used to list available rooms for each dungeon.
 - doorTypes: List of possible doors. Each door has the same chance of being selected.
   - prefab: Identifier of the door object.
   - connectionType: Type of the door connection.
-  - chance: Chance to be spawned if this door is selected. 
+  - chance (default: `0`): Chance to be spawned if this door is selected. IF zero, the general `doorChance` is used instead.
 - maxTilt (default: `90` degrees): Maximum terrain angle. Only for CampGrid and CampRadial.
 - perimeterSections (default: `0`): Amount of perimeter walls to spawn. Only for CampRadial.
 - perimeterBuffer (default: `0` meters): Size of the perimeter area around the camp. Only for CampRadial.
@@ -471,6 +473,8 @@ New rooms can be created from blueprints or cloning an existing room by adding `
     - Blueprints are supported.
     - Use command `ew_rooms` to print room contents.
     - Note: If dungeon has object swaps, those are applied first.
+- centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint center point. Only for blueprints.
+  - Infinity Hammer mod saves the center point to the blueprint. This is automatically used if available.
 
 ## Vegetation
 
