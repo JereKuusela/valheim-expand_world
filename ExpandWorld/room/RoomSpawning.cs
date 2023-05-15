@@ -21,6 +21,7 @@ public class RoomSpawning
   public static Dictionary<string, DungeonDB.RoomData> Prefabs = new();
 
   public static Dictionary<string, RoomData> Data = new();
+  public static Dictionary<string, Dictionary<string, ZDO?>> ObjectData = new();
 
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
@@ -58,7 +59,6 @@ public class RoomSpawning
     return to;
   }
 
-  private static ZDO? DataOverride(string location, string prefab) => LocationSpawning.DataOverride(location, prefab);
   [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
   static bool ReplaceRoom(ref DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
@@ -141,12 +141,17 @@ public class RoomSpawning
       room.name = Parse.Name(room.name);
   }
 
-  public static bool TryGetSwap(string room, string prefab, out string swapped)
+  public static string PrefabOverride(string room, string prefab)
   {
-    swapped = "";
-    if (!ObjectSwaps.TryGetValue(room, out var objectSwaps)) return false;
-    if (!objectSwaps.TryGetValue(prefab, out var swaps)) return false;
-    swapped = Spawn.RandomizeSwap(swaps);
-    return true;
+    if (!ObjectSwaps.TryGetValue(room, out var objectSwaps)) return prefab;
+    if (!objectSwaps.TryGetValue(prefab, out var swaps)) return prefab;
+    return Spawn.RandomizeSwap(swaps);
+  }
+
+  public static ZDO? DataOverride(string dungeon, string prefab)
+  {
+    if (!ObjectData.TryGetValue(dungeon, out var objectData)) return null;
+    if (!objectData.TryGetValue(prefab, out var data)) return null;
+    return data;
   }
 }

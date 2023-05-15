@@ -340,23 +340,12 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - groundOffset (default: `0` meters): Placed above the ground.
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
 - objectSwap: Changes location objects to other objects, doesn't include dungeons.
-    - Use format `id, swapid` for a direct swap.
-    - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
-    - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
-    - Empty id can be used to spawn nothing.
-    - Blueprints are supported.
-    - Use command `ew_locations` to print location contents.
+    - See [Object swaps](https://github.com/JereKuusela/valheim-expand_world#Object_swaps) for details.
     - [Example](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples/examples_locations.md#location-adding-new-objects)
-- objectData: List to set child object data. Format is `id,data`.
-  - id: Prefab name.
-  - data: ZDO data override.
-- objects: Extra objects or blueprints. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
-  - id: Prefab name.
-  - posX, posZ, posY: Offset from the location position. Defalt is 0.
-  - rotY, rotX, rotZ: Rotation. Default is 0.
-  - scaleX, scaleZ, scaleY: Scale. Default is 1.
-  - chance: Chance to spawn (from 0 to 1). Default is 1.
-  - data: ZDO data override.
+- objectData: Replaces object data in the location, doesn't include dungeons.
+  - See [Object data](https://github.com/JereKuusela/valheim-expand_world#Object_data) for details.
+- objects: Extra objects in the location.
+  - See [Custom objects](https://github.com/JereKuusela/valheim-expand_world#Custom_objects) for details.
 - applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
 - exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).
   - Note: Maximum suggested value is 32 meters. Higher values go past the zone border and can cause issues.
@@ -385,7 +374,8 @@ Command `ew_dungeons` can be used to list available rooms for each dungeon.
   - Reasonable maximum is 3 zones which is 192 meters.
   - Note: Zone size is 64m x 64m. So values above that causes overflow to the adjacent zones.
   - Note: Dungeons have an environment cube that has 64 meter size. This is automatically scaled, unless running in the server side only mode.
-- themes: List of available room sets. Possible values are `Crypt`, `SunkenCrypt`, `Cave`, `ForestCrypt`, `GoblinCamp`, `MeadowsVillage`, `MeadowsFarm`, `DvergerTown`, `DvergerBoss`. For example `MeadowsVillage,MeadowsFarm` would use both sets.
+- themes: List of available room sets separated by ",".
+  - For example `SunkenCrypt,ForestCrypt` would use both sets.
 - maxRooms (default: `1`): Maximum amount of rooms. Only for Dungeon and CampRadial.
 - minRooms (default: `1`): Minimum amount of rooms. Only for Dungeon and CampRadial.
 - minRequiredRooms (default: `1`): Minimum amount of rooms in the required list. Only for Dungeon and CampRadial.
@@ -409,16 +399,11 @@ Command `ew_dungeons` can be used to list available rooms for each dungeon.
 - tileWidth (default: `0` meters): Size of a single tile. Only for CampGrid.
 - spawnChance (default: `1`): Chance for each tile to spawn. Only for CampGrid.
 - interiorTransform (default: `false`): Some locations may require this being true. If you notice weird warnings, try setting this to true.
-- objectData: List to set dungeon object data. Format is `id,data`.
-  - id: Prefab name.
-  - data: ZDO data override.
+- objectData: Replaces object data in the dungeon.
+    - See [Object data](https://github.com/JereKuusela/valheim-expand_world#Object_data) for details.
 - objectSwap: Changes dungeon objects to other objects.
-    - Use format `id, swapid` for a direct swap.
-    - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
-    - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
-    - Empty id can be used to spawn nothing.
-    - Blueprints are supported.
-    - Use command `ew_rooms` to print room contents.
+    - See [Object swaps](https://github.com/JereKuusela/valheim-expand_world#Object_swaps) for details.
+    - Note: If a room has object swaps, the dungeon swaps are applied first.
 
 ## Rooms
 
@@ -429,7 +414,7 @@ See [examples](https://github.com/JereKuusela/valheim-expand_world/blob/main/exa
 New rooms can be created from blueprints or cloning an existing room by adding `:suffix` to the name.
 
 - name: Name of the room prefab.
-- theme: Determines in which dungeons this room can appear. See dungeons for available values.
+- theme: Determines in which dungeons this room can appear. Custom values can be used.
 - enabled (default `true`): Quick way to disable this room.
 - entrance (default `false`): If true, this room is used only as the first room.
   - At least one entrance room is required. If multiple exist, one is randomly selected (`weight` field is never used).
@@ -458,21 +443,11 @@ New rooms can be created from blueprints or cloning an existing room by adding `
   - type: Type of the connection. Only connections with the same type are connected.
   - entrance (default: `false`): If true, used for the entrance.
   - door (default: `true`): If true, allows placing door. If `other`, allows placing door if the other connection also allows placing a door.
-- objects: Extra objects or blueprints. Format is `id,posX,posZ,posY,rotY,rotX,rotZ,scaleX,scaleZ,scaleY,chance,data`.
-  - id: Prefab name.
-  - posX, posZ, posY: Offset from the location position. Defalt is 0.
-  - rotY, rotX, rotZ: Rotation. Default is 0.
-  - scaleX, scaleZ, scaleY: Scale. Default is 1.
-  - chance: Chance to spawn (from 0 to 1). Default is 1.
-  - data: ZDO data override.
+- objects: Extra objects in the room.
+    - See [Custom objects](https://github.com/JereKuusela/valheim-expand_world#Custom_objects) for details.
 - objectSwap: Changes room objects to other objects.
-    - Use format `id, swapid` for a direct swap.
-    - Use format `id, swapid1, swapid2, ...` for multiple possible outcomes.
-    - Use format `id, swapid1:weight1, swapid2:weight2, ...` to control the chance of each outcome.
-    - Empty id can be used to spawn nothing.
-    - Blueprints are supported.
-    - Use command `ew_rooms` to print room contents.
-    - Note: If dungeon has object swaps, those are applied first.
+    - See [Object swaps](https://github.com/JereKuusela/valheim-expand_world#Object_swaps) for details.
+    - Note: If the dungeon has object swaps, those are applied first.
 - centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint center point. Only for blueprints.
   - Infinity Hammer mod saves the center point to the blueprint. This is automatically used if available.
 
@@ -661,3 +636,78 @@ Streams have params:
 - Stream max length (default: `299` meters): Maximum length for streams.
 - Stream curve width (default: `15`): How wide the curves are.
 - Stream curve wave length (default: `20`): How often the stream changes direction.
+
+# Custom objects
+
+New objects can be added to locations, dungeon rooms and zone spawners (creature spawns) by using the `objects` field.
+
+The objects are added relative to the spawn or location center.
+
+```
+  - objects:
+    # Format is:
+    - id, posX,posY,posZ, rotT,rotX,rotZ, scaleX,scaleY,scaleZ, chance, data
+    # Adds a mushroom at the center to visually show where it is.
+    - GlowingMushroom, 0,0,0
+    # Adds a bigger mushroom if the first one wasn't big enough.
+    - GlowingMushroom, 0,0,0 0,0,0 2,2,2
+    # Adds a chest near the center with 90 degrees rotation that has a 50% chance to appear.
+    - Chest, 5,0,0, 90,0,0, 1,1,1, 0.5
+    # Adds a chest with specific data (changes items).
+    # It's recommended to use the objectData field if possible (less typing).
+    # However this can be used to override the objectData.
+    - Chest, 5,0,0, 90,0,0, 1,1,1, 0.5, ASDASD
+```
+
+For the default objects, you can use commands  `ew_locations` and `ew_rooms` to print location or room contents.
+
+## Object swaps
+
+Objects in locations can be swapped to other objects by using the `objectSwap` field. This affects both original and custom objects.
+
+- expand_locations.yaml: Affects only the overworld part of the location.
+- expand_dungeons.yaml: Affects all rooms in the dungeon.
+- expand_rooms.yaml: Affects only the single room. Dungeon swap is applied first.
+  - If the dungeon swaps object A to object X, then the room must swap the object X (not the object A).
+  - If the there is no dungeon swap, then the room must swap the object A.
+  - If you need to handle both situations, add swap for both A and X objects.
+
+Note: To prevent a custom object being swapped, use a dummy object and then create a swap for it. For example acustom object A would get swapped to object X, then use object D instead and swap it back to the object A.
+
+Note: Objects can be removed by swapping to nothing.
+
+```
+  - objectSwap:
+      # Swaps object A to object X.
+      - idA, idX
+      # Adds another swap for object A. The swap is randomly selected.
+      # Total weight: 1 + 2 = 3.
+      # 3 / 4 =  66% chance to select this swap.
+      - idA:2, idY
+      # Same as above but in a single line.
+      - idB, idX, idY:2
+      # Dummy swap. To add a custom object A, use object D instead and swap it back to A.
+      - idD, idA
+      # Swap object E to nothing.
+      - idE,
+      # Swap object F to nothing or object X (50% chance).
+      - idF,,X
+```
+
+## Object data
+
+Initial object data in locations can be changed by using the `objectData` field. This affects both original and custom objects.
+
+Note: Object data is not changed if the custom object has set a specific data.
+
+```
+  - objectData:
+      # Sets object A data to CAAAAAECXKVYFAAAAA==.
+      - idA, CAAAAAECXKVYFAAAAA==
+      # Adds another object data. The data is randomly selected.
+      # Total weight: 1 + 2 = 3.
+      # 2 / 3 = 66% chance to select this swap.
+      - idA:2, CAAAAAJrzPp8AAAAAHZc4rL6DUI8
+      # Same as above but in a single line.
+      - idB, CAAAAAECXKVYFAAAAA==, CAAAAAJrzPp8AAAAAHZc4rL6DUI8:2
+```

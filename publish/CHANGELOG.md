@@ -7,6 +7,9 @@
   - Fixes custom dungeons not working.
   - Fixes the default door spawn change being 1 instead of 0 (too many doors appeared for some dungeons).
   - Removes creator information automatically from blueprints and data values (so that things don't appear player built).
+  - TODO: Change paint like mistlands vegetation?
+  - TODO: Check that no build works.
+  - TODO: Check that random health works for blueprints (ignore health data if given).
   
 - v1.40
   - Adds blueprint dungeons rooms.

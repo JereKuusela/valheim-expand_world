@@ -58,7 +58,7 @@ public static class Parse
   }
   public static List<BlueprintObject> Objects(string[] args)
   {
-    return args.Select(Parse.Split).Select(split => new BlueprintObject(
+    return args.Select(s => Parse.Split(s)).Select(split => new BlueprintObject(
         split[0],
         Parse.VectorXZY(split, 1),
         Parse.AngleYXZ(split, 4),
@@ -68,7 +68,7 @@ public static class Parse
         Parse.Float(split, 10, 1f)
       )).ToList();
   }
-  public static string[] Split(string arg) => arg.Split(',').Select(s => s.Trim()).Where(s => s != "").ToArray();
+  public static string[] Split(string arg, bool removeEmpty = true, char split = ',') => arg.Split(split).Select(s => s.Trim()).Where(s => removeEmpty && s != "").ToArray();
   public static string Name(string arg) => arg.Split(':')[0];
   public static Vector3 VectorXZY(string arg) => VectorXZY(arg, Vector3.zero);
   public static Vector3 VectorXZY(string arg, Vector3 defaultValue) => VectorXZY(Split(arg), 0, defaultValue);

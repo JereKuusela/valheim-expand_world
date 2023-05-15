@@ -167,7 +167,7 @@ public class Data : MonoBehaviour
     Heightmap.Biome.Ocean | Heightmap.Biome.Plains | Heightmap.Biome.Swamp;
 
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
-  public static List<string> ToList(string str) => Parse.Split(str).ToList();
+  public static List<string> ToList(string str, bool removeEmpty = true) => Parse.Split(str, removeEmpty).ToList();
   public static Dictionary<string, string> ToDict(string str) => ToList(str).Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0].Trim(), s => s[1].Trim());
   public static ZDO? ToZDO(string data)
   {

@@ -64,10 +64,21 @@ public class Spawn
     }
   }
 
-  public static GameObject? BPO(string source, BlueprintObject obj, Func<string, string, ZDO?> dataOverride, List<GameObject>? spawned)
+  // Spawning a object should support following scenarions:
+  // 1. Adding an object with random data.
+  // 2. Adding an object with random prefab.
+  // 3. Adding an object with a specific data, regardless of other configuration.
+  // 4. Adding an object with a specific prefab, regardless of other configuration.
+  //
+  // 1. can be achieved by applying objectData to every object.
+  // 2. can be achieved by applying objectSwap to every object.
+  // 3. can be achieved by skipping objectData if the object has already custom data.
+  // 4. can be achieved by using a dummy object and then objectSwap to replace it.
+  public static GameObject? BPO(string source, BlueprintObject obj, Func<string, string, ZDO?> dataOverride, Func<string, string, string> prefabOverride, List<GameObject>? spawned)
   {
     var pos = obj.Pos;
     var rot = obj.Rot;
+    obj.Prefab = prefabOverride(source, obj.Prefab);
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);
     if (!prefab)
     {
@@ -87,21 +98,36 @@ public class Spawn
     return go;
   }
 
-  private static List<Tuple<float, string>> ParseSwap(IEnumerable<string> items)
+  private static List<Tuple<float, string>> ParseSwap(IEnumerable<string> items, float baseWeight)
   {
     var total = 0f;
-    return items.Select(s => s.Split(':')).Select(s =>
+    // Parse.Split not used to keep empty objects.
+    return items.Select(s => s.Trim().Split(':')).Select(s =>
     {
       var weight = Parse.Float(s, 1, 1f);
-      total += weight;
+      total += weight * baseWeight;
       return Tuple.Create(weight, s[0]);
     }).ToList().Select(t => Tuple.Create(t.Item1 / total, t.Item2)).ToList();
   }
 
   public static Dictionary<string, List<Tuple<float, string>>> LoadSwaps(string[] objectSwap)
   {
-    var swaps = objectSwap.Select(Data.ToList)
-        .ToDictionary(arr => arr[0], arr => Spawn.ParseSwap(arr.Skip(1)));
+    Dictionary<string, List<Tuple<float, string>>> swaps = new();
+    // Empty items are kept to support spawning nothing.
+    var list = objectSwap.Select(s => Data.ToList(s, false)).ToList();
+    // Complicated logic to support:
+    // 1. Multiple rows for the same object.
+    // 2. Multiple swaps in the same row.
+    foreach (var row in list)
+    {
+      var split = Parse.Split(row[0], true, ':');
+      var name = split[0];
+      var weight = Parse.Float(split, 1, 1f);
+      var items = row.Skip(1);
+      if (!swaps.ContainsKey(name))
+        swaps[name] = new();
+      swaps[name].AddRange(ParseSwap(items, weight));
+    }
     foreach (var kvp in swaps)
     {
       foreach (var swap in kvp.Value)
@@ -112,7 +138,7 @@ public class Spawn
 
   public static Dictionary<string, ZDO?> LoadData(string[] objectData)
   {
-    return objectData.Select(Data.ToList).ToDictionary(arr => arr[0], arr => Data.ToZDO(arr[1]));
+    return objectData.Select(s => Data.ToList(s)).ToDictionary(arr => arr[0], arr => Data.ToZDO(arr[1]));
   }
 
   public static string RandomizeSwap(List<Tuple<float, string>> swaps)

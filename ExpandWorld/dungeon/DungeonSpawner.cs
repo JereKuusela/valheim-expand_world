@@ -16,20 +16,36 @@ public class Spawner
   public static string RoomName = "";
   public static string DungeonName = "";
 
-  public static bool TryGetSwap(string dungeon, string prefab, out string swapped)
+
+  private static string PrefabDungeonOverride(string dungeon, string prefab)
   {
-    swapped = "";
-    if (!Generators.TryGetValue(dungeon, out var gen)) return false;
-    if (!gen.m_objectSwaps.TryGetValue(prefab, out var swaps)) return false;
-    swapped = Spawn.RandomizeSwap(swaps);
-    return true;
+    if (!Generators.TryGetValue(dungeon, out var gen)) return prefab;
+    if (!gen.m_objectSwaps.TryGetValue(prefab, out var swaps)) return prefab;
+    return Spawn.RandomizeSwap(swaps);
+  }
+  private static string PrefabOverride(string dungeonRoom, string prefab)
+  {
+    var split = dungeonRoom.Split('|');
+    prefab = PrefabDungeonOverride(split[0], prefab);
+    if (split.Length > 1)
+      prefab = RoomSpawning.PrefabOverride(split[1], prefab);
+    return prefab;
   }
 
-  public static ZDO? DataOverride(string dungeon, string prefab)
+  private static ZDO? DataDungeonOverride(string dungeon, string prefab)
   {
     if (!Generators.TryGetValue(dungeon, out var gen)) return null;
     if (!gen.m_objectData.TryGetValue(prefab, out var data)) return null;
     return data;
+  }
+  public static ZDO? DataOverride(string dungeonRoom, string prefab)
+  {
+    ZDO? data = null;
+    var split = dungeonRoom.Split('|');
+    if (split.Length > 1)
+      data = RoomSpawning.DataOverride(split[1], prefab);
+    if (data != null) return data;
+    return DataDungeonOverride(split[0], prefab);
   }
 
   ///<summary>Implements object data and swapping from location data.</summary>
@@ -39,12 +55,8 @@ public class Spawner
     // Revert to the default behaviour as a fail safe.
     if (Helper.IsClient()) return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
     BlueprintObject bpo = new(Utils.GetPrefabName(prefab), position, rotation, prefab.transform.localScale, "", null, 1f);
-    if (TryGetSwap(dg.name, bpo.Prefab, out var objName))
-      bpo.Prefab = objName;
-    if (RoomSpawning.TryGetSwap(RoomName, bpo.Prefab, out objName))
-      bpo.Prefab = objName;
-
-    var obj = Spawn.BPO(dg.name, bpo, DataOverride, null);
+    var source = $"{DungeonName}|{RoomName}";
+    var obj = Spawn.BPO(source, bpo, DataOverride, PrefabOverride, null);
     return obj ?? LocationSpawning.DummySpawn;
   }
 

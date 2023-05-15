@@ -11,14 +11,11 @@ public class LocationSpawning
     if (!objectData.TryGetValue(prefab, out var data)) return null;
     return data;
   }
-
-  public static bool TryGetSwap(string location, string prefab, out string swapped)
+  public static string PrefabOverride(string location, string prefab)
   {
-    swapped = "";
-    if (!LocationLoading.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return false;
-    if (!objectSwaps.TryGetValue(prefab, out var swaps)) return false;
-    swapped = Spawn.RandomizeSwap(swaps);
-    return true;
+    if (!LocationLoading.ObjectSwaps.TryGetValue(location, out var objectSwaps)) return prefab;
+    if (!objectSwaps.TryGetValue(prefab, out var swaps)) return prefab;
+    return Spawn.RandomizeSwap(swaps);
   }
   static string DummyObj = "vfx_auto_pickup";
   public static GameObject DummySpawn => UnityEngine.Object.Instantiate<GameObject>(ZNetScene.instance.GetPrefab(DummyObj), Vector3.zero, Quaternion.identity);
@@ -26,9 +23,7 @@ public class LocationSpawning
   {
     BlueprintObject bpo = new(Utils.GetPrefabName(prefab), position, rotation, prefab.transform.localScale, "", null, 1f);
     var locName = location.m_prefabName;
-    if (LocationSpawning.TryGetSwap(locName, bpo.Prefab, out var objName))
-      bpo.Prefab = objName;
-    var obj = Spawn.BPO(locName, bpo, DataOverride, spawnedGhostObjects);
+    var obj = Spawn.BPO(locName, bpo, DataOverride, PrefabOverride, spawnedGhostObjects);
     return obj ?? LocationSpawning.DummySpawn;
   }
 
@@ -39,7 +34,7 @@ public class LocationSpawning
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      Spawn.BPO(location.m_prefabName, obj, DataOverride, spawnedGhostObjects);
+      Spawn.BPO(location.m_prefabName, obj, DataOverride, PrefabOverride, spawnedGhostObjects);
     }
   }
 }

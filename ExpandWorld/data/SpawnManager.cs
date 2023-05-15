@@ -26,7 +26,7 @@ public class SpawnManager
     }
     if (data.objects != null)
     {
-      Objects[spawn] = data.objects.Select(Parse.Split).Select(split => new BlueprintObject(
+      Objects[spawn] = data.objects.Select(s => Parse.Split(s)).Select(split => new BlueprintObject(
         split[0],
         Parse.VectorXZY(split, 1),
         Quaternion.identity,
