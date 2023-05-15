@@ -103,7 +103,6 @@ public class BiomeManager
     if (Helper.IsClient()) Set(yaml);
   }
   public static bool BiomeForestMultiplier = false;
-  public static bool BiomePaint = false;
 
   private static List<BiomeData> Parse(string yaml)
   {
@@ -205,7 +204,6 @@ public class BiomeManager
     // But better still set as a failsafe.
     Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
-    BiomePaint = rawData.Any(data => data.paint != "");
     Environments = rawData.Select(FromData).ToList();
     // This tracks if content (environments) have been loaded.
     if (ZoneSystem.instance.m_locationsByHash.Count > 0)

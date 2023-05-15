@@ -152,7 +152,7 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - maximumAltitude (default: `1000` meters): Maximum altitude.
 - minimumAltitude (default: `-1000` meters): Minimum altitude.
 - excessFactor (default: `0.5`): How strongly the altitude is reduced if over the maximum or minimum limit. For example 0.5 square roots the excess altitude.
-- paint: Default terrain paint. Using this will lower the performance. Format is `dirt,cultivated,paved,vegetation` (from 0.0 to 1.0) or a pre-defined color (cultivated, dirt, grass, grass_dark, patches, paved, paved_dark, paved_dirt, paved_moss)
+- paint: Default terrain paint. Format is `dirt,cultivated,paved,vegetation` (from 0.0 to 1.0) or a pre-defined color (cultivated, dirt, grass, grass_dark, patches, paved, paved_dark, paved_dirt, paved_moss)
 - color: Terrain style. Not fully sure how this works but the color value somehow determines which default biome terrain style to use.
 - mapColorMultiplier (default: `1.0`): Changes how quickly the terrain altitude affects the map color. Increasing the value can be useful for low altitude biomes to show the altitude differences better. Lowering the value can be useful for high altitude biomes to reduce amount of white color (from mountain altitudes). Negative value can be useful for underwater biomes to show the map color (normally all underwater areas get blueish color).
 - mapColor: Color in the minimap (red, green, blue, alpha).

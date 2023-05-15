@@ -49,9 +49,12 @@ public class BiomeHeight
     __state = biome;
     biome = BiomeManager.GetTerrain(biome);
   }
-  static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref float __result)
+  static void Postfix(WorldGenerator __instance, Heightmap.Biome __state, ref Color mask, ref float __result)
   {
     if (__instance.m_world.m_menu) return;
+    if (BiomeManager.TryGetColor(__state, out var color))
+      mask = color;
+
     __result -= Configuration.WaterLevel;
     if (BiomeManager.TryGetData(__state, out var data))
     {

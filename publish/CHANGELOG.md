@@ -6,8 +6,9 @@
   - Changes the field `noBuildDungeon` in the `expand_locations.yaml` to affect the whole zone when set to true.
   - Fixes custom dungeons not working.
   - Fixes the default door spawn change being 1 instead of 0 (too many doors appeared for some dungeons).
+  - Fixes the field `paint` in the `expand_biomes.yaml` file not working when set to `0,0,0,0`.
   - Removes creator information automatically from blueprints and data values (so that things don't appear player built).
-  - TODO: Change paint like mistlands vegetation?
+  - Improves the performance of the field `paint` in the `expand_biomes.yaml` file.
   - TODO: Check that no build works.
   - TODO: Check that random health works for blueprints (ignore health data if given).
   
