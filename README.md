@@ -346,7 +346,7 @@ Locations are pregenerated at world generation. You must use `genloc` command to
   - See [Object data](https://github.com/JereKuusela/valheim-expand_world#Object_data) for details.
 - objects: Extra objects in the location.
   - See [Custom objects](https://github.com/JereKuusela/valheim-expand_world#Custom_objects) for details.
-- applyRandomDamage (default: `false`): If true, pieces are randomly damaged.
+- randomDamage (default: `false`): If true, pieces are randomly damaged.
 - exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).
   - Note: Maximum suggested value is 32 meters. Higher values go past the zone border and can cause issues.
 - clearArea (default: `false`): If true, vegetation is not placed within `exteriorRadius`.
