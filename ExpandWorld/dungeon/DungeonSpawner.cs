@@ -38,12 +38,12 @@ public class Spawner
     if (!gen.m_objectData.TryGetValue(prefab, out var data)) return null;
     return data;
   }
-  public static ZDO? DataOverride(string dungeonRoom, string prefab)
+  public static ZDO? DataOverride(ZDO? data, string dungeonRoom, string prefab)
   {
-    ZDO? data = null;
+    if (data != null) return data;
     var split = dungeonRoom.Split('|');
     if (split.Length > 1)
-      data = RoomSpawning.DataOverride(split[1], prefab);
+      data = RoomSpawning.DataOverride(data, split[1], prefab);
     if (data != null) return data;
     return DataDungeonOverride(split[0], prefab);
   }

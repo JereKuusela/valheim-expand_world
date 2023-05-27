@@ -25,14 +25,15 @@ public class VegetationSpawning
     return veg;
   }
 
-  private static ZDO? DataOverride(string dummy, string prefab)
+  private static ZDO? DataOverride(ZDO? data, string dummy, string prefab)
   {
-    if (!ZDO.TryGetValue(Veg, out var data)) return null;
+    if (data != null) return data;
+    if (!ZDO.TryGetValue(Veg, out data)) return null;
     return data;
   }
   static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot)
   {
-    return Data.Instantiate(prefab, pos, rot, DataOverride("", ""));
+    return Data.Instantiate(prefab, pos, rot, DataOverride(null, "", ""));
   }
   static GameObject InstantiateBlueprint(GameObject prefab, Vector3 position, Quaternion rotation)
   {

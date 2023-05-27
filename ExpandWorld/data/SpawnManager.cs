@@ -190,7 +190,7 @@ public class SpawnZDO
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
 
-  static ZDO? DataOverride(string source, string prefab) => null;
+  static ZDO? DataOverride(ZDO? zdo, string source, string prefab) => zdo;
   static void Postfix(SpawnSystem.SpawnData critter, Vector3 spawnPoint)
   {
     if (!SpawnManager.Objects.TryGetValue(critter, out var objects)) return;

@@ -278,6 +278,10 @@ public class Data : MonoBehaviour
       ExpandWorld.Log.LogWarning($"Prefab {str} not found!");
     return null;
   }
+  // Users very easily might have creator on their blueprints or copied data.
+  // This causes enemies to attack them because they are considered player built.
+  // So far no reason to keep this data.
+  private static int CreatorHash = "creator".GetStableHashCode();
   public static void CopyData(ZDO from, ZDO to)
   {
     to.m_floats = from.m_floats;
@@ -287,13 +291,12 @@ public class Data : MonoBehaviour
     to.m_longs = from.m_longs;
     to.m_strings = from.m_strings;
     to.m_byteArrays = from.m_byteArrays;
+    if (to.m_longs != null)
+      to.m_longs.Remove(CreatorHash);
     to.IncreseDataRevision();
   }
 
-  // Users very easily might have creator on their blueprints or copied data.
-  // This causes enemies to attack them because they are considered player built.
-  // So far no reason to keep this data.
-  private static int CreatorHash = "creator".GetStableHashCode();
+
   public static void Deserialize(ZDO zdo, ZPackage pkg)
   {
     int num = pkg.ReadInt();
@@ -362,7 +365,6 @@ public class Data : MonoBehaviour
         int key5 = pkg.ReadInt();
         zdo.m_longs[key5] = pkg.ReadLong();
       }
-      zdo.m_longs.Remove(CreatorHash);
     }
     else
     {

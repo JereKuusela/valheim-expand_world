@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+ using DataOverride = System.Func<ZDO?, string, string, ZDO?>;  
+
 namespace ExpandWorld;
 
 // Most of the custom object spawning should be done here because there are many pitfalls:
@@ -11,12 +13,13 @@ namespace ExpandWorld;
 public class Spawn
 {
   public static Vector3? DungeonGeneratorPos = null;
-  public static void Blueprint(string source, string name, Vector3 pos, Quaternion rot, Func<string, string, ZDO?> dataOverride, List<GameObject>? spawned)
+  public static bool IgnoreHealth = false;
+  public static void Blueprint(string source, string name, Vector3 pos, Quaternion rot, DataOverride dataOverride, List<GameObject>? spawned)
   {
     if (BlueprintManager.TryGet(name, out var bp))
       Blueprint(source, bp, pos, rot, dataOverride, spawned);
   }
-  public static void Blueprint(string source, Blueprint bp, Vector3 pos, Quaternion rot, Func<string, string, ZDO?> dataOverride, List<GameObject>? spawned)
+  public static void Blueprint(string source, Blueprint bp, Vector3 pos, Quaternion rot, DataOverride dataOverride, List<GameObject>? spawned)
   {
     foreach (var obj in bp.Objects)
     {
@@ -30,7 +33,7 @@ public class Spawn
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
     Data.InitZDO(position, rotation, scale, data, view);
   }
-  public static void BPO(string source, BlueprintObject obj, Vector3 pos, Quaternion rot, Func<string, string, ZDO?> dataOverride, List<GameObject>? spawned)
+  public static void BPO(string source, BlueprintObject obj, Vector3 pos, Quaternion rot, DataOverride dataOverride, List<GameObject>? spawned)
   {
     pos += rot * obj.Pos;
     rot = rot * obj.Rot;
@@ -45,8 +48,8 @@ public class Spawn
       ExpandWorld.Log.LogWarning($"Blueprint prefab {obj.Prefab} not found!");
       return;
     }
-    var data = dataOverride(source, obj.Prefab);
-    SetData(prefab, pos, rot, obj.Scale, data ?? obj.Data);
+    var data = dataOverride(obj.Data, source, obj.Prefab);
+    SetData(prefab, pos, rot, obj.Scale, data);
     var go = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, rot);
     if (go.TryGetComponent<DungeonGenerator>(out var dg))
     {
@@ -74,7 +77,7 @@ public class Spawn
   // 2. can be achieved by applying objectSwap to every object.
   // 3. can be achieved by skipping objectData if the object has already custom data.
   // 4. can be achieved by using a dummy object and then objectSwap to replace it.
-  public static GameObject? BPO(string source, BlueprintObject obj, Func<string, string, ZDO?> dataOverride, Func<string, string, string> prefabOverride, List<GameObject>? spawned)
+  public static GameObject? BPO(string source, BlueprintObject obj, DataOverride dataOverride, Func<string, string, string> prefabOverride, List<GameObject>? spawned)
   {
     var pos = obj.Pos;
     var rot = obj.Rot;
@@ -90,8 +93,8 @@ public class Spawn
       ExpandWorld.Log.LogWarning($"Blueprint prefab {obj.Prefab} not found!");
       return null;
     }
-    var data = dataOverride(source, obj.Prefab);
-    SetData(prefab, pos, rot, obj.Scale, data ?? obj.Data);
+    var data = dataOverride(obj.Data, source, obj.Prefab);
+    SetData(prefab, pos, rot, obj.Scale, data);
     var go = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, rot);
     // This is used for the top level objects so dungeon generation is done by vanilal code.
     Data.CleanGhostInit(go);

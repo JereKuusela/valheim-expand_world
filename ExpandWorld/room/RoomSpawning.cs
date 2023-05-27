@@ -148,10 +148,11 @@ public class RoomSpawning
     return Spawn.RandomizeSwap(swaps);
   }
 
-  public static ZDO? DataOverride(string dungeon, string prefab)
+  public static ZDO? DataOverride(ZDO? data, string dungeon, string prefab)
   {
+    if (data != null) return data;
     if (!ObjectData.TryGetValue(dungeon, out var objectData)) return null;
-    if (!objectData.TryGetValue(prefab, out var data)) return null;
+    if (!objectData.TryGetValue(prefab, out data)) return null;
     return data;
   }
 }

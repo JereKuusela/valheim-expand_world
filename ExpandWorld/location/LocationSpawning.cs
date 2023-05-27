@@ -5,11 +5,23 @@ namespace ExpandWorld;
 
 public class LocationSpawning
 {
-  public static ZDO? DataOverride(string location, string prefab)
+  
+  // Random damage should override preset health.
+  private static int HealthHash = "health".GetStableHashCode();
+  private static ZDO RemoveHealth(ZDO zdo, string location)
   {
-    if (!LocationLoading.ObjectData.TryGetValue(location, out var objectData)) return null;
-    if (!objectData.TryGetValue(prefab, out var data)) return null;
-    return data;
+    if (!LocationLoading.LocationData.TryGetValue(location, out var data)) return zdo;
+    if (data.randomDamage && zdo.m_floats != null) zdo.m_floats.Remove(HealthHash);
+    return zdo; 
+  }
+  public static ZDO? DataOverride(ZDO? data, string location, string prefab)
+  {
+    if (data == null) {
+      if (!LocationLoading.ObjectData.TryGetValue(location, out var objectData)) return null;
+      if (!objectData.TryGetValue(prefab, out data)) return null;
+    }
+    if (data == null) return null;
+    return RemoveHealth(data, location);
   }
   public static string PrefabOverride(string location, string prefab)
   {
