@@ -117,13 +117,13 @@ public partial class Terrain
     var smooth = border / radius;
     List<HeightNode> nodes = new();
     GetHeightNodes(nodes, compiler, pos, radius);
-    Operation action = (compiler, index, node) =>
+    void action(TerrainComp compiler, int index, TerrainNode node)
     {
       var multiplier = CalculateSmooth(smooth, node.Distance);
       compiler.m_levelDelta[index] = multiplier * (pos.y - compiler.m_hmap.m_heights[index]);
       compiler.m_smoothDelta[index] = 0f;
       compiler.m_modifiedHeight[index] = compiler.m_levelDelta[index] != 0f;
-    };
+    }
     DoOperation(nodes, pos, radius, action);
   }
   public static void Paint(TerrainComp compiler, Vector3 pos, string paint, float radius, float border)
@@ -134,14 +134,14 @@ public partial class Terrain
     List<PaintNode> nodes = new();
     Color color = ParsePaint(paint);
     GetPaintNodes(nodes, compiler, pos, radius);
-    Operation action = (compiler, index, node) =>
+    void action(TerrainComp compiler, int index, TerrainNode node)
     {
       var multiplier = CalculateSmooth(smooth, node.Distance);
       var newColor = Color.Lerp(compiler.m_paintMask[index], color, multiplier);
       newColor.a = color.a;
       compiler.m_paintMask[index] = newColor;
       compiler.m_modifiedPaint[index] = true;
-    };
+    }
     DoOperation(nodes, pos, radius, action);
   }
 

@@ -682,7 +682,7 @@ Note: Objects can be removed by swapping to nothing.
       - idA, idX
       # Adds another swap for object A. The swap is randomly selected.
       # Total weight: 1 + 2 = 3.
-      # 3 / 4 =  66% chance to select this swap.
+      # 2 / 3 =  66% chance to select this swap.
       - idA:2, idY
       # Same as above but in a single line.
       - idB, idX, idY:2
@@ -709,5 +709,6 @@ Note: Object data is not changed if the custom object has set a specific data.
       # 2 / 3 = 66% chance to select this swap.
       - idA:2, CAAAAAJrzPp8AAAAAHZc4rL6DUI8
       # Same as above but in a single line.
+      # Not recommended to use this way for longer data values.
       - idB, CAAAAAECXKVYFAAAAA==, CAAAAAJrzPp8AAAAAHZc4rL6DUI8:2
 ```

@@ -21,7 +21,7 @@ public class RoomSpawning
   public static Dictionary<string, DungeonDB.RoomData> Prefabs = new();
 
   public static Dictionary<string, RoomData> Data = new();
-  public static Dictionary<string, Dictionary<string, ZDO?>> ObjectData = new();
+  public static Dictionary<string, Dictionary<string, List<Tuple<float, ZDO?>>>> ObjectData = new();
 
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
@@ -72,15 +72,17 @@ public class RoomSpawning
     if (Prefabs.TryGetValue(baseName, out var roomData))
     {
       // The proxy shouldn't be modified, or entries will get reference to the same room.
-      room = new();
-      room.m_room = OverrideParameters(parameters, roomData.m_room);
-      room.m_netViews = roomData.m_netViews;
-      room.m_randomSpawns = roomData.m_randomSpawns;
+      room = new()
+      {
+        m_room = OverrideParameters(parameters, roomData.m_room),
+        m_netViews = roomData.m_netViews,
+        m_randomSpawns = roomData.m_randomSpawns
+      };
       return true;
     }
     if (BlueprintManager.TryGet(parameters.name, out var bp))
     {
-      Spawn.Blueprint(Dungeon.Spawner.LocationName, bp, pos, rot, DataOverride, null);
+      Spawn.Blueprint(Dungeon.Spawner.LocationName, bp, pos, rot, DataOverride, PrefabOverride, null);
     }
     return true;
   }
@@ -98,7 +100,7 @@ public class RoomSpawning
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      Spawn.BPO(Dungeon.Spawner.LocationName, obj, pos, rot, DataOverride, null);
+      Spawn.BPO(Dungeon.Spawner.LocationName, obj, pos, rot, DataOverride, PrefabOverride, null);
     }
     UnityEngine.Random.state = state;
   }
@@ -148,11 +150,11 @@ public class RoomSpawning
     return Spawn.RandomizeSwap(swaps);
   }
 
-  public static ZDO? DataOverride(ZDO? data, string dungeon, string prefab)
+  public static ZDO? DataOverride(ZDO? zdo, string dungeon, string prefab)
   {
-    if (data != null) return data;
+    if (zdo != null) return zdo;
     if (!ObjectData.TryGetValue(dungeon, out var objectData)) return null;
-    if (!objectData.TryGetValue(prefab, out data)) return null;
-    return data;
+    if (!objectData.TryGetValue(prefab, out var data)) return null;
+    return Spawn.RandomizeData(data);
   }
 }

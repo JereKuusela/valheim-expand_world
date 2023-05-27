@@ -70,10 +70,12 @@ public class ExpandWorld : BaseUnityPlugin
   {
     Generate.CheckRegen(Time.deltaTime);
   }
+#pragma warning disable IDE0051
   private void OnDestroy()
   {
     Config.Save();
   }
+#pragma warning restore IDE0051
 
   private void SetupWatcher()
   {
@@ -129,7 +131,7 @@ public class SetCommands
 [HarmonyPatch(typeof(ZRpc), nameof(ZRpc.SetLongTimeout))]
 public class IncreaseTimeout
 {
-  static bool Prefix(bool enable)
+  static bool Prefix()
   {
     if (Configuration.ServerOnly) return true;
     ZRpc.m_timeout = 300f;

@@ -14,7 +14,7 @@ public class LocationLoading
   public static string Pattern = "expand_locations*.yaml";
   public static Dictionary<string, ZDO?> ZDO = new();
   public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
-  public static Dictionary<string, Dictionary<string, ZDO?>> ObjectData = new();
+  public static Dictionary<string, Dictionary<string, List<Tuple<float, ZDO?>>>> ObjectData = new();
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, LocationData> LocationData = new();
   public static Dictionary<string, string> Dungeons = new();
@@ -121,17 +121,6 @@ public class LocationLoading
     if (File.Exists(FilePath)) return;
     var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
-  }
-  private static void AddMissing(HashSet<string> missingLocations)
-  {
-    ExpandWorld.Log.LogWarning($"Adding {missingLocations.Count} missing locations to the expand_locations.yaml file.");
-    foreach (var loc in missingLocations)
-      ExpandWorld.Log.LogWarning(loc);
-    var yaml = File.ReadAllText(FilePath);
-    var data = Data.Deserialize<LocationData>(yaml, FileName).ToList();
-    data.AddRange(ZoneSystem.instance.m_locations.Where(loc => missingLocations.Contains(loc.m_prefabName)).Select(ToData));
-    // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
   }
   public static void Initialize()
   {
@@ -260,12 +249,14 @@ public class LocationLoading
   }
   public static Location GetBluePrintLocation(string prefab)
   {
-    if (!LocationLoading.BlueprintLocations.TryGetValue(prefab, out var location))
+    if (!BlueprintLocations.TryGetValue(prefab, out var location))
     {
-      var obj = new GameObject();
-      obj.name = "Blueprint";
+      var obj = new GameObject
+      {
+        name = "Blueprint"
+      };
       location = obj.AddComponent<Location>();
-      LocationLoading.BlueprintLocations.Add(prefab, location);
+      BlueprintLocations.Add(prefab, location);
     }
     return location;
   }
@@ -315,7 +306,7 @@ public class LocationLoading
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.CreateLocationProxy))]
 public class LocationZDO
 {
-  static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation, ZoneSystem.SpawnMode mode)
+  static void Prefix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rotation)
   {
     if (!LocationLoading.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
@@ -368,7 +359,7 @@ public class LocationObjectDataAndSwap
   }
 
 
-  static void Postfix(ZoneSystem __instance, ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
+  static void Postfix(ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode, List<GameObject> spawnedGhostObjects)
   {
     if (mode != ZoneSystem.SpawnMode.Client)
     {
@@ -382,7 +373,7 @@ public class LocationObjectDataAndSwap
       if (mode == ZoneSystem.SpawnMode.Ghost)
         ZNetView.StartGhostInit();
       if (isBluePrint)
-        Spawn.Blueprint(location.m_prefabName, bp, pos, rot, LocationSpawning.DataOverride, spawnedGhostObjects);
+        Spawn.Blueprint(location.m_prefabName, bp, pos, rot, LocationSpawning.DataOverride, LocationSpawning.PrefabOverride, spawnedGhostObjects);
       LocationSpawning.CustomObjects(location, pos, rot, spawnedGhostObjects);
       if (mode == ZoneSystem.SpawnMode.Ghost)
         ZNetView.FinishGhostInit();

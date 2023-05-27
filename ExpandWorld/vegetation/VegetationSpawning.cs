@@ -31,6 +31,11 @@ public class VegetationSpawning
     if (!ZDO.TryGetValue(Veg, out data)) return null;
     return data;
   }
+
+  private static string PrefabOverride(string dummy, string prefab)
+  {
+    return prefab;
+  }
   static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot)
   {
     return Data.Instantiate(prefab, pos, rot, DataOverride(null, "", ""));
@@ -39,7 +44,7 @@ public class VegetationSpawning
   {
     if (Mode == ZoneSystem.SpawnMode.Ghost)
       ZNetView.StartGhostInit();
-    Spawn.Blueprint("", prefab.name, position, rotation, DataOverride, SpawnedObjects);
+    Spawn.Blueprint("", prefab.name, position, rotation, DataOverride, PrefabOverride, SpawnedObjects);
     if (Mode == ZoneSystem.SpawnMode.Ghost)
       ZNetView.FinishGhostInit();
     // Blueprints spawn a dummy non-ZNetView object, so no extra stuff is needed.

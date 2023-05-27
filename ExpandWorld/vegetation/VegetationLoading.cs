@@ -9,9 +9,9 @@ namespace ExpandWorld;
 
 public class VegetationLoading
 {
-  private static string FileName = "expand_vegetation.yaml";
-  private static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
-  private static string Pattern = "expand_vegetation*.yaml";
+  private static readonly string FileName = "expand_vegetation.yaml";
+  private static readonly string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
+  private static readonly string Pattern = "expand_vegetation*.yaml";
 
 
   // Default items are stored to track missing entries.
@@ -113,11 +113,46 @@ public class VegetationLoading
 
   public static ZoneSystem.ZoneVegetation FromData(VegetationData data)
   {
-    var veg = new ZoneSystem.ZoneVegetation();
-    veg.m_name = data.prefab;
+    var veg = new ZoneSystem.ZoneVegetation
+    {
+      m_name = data.prefab,
+      m_enable = data.enabled,
+      m_min = data.min,
+      m_max = data.max,
+      m_forcePlacement = data.forcePlacement,
+      m_scaleMin = Parse.Scale(data.scaleMin).x,
+      m_scaleMax = Parse.Scale(data.scaleMax).x,
+      m_randTilt = data.randTilt,
+      m_chanceToUseGroundTilt = data.chanceToUseGroundTilt,
+      m_biome = Data.ToBiomes(data.biome),
+      m_biomeArea = Data.ToBiomeAreas(data.biomeArea),
+      m_blockCheck = data.blockCheck,
+      m_minAltitude = data.minAltitude,
+      m_maxAltitude = data.maxAltitude,
+      m_minOceanDepth = data.minOceanDepth,
+      m_maxOceanDepth = data.maxOceanDepth,
+      m_minVegetation = data.minVegetation,
+      m_maxVegetation = data.maxVegetation,
+      m_minTilt = data.minTilt,
+      m_maxTilt = data.maxTilt,
+      m_terrainDeltaRadius = data.terrainDeltaRadius,
+      m_maxTerrainDelta = data.maxTerrainDelta,
+      m_minTerrainDelta = data.minTerrainDelta,
+      m_snapToWater = data.snapToWater,
+      m_snapToStaticSolid = data.snapToStaticSolid,
+      m_groundOffset = data.groundOffset,
+      m_groupSizeMin = data.groupSizeMin,
+      m_groupSizeMax = data.groupSizeMax,
+      m_groupRadius = data.groupRadius,
+      m_inForest = data.inForest,
+      m_forestTresholdMin = data.forestTresholdMin,
+      m_forestTresholdMax = data.forestTresholdMax
+    };
     var hash = data.prefab.GetStableHashCode();
-    Range<Vector3> scale = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax));
-    scale.Uniform = data.scaleUniform;
+    Range<Vector3> scale = new(Parse.Scale(data.scaleMin), Parse.Scale(data.scaleMax))
+    {
+      Uniform = data.scaleUniform
+    };
     // Minor optimization to skip RNG calls if there is nothing to randomize.
     if (Helper.IsMultiAxis(scale))
       VegetationSpawning.Scale[veg] = scale;
@@ -136,74 +171,45 @@ public class VegetationLoading
     {
       veg.m_prefab = new GameObject(data.prefab);
     }
-    veg.m_enable = data.enabled;
-    veg.m_min = data.min;
-    veg.m_max = data.max;
-    veg.m_forcePlacement = data.forcePlacement;
-    veg.m_scaleMin = Parse.Scale(data.scaleMin).x;
-    veg.m_scaleMax = Parse.Scale(data.scaleMax).x;
-    veg.m_randTilt = data.randTilt;
-    veg.m_chanceToUseGroundTilt = data.chanceToUseGroundTilt;
-    veg.m_biome = Data.ToBiomes(data.biome);
-    veg.m_biomeArea = Data.ToBiomeAreas(data.biomeArea);
-    veg.m_blockCheck = data.blockCheck;
-    veg.m_minAltitude = data.minAltitude;
-    veg.m_maxAltitude = data.maxAltitude;
-    veg.m_minOceanDepth = data.minOceanDepth;
-    veg.m_maxOceanDepth = data.maxOceanDepth;
-    veg.m_minVegetation = data.minVegetation;
-    veg.m_maxVegetation = data.maxVegetation;
-    veg.m_minTilt = data.minTilt;
-    veg.m_maxTilt = data.maxTilt;
-    veg.m_terrainDeltaRadius = data.terrainDeltaRadius;
-    veg.m_maxTerrainDelta = data.maxTerrainDelta;
-    veg.m_minTerrainDelta = data.minTerrainDelta;
-    veg.m_snapToWater = data.snapToWater;
-    veg.m_snapToStaticSolid = data.snapToStaticSolid;
-    veg.m_groundOffset = data.groundOffset;
-    veg.m_groupSizeMin = data.groupSizeMin;
-    veg.m_groupSizeMax = data.groupSizeMax;
-    veg.m_groupRadius = data.groupRadius;
-    veg.m_inForest = data.inForest;
-    veg.m_forestTresholdMin = data.forestTresholdMin;
-    veg.m_forestTresholdMax = data.forestTresholdMax;
     return veg;
   }
   public static VegetationData ToData(ZoneSystem.ZoneVegetation veg)
   {
-    VegetationData data = new();
-    data.enabled = veg.m_enable;
-    data.prefab = veg.m_prefab.name;
-    data.min = veg.m_min;
-    data.max = veg.m_max;
-    data.forcePlacement = veg.m_forcePlacement;
-    data.scaleMin = veg.m_scaleMin.ToString(CultureInfo.InvariantCulture);
-    data.scaleMax = veg.m_scaleMax.ToString(CultureInfo.InvariantCulture);
-    data.randTilt = veg.m_randTilt;
-    data.chanceToUseGroundTilt = veg.m_chanceToUseGroundTilt;
-    data.biome = Data.FromBiomes(veg.m_biome);
-    data.biomeArea = Data.FromBiomeAreas(veg.m_biomeArea);
-    data.blockCheck = veg.m_blockCheck;
-    data.minAltitude = veg.m_minAltitude;
-    data.maxAltitude = veg.m_maxAltitude;
-    data.minOceanDepth = veg.m_minOceanDepth;
-    data.maxOceanDepth = veg.m_maxOceanDepth;
-    data.minVegetation = veg.m_minVegetation;
-    data.maxVegetation = veg.m_maxVegetation;
-    data.minTilt = veg.m_minTilt;
-    data.maxTilt = veg.m_maxTilt;
-    data.terrainDeltaRadius = veg.m_terrainDeltaRadius;
-    data.maxTerrainDelta = veg.m_maxTerrainDelta;
-    data.minTerrainDelta = veg.m_minTerrainDelta;
-    data.snapToWater = veg.m_snapToWater;
-    data.snapToStaticSolid = veg.m_snapToStaticSolid;
-    data.groundOffset = veg.m_groundOffset;
-    data.groupSizeMin = veg.m_groupSizeMin;
-    data.groupSizeMax = veg.m_groupSizeMax;
-    data.groupRadius = veg.m_groupRadius;
-    data.inForest = veg.m_inForest;
-    data.forestTresholdMin = veg.m_forestTresholdMin;
-    data.forestTresholdMax = veg.m_forestTresholdMax;
+    VegetationData data = new()
+    {
+      enabled = veg.m_enable,
+      prefab = veg.m_prefab.name,
+      min = veg.m_min,
+      max = veg.m_max,
+      forcePlacement = veg.m_forcePlacement,
+      scaleMin = veg.m_scaleMin.ToString(CultureInfo.InvariantCulture),
+      scaleMax = veg.m_scaleMax.ToString(CultureInfo.InvariantCulture),
+      randTilt = veg.m_randTilt,
+      chanceToUseGroundTilt = veg.m_chanceToUseGroundTilt,
+      biome = Data.FromBiomes(veg.m_biome),
+      biomeArea = Data.FromBiomeAreas(veg.m_biomeArea),
+      blockCheck = veg.m_blockCheck,
+      minAltitude = veg.m_minAltitude,
+      maxAltitude = veg.m_maxAltitude,
+      minOceanDepth = veg.m_minOceanDepth,
+      maxOceanDepth = veg.m_maxOceanDepth,
+      minVegetation = veg.m_minVegetation,
+      maxVegetation = veg.m_maxVegetation,
+      minTilt = veg.m_minTilt,
+      maxTilt = veg.m_maxTilt,
+      terrainDeltaRadius = veg.m_terrainDeltaRadius,
+      maxTerrainDelta = veg.m_maxTerrainDelta,
+      minTerrainDelta = veg.m_minTerrainDelta,
+      snapToWater = veg.m_snapToWater,
+      snapToStaticSolid = veg.m_snapToStaticSolid,
+      groundOffset = veg.m_groundOffset,
+      groupSizeMin = veg.m_groupSizeMin,
+      groupSizeMax = veg.m_groupSizeMax,
+      groupRadius = veg.m_groupRadius,
+      inForest = veg.m_inForest,
+      forestTresholdMin = veg.m_forestTresholdMin,
+      forestTresholdMax = veg.m_forestTresholdMax
+    };
     return data;
   }
 

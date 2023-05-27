@@ -15,8 +15,42 @@ public class SpawnManager
   public static Dictionary<SpawnSystem.SpawnData, List<BlueprintObject>> Objects = new();
   public static SpawnSystem.SpawnData FromData(SpawnData data)
   {
-    var spawn = new SpawnSystem.SpawnData();
-    spawn.m_prefab = Data.ToPrefab(data.prefab);
+    var spawn = new SpawnSystem.SpawnData
+    {
+      m_prefab = Data.ToPrefab(data.prefab),
+      m_enabled = data.enabled,
+      m_biome = Data.ToBiomes(data.biome),
+      m_biomeArea = Data.ToBiomeAreas(data.biomeArea),
+      m_maxSpawned = data.maxSpawned,
+      m_spawnInterval = data.spawnInterval,
+      m_spawnChance = data.spawnChance,
+      m_spawnDistance = data.spawnDistance,
+      m_spawnRadiusMin = data.spawnRadiusMin,
+      m_spawnRadiusMax = data.spawnRadiusMax,
+      m_requiredGlobalKey = data.requiredGlobalKey,
+      m_requiredEnvironments = Data.ToList(data.requiredEnvironments),
+      m_groupSizeMin = data.groupSizeMin,
+      m_groupSizeMax = data.groupSizeMax,
+      m_spawnAtDay = data.spawnAtDay,
+      m_spawnAtNight = data.spawnAtNight,
+      m_groupRadius = data.groupRadius,
+      m_minAltitude = data.minAltitude,
+      m_maxAltitude = data.maxAltitude,
+      m_minTilt = data.minTilt,
+      m_maxTilt = data.maxTilt,
+      m_inForest = data.inForest,
+      m_outsideForest = data.outsideForest,
+      m_minOceanDepth = data.minOceanDepth,
+      m_maxOceanDepth = data.maxOceanDepth,
+      m_huntPlayer = data.huntPlayer,
+      m_groundOffset = data.groundOffset,
+      m_maxLevel = data.maxLevel,
+      m_minLevel = data.minLevel,
+      m_levelUpMinCenterDistance = data.levelUpMinCenterDistance,
+      m_overrideLevelupChance = data.overrideLevelupChance
+    };
+    if (spawn.m_minAltitude == -10000f)
+      spawn.m_minAltitude = spawn.m_maxAltitude > 0f ? 0f : -1000f;
     if (data.data != "")
     {
       ZPackage pkg = new(data.data);
@@ -36,74 +70,44 @@ public class SpawnManager
         Parse.Float(split, 4, 1f)
       )).ToList();
     }
-    spawn.m_enabled = data.enabled;
-    spawn.m_biome = Data.ToBiomes(data.biome);
-    spawn.m_biomeArea = Data.ToBiomeAreas(data.biomeArea);
-    spawn.m_maxSpawned = data.maxSpawned;
-    spawn.m_spawnInterval = data.spawnInterval;
-    spawn.m_spawnChance = data.spawnChance;
-    spawn.m_spawnDistance = data.spawnDistance;
-    spawn.m_spawnRadiusMin = data.spawnRadiusMin;
-    spawn.m_spawnRadiusMax = data.spawnRadiusMax;
-    spawn.m_requiredGlobalKey = data.requiredGlobalKey;
-    spawn.m_requiredEnvironments = Data.ToList(data.requiredEnvironments);
-    spawn.m_groupSizeMin = data.groupSizeMin;
-    spawn.m_groupSizeMax = data.groupSizeMax;
-    spawn.m_spawnAtDay = data.spawnAtDay;
-    spawn.m_spawnAtNight = data.spawnAtNight;
-    spawn.m_groupRadius = data.groupRadius;
-    spawn.m_minAltitude = data.minAltitude;
-    spawn.m_maxAltitude = data.maxAltitude;
-    if (spawn.m_minAltitude == -10000f)
-      spawn.m_minAltitude = spawn.m_maxAltitude > 0f ? 0f : -1000f;
-    spawn.m_minTilt = data.minTilt;
-    spawn.m_maxTilt = data.maxTilt;
-    spawn.m_inForest = data.inForest;
-    spawn.m_outsideForest = data.outsideForest;
-    spawn.m_minOceanDepth = data.minOceanDepth;
-    spawn.m_maxOceanDepth = data.maxOceanDepth;
-    spawn.m_huntPlayer = data.huntPlayer;
-    spawn.m_groundOffset = data.groundOffset;
-    spawn.m_maxLevel = data.maxLevel;
-    spawn.m_minLevel = data.minLevel;
-    spawn.m_levelUpMinCenterDistance = data.levelUpMinCenterDistance;
-    spawn.m_overrideLevelupChance = data.overrideLevelupChance;
     return spawn;
   }
   public static SpawnData ToData(SpawnSystem.SpawnData spawn)
   {
-    SpawnData data = new();
-    data.prefab = spawn.m_prefab.name;
-    data.enabled = spawn.m_enabled;
-    data.biome = Data.FromBiomes(spawn.m_biome);
-    data.biomeArea = Data.FromBiomeAreas(spawn.m_biomeArea);
-    data.maxSpawned = spawn.m_maxSpawned;
-    data.spawnInterval = spawn.m_spawnInterval;
-    data.spawnChance = spawn.m_spawnChance;
-    data.spawnDistance = spawn.m_spawnDistance;
-    data.spawnRadiusMin = spawn.m_spawnRadiusMin;
-    data.spawnRadiusMax = spawn.m_spawnRadiusMax;
-    data.requiredGlobalKey = spawn.m_requiredGlobalKey;
-    data.requiredEnvironments = Data.FromList(spawn.m_requiredEnvironments);
-    data.spawnAtDay = spawn.m_spawnAtDay;
-    data.spawnAtNight = spawn.m_spawnAtNight;
-    data.groupSizeMin = spawn.m_groupSizeMin;
-    data.groupSizeMax = spawn.m_groupSizeMax;
-    data.groupRadius = spawn.m_groupRadius;
-    data.minAltitude = spawn.m_minAltitude;
-    data.maxAltitude = spawn.m_maxAltitude;
-    data.minTilt = spawn.m_minTilt;
-    data.maxTilt = spawn.m_maxTilt;
-    data.inForest = spawn.m_inForest;
-    data.outsideForest = spawn.m_outsideForest;
-    data.minOceanDepth = spawn.m_minOceanDepth;
-    data.maxOceanDepth = spawn.m_maxOceanDepth;
-    data.huntPlayer = spawn.m_huntPlayer;
-    data.groundOffset = spawn.m_groundOffset;
-    data.maxLevel = spawn.m_maxLevel;
-    data.minLevel = spawn.m_minLevel;
-    data.levelUpMinCenterDistance = spawn.m_levelUpMinCenterDistance;
-    data.overrideLevelupChance = spawn.m_overrideLevelupChance;
+    SpawnData data = new()
+    {
+      prefab = spawn.m_prefab.name,
+      enabled = spawn.m_enabled,
+      biome = Data.FromBiomes(spawn.m_biome),
+      biomeArea = Data.FromBiomeAreas(spawn.m_biomeArea),
+      maxSpawned = spawn.m_maxSpawned,
+      spawnInterval = spawn.m_spawnInterval,
+      spawnChance = spawn.m_spawnChance,
+      spawnDistance = spawn.m_spawnDistance,
+      spawnRadiusMin = spawn.m_spawnRadiusMin,
+      spawnRadiusMax = spawn.m_spawnRadiusMax,
+      requiredGlobalKey = spawn.m_requiredGlobalKey,
+      requiredEnvironments = Data.FromList(spawn.m_requiredEnvironments),
+      spawnAtDay = spawn.m_spawnAtDay,
+      spawnAtNight = spawn.m_spawnAtNight,
+      groupSizeMin = spawn.m_groupSizeMin,
+      groupSizeMax = spawn.m_groupSizeMax,
+      groupRadius = spawn.m_groupRadius,
+      minAltitude = spawn.m_minAltitude,
+      maxAltitude = spawn.m_maxAltitude,
+      minTilt = spawn.m_minTilt,
+      maxTilt = spawn.m_maxTilt,
+      inForest = spawn.m_inForest,
+      outsideForest = spawn.m_outsideForest,
+      minOceanDepth = spawn.m_minOceanDepth,
+      maxOceanDepth = spawn.m_maxOceanDepth,
+      huntPlayer = spawn.m_huntPlayer,
+      groundOffset = spawn.m_groundOffset,
+      maxLevel = spawn.m_maxLevel,
+      minLevel = spawn.m_minLevel,
+      levelUpMinCenterDistance = spawn.m_levelUpMinCenterDistance,
+      overrideLevelupChance = spawn.m_overrideLevelupChance
+    };
     return data;
   }
   public static bool IsValid(SpawnSystem.SpawnData spawn) => spawn.m_prefab;
@@ -190,6 +194,10 @@ public class SpawnZDO
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
 
+  private static string PrefabOverride(string dummy, string prefab)
+  {
+    return prefab;
+  }
   static ZDO? DataOverride(ZDO? zdo, string source, string prefab) => zdo;
   static void Postfix(SpawnSystem.SpawnData critter, Vector3 spawnPoint)
   {
@@ -197,7 +205,7 @@ public class SpawnZDO
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      Spawn.BPO("", obj, spawnPoint, Quaternion.identity, DataOverride, null);
+      Spawn.BPO("", obj, spawnPoint, Quaternion.identity, DataOverride, PrefabOverride, null);
     }
   }
 }

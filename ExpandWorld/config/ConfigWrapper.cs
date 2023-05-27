@@ -11,8 +11,8 @@ namespace Service;
 public class ConfigWrapper
 {
 
-  private ConfigFile ConfigFile;
-  private ConfigSync ConfigSync;
+  private readonly ConfigFile ConfigFile;
+  private readonly ConfigSync ConfigSync;
   public ConfigWrapper(string command, ConfigFile configFile, ConfigSync configSync)
   {
     ConfigFile = configFile;
@@ -41,7 +41,7 @@ public class ConfigWrapper
         handler(args.Context, string.Join(" ", args.Args.Skip(2)));
     }, optionsFetcher: () => SettingHandlers.Keys.ToList());
   }
-  public CustomSyncedValue<string> AddValue(string identifier) => new CustomSyncedValue<string>(ConfigSync, identifier);
+  public CustomSyncedValue<string> AddValue(string identifier) => new(ConfigSync, identifier);
   public ConfigEntry<bool> BindLocking(string group, string name, bool value, ConfigDescription description)
   {
     var configEntry = ConfigFile.Bind(group, name, value, description);
@@ -91,8 +91,7 @@ public class ConfigWrapper
     context.AddString(message);
     Player.m_localPlayer?.Message(MessageHud.MessageType.TopLeft, message);
   }
-  private Dictionary<string, ConfigEntryBase> Settings = new();
-  private Dictionary<string, Action<Terminal, string>> SettingHandlers = new();
+  private readonly Dictionary<string, Action<Terminal, string>> SettingHandlers = new();
   private string ToKey(string name) => name.ToLower().Replace(' ', '_').Replace("(", "").Replace(")", "");
   private void Register(ConfigEntry<bool> setting)
   {
@@ -107,15 +106,14 @@ public class ConfigWrapper
     SettingHandlers.Add(key, (Terminal terminal, string value) => SetValue(terminal, setting, name, value));
   }
   private static string State(bool value) => value ? "enabled" : "disabled";
-  private static string Flag(bool value) => value ? "Removed" : "Added";
-  private static HashSet<string> Truthies = new() {
+  private static readonly HashSet<string> Truthies = new() {
     "1",
     "true",
     "yes",
     "on"
   };
   private static bool IsTruthy(string value) => Truthies.Contains(value);
-  private static HashSet<string> Falsies = new() {
+  private static readonly HashSet<string> Falsies = new() {
     "0",
     "false",
     "no",
@@ -128,11 +126,6 @@ public class ConfigWrapper
     else if (IsTruthy(value)) setting.Value = true;
     else if (IsFalsy(value)) setting.Value = false;
     AddMessage(context, $"{name} {State(setting.Value)}.");
-  }
-  private static int TryParseInt(string value, int defaultValue)
-  {
-    if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result)) return result;
-    return defaultValue;
   }
   private static int? TryParseInt(ConfigEntry<string> setting)
   {

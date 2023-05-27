@@ -34,11 +34,13 @@ public class LocationSetup
   // Copy paste from vanilla code.
   private static ZoneSystem.ZoneLocation SetupLocation(Location location)
   {
-    ZoneSystem.ZoneLocation zoneLocation = new();
-    zoneLocation.m_enable = false;
-    zoneLocation.m_maxTerrainDelta = 10f;
-    zoneLocation.m_randomRotation = false;
-    zoneLocation.m_prefab = location.gameObject;
+    ZoneSystem.ZoneLocation zoneLocation = new()
+    {
+      m_enable = false,
+      m_maxTerrainDelta = 10f,
+      m_randomRotation = false,
+      m_prefab = location.gameObject
+    };
     zoneLocation.m_prefabName = zoneLocation.m_prefab.name;
     zoneLocation.m_hash = zoneLocation.m_prefabName.GetStableHashCode();
     zoneLocation.m_location = location;

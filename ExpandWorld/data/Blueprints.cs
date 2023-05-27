@@ -153,7 +153,6 @@ public class Blueprints
       bps = LoadFiles(Configuration.BlueprintLocalFolder, bps);
     return bps.Distinct().OrderBy(s => s);
   }
-  private static List<string> GetBlueprints() => Files().Select(path => Path.GetFileNameWithoutExtension(path).Replace(" ", "_")).ToList();
   public static bool TryGetBluePrint(string name, out Blueprint blueprint)
   {
     blueprint = new("Invalid");

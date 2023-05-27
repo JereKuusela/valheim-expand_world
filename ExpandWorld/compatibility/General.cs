@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 namespace ExpandWorld;
 
+#pragma warning disable IDE0051
 [HarmonyPatch]
 public class TryParseBiome
 {
@@ -15,13 +16,13 @@ public class TryParseBiome
         .Select(method => method.MakeGenericMethod(typeof(Heightmap.Biome)))
         .Cast<MethodBase>();
   }
+
   static bool Prefix(string value, ref Heightmap.Biome result, ref bool __result)
   {
     __result = BiomeManager.TryGetBiome(value, out result);
     return false;
   }
 }
-
 [HarmonyPatch]
 public class TryParseTheme
 {
@@ -38,6 +39,7 @@ public class TryParseTheme
     return false;
   }
 }
+#pragma warning restore  IDE0051
 [HarmonyPatch(typeof(Enum), nameof(Enum.GetValues))]
 public class GetValues
 {

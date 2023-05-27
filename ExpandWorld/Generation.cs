@@ -76,7 +76,7 @@ public class WorldGeneration
     wg.FindLakes();
     wg.m_rivers = wg.PlaceRivers();
     wg.m_streams = wg.PlaceStreams();
-    ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+    ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
     stopwatch.Stop();
     WorldGeneration.HasLoaded = true;
   }
@@ -104,7 +104,6 @@ public class WorldGeneration
   static CancellationTokenSource? CTS = null;
   static IEnumerator Coroutine(WorldGenerator wg)
   {
-    int taskIndex = global::ExpandWorld.Generate.LastTaskIndex++;
     Cancel();
     MapGeneration.Cancel();
 
@@ -150,7 +149,7 @@ public class WorldGeneration
       yield break;
     yield return null;
     HasLoaded = true;
-    ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+    ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
     stopwatch.Stop();
     cts.Dispose();
 
@@ -192,14 +191,22 @@ public class MapGeneration
   {
     if (map.m_textureSize == textureSize) return;
     map.m_textureSize = textureSize;
-    map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
-    map.m_mapTexture.wrapMode = TextureWrapMode.Clamp;
-    map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
-    map.m_forestMaskTexture.wrapMode = TextureWrapMode.Clamp;
-    map.m_heightTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false);
-    map.m_heightTexture.wrapMode = TextureWrapMode.Clamp;
-    map.m_fogTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false);
-    map.m_fogTexture.wrapMode = TextureWrapMode.Clamp;
+    map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    {
+      wrapMode = TextureWrapMode.Clamp
+    };
+    map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    {
+      wrapMode = TextureWrapMode.Clamp
+    };
+    map.m_heightTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false)
+    {
+      wrapMode = TextureWrapMode.Clamp
+    };
+    map.m_fogTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    {
+      wrapMode = TextureWrapMode.Clamp
+    };
     map.m_explored = new bool[map.m_textureSize * map.m_textureSize];
     map.m_exploredOthers = new bool[map.m_textureSize * map.m_textureSize];
     map.m_mapImageLarge.material.SetTexture("_MainTex", map.m_mapTexture);
@@ -257,7 +264,7 @@ public class MapGeneration
       // So do one "fake" generate call to trigger those.
       DoFakeGenerate = true;
       map.GenerateWorldMap();
-      ExpandWorld.Log.LogInfo($"Map generation finished ({stopwatch.Elapsed.TotalSeconds.ToString("F0")} seconds).");
+      ExpandWorld.Log.LogInfo($"Map generation finished ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
     }
     stopwatch.Stop();
     cts.Dispose();

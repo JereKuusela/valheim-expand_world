@@ -33,7 +33,7 @@ public class RoomLoading
     File.WriteAllText(FilePath, yaml);
   }
 
-  private static Dictionary<string, Room.Theme> DefaultNameToTheme = new() {
+  private static readonly Dictionary<string, Room.Theme> DefaultNameToTheme = new() {
     {"Crypt", Room.Theme.Crypt},
     {"SunkenCrypt", Room.Theme.SunkenCrypt},
     {"Cave", Room.Theme.Cave},
@@ -54,6 +54,7 @@ public class RoomLoading
     RoomSpawning.Data.Clear();
     RoomSpawning.Objects.Clear();
     RoomSpawning.ObjectSwaps.Clear();
+    RoomSpawning.ObjectData.Clear();
     NameToTheme = DefaultNameToTheme.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
     ThemeToName = DefaultNameToTheme.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     if (Helper.IsClient()) return;
@@ -178,31 +179,35 @@ public class RoomLoading
       RoomSpawning.Objects[data.name] = Parse.Objects(data.objects);
     if (data.objectSwap != null)
       RoomSpawning.ObjectSwaps[data.name] = Spawn.LoadSwaps(data.objectSwap);
+    if (data.objectData != null)
+      RoomSpawning.ObjectData[data.name] = Spawn.LoadData(data.objectData);
     return roomData;
   }
   private static RoomData ToData(DungeonDB.RoomData roomData)
   {
     var room = roomData.m_room;
-    RoomData data = new();
-    data.name = room.gameObject.name;
-    data.theme = Data.FromEnum(room.m_theme);
-    data.entrance = room.m_entrance;
-    data.endCap = room.m_endCap;
-    data.divider = room.m_divider;
-    data.enabled = room.m_enabled;
-    data.size = $"{room.m_size.x},{room.m_size.z},{room.m_size.y}";
-    data.minPlaceOrder = room.m_minPlaceOrder;
-    data.weight = room.m_weight;
-    data.faceCenter = room.m_faceCenter;
-    data.perimeter = room.m_perimeter;
-    data.endCapPriority = room.m_endCapPrio;
-    data.connections = room.GetConnections().Select(connection => new RoomConnectionData
+    RoomData data = new()
     {
-      position = $"{Helper.Print(connection.transform.localPosition)},{Helper.Print(connection.transform.localRotation)}",
-      type = connection.m_type,
-      entrance = connection.m_entrance,
-      door = connection.m_allowDoor ? "true" : connection.m_doorOnlyIfOtherAlsoAllowsDoor ? "other" : "false"
-    }).ToArray();
+      name = room.gameObject.name,
+      theme = Data.FromEnum(room.m_theme),
+      entrance = room.m_entrance,
+      endCap = room.m_endCap,
+      divider = room.m_divider,
+      enabled = room.m_enabled,
+      size = $"{room.m_size.x},{room.m_size.z},{room.m_size.y}",
+      minPlaceOrder = room.m_minPlaceOrder,
+      weight = room.m_weight,
+      faceCenter = room.m_faceCenter,
+      perimeter = room.m_perimeter,
+      endCapPriority = room.m_endCapPrio,
+      connections = room.GetConnections().Select(connection => new RoomConnectionData
+      {
+        position = $"{Helper.Print(connection.transform.localPosition)},{Helper.Print(connection.transform.localRotation)}",
+        type = connection.m_type,
+        entrance = connection.m_entrance,
+        door = connection.m_allowDoor ? "true" : connection.m_doorOnlyIfOtherAlsoAllowsDoor ? "other" : "false"
+      }).ToArray()
+    };
     return data;
   }
 

@@ -57,34 +57,36 @@ public class ClutterManager
   }
   public static ClutterData ToData(ClutterSystem.Clutter clutter)
   {
-    ClutterData data = new();
-    data.prefab = clutter.m_prefab.name;
-    data.enabled = clutter.m_enabled;
-    data.amount = clutter.m_amount;
-    data.biome = Data.FromBiomes(clutter.m_biome);
-    data.instanced = clutter.m_instanced;
-    data.onUncleared = clutter.m_onUncleared;
-    data.onCleared = clutter.m_onCleared;
-    data.scaleMin = clutter.m_scaleMin;
-    data.scaleMax = clutter.m_scaleMax;
-    data.maxTilt = clutter.m_maxTilt;
-    data.minTilt = clutter.m_minTilt;
-    data.maxAltitude = clutter.m_maxAlt;
-    data.minAltitude = clutter.m_minAlt;
-    data.maxVegetation = clutter.m_maxVegetation;
-    data.minVegetation = clutter.m_minVegetation;
-    data.snapToWater = clutter.m_snapToWater;
-    data.terrainTilt = clutter.m_terrainTilt;
-    data.randomOffset = clutter.m_randomOffset;
-    data.minOceanDepth = clutter.m_minOceanDepth;
-    data.maxOceanDepth = clutter.m_maxOceanDepth;
-    data.inForest = clutter.m_inForest;
-    data.forestTresholdMin = clutter.m_forestTresholdMin;
-    data.forestTresholdMax = clutter.m_forestTresholdMax;
-    data.fractalScale = clutter.m_fractalScale;
-    data.fractalOffset = clutter.m_fractalOffset;
-    data.fractalThresholdMin = clutter.m_fractalTresholdMin;
-    data.fractalThresholdMax = clutter.m_fractalTresholdMax;
+    ClutterData data = new()
+    {
+      prefab = clutter.m_prefab.name,
+      enabled = clutter.m_enabled,
+      amount = clutter.m_amount,
+      biome = Data.FromBiomes(clutter.m_biome),
+      instanced = clutter.m_instanced,
+      onUncleared = clutter.m_onUncleared,
+      onCleared = clutter.m_onCleared,
+      scaleMin = clutter.m_scaleMin,
+      scaleMax = clutter.m_scaleMax,
+      maxTilt = clutter.m_maxTilt,
+      minTilt = clutter.m_minTilt,
+      maxAltitude = clutter.m_maxAlt,
+      minAltitude = clutter.m_minAlt,
+      maxVegetation = clutter.m_maxVegetation,
+      minVegetation = clutter.m_minVegetation,
+      snapToWater = clutter.m_snapToWater,
+      terrainTilt = clutter.m_terrainTilt,
+      randomOffset = clutter.m_randomOffset,
+      minOceanDepth = clutter.m_minOceanDepth,
+      maxOceanDepth = clutter.m_maxOceanDepth,
+      inForest = clutter.m_inForest,
+      forestTresholdMin = clutter.m_forestTresholdMin,
+      forestTresholdMax = clutter.m_forestTresholdMax,
+      fractalScale = clutter.m_fractalScale,
+      fractalOffset = clutter.m_fractalOffset,
+      fractalThresholdMin = clutter.m_fractalTresholdMin,
+      fractalThresholdMax = clutter.m_fractalTresholdMax
+    };
     return data;
   }
 

@@ -32,29 +32,30 @@ public class Spawner
     return prefab;
   }
 
-  private static ZDO? DataDungeonOverride(string dungeon, string prefab)
+  private static ZDO? DataDungeonOverride(ZDO? zdo, string dungeon, string prefab)
   {
+    if (zdo != null) return zdo;
     if (!Generators.TryGetValue(dungeon, out var gen)) return null;
     if (!gen.m_objectData.TryGetValue(prefab, out var data)) return null;
-    return data;
+    return Spawn.RandomizeData(data);
   }
-  public static ZDO? DataOverride(ZDO? data, string dungeonRoom, string prefab)
+  public static ZDO? DataOverride(ZDO? zdo, string dungeonRoom, string prefab)
   {
-    if (data != null) return data;
+    if (zdo != null) return zdo;
     var split = dungeonRoom.Split('|');
     if (split.Length > 1)
-      data = RoomSpawning.DataOverride(data, split[1], prefab);
-    if (data != null) return data;
-    return DataDungeonOverride(split[0], prefab);
+      zdo = RoomSpawning.DataOverride(zdo, split[1], prefab);
+    if (zdo != null) return zdo;
+    return DataDungeonOverride(zdo, split[0], prefab);
   }
 
   ///<summary>Implements object data and swapping from location data.</summary>
-  static GameObject CustomObject(GameObject prefab, Vector3 position, Quaternion rotation, DungeonGenerator dg)
+  static GameObject CustomObject(GameObject prefab, Vector3 pos, Quaternion rot)
   {
     // Some mods cause client side dungeon reloading. In this case, no data is available.
     // Revert to the default behaviour as a fail safe.
-    if (Helper.IsClient()) return UnityEngine.Object.Instantiate<GameObject>(prefab, position, rotation);
-    BlueprintObject bpo = new(Utils.GetPrefabName(prefab), position, rotation, prefab.transform.localScale, "", null, 1f);
+    if (Helper.IsClient()) return Object.Instantiate(prefab, pos, rot);
+    BlueprintObject bpo = new(Utils.GetPrefabName(prefab), pos, rot, prefab.transform.localScale, "", null, 1f);
     var source = $"{DungeonName}|{RoomName}";
     var obj = Spawn.BPO(source, bpo, DataOverride, PrefabOverride, null);
     return obj ?? LocationSpawning.DummySpawn;
@@ -62,10 +63,9 @@ public class Spawner
 
   static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions)
   {
-    var instantiator = typeof(UnityEngine.Object).GetMethods().First(m => m.Name == nameof(UnityEngine.Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
+    var instantiator = typeof(Object).GetMethods().First(m => m.Name == nameof(Object.Instantiate) && m.IsGenericMethodDefinition && m.GetParameters().Skip(1).Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Vector3), typeof(Quaternion) })).MakeGenericMethod(typeof(GameObject));
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
       .Set(OpCodes.Call, Transpilers.EmitDelegate(CustomObject).operand)
       .InstructionEnumeration();
   }

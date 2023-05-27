@@ -161,7 +161,7 @@ public class Data : MonoBehaviour
       }
     }
   }
-  private static Heightmap.Biome DefaultMax =
+  private static readonly Heightmap.Biome DefaultMax =
     Heightmap.Biome.AshLands | Heightmap.Biome.BlackForest | Heightmap.Biome.DeepNorth |
     Heightmap.Biome.Meadows | Heightmap.Biome.Mistlands | Heightmap.Biome.Mountain |
     Heightmap.Biome.Ocean | Heightmap.Biome.Plains | Heightmap.Biome.Swamp;
@@ -231,7 +231,7 @@ public class Data : MonoBehaviour
     foreach (var item in list)
     {
       if (Enum.TryParse<T>(item, true, out var parsed))
-        value = value + (int)(object)parsed;
+        value += (int)(object)parsed;
       else
         ExpandWorld.Log.LogWarning($"Failed to parse value {item} as {nameof(T)}.");
     }
@@ -281,7 +281,7 @@ public class Data : MonoBehaviour
   // Users very easily might have creator on their blueprints or copied data.
   // This causes enemies to attack them because they are considered player built.
   // So far no reason to keep this data.
-  private static int CreatorHash = "creator".GetStableHashCode();
+  private static readonly int CreatorHash = "creator".GetStableHashCode();
   public static void CopyData(ZDO from, ZDO to)
   {
     to.m_floats = from.m_floats;
@@ -291,8 +291,7 @@ public class Data : MonoBehaviour
     to.m_longs = from.m_longs;
     to.m_strings = from.m_strings;
     to.m_byteArrays = from.m_byteArrays;
-    if (to.m_longs != null)
-      to.m_longs.Remove(CreatorHash);
+    to.m_longs?.Remove(CreatorHash);
     to.IncreseDataRevision();
   }
 

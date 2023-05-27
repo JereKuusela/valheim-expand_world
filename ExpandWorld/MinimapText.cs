@@ -28,7 +28,7 @@ public class Minimap_ShowLoading
   private static string GetText() => "\nLoading..";
   private static string PreviousSmallText = "";
   private static string PreviousLargeText = "";
-  static void Postfix(Minimap __instance, Player player)
+  static void Postfix(Minimap __instance)
   {
     var mode = __instance.m_mode;
     if (PreviousSmallText != "")

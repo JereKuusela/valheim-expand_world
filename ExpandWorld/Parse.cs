@@ -68,7 +68,7 @@ public static class Parse
         Parse.Float(split, 10, 1f)
       )).ToList();
   }
-  public static string[] Split(string arg, bool removeEmpty = true, char split = ',') => arg.Split(split).Select(s => s.Trim()).Where(s => removeEmpty && s != "").ToArray();
+  public static string[] Split(string arg, bool removeEmpty = true, char split = ',') => arg.Split(split).Select(s => s.Trim()).Where(s => !removeEmpty || s != "").ToArray();
   public static string Name(string arg) => arg.Split(':')[0];
   public static Vector3 VectorXZY(string arg) => VectorXZY(arg, Vector3.zero);
   public static Vector3 VectorXZY(string arg, Vector3 defaultValue) => VectorXZY(Split(arg), 0, defaultValue);

@@ -39,7 +39,7 @@ public class GetMapColor
 public class HeightmapGetBiome
 {
   public static bool Nature = false;
-  private static Dictionary<Heightmap.Biome, float> Weights = new();
+  private static readonly Dictionary<Heightmap.Biome, float> Weights = new();
 
   public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z)
   {
@@ -72,9 +72,7 @@ public class HeightmapGetBiome
       __result = __instance.m_cornerBiomes[0];
       return false;
     }
-    var x = point.x;
-    var z = point.z;
-    __instance.WorldToNormalizedHM(point, out x, out z);
+    __instance.WorldToNormalizedHM(point, out var x, out var z);
     __result = GetBiome(__instance, x, z);
     return false;
   }
@@ -141,8 +139,7 @@ public class GetBiome
 
   private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy)
   {
-    if (Data == null)
-      Data = WorldManager.GetDefault(obj);
+    Data ??= WorldManager.GetDefault(obj);
     var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
     if (magnitude > Configuration.WorldTotalRadius)
       return Heightmap.Biome.Ocean;

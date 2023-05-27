@@ -17,6 +17,7 @@ using UnityEngine;
 
 namespace ServerSync;
 
+#pragma warning disable
 [PublicAPI]
 public abstract class OwnConfigEntryBase
 {
@@ -1395,3 +1396,4 @@ public class VersionCheck
     }
   }
 }
+#pragma warning restore

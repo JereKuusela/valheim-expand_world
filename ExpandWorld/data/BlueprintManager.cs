@@ -18,7 +18,7 @@ public class BlueprintManager
   public static bool Has(string name) => BlueprintFiles.ContainsKey(Parse.Name(name));
   public static bool TryGet(string name, out Blueprint bp) => BlueprintFiles.TryGetValue(Parse.Name(name), out bp);
   public static Dictionary<string, Blueprint> BlueprintFiles = new();
-  private static Dictionary<string, BlueprintMetaData> MetaData = new();
+  private static readonly Dictionary<string, BlueprintMetaData> MetaData = new();
   public static bool Load(string name, string centerPiece) => Load(name, centerPiece, new string[0]);
   public static bool Load(string name, string centerPiece, string[] snapPieces)
   {
@@ -48,7 +48,7 @@ public class BlueprintManager
   public static void Reload(string name)
   {
     if (!Has(name)) return;
-    if (!Blueprints.TryGetBluePrint(name, out var bp)) return;
+    if (!Blueprints.TryGetBluePrint(name, out _)) return;
     ExpandWorld.Log.LogInfo($"Reloading blueprint {name}.");
     BlueprintFiles.Remove(name);
     if (MetaData.TryGetValue(name, out var data))

@@ -53,11 +53,13 @@ public partial class Loader
   }
   public static DungeonData To(DungeonGenerator dg)
   {
-    DungeonData data = new();
-    data.name = Utils.GetPrefabName(dg.gameObject);
-    data.algorithm = dg.m_algorithm.ToString();
-    data.themes = global::ExpandWorld.Data.FromEnum(dg.m_themes);
-    data.interiorTransform = dg.m_useCustomInteriorTransform;
+    DungeonData data = new()
+    {
+      name = Utils.GetPrefabName(dg.gameObject),
+      algorithm = dg.m_algorithm.ToString(),
+      themes = global::ExpandWorld.Data.FromEnum(dg.m_themes),
+      interiorTransform = dg.m_useCustomInteriorTransform
+    };
     if (dg.m_zoneSize.x == dg.m_zoneSize.y && dg.m_zoneSize.y == dg.m_zoneSize.z)
       data.bounds = Helper.Print(dg.m_zoneSize.x);
     else

@@ -14,95 +14,99 @@ public class EnvironmentManager
   private static Dictionary<string, EnvSetup> Originals = new();
   public static EnvSetup FromData(EnvironmentData data)
   {
-    var env = new EnvSetup();
-    env.m_psystems = new GameObject[0];
+    var env = new EnvSetup
+    {
+      m_psystems = new GameObject[0],
+      m_name = data.name,
+      m_default = data.isDefault,
+      m_isWet = data.isWet,
+      m_isFreezing = data.isFreezing,
+      m_isFreezingAtNight = data.isFreezingAtNight,
+      m_isCold = data.isCold,
+      m_isColdAtNight = data.isColdAtNight,
+      m_alwaysDark = data.alwaysDark,
+      m_ambColorNight = Data.Sanity(data.ambColorNight),
+      m_ambColorDay = Data.Sanity(data.ambColorDay),
+      m_fogColorNight = Data.Sanity(data.fogColorNight),
+      m_fogColorMorning = Data.Sanity(data.fogColorMorning),
+      m_fogColorDay = Data.Sanity(data.fogColorDay),
+      m_fogColorEvening = Data.Sanity(data.fogColorEvening),
+      m_fogColorSunNight = Data.Sanity(data.fogColorSunNight),
+      m_fogColorSunMorning = Data.Sanity(data.fogColorSunMorning),
+      m_fogColorSunDay = Data.Sanity(data.fogColorSunDay),
+      m_fogColorSunEvening = Data.Sanity(data.fogColorSunEvening),
+      m_fogDensityNight = data.fogDensityNight,
+      m_fogDensityMorning = data.fogDensityMorning,
+      m_fogDensityDay = data.fogDensityDay,
+      m_fogDensityEvening = data.fogDensityEvening,
+      m_sunColorNight = Data.Sanity(data.sunColorNight),
+      m_sunColorMorning = Data.Sanity(data.sunColorMorning),
+      m_sunColorDay = Data.Sanity(data.sunColorDay),
+      m_sunColorEvening = Data.Sanity(data.sunColorEvening),
+      m_lightIntensityDay = data.lightIntensityDay,
+      m_lightIntensityNight = data.lightIntensityNight,
+      m_sunAngle = data.sunAngle,
+      m_windMin = data.windMin,
+      m_windMax = data.windMax,
+      m_rainCloudAlpha = data.rainCloudAlpha,
+      m_ambientVol = data.ambientVol,
+      m_ambientList = data.ambientList,
+      m_musicMorning = data.musicMorning,
+      m_musicEvening = data.musicEvening,
+      m_musicDay = data.musicDay,
+      m_musicNight = data.musicNight
+    };
     if (Originals.TryGetValue(data.particles, out var setup))
       env = setup.Clone();
     else if (Originals.TryGetValue(data.name, out setup))
       env = setup.Clone();
     else
       ExpandWorld.Log.LogWarning($"Failed to find a particle system \"{data.particles}\". Make sure field \"particles\" it set correctly.");
-    env.m_name = data.name;
-    env.m_default = data.isDefault;
-    env.m_isWet = data.isWet;
-    env.m_isFreezing = data.isFreezing;
-    env.m_isFreezingAtNight = data.isFreezingAtNight;
-    env.m_isCold = data.isCold;
-    env.m_isColdAtNight = data.isColdAtNight;
-    env.m_alwaysDark = data.alwaysDark;
-    env.m_ambColorNight = Data.Sanity(data.ambColorNight);
-    env.m_ambColorDay = Data.Sanity(data.ambColorDay);
-    env.m_fogColorNight = Data.Sanity(data.fogColorNight);
-    env.m_fogColorMorning = Data.Sanity(data.fogColorMorning);
-    env.m_fogColorDay = Data.Sanity(data.fogColorDay);
-    env.m_fogColorEvening = Data.Sanity(data.fogColorEvening);
-    env.m_fogColorSunNight = Data.Sanity(data.fogColorSunNight);
-    env.m_fogColorSunMorning = Data.Sanity(data.fogColorSunMorning);
-    env.m_fogColorSunDay = Data.Sanity(data.fogColorSunDay);
-    env.m_fogColorSunEvening = Data.Sanity(data.fogColorSunEvening);
-    env.m_fogDensityNight = data.fogDensityNight;
-    env.m_fogDensityMorning = data.fogDensityMorning;
-    env.m_fogDensityDay = data.fogDensityDay;
-    env.m_fogDensityEvening = data.fogDensityEvening;
-    env.m_sunColorNight = Data.Sanity(data.sunColorNight);
-    env.m_sunColorMorning = Data.Sanity(data.sunColorMorning);
-    env.m_sunColorDay = Data.Sanity(data.sunColorDay);
-    env.m_sunColorEvening = Data.Sanity(data.sunColorEvening);
-    env.m_lightIntensityDay = data.lightIntensityDay;
-    env.m_lightIntensityNight = data.lightIntensityNight;
-    env.m_sunAngle = data.sunAngle;
-    env.m_windMin = data.windMin;
-    env.m_windMax = data.windMax;
-    env.m_rainCloudAlpha = data.rainCloudAlpha;
-    env.m_ambientVol = data.ambientVol;
-    env.m_ambientList = data.ambientList;
-    env.m_musicMorning = data.musicMorning;
-    env.m_musicEvening = data.musicEvening;
-    env.m_musicDay = data.musicDay;
-    env.m_musicNight = data.musicNight;
     return env;
   }
   public static EnvironmentData ToData(EnvSetup env)
   {
-    EnvironmentData data = new();
-    data.name = env.m_name;
-    data.isDefault = env.m_default;
-    data.isWet = env.m_isWet;
-    data.isFreezing = env.m_isFreezing;
-    data.isFreezingAtNight = env.m_isFreezingAtNight;
-    data.isCold = env.m_isCold;
-    data.isColdAtNight = env.m_isColdAtNight;
-    data.alwaysDark = env.m_alwaysDark;
-    data.ambColorNight = env.m_ambColorNight;
-    data.ambColorDay = env.m_ambColorDay;
-    data.fogColorNight = env.m_fogColorNight;
-    data.fogColorMorning = env.m_fogColorMorning;
-    data.fogColorDay = env.m_fogColorDay;
-    data.fogColorEvening = env.m_fogColorEvening;
-    data.fogColorSunNight = env.m_fogColorSunNight;
-    data.fogColorSunMorning = env.m_fogColorSunMorning;
-    data.fogColorSunDay = env.m_fogColorSunDay;
-    data.fogColorSunEvening = env.m_fogColorSunEvening;
-    data.fogDensityNight = env.m_fogDensityNight;
-    data.fogDensityMorning = env.m_fogDensityMorning;
-    data.fogDensityDay = env.m_fogDensityDay;
-    data.fogDensityEvening = env.m_fogDensityEvening;
-    data.sunColorNight = env.m_sunColorNight;
-    data.sunColorMorning = env.m_sunColorMorning;
-    data.sunColorDay = env.m_sunColorDay;
-    data.sunColorEvening = env.m_sunColorEvening;
-    data.lightIntensityDay = env.m_lightIntensityDay;
-    data.lightIntensityNight = env.m_lightIntensityNight;
-    data.sunAngle = env.m_sunAngle;
-    data.windMin = env.m_windMin;
-    data.windMax = env.m_windMax;
-    data.rainCloudAlpha = env.m_rainCloudAlpha;
-    data.ambientVol = env.m_ambientVol;
-    data.ambientList = env.m_ambientList;
-    data.musicMorning = env.m_musicMorning;
-    data.musicEvening = env.m_musicEvening;
-    data.musicDay = env.m_musicDay;
-    data.musicNight = env.m_musicNight;
+    EnvironmentData data = new()
+    {
+      name = env.m_name,
+      isDefault = env.m_default,
+      isWet = env.m_isWet,
+      isFreezing = env.m_isFreezing,
+      isFreezingAtNight = env.m_isFreezingAtNight,
+      isCold = env.m_isCold,
+      isColdAtNight = env.m_isColdAtNight,
+      alwaysDark = env.m_alwaysDark,
+      ambColorNight = env.m_ambColorNight,
+      ambColorDay = env.m_ambColorDay,
+      fogColorNight = env.m_fogColorNight,
+      fogColorMorning = env.m_fogColorMorning,
+      fogColorDay = env.m_fogColorDay,
+      fogColorEvening = env.m_fogColorEvening,
+      fogColorSunNight = env.m_fogColorSunNight,
+      fogColorSunMorning = env.m_fogColorSunMorning,
+      fogColorSunDay = env.m_fogColorSunDay,
+      fogColorSunEvening = env.m_fogColorSunEvening,
+      fogDensityNight = env.m_fogDensityNight,
+      fogDensityMorning = env.m_fogDensityMorning,
+      fogDensityDay = env.m_fogDensityDay,
+      fogDensityEvening = env.m_fogDensityEvening,
+      sunColorNight = env.m_sunColorNight,
+      sunColorMorning = env.m_sunColorMorning,
+      sunColorDay = env.m_sunColorDay,
+      sunColorEvening = env.m_sunColorEvening,
+      lightIntensityDay = env.m_lightIntensityDay,
+      lightIntensityNight = env.m_lightIntensityNight,
+      sunAngle = env.m_sunAngle,
+      windMin = env.m_windMin,
+      windMax = env.m_windMax,
+      rainCloudAlpha = env.m_rainCloudAlpha,
+      ambientVol = env.m_ambientVol,
+      ambientList = env.m_ambientList,
+      musicMorning = env.m_musicMorning,
+      musicEvening = env.m_musicEvening,
+      musicDay = env.m_musicDay,
+      musicNight = env.m_musicNight
+    };
     return data;
   }
 

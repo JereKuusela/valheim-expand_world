@@ -13,19 +13,23 @@ public class BiomeManager
 
   public static EnvEntry FromData(BiomeEnvironment data)
   {
-    EnvEntry env = new();
-    env.m_environment = data.environment;
-    env.m_weight = data.weight;
+    EnvEntry env = new()
+    {
+      m_environment = data.environment,
+      m_weight = data.weight
+    };
     return env;
   }
   public static BiomeEnvironment ToData(EnvEntry env)
   {
-    BiomeEnvironment data = new();
-    data.environment = env.m_environment;
-    data.weight = env.m_weight;
+    BiomeEnvironment data = new()
+    {
+      environment = env.m_environment,
+      weight = env.m_weight
+    };
     return data;
   }
-  private static Dictionary<string, Heightmap.Biome> OriginalBiomes = new() {
+  private static readonly Dictionary<string, Heightmap.Biome> OriginalBiomes = new() {
     { "None", Heightmap.Biome.None},
     { "Meadows", Heightmap.Biome.Meadows},
     { "Swamp", Heightmap.Biome.Swamp},
@@ -43,8 +47,8 @@ public class BiomeManager
   public static Dictionary<Heightmap.Biome, string> BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToNature = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
-  private static Dictionary<Heightmap.Biome, Color> BiomeToColor = new();
-  private static Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
+  private static readonly Dictionary<Heightmap.Biome, Color> BiomeToColor = new();
+  private static readonly Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
   public static bool TryGetColor(Heightmap.Biome biome, out Color color) => BiomeToColor.TryGetValue(biome, out color);
   public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
@@ -54,28 +58,32 @@ public class BiomeManager
   public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature.TryGetValue(biome, out var nature) ? nature : biome;
   public static BiomeEnvSetup FromData(BiomeData data)
   {
-    var biome = new BiomeEnvSetup();
-    biome.m_biome = Data.ToBiomes(data.biome);
-    biome.m_environments = data.environments.Select(FromData).ToList();
-    biome.m_musicMorning = data.musicMorning;
-    biome.m_musicEvening = data.musicEvening;
-    biome.m_musicDay = data.musicDay;
-    biome.m_musicNight = data.musicNight;
+    var biome = new BiomeEnvSetup
+    {
+      m_biome = Data.ToBiomes(data.biome),
+      m_environments = data.environments.Select(FromData).ToList(),
+      m_musicMorning = data.musicMorning,
+      m_musicEvening = data.musicEvening,
+      m_musicDay = data.musicDay,
+      m_musicNight = data.musicNight
+    };
     return biome;
   }
   public static BiomeData ToData(BiomeEnvSetup biome)
   {
-    BiomeData data = new();
-    data.biome = Data.FromBiomes(biome.m_biome);
-    data.environments = biome.m_environments.Select(ToData).ToArray();
-    data.musicMorning = biome.m_musicMorning;
-    data.musicEvening = biome.m_musicEvening;
-    data.musicDay = biome.m_musicDay;
-    data.musicNight = biome.m_musicNight;
-    data.color = Heightmap.GetBiomeColor(biome.m_biome);
-    data.mapColor = Minimap.instance.GetPixelColor(biome.m_biome);
-    // Reduces the mountains on the map.
-    data.mapColorMultiplier = biome.m_biome == Heightmap.Biome.AshLands ? 0.5f : 1f;
+    BiomeData data = new()
+    {
+      biome = Data.FromBiomes(biome.m_biome),
+      environments = biome.m_environments.Select(ToData).ToArray(),
+      musicMorning = biome.m_musicMorning,
+      musicEvening = biome.m_musicEvening,
+      musicDay = biome.m_musicDay,
+      musicNight = biome.m_musicNight,
+      color = Heightmap.GetBiomeColor(biome.m_biome),
+      mapColor = Minimap.instance.GetPixelColor(biome.m_biome),
+      // Reduces the mountains on the map.
+      mapColorMultiplier = biome.m_biome == Heightmap.Biome.AshLands ? 0.5f : 1f
+    };
     return data;
   }
 

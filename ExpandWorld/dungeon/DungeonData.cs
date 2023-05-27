@@ -59,7 +59,7 @@ public class FakeDungeonGenerator
 {
   public string name = "";
   public DungeonGenerator.Algorithm m_algorithm = DungeonGenerator.Algorithm.Dungeon;
-  public Vector3 m_zoneSize = new Vector3(64f, 64f, 64f);
+  public Vector3 m_zoneSize = new(64f, 64f, 64f);
   public int m_maxRooms = 1;
   public int m_minRooms = 1;
   public int m_minRequiredRooms = 1;
@@ -80,5 +80,5 @@ public class FakeDungeonGenerator
   public float m_perimeterBuffer;
   public bool m_useCustomInteriorTransform;
   public Dictionary<string, List<Tuple<float, string>>> m_objectSwaps = new();
-  public Dictionary<string, ZDO?> m_objectData = new();
+  public Dictionary<string, List<Tuple<float, ZDO?>>> m_objectData = new();
 }
