@@ -9,30 +9,26 @@ namespace ExpandWorld;
 
 public class BlueprintObject
 {
+  static readonly int HashScale = "scale".GetStableHashCode();
   public string Prefab = "";
   public Vector3 Pos;
   public Quaternion Rot;
-  public Vector3 Scale;
-  public string ExtraInfo;
   public ZDO? Data;
-  public float Chance = 1f; public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, string info, ZDO? data, float chance)
+  public float Chance = 1f;
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, ZDO? data, float chance)
   {
     Prefab = name;
     Pos = pos;
     Rot = rot.normalized;
-    Scale = scale;
-    ExtraInfo = info;
     Data = data;
     Chance = chance;
-  }
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot)
-  {
-    Prefab = name;
-    Pos = pos;
-    Rot = rot.normalized;
-    Scale = Vector3.one;
-    ExtraInfo = "";
-    Data = null;
+    if (scale != Vector3.one)
+    {
+      Data ??= new();
+      // Scale is actually stored in the ZDO, so this will make the handling easier.
+      Data.m_vec3 ??= new();
+      Data.m_vec3[HashScale] = new Vector3(scale.x, scale.y, scale.z);
+    }
   }
 }
 
@@ -205,7 +201,7 @@ public class Blueprints
     var rotY = InvariantFloat(split, 6);
     var rotZ = InvariantFloat(split, 7);
     var rotW = InvariantFloat(split, 8);
-    var info = split.Length > 9 ? split[9] : "";
+    // Info is not supported.
     var scaleX = InvariantFloat(split, 10, 1f);
     var scaleY = InvariantFloat(split, 11, 1f);
     var scaleZ = InvariantFloat(split, 12, 1f);
@@ -218,7 +214,7 @@ public class Blueprints
       ZPackage pkg = new(data);
       Data.Deserialize(zdo, pkg);
     }
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), info, zdo, chance);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), zdo, chance);
   }
   private static Vector3 GetPlanBuildSnapPoint(string row)
   {
@@ -255,7 +251,7 @@ public class Blueprints
       ZPackage pkg = new(data);
       Data.Deserialize(zdo, pkg);
     }
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, "", zdo, chance);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, zdo, chance);
   }
   private static float InvariantFloat(string[] row, int index, float defaultValue = 0f)
   {

@@ -60,12 +60,11 @@ public static class Parse
   {
     return args.Select(s => Parse.Split(s)).Select(split => new BlueprintObject(
         split[0],
-        Parse.VectorXZY(split, 1),
-        Parse.AngleYXZ(split, 4),
-        Parse.VectorXZY(split, 7, Vector3.one),
-        "",
+        VectorXZY(split, 1),
+        AngleYXZ(split, 4),
+        VectorXZY(split, 7, Vector3.one),
         Data.ToZDO(split.Length > 11 ? split[11] : ""),
-        Parse.Float(split, 10, 1f)
+        Float(split, 10, 1f)
       )).ToList();
   }
   public static string[] Split(string arg, bool removeEmpty = true, char split = ',') => arg.Split(split).Select(s => s.Trim()).Where(s => !removeEmpty || s != "").ToArray();

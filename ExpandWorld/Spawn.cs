@@ -33,13 +33,12 @@ public class Spawn
       BPO(source, obj, pos, rot, dataOverride, prefabOverride, spawned);
     }
   }
-  private static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 scale, ZDO? data = null)
+  private static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
   {
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, scale, data, view);
+    Data.InitZDO(position, rotation, data, view);
   }
-
 
   // Spawning a object should support following scenarions:
   // 1. Adding an object with random data.
@@ -87,7 +86,7 @@ public class Spawn
       return null;
     }
     var data = dataOverride(obj.Data, source, obj.Prefab);
-    SetData(prefab, pos, rot, obj.Scale, data);
+    SetData(prefab, pos, rot, data);
     var go = UnityEngine.Object.Instantiate(prefab, pos, rot);
     Data.CleanGhostInit(go);
     if (ZNetView.m_ghostInit)

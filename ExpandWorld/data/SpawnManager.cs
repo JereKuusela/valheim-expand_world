@@ -65,7 +65,6 @@ public class SpawnManager
         Parse.VectorXZY(split, 1),
         Quaternion.identity,
         Vector3.one,
-        "",
         Data.ToZDO(split.Length > 5 ? split[5] : ""),
         Parse.Float(split, 4, 1f)
       )).ToList();

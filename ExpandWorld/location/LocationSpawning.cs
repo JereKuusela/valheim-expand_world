@@ -36,7 +36,7 @@ public class LocationSpawning
   public static GameObject DummySpawn => UnityEngine.Object.Instantiate(ZNetScene.instance.GetPrefab(DummyObj), Vector3.zero, Quaternion.identity);
   public static GameObject Object(GameObject prefab, Vector3 pos, Quaternion rot, List<GameObject> spawnedGhostObjects, ZoneSystem.ZoneLocation location)
   {
-    BlueprintObject bpo = new(Utils.GetPrefabName(prefab), pos, rot, prefab.transform.localScale, "", null, 1f);
+    BlueprintObject bpo = new(Utils.GetPrefabName(prefab), pos, rot, prefab.transform.localScale, null, 1f);
     var locName = location.m_prefabName;
     var obj = Spawn.BPO(locName, bpo, DataOverride, PrefabOverride, spawnedGhostObjects);
     return obj ?? DummySpawn;

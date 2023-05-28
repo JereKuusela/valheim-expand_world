@@ -55,7 +55,7 @@ public class Spawner
     // Some mods cause client side dungeon reloading. In this case, no data is available.
     // Revert to the default behaviour as a fail safe.
     if (Helper.IsClient()) return Object.Instantiate(prefab, pos, rot);
-    BlueprintObject bpo = new(Utils.GetPrefabName(prefab), pos, rot, prefab.transform.localScale, "", null, 1f);
+    BlueprintObject bpo = new(Utils.GetPrefabName(prefab), pos, rot, prefab.transform.localScale, null, 1f);
     var source = $"{DungeonName}|{RoomName}";
     var obj = Spawn.BPO(source, bpo, DataOverride, PrefabOverride, null);
     return obj ?? LocationSpawning.DummySpawn;

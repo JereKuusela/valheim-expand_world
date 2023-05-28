@@ -8,6 +8,7 @@
   - Fixes the default door spawn change being 1 instead of 0 (too many doors appeared for some dungeons).
   - Fixes the field `paint` in the `expand_biomes.yaml` file not working when set to `0,0,0,0`.
   - Fixes the health data not being ignored for locations with random damage.
+  - Fixes blueprint object scale values not being read correctly.
   - Removes creator information automatically from blueprints and data values (so that things don't appear player built).
   - Improves the performance of the field `paint` in the `expand_biomes.yaml` file.
   

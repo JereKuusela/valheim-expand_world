@@ -282,6 +282,7 @@ public class Data : MonoBehaviour
   // This causes enemies to attack them because they are considered player built.
   // So far no reason to keep this data.
   private static readonly int CreatorHash = "creator".GetStableHashCode();
+
   public static void CopyData(ZDO from, ZDO to)
   {
     to.m_floats = from.m_floats;
@@ -302,7 +303,7 @@ public class Data : MonoBehaviour
     if ((num & 1) != 0)
     {
       zdo.InitFloats();
-      int num2 = (int)pkg.ReadByte();
+      int num2 = pkg.ReadByte();
       for (int i = 0; i < num2; i++)
       {
         int key = pkg.ReadInt();
@@ -316,7 +317,7 @@ public class Data : MonoBehaviour
     if ((num & 2) != 0)
     {
       zdo.InitVec3();
-      int num3 = (int)pkg.ReadByte();
+      int num3 = pkg.ReadByte();
       for (int j = 0; j < num3; j++)
       {
         int key2 = pkg.ReadInt();
@@ -330,7 +331,7 @@ public class Data : MonoBehaviour
     if ((num & 4) != 0)
     {
       zdo.InitQuats();
-      int num4 = (int)pkg.ReadByte();
+      int num4 = pkg.ReadByte();
       for (int k = 0; k < num4; k++)
       {
         int key3 = pkg.ReadInt();
@@ -344,7 +345,7 @@ public class Data : MonoBehaviour
     if ((num & 8) != 0)
     {
       zdo.InitInts();
-      int num5 = (int)pkg.ReadByte();
+      int num5 = pkg.ReadByte();
       for (int l = 0; l < num5; l++)
       {
         int key4 = pkg.ReadInt();
@@ -358,7 +359,7 @@ public class Data : MonoBehaviour
     if ((num & 64) != 0)
     {
       zdo.InitLongs();
-      int num6 = (int)pkg.ReadByte();
+      int num6 = pkg.ReadByte();
       for (int m = 0; m < num6; m++)
       {
         int key5 = pkg.ReadInt();
@@ -372,7 +373,7 @@ public class Data : MonoBehaviour
     if ((num & 16) != 0)
     {
       zdo.InitStrings();
-      int num7 = (int)pkg.ReadByte();
+      int num7 = pkg.ReadByte();
       for (int n = 0; n < num7; n++)
       {
         int key6 = pkg.ReadInt();
@@ -386,7 +387,7 @@ public class Data : MonoBehaviour
     if ((num & 128) != 0)
     {
       zdo.InitByteArrays();
-      int num8 = (int)pkg.ReadByte();
+      int num8 = pkg.ReadByte();
       for (int num9 = 0; num9 < num8; num9++)
       {
         int key7 = pkg.ReadInt();
@@ -396,37 +397,28 @@ public class Data : MonoBehaviour
     }
     zdo.ReleaseByteArrays();
   }
-  public static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot, Vector3 sc, ZDO? data)
-  {
-    Data.InitZDO(pos, rot, sc, data, prefab);
-    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, rot);
-    Data.CleanGhostInit(obj);
-    return obj;
-  }
   public static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot, ZDO? data)
   {
-    Data.InitZDO(pos, rot, Vector3.one, data, prefab);
-    var obj = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, rot);
-    Data.CleanGhostInit(obj);
+    InitZDO(pos, rot, data, prefab);
+    var obj = Instantiate(prefab, pos, rot);
+    CleanGhostInit(obj);
     return obj;
   }
-  public static void InitZDO(Vector3 pos, Quaternion rot, Vector3 sc, ZDO? data, GameObject obj)
+  public static void InitZDO(Vector3 pos, Quaternion rot, ZDO? data, GameObject obj)
   {
     if (data == null) return;
     if (!obj.TryGetComponent<ZNetView>(out var view)) return;
-    InitZDO(pos, rot, sc, data, view);
+    InitZDO(pos, rot, data, view);
   }
-  public static void InitZDO(Vector3 pos, Quaternion rot, Vector3 sc, ZDO data, ZNetView view)
+  public static void InitZDO(Vector3 pos, Quaternion rot, ZDO data, ZNetView view)
   {
     ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(pos);
-    Data.CopyData(data.Clone(), ZNetView.m_initZDO);
+    CopyData(data.Clone(), ZNetView.m_initZDO);
     ZNetView.m_initZDO.m_rotation = rot;
     ZNetView.m_initZDO.m_type = view.m_type;
     ZNetView.m_initZDO.m_distant = view.m_distant;
     ZNetView.m_initZDO.m_persistent = view.m_persistent;
     ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
-    if (view.m_syncInitialScale && sc != Vector3.one)
-      ZNetView.m_initZDO.Set("scale", sc);
     ZNetView.m_initZDO.m_dataRevision = 1;
   }
   public static void CleanGhostInit(GameObject obj)

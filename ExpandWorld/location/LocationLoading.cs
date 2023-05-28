@@ -310,7 +310,7 @@ public class LocationZDO
   {
     if (!LocationLoading.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
-    if (data != null) Data.InitZDO(pos, rotation, Vector3.one, data, view);
+    if (data != null) Data.InitZDO(pos, rotation, data, view);
   }
 }
 [HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
