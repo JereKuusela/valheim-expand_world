@@ -164,7 +164,7 @@ public class Spawn
     if (swaps.Count == 1)
       return swaps[0].Item2;
     var rng = UnityEngine.Random.value;
-    ExpandWorld.Log.LogDebug($"RandomizeSwap: Roll {Helper.Print(rng)} for {string.Join(", ", swaps.Select(s => s.Item2 + ":" + Helper.Print(s.Item1)))}");
+    //ExpandWorld.Log.LogDebug($"RandomizeSwap: Roll {Helper.Print(rng)} for {string.Join(", ", swaps.Select(s => s.Item2 + ":" + Helper.Print(s.Item1)))}");
     foreach (var swap in swaps)
     {
       rng -= swap.Item1;
@@ -179,7 +179,7 @@ public class Spawn
     if (swaps.Count == 1)
       return swaps[0].Item2;
     var rng = UnityEngine.Random.value;
-    ExpandWorld.Log.LogDebug($"RandomizeData: Roll {Helper.Print(rng)} for weigths {string.Join(", ", swaps.Select(s => Helper.Print(s.Item1)))}");
+    //ExpandWorld.Log.LogDebug($"RandomizeData: Roll {Helper.Print(rng)} for weigths {string.Join(", ", swaps.Select(s => Helper.Print(s.Item1)))}");
     foreach (var swap in swaps)
     {
       rng -= swap.Item1;

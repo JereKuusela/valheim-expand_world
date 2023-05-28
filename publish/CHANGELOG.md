@@ -11,6 +11,7 @@
   - Fixes blueprint object scale values not being read correctly.
   - Removes creator information automatically from blueprints and data values (so that things don't appear player built).
   - Improves the performance of the field `paint` in the `expand_biomes.yaml` file.
+  - Improves the error message for failing blueprints.
   
 - v1.40
   - Adds blueprint dungeons rooms.

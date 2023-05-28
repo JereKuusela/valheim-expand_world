@@ -169,23 +169,33 @@ public class Blueprints
     if (extension == ".blueprint") return GetPlanBuild(bp, rows);
     throw new InvalidOperationException("Unknown file format.");
   }
-  private static Blueprint GetPlanBuild(Blueprint bp, string[] rows)
+  private static Blueprint? GetPlanBuild(Blueprint bp, string[] rows)
   {
     var piece = true;
-    foreach (var row in rows)
+    var currentRow = -1;
+    try
     {
-      if (row.StartsWith("#snappoints", StringComparison.OrdinalIgnoreCase))
-        piece = false;
-      else if (row.StartsWith("#pieces", StringComparison.OrdinalIgnoreCase))
-        piece = true;
-      else if (row.StartsWith("#center:", StringComparison.OrdinalIgnoreCase))
-        bp.CenterPiece = row.Split(':')[1];
-      else if (row.StartsWith("#", StringComparison.Ordinal))
-        continue;
-      else if (piece)
-        bp.Objects.Add(GetPlanBuildObject(row));
-      else
-        bp.SnapPoints.Add(new(GetPlanBuildSnapPoint(row), Quaternion.identity));
+      foreach (var row in rows)
+      {
+        currentRow += 1;
+        if (row.StartsWith("#snappoints", StringComparison.OrdinalIgnoreCase))
+          piece = false;
+        else if (row.StartsWith("#pieces", StringComparison.OrdinalIgnoreCase))
+          piece = true;
+        else if (row.StartsWith("#center:", StringComparison.OrdinalIgnoreCase))
+          bp.CenterPiece = row.Split(':')[1];
+        else if (row.StartsWith("#", StringComparison.Ordinal))
+          continue;
+        else if (piece)
+          bp.Objects.Add(GetPlanBuildObject(row));
+        else
+          bp.SnapPoints.Add(new(GetPlanBuildSnapPoint(row), Quaternion.identity));
+      }
+    }
+    catch
+    {
+      ExpandWorld.Log.LogError($"Failed to load blueprint {bp.Name} at row {currentRow}: {rows[currentRow]}.");
+      return null;
     }
     return bp;
   }
