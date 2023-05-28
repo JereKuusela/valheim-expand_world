@@ -87,7 +87,14 @@ public class Spawner
     if (LocationLoading.LocationData.TryGetValue(LocationName, out var data) && data.dungeon != "")
       dungeonName = data.dungeon;
     Override(__instance, dungeonName);
+    DungeonName = dungeonName;
   }
+  [HarmonyPatch(nameof(DungeonGenerator.Generate), typeof(ZoneSystem.SpawnMode)), HarmonyPostfix]
+  static void GenerateEnd()
+  {
+    DungeonName = "";
+  }
+
 
 
   // The dungeon prefab is only used for generating, so the properties can be just overwritten.

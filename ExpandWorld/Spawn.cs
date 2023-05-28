@@ -7,12 +7,6 @@ using DataOverride = System.Func<ZDO?, string, string, ZDO?>;
 
 namespace ExpandWorld;
 
-public enum SpawnMode
-{
-  GhostDestroy,
-  GhostIgnore
-}
-
 // Most of the custom object spawning should be done here because there are many pitfalls:
 // 1. If custom data is used, ghost init is not used and must be done manually.
 // 2. On ghost spawning mode, created objects must be either stored or instantly destroyed.
@@ -164,7 +158,7 @@ public class Spawn
     if (swaps.Count == 1)
       return swaps[0].Item2;
     var rng = UnityEngine.Random.value;
-    //ExpandWorld.Log.LogDebug($"RandomizeSwap: Roll {Helper.Print(rng)} for {string.Join(", ", swaps.Select(s => s.Item2 + ":" + Helper.Print(s.Item1)))}");
+    ExpandWorld.Log.LogDebug($"RandomizeSwap: Roll {Helper.Print(rng)} for {string.Join(", ", swaps.Select(s => s.Item2 + ":" + Helper.Print(s.Item1)))}");
     foreach (var swap in swaps)
     {
       rng -= swap.Item1;
@@ -179,7 +173,7 @@ public class Spawn
     if (swaps.Count == 1)
       return swaps[0].Item2;
     var rng = UnityEngine.Random.value;
-    //ExpandWorld.Log.LogDebug($"RandomizeData: Roll {Helper.Print(rng)} for weigths {string.Join(", ", swaps.Select(s => Helper.Print(s.Item1)))}");
+    ExpandWorld.Log.LogDebug($"RandomizeData: Roll {Helper.Print(rng)} for weigths {string.Join(", ", swaps.Select(s => Helper.Print(s.Item1)))}");
     foreach (var swap in swaps)
     {
       rng -= swap.Item1;

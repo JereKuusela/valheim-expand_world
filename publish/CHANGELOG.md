@@ -1,3 +1,6 @@
+- v1.42
+  - Fixes custom dungeons not working (for real this time).
+
 - v1.41
   - Adds new fields `bounds`, `objectData` and `objectSwap` to the `expand_dungeons.yaml` file.
   - Adds a new field`objectSwap` to the `expand_rooms.yaml` file.
