@@ -46,7 +46,10 @@ public partial class Loader
     dg.m_perimeterBuffer = data.perimeterBuffer;
     dg.m_useCustomInteriorTransform = data.interiorTransform;
     if (data.objectSwap != null)
+    {
       dg.m_objectSwaps = Spawn.LoadSwaps(data.objectSwap);
+      //ExpandWorld.Log.LogDebug($"Loaded {dg.m_objectSwaps.Count} object swaps for {dg.name}.");
+    }
     if (data.objectData != null)
       dg.m_objectData = Spawn.LoadData(data.objectData);
     return dg;

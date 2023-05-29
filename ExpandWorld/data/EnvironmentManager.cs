@@ -14,47 +14,9 @@ public class EnvironmentManager
   private static Dictionary<string, EnvSetup> Originals = new();
   public static EnvSetup FromData(EnvironmentData data)
   {
-    var env = new EnvSetup
+    EnvSetup env = new()
     {
-      m_psystems = new GameObject[0],
-      m_name = data.name,
-      m_default = data.isDefault,
-      m_isWet = data.isWet,
-      m_isFreezing = data.isFreezing,
-      m_isFreezingAtNight = data.isFreezingAtNight,
-      m_isCold = data.isCold,
-      m_isColdAtNight = data.isColdAtNight,
-      m_alwaysDark = data.alwaysDark,
-      m_ambColorNight = Data.Sanity(data.ambColorNight),
-      m_ambColorDay = Data.Sanity(data.ambColorDay),
-      m_fogColorNight = Data.Sanity(data.fogColorNight),
-      m_fogColorMorning = Data.Sanity(data.fogColorMorning),
-      m_fogColorDay = Data.Sanity(data.fogColorDay),
-      m_fogColorEvening = Data.Sanity(data.fogColorEvening),
-      m_fogColorSunNight = Data.Sanity(data.fogColorSunNight),
-      m_fogColorSunMorning = Data.Sanity(data.fogColorSunMorning),
-      m_fogColorSunDay = Data.Sanity(data.fogColorSunDay),
-      m_fogColorSunEvening = Data.Sanity(data.fogColorSunEvening),
-      m_fogDensityNight = data.fogDensityNight,
-      m_fogDensityMorning = data.fogDensityMorning,
-      m_fogDensityDay = data.fogDensityDay,
-      m_fogDensityEvening = data.fogDensityEvening,
-      m_sunColorNight = Data.Sanity(data.sunColorNight),
-      m_sunColorMorning = Data.Sanity(data.sunColorMorning),
-      m_sunColorDay = Data.Sanity(data.sunColorDay),
-      m_sunColorEvening = Data.Sanity(data.sunColorEvening),
-      m_lightIntensityDay = data.lightIntensityDay,
-      m_lightIntensityNight = data.lightIntensityNight,
-      m_sunAngle = data.sunAngle,
-      m_windMin = data.windMin,
-      m_windMax = data.windMax,
-      m_rainCloudAlpha = data.rainCloudAlpha,
-      m_ambientVol = data.ambientVol,
-      m_ambientList = data.ambientList,
-      m_musicMorning = data.musicMorning,
-      m_musicEvening = data.musicEvening,
-      m_musicDay = data.musicDay,
-      m_musicNight = data.musicNight
+      m_psystems = new GameObject[0]
     };
     if (Originals.TryGetValue(data.particles, out var setup))
       env = setup.Clone();
@@ -62,6 +24,45 @@ public class EnvironmentManager
       env = setup.Clone();
     else
       ExpandWorld.Log.LogWarning($"Failed to find a particle system \"{data.particles}\". Make sure field \"particles\" it set correctly.");
+
+    env.m_name = data.name;
+    env.m_default = data.isDefault;
+    env.m_isWet = data.isWet;
+    env.m_isFreezing = data.isFreezing;
+    env.m_isFreezingAtNight = data.isFreezingAtNight;
+    env.m_isCold = data.isCold;
+    env.m_isColdAtNight = data.isColdAtNight;
+    env.m_alwaysDark = data.alwaysDark;
+    env.m_ambColorNight = Data.Sanity(data.ambColorNight);
+    env.m_ambColorDay = Data.Sanity(data.ambColorDay);
+    env.m_fogColorNight = Data.Sanity(data.fogColorNight);
+    env.m_fogColorMorning = Data.Sanity(data.fogColorMorning);
+    env.m_fogColorDay = Data.Sanity(data.fogColorDay);
+    env.m_fogColorEvening = Data.Sanity(data.fogColorEvening);
+    env.m_fogColorSunNight = Data.Sanity(data.fogColorSunNight);
+    env.m_fogColorSunMorning = Data.Sanity(data.fogColorSunMorning);
+    env.m_fogColorSunDay = Data.Sanity(data.fogColorSunDay);
+    env.m_fogColorSunEvening = Data.Sanity(data.fogColorSunEvening);
+    env.m_fogDensityNight = data.fogDensityNight;
+    env.m_fogDensityMorning = data.fogDensityMorning;
+    env.m_fogDensityDay = data.fogDensityDay;
+    env.m_fogDensityEvening = data.fogDensityEvening;
+    env.m_sunColorNight = Data.Sanity(data.sunColorNight);
+    env.m_sunColorMorning = Data.Sanity(data.sunColorMorning);
+    env.m_sunColorDay = Data.Sanity(data.sunColorDay);
+    env.m_sunColorEvening = Data.Sanity(data.sunColorEvening);
+    env.m_lightIntensityDay = data.lightIntensityDay;
+    env.m_lightIntensityNight = data.lightIntensityNight;
+    env.m_sunAngle = data.sunAngle;
+    env.m_windMin = data.windMin;
+    env.m_windMax = data.windMax;
+    env.m_rainCloudAlpha = data.rainCloudAlpha;
+    env.m_ambientVol = data.ambientVol;
+    env.m_ambientList = data.ambientList;
+    env.m_musicMorning = data.musicMorning;
+    env.m_musicEvening = data.musicEvening;
+    env.m_musicDay = data.musicDay;
+    env.m_musicNight = data.musicNight;
     return env;
   }
   public static EnvironmentData ToData(EnvSetup env)

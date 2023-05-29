@@ -1,5 +1,6 @@
 - v1.42
   - Fixes custom dungeons not working (for real this time).
+  - Fixes custom environments not working.
 
 - v1.41
   - Adds new fields `bounds`, `objectData` and `objectSwap` to the `expand_dungeons.yaml` file.

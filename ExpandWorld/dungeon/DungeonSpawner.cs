@@ -101,6 +101,7 @@ public class Spawner
   public static void Override(DungeonGenerator dg, string name)
   {
     if (!Generators.TryGetValue(name, out var data)) return;
+    //ExpandWorld.Log.LogDebug($"Overriding with dungeon {name}.");
     dg.name = name;
     dg.m_algorithm = data.m_algorithm;
     dg.m_zoneSize = data.m_zoneSize;

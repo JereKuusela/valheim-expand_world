@@ -29,7 +29,7 @@ public partial class Loader
       .Select(loc => loc.m_prefab ? loc.m_prefab.GetComponentInChildren<DungeonGenerator>() : null!)
       .Where(dg => dg != null)
       .Distinct(new DgComparer()).ToList();
-    var yaml = global::ExpandWorld.Data.Serializer().Serialize(dgs.Select(To).ToList());
+    var yaml = Data.Serializer().Serialize(dgs.Select(To).ToList());
     File.WriteAllText(FilePath, yaml);
   }
 

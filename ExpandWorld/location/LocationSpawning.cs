@@ -21,7 +21,7 @@ public class LocationSpawning
       if (!LocationLoading.ObjectData.TryGetValue(location, out var objectData)) return null;
       if (!objectData.TryGetValue(prefab, out var data)) return null;
       zdo = Spawn.RandomizeData(data);
-      ExpandWorld.Log.LogDebug($"Replaced data for {prefab} in {location}");
+      //ExpandWorld.Log.LogDebug($"Replaced data for {prefab} in {location}");
     }
     if (zdo == null) return null;
     return RemoveHealth(zdo, location);
@@ -46,7 +46,7 @@ public class LocationSpawning
   public static void CustomObjects(ZoneSystem.ZoneLocation location, Vector3 pos, Quaternion rot, List<GameObject> spawnedGhostObjects)
   {
     if (!LocationLoading.Objects.TryGetValue(location.m_prefabName, out var objects)) return;
-    ExpandWorld.Log.LogDebug($"Spawning {objects.Count} custom objects in {location.m_prefabName}");
+    //ExpandWorld.Log.LogDebug($"Spawning {objects.Count} custom objects in {location.m_prefabName}");
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && Random.value > obj.Chance) continue;
