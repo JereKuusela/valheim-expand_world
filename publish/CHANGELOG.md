@@ -1,3 +1,6 @@
+- v1.43
+  - Fixes dungeon environment boxes being scaled way too big.
+
 - v1.42
   - Fixes custom dungeons not working (for real this time).
   - Fixes custom environments not working.

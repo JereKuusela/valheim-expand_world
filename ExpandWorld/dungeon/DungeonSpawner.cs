@@ -156,10 +156,10 @@ public class EnvironmentBox
     // Don't shrink from the default so that people can build there more easily.
     // Otherwise for small dungeons the box would be very small.
     var origSize = envZone.transform.localScale;
-    // Also leave some margins just in case so that the box doesn't clip through the walls.
-    size.x = Mathf.Max(size.x + 10f, origSize.x);
-    size.y = Mathf.Max(size.y + 10f, origSize.y);
-    size.z = Mathf.Max(size.z + 10f, origSize.z);
+    size.x = Mathf.Max(size.x, origSize.x);
+    size.y = Mathf.Max(size.y, origSize.y);
+    size.z = Mathf.Max(size.z, origSize.z);
+    ExpandWorld.Log.LogDebug($"Scaling environment box for {loc.name} from {origSize} to {size}.");
     envZone.transform.localScale = size;
   }
 
@@ -168,12 +168,22 @@ public class EnvironmentBox
   {
     var pos = __instance.transform.position;
     var zone = ZoneSystem.instance.GetZone(pos);
-    var colliders = __instance.GetComponentsInChildren<Collider>();
-    Bounds bounds = new();
-    foreach (var collider in colliders)
-      bounds.Encapsulate(collider.bounds);
-    var size = bounds.size;
-    Cache[zone] = size;
+    var zonePos = ZoneSystem.instance.GetZonePos(zone);
+    var colliders = __instance.GetComponentsInChildren<Room>().SelectMany(room => room.GetComponentsInChildren<Collider>()).ToList();
+    Bounds bounds = new()
+    {
+      center = zonePos
+    };
+    foreach (var c in colliders)
+      bounds.Encapsulate(c.bounds);
+    // Bounds doesn't keep the center point, so manually calculate the biggest size.
+    var offset = bounds.center - zonePos;
+    var extents = Vector3.zero;
+    extents.x = Mathf.Max(Mathf.Abs(offset.x + bounds.extents.x), Mathf.Abs(offset.x - bounds.extents.x));
+    extents.y = Mathf.Max(Mathf.Abs(offset.y + bounds.extents.y), Mathf.Abs(offset.y - bounds.extents.y));
+    extents.z = Mathf.Max(Mathf.Abs(offset.z + bounds.extents.z), Mathf.Abs(offset.z - bounds.extents.z));
+    ExpandWorld.Log.LogDebug($"Bounds for {__instance.name} are {bounds.center} {bounds.extents} {zonePos}.");
+    Cache[zone] = 2 * extents;
     var locsInZone = Location.m_allLocations.Where(loc => ZoneSystem.instance.GetZone(loc.transform.position) == zone).ToArray();
     foreach (var loc in locsInZone)
       TryScale(loc);

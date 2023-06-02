@@ -60,7 +60,7 @@ public partial class Loader
     {
       name = Utils.GetPrefabName(dg.gameObject),
       algorithm = dg.m_algorithm.ToString(),
-      themes = global::ExpandWorld.Data.FromEnum(dg.m_themes),
+      themes = Data.FromEnum(dg.m_themes),
       interiorTransform = dg.m_useCustomInteriorTransform
     };
     if (dg.m_zoneSize.x == dg.m_zoneSize.y && dg.m_zoneSize.y == dg.m_zoneSize.z)
