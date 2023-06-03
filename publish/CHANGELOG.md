@@ -1,3 +1,6 @@
+- v1.44
+  - Fixes dungeon environment boxes being scaled way too big (for real this time).
+
 - v1.43
   - Fixes dungeon environment boxes being scaled way too big.
 

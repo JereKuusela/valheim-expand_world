@@ -159,7 +159,7 @@ public class EnvironmentBox
     size.x = Mathf.Max(size.x, origSize.x);
     size.y = Mathf.Max(size.y, origSize.y);
     size.z = Mathf.Max(size.z, origSize.z);
-    ExpandWorld.Log.LogDebug($"Scaling environment box for {loc.name} from {origSize} to {size}.");
+    // ExpandWorld.Log.LogDebug($"Scaling environment box for {loc.name} from {origSize} to {size}.");
     envZone.transform.localScale = size;
   }
 
@@ -168,21 +168,23 @@ public class EnvironmentBox
   {
     var pos = __instance.transform.position;
     var zone = ZoneSystem.instance.GetZone(pos);
-    var zonePos = ZoneSystem.instance.GetZonePos(zone);
-    var colliders = __instance.GetComponentsInChildren<Room>().SelectMany(room => room.GetComponentsInChildren<Collider>()).ToList();
+    var center = ZoneSystem.instance.GetZonePos(zone) with { y = pos.y };
+    var colliders = __instance.GetComponentsInChildren<Room>().SelectMany(room => room.GetComponentsInChildren<BoxCollider>()).ToList();
     Bounds bounds = new()
     {
-      center = zonePos
+      center = center,
     };
     foreach (var c in colliders)
       bounds.Encapsulate(c.bounds);
     // Bounds doesn't keep the center point, so manually calculate the biggest size.
-    var offset = bounds.center - zonePos;
+    var offset = bounds.center - center;
     var extents = Vector3.zero;
-    extents.x = Mathf.Max(Mathf.Abs(offset.x + bounds.extents.x), Mathf.Abs(offset.x - bounds.extents.x));
-    extents.y = Mathf.Max(Mathf.Abs(offset.y + bounds.extents.y), Mathf.Abs(offset.y - bounds.extents.y));
-    extents.z = Mathf.Max(Mathf.Abs(offset.z + bounds.extents.z), Mathf.Abs(offset.z - bounds.extents.z));
-    ExpandWorld.Log.LogDebug($"Bounds for {__instance.name} are {bounds.center} {bounds.extents} {zonePos}.");
+    // Vanilla mountain caves seemed to overflow a bit, so make the box smaller to reduce chance of dungeons clipping.
+    var tweak = -1f;
+    extents.x = Mathf.Max(Mathf.Abs(offset.x + bounds.extents.x) + tweak, Mathf.Abs(offset.x - bounds.extents.x) + tweak);
+    extents.y = Mathf.Max(Mathf.Abs(offset.y + bounds.extents.y) + tweak, Mathf.Abs(offset.y - bounds.extents.y) + tweak);
+    extents.z = Mathf.Max(Mathf.Abs(offset.z + bounds.extents.z) + tweak, Mathf.Abs(offset.z - bounds.extents.z) + tweak);
+    // ExpandWorld.Log.LogDebug($"Bounds for {__instance.name} are {bounds.center} {bounds.extents} {center}.");
     Cache[zone] = 2 * extents;
     var locsInZone = Location.m_allLocations.Where(loc => ZoneSystem.instance.GetZone(loc.transform.position) == zone).ToArray();
     foreach (var loc in locsInZone)
