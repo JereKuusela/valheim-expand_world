@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -60,7 +61,7 @@ public class BiomeManager
   {
     var biome = new BiomeEnvSetup
     {
-      m_biome = Data.ToBiomes(data.biome),
+      m_biome = DataManager.ToBiomes(data.biome),
       m_environments = data.environments.Select(FromData).ToList(),
       m_musicMorning = data.musicMorning,
       m_musicEvening = data.musicEvening,
@@ -73,7 +74,7 @@ public class BiomeManager
   {
     BiomeData data = new()
     {
-      biome = Data.FromBiomes(biome.m_biome),
+      biome = DataManager.FromBiomes(biome.m_biome),
       environments = biome.m_environments.Select(ToData).ToArray(),
       musicMorning = biome.m_musicMorning,
       musicEvening = biome.m_musicEvening,
@@ -91,20 +92,20 @@ public class BiomeManager
   {
     if (!Helper.IsServer() || !Configuration.DataBiome) return;
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataBiome ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataBiome ? DataManager.Read(Pattern) : "";
     Configuration.valueBiomeData.Value = yaml;
     Set(yaml);
   }
   public static void NamesFromFile()
   {
     if (!Configuration.DataBiome) return;
-    LoadNames(Data.Read(Pattern));
+    LoadNames(DataManager.Read(Pattern));
   }
   public static void FromSetting(string yaml)
   {
@@ -119,7 +120,7 @@ public class BiomeManager
     {
       try
       {
-        rawData = Data.Deserialize<BiomeData>(yaml, FileName);
+        rawData = DataManager.Deserialize<BiomeData>(yaml, FileName);
       }
       catch (Exception e)
       {
@@ -164,7 +165,8 @@ public class BiomeManager
     BiomeToColor.Clear();
     NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
-    var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
+    var biomeNumber = (int)Heightmap.Biome.Mistlands * 2;
+    var index = 10;
     foreach (var item in rawData)
     {
       var biome = (Heightmap.Biome)biomeNumber;
@@ -174,8 +176,8 @@ public class BiomeManager
         isDefaultBiome = true;
         biome = defaultBiome;
       }
-      Data.Sanity(ref item.mapColor);
-      Data.Sanity(ref item.color);
+      DataManager.Sanity(ref item.mapColor);
+      DataManager.Sanity(ref item.color);
       if (!BiomeToDisplayName.ContainsKey(biome))
         BiomeToDisplayName[biome] = item.biome;
       if (item.name != "" || !isDefaultBiome)
@@ -189,6 +191,8 @@ public class BiomeManager
         BiomeToData[biome] = item;
         continue;
       }
+      Heightmap.s_biomeToIndex[biome] = index;
+      index += 1;
       NameToBiome.Add(item.biome.ToLower(), biome);
       BiomeToData[biome] = item;
       if (item.paint != "") BiomeToColor[biome] = Terrain.ParsePaint(item.paint);
@@ -208,9 +212,13 @@ public class BiomeManager
         return terrain;
       return GetBiome(data.biome);
     });
-    // This is not used because base game code is overriden (low performance).
-    // But better still set as a failsafe.
-    Heightmap.tempBiomeWeights = new float[biomeNumber / 2 + 1];
+    var indexToBiome = BiomeToData.Keys.ToArray();
+    Dictionary<Heightmap.Biome, int> biomeToIndex = new();
+    for (int i = 0; i < indexToBiome.Length; i++)
+      biomeToIndex[indexToBiome[i]] = i;
+    typeof(Heightmap).GetField(nameof(Heightmap.s_indexToBiome), BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, indexToBiome);
+    typeof(Heightmap).GetField(nameof(Heightmap.s_tempBiomeWeights), BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, new float[indexToBiome.Length]);
+    typeof(Heightmap).GetField(nameof(Heightmap.s_biomeToIndex), BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, biomeToIndex);
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
     Environments = rawData.Select(FromData).ToList();
     // This tracks if content (environments) have been loaded.
@@ -246,6 +254,6 @@ public class BiomeManager
       if (ZNet.m_instance == null) NamesFromFile();
       else FromFile();
     };
-    Data.SetupWatcher(Pattern, callback);
+    DataManager.SetupWatcher(Pattern, callback);
   }
 }

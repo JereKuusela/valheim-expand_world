@@ -29,7 +29,7 @@ public partial class Loader
     {
       m_chance = type.chance,
       m_connectionType = type.connectionType,
-      m_prefab = Data.ToPrefab(type.prefab)
+      m_prefab = DataManager.ToPrefab(type.prefab)
     }).ToList();
     dg.m_maxRooms = data.maxRooms;
     dg.m_minRooms = data.minRooms;
@@ -38,7 +38,7 @@ public partial class Loader
     dg.m_minRequiredRooms = data.minRequiredRooms;
     dg.m_excludedRooms = RoomLoading.ParseRooms(data.excludedRooms).ToHashSet();
     dg.m_requiredRooms = RoomLoading.ParseRooms(data.requiredRooms);
-    dg.m_themes = Data.ToList(data.themes);
+    dg.m_themes = DataManager.ToList(data.themes);
     dg.m_tileWidth = data.tileWidth;
     dg.m_spawnChance = data.spawnChance;
     dg.m_gridSize = data.gridSize;
@@ -60,7 +60,7 @@ public partial class Loader
     {
       name = Utils.GetPrefabName(dg.gameObject),
       algorithm = dg.m_algorithm.ToString(),
-      themes = Data.FromEnum(dg.m_themes),
+      themes = DataManager.FromEnum(dg.m_themes),
       interiorTransform = dg.m_useCustomInteriorTransform
     };
     if (dg.m_zoneSize.x == dg.m_zoneSize.y && dg.m_zoneSize.y == dg.m_zoneSize.z)
@@ -79,7 +79,7 @@ public partial class Loader
       data.maxRooms = dg.m_maxRooms;
       data.minRequiredRooms = dg.m_minRequiredRooms;
       data.minRooms = dg.m_minRooms;
-      data.requiredRooms = global::ExpandWorld.Data.FromList(dg.m_requiredRooms);
+      data.requiredRooms = global::ExpandWorld.DataManager.FromList(dg.m_requiredRooms);
       data.roomWeights = dg.m_alternativeFunctionality;
     }
     if (dg.m_algorithm == DungeonGenerator.Algorithm.CampRadial)

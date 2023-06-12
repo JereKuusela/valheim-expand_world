@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using BepInEx;
 using HarmonyLib;
+using Service;
 using UnityEngine;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
@@ -94,9 +95,9 @@ public class HandleSpawnData
 [HarmonyPatch(typeof(SpawnSystem), nameof(SpawnSystem.UpdateSpawning))]
 public class Spawn_WaitForConfigSync
 {
-  static bool Prefix() => Data.IsReady;
+  static bool Prefix() => DataManager.IsReady;
 }
-public class Data : MonoBehaviour
+public class DataManager : MonoBehaviour
 {
   public static bool IsReady => ExpandWorld.ConfigSync.IsSourceOfTruth || ExpandWorld.ConfigSync.InitialSyncDone;
 
@@ -168,15 +169,9 @@ public class Data : MonoBehaviour
 
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
   public static List<string> ToList(string str, bool removeEmpty = true) => Parse.Split(str, removeEmpty).ToList();
+  public static int[] ToHashList(string str, bool removeEmpty = true) => Parse.Split(str, removeEmpty).Select(s => s.ToLowerInvariant().GetStableHashCode()).ToArray();
   public static Dictionary<string, string> ToDict(string str) => ToList(str).Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0].Trim(), s => s[1].Trim());
-  public static ZDO? ToZDO(string data)
-  {
-    if (data == "") return null;
-    ZPackage pkg = new(data);
-    ZDO zdo = new();
-    Data.Deserialize(zdo, pkg);
-    return zdo;
-  }
+  public static ZPackage? Deserialize(string data) => data == "" ? null : new(data);
   public static string FromBiomes(Heightmap.Biome biome)
   {
     // Unused biome.
@@ -278,149 +273,16 @@ public class Data : MonoBehaviour
       ExpandWorld.Log.LogWarning($"Prefab {str} not found!");
     return null;
   }
-  // Users very easily might have creator on their blueprints or copied data.
-  // This causes enemies to attack them because they are considered player built.
-  // So far no reason to keep this data.
-  private static readonly int CreatorHash = "creator".GetStableHashCode();
 
-  public static void CopyData(ZDO from, ZDO to)
+  public static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot, ZPackage? data)
   {
-    to.m_floats = from.m_floats;
-    to.m_vec3 = from.m_vec3;
-    to.m_quats = from.m_quats;
-    to.m_ints = from.m_ints;
-    to.m_longs = from.m_longs;
-    to.m_strings = from.m_strings;
-    to.m_byteArrays = from.m_byteArrays;
-    to.m_longs?.Remove(CreatorHash);
-    to.IncreseDataRevision();
-  }
-
-
-  public static void Deserialize(ZDO zdo, ZPackage pkg)
-  {
-    int num = pkg.ReadInt();
-    if ((num & 1) != 0)
-    {
-      zdo.InitFloats();
-      int num2 = pkg.ReadByte();
-      for (int i = 0; i < num2; i++)
-      {
-        int key = pkg.ReadInt();
-        zdo.m_floats[key] = pkg.ReadSingle();
-      }
-    }
-    else
-    {
-      zdo.ReleaseFloats();
-    }
-    if ((num & 2) != 0)
-    {
-      zdo.InitVec3();
-      int num3 = pkg.ReadByte();
-      for (int j = 0; j < num3; j++)
-      {
-        int key2 = pkg.ReadInt();
-        zdo.m_vec3[key2] = pkg.ReadVector3();
-      }
-    }
-    else
-    {
-      zdo.ReleaseVec3();
-    }
-    if ((num & 4) != 0)
-    {
-      zdo.InitQuats();
-      int num4 = pkg.ReadByte();
-      for (int k = 0; k < num4; k++)
-      {
-        int key3 = pkg.ReadInt();
-        zdo.m_quats[key3] = pkg.ReadQuaternion();
-      }
-    }
-    else
-    {
-      zdo.ReleaseQuats();
-    }
-    if ((num & 8) != 0)
-    {
-      zdo.InitInts();
-      int num5 = pkg.ReadByte();
-      for (int l = 0; l < num5; l++)
-      {
-        int key4 = pkg.ReadInt();
-        zdo.m_ints[key4] = pkg.ReadInt();
-      }
-    }
-    else
-    {
-      zdo.ReleaseInts();
-    }
-    if ((num & 64) != 0)
-    {
-      zdo.InitLongs();
-      int num6 = pkg.ReadByte();
-      for (int m = 0; m < num6; m++)
-      {
-        int key5 = pkg.ReadInt();
-        zdo.m_longs[key5] = pkg.ReadLong();
-      }
-    }
-    else
-    {
-      zdo.ReleaseLongs();
-    }
-    if ((num & 16) != 0)
-    {
-      zdo.InitStrings();
-      int num7 = pkg.ReadByte();
-      for (int n = 0; n < num7; n++)
-      {
-        int key6 = pkg.ReadInt();
-        zdo.m_strings[key6] = pkg.ReadString();
-      }
-    }
-    else
-    {
-      zdo.ReleaseStrings();
-    }
-    if ((num & 128) != 0)
-    {
-      zdo.InitByteArrays();
-      int num8 = pkg.ReadByte();
-      for (int num9 = 0; num9 < num8; num9++)
-      {
-        int key7 = pkg.ReadInt();
-        zdo.m_byteArrays[key7] = pkg.ReadByteArray();
-      }
-      return;
-    }
-    zdo.ReleaseByteArrays();
-  }
-  public static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot, ZDO? data)
-  {
-    InitZDO(pos, rot, data, prefab);
+    var zdo = DataHelper.InitZDO(pos, rot, null, data, prefab);
+    zdo?.RemoveLong(ZDOVars.s_creator);
     var obj = Instantiate(prefab, pos, rot);
     CleanGhostInit(obj);
     return obj;
   }
-  public static void InitZDO(Vector3 pos, Quaternion rot, ZDO? data, GameObject obj)
-  {
-    if (data == null) return;
-    if (!obj.TryGetComponent<ZNetView>(out var view)) return;
-    InitZDO(pos, rot, data, view);
-  }
-  public static void InitZDO(Vector3 pos, Quaternion rot, ZDO data, ZNetView view)
-  {
-    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(pos);
-    CopyData(data.Clone(), ZNetView.m_initZDO);
-    ZNetView.m_initZDO.m_rotation = rot;
-    ZNetView.m_initZDO.m_type = view.m_type;
-    ZNetView.m_initZDO.m_distant = view.m_distant;
-    ZNetView.m_initZDO.m_persistent = view.m_persistent;
-    ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
-    ZNetView.m_initZDO.m_dataRevision = 1;
-  }
+
   public static void CleanGhostInit(GameObject obj)
   {
     if (ZNetView.m_ghostInit) CleanGhostInit(obj.GetComponent<ZNetView>());

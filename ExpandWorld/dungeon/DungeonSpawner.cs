@@ -32,21 +32,21 @@ public class Spawner
     return prefab;
   }
 
-  private static ZDO? DataDungeonOverride(ZDO? zdo, string dungeon, string prefab)
+  private static ZPackage? DataDungeonOverride(ZPackage? pgk, string dungeon, string prefab)
   {
-    if (zdo != null) return zdo;
+    if (pgk != null) return pgk;
     if (!Generators.TryGetValue(dungeon, out var gen)) return null;
     if (!gen.m_objectData.TryGetValue(prefab, out var data)) return null;
     return Spawn.RandomizeData(data);
   }
-  public static ZDO? DataOverride(ZDO? zdo, string dungeonRoom, string prefab)
+  public static ZPackage? DataOverride(ZPackage? pgk, string dungeonRoom, string prefab)
   {
-    if (zdo != null) return zdo;
+    if (pgk != null) return pgk;
     var split = dungeonRoom.Split('|');
     if (split.Length > 1)
-      zdo = RoomSpawning.DataOverride(zdo, split[1], prefab);
-    if (zdo != null) return zdo;
-    return DataDungeonOverride(zdo, split[0], prefab);
+      pgk = RoomSpawning.DataOverride(pgk, split[1], prefab);
+    if (pgk != null) return pgk;
+    return DataDungeonOverride(pgk, split[0], prefab);
   }
 
   ///<summary>Implements object data and swapping from location data.</summary>
@@ -116,7 +116,7 @@ public class Spawner
     dg.m_minAltitude = data.m_minAltitude;
     dg.m_minRequiredRooms = data.m_minRequiredRooms;
     dg.m_requiredRooms = data.m_requiredRooms;
-    dg.m_themes = Data.ToEnum<Room.Theme>(data.m_themes);
+    dg.m_themes = DataManager.ToEnum<Room.Theme>(data.m_themes);
     dg.m_gridSize = data.m_gridSize;
     dg.m_tileWidth = data.m_tileWidth;
     dg.m_spawnChance = data.m_spawnChance;

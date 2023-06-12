@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
+using Service;
 using UnityEngine;
 namespace ExpandWorld;
 
@@ -12,9 +13,9 @@ public class LocationLoading
   public static string FileName = "expand_locations.yaml";
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_locations*.yaml";
-  public static Dictionary<string, ZDO?> ZDO = new();
+  public static Dictionary<string, ZPackage?> ZDO = new();
   public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
-  public static Dictionary<string, Dictionary<string, List<Tuple<float, ZDO?>>>> ObjectData = new();
+  public static Dictionary<string, Dictionary<string, List<Tuple<float, ZPackage?>>>> ObjectData = new();
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, LocationData> LocationData = new();
   public static Dictionary<string, string> Dungeons = new();
@@ -31,7 +32,7 @@ public class LocationLoading
     }
 
     if (data.data != "")
-      ZDO[data.prefab] = Data.ToZDO(data.data);
+      ZDO[data.prefab] = DataManager.Deserialize(data.data);
     if (data.dungeon != "")
       Dungeons[data.prefab] = data.dungeon;
     if (data.objectSwap != null)
@@ -42,8 +43,8 @@ public class LocationLoading
       Objects[data.prefab] = Parse.Objects(data.objects);
 
     loc.m_enable = data.enabled;
-    loc.m_biome = Data.ToBiomes(data.biome);
-    loc.m_biomeArea = Data.ToBiomeAreas(data.biomeArea);
+    loc.m_biome = DataManager.ToBiomes(data.biome);
+    loc.m_biomeArea = DataManager.ToBiomeAreas(data.biomeArea);
     loc.m_quantity = data.quantity;
     loc.m_prioritized = data.prioritized;
     loc.m_centerFirst = data.centerFirst;
@@ -76,8 +77,8 @@ public class LocationLoading
       data = existing;
     data.prefab = loc.m_prefabName;
     data.enabled = loc.m_enable;
-    data.biome = Data.FromBiomes(loc.m_biome);
-    data.biomeArea = Data.FromBiomeAreas(loc.m_biomeArea);
+    data.biome = DataManager.FromBiomes(loc.m_biome);
+    data.biomeArea = DataManager.FromBiomeAreas(loc.m_biomeArea);
     data.quantity = loc.m_quantity;
     data.prioritized = loc.m_prioritized;
     data.centerFirst = loc.m_centerFirst;
@@ -119,7 +120,7 @@ public class LocationLoading
   private static void ToFile()
   {
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(ZoneSystem.instance.m_locations.Where(IsValid).Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void Initialize()
@@ -213,18 +214,18 @@ public class LocationLoading
     foreach (var item in missing)
       ExpandWorld.Log.LogWarning(item);
     var yaml = File.ReadAllText(FilePath);
-    var data = Data.Deserialize<LocationData>(yaml, FileName).ToList();
+    var data = DataManager.Deserialize<LocationData>(yaml, FileName).ToList();
     data.AddRange(missing.Select(ToData));
     // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
+    File.WriteAllText(FilePath, DataManager.Serializer().Serialize(data));
     return true;
   }
   private static List<ZoneSystem.ZoneLocation> FromFile()
   {
     try
     {
-      var yaml = Data.Read(Pattern);
-      return Data.Deserialize<LocationData>(yaml, FileName).Select(FromData)
+      var yaml = DataManager.Read(Pattern);
+      return DataManager.Deserialize<LocationData>(yaml, FileName).Select(FromData)
         .Where(loc => loc.m_prefabName != "").ToList();
     }
     catch (Exception e)
@@ -300,7 +301,7 @@ public class LocationLoading
 
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, Load);
+    DataManager.SetupWatcher(Pattern, Load);
   }
 }
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.CreateLocationProxy))]
@@ -310,7 +311,7 @@ public class LocationZDO
   {
     if (!LocationLoading.ZDO.TryGetValue(location.m_prefabName, out var data)) return;
     if (!__instance.m_locationProxyPrefab.TryGetComponent<ZNetView>(out var view)) return;
-    if (data != null) Data.InitZDO(pos, rotation, data, view);
+    if (data != null) DataHelper.InitZDO(pos, rotation, null, data, view);
   }
 }
 [HarmonyPatch(typeof(LocationProxy), nameof(LocationProxy.SetLocation))]
@@ -321,7 +322,7 @@ public class FixGhostInit
     if (ZNetView.m_ghostInit)
     {
       spawnNow = false;
-      Data.CleanGhostInit(__instance.m_nview);
+      DataManager.CleanGhostInit(__instance.m_nview);
     }
   }
 }
@@ -336,6 +337,7 @@ public class LocationObjectDataAndSwap
     var flag = loc && loc.m_useCustomInteriorTransform && loc.m_interiorTransform && loc.m_generator;
     if (flag)
       Spawn.DungeonGeneratorPos = location.m_generatorPosition;
+    Spawn.IgnoreHealth = location.m_location.m_applyRandomDamage;
     Dungeon.Spawner.LocationName = "";
     if (mode != ZoneSystem.SpawnMode.Client)
     {
@@ -380,6 +382,7 @@ public class LocationObjectDataAndSwap
     }
     Dungeon.Spawner.LocationName = "";
     Spawn.DungeonGeneratorPos = null;
+    Spawn.IgnoreHealth = false;
   }
 
   static void HandleTerrain(Vector3 pos, float radius, bool isBlueprint, LocationData data)

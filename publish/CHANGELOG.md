@@ -1,3 +1,7 @@
+- v1.45
+  - Adds new fields `requiredGlobalKey` and `forbiddenGlobalKey` to the `expand_vegetation.yaml` file.
+  - Updated for the new game version.
+
 - v1.44
   - Fixes dungeon environment boxes being scaled way too big (for real this time).
 

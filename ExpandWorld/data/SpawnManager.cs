@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HarmonyLib;
+using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -17,10 +18,10 @@ public class SpawnManager
   {
     var spawn = new SpawnSystem.SpawnData
     {
-      m_prefab = Data.ToPrefab(data.prefab),
+      m_prefab = DataManager.ToPrefab(data.prefab),
       m_enabled = data.enabled,
-      m_biome = Data.ToBiomes(data.biome),
-      m_biomeArea = Data.ToBiomeAreas(data.biomeArea),
+      m_biome = DataManager.ToBiomes(data.biome),
+      m_biomeArea = DataManager.ToBiomeAreas(data.biomeArea),
       m_maxSpawned = data.maxSpawned,
       m_spawnInterval = data.spawnInterval,
       m_spawnChance = data.spawnChance,
@@ -28,7 +29,7 @@ public class SpawnManager
       m_spawnRadiusMin = data.spawnRadiusMin,
       m_spawnRadiusMax = data.spawnRadiusMax,
       m_requiredGlobalKey = data.requiredGlobalKey,
-      m_requiredEnvironments = Data.ToList(data.requiredEnvironments),
+      m_requiredEnvironments = DataManager.ToList(data.requiredEnvironments),
       m_groupSizeMin = data.groupSizeMin,
       m_groupSizeMax = data.groupSizeMax,
       m_spawnAtDay = data.spawnAtDay,
@@ -53,10 +54,7 @@ public class SpawnManager
       spawn.m_minAltitude = spawn.m_maxAltitude > 0f ? 0f : -1000f;
     if (data.data != "")
     {
-      ZPackage pkg = new(data.data);
-      ZDO zdo = new();
-      Data.Deserialize(zdo, pkg);
-      ZDO[spawn] = zdo;
+      ZDO[spawn] = DataManager.Deserialize(data.data);
     }
     if (data.objects != null)
     {
@@ -65,7 +63,7 @@ public class SpawnManager
         Parse.VectorXZY(split, 1),
         Quaternion.identity,
         Vector3.one,
-        Data.ToZDO(split.Length > 5 ? split[5] : ""),
+        DataManager.Deserialize(split.Length > 5 ? split[5] : ""),
         Parse.Float(split, 4, 1f)
       )).ToList();
     }
@@ -77,8 +75,8 @@ public class SpawnManager
     {
       prefab = spawn.m_prefab.name,
       enabled = spawn.m_enabled,
-      biome = Data.FromBiomes(spawn.m_biome),
-      biomeArea = Data.FromBiomeAreas(spawn.m_biomeArea),
+      biome = DataManager.FromBiomes(spawn.m_biome),
+      biomeArea = DataManager.FromBiomeAreas(spawn.m_biomeArea),
       maxSpawned = spawn.m_maxSpawned,
       spawnInterval = spawn.m_spawnInterval,
       spawnChance = spawn.m_spawnChance,
@@ -86,7 +84,7 @@ public class SpawnManager
       spawnRadiusMin = spawn.m_spawnRadiusMin,
       spawnRadiusMax = spawn.m_spawnRadiusMax,
       requiredGlobalKey = spawn.m_requiredGlobalKey,
-      requiredEnvironments = Data.FromList(spawn.m_requiredEnvironments),
+      requiredEnvironments = DataManager.FromList(spawn.m_requiredEnvironments),
       spawnAtDay = spawn.m_spawnAtDay,
       spawnAtNight = spawn.m_spawnAtNight,
       groupSizeMin = spawn.m_groupSizeMin,
@@ -115,7 +113,7 @@ public class SpawnManager
     var spawnSystem = SpawnSystem.m_instances.FirstOrDefault();
     if (spawnSystem == null) return "";
     var spawns = spawnSystem.m_spawnLists.SelectMany(s => s.m_spawners);
-    var yaml = Data.Serializer().Serialize(spawns.Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(spawns.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
     return yaml;
   }
@@ -129,7 +127,7 @@ public class SpawnManager
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataSpawns ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataSpawns ? DataManager.Read(Pattern) : "";
     Configuration.valueSpawnData.Value = yaml;
     Set(yaml);
   }
@@ -145,7 +143,7 @@ public class SpawnManager
     if (yaml == "" || !Configuration.DataSpawns) return;
     try
     {
-      var data = Data.Deserialize<SpawnData>(yaml, FileName)
+      var data = DataManager.Deserialize<SpawnData>(yaml, FileName)
         .Select(FromData).Where(IsValid).ToList();
       if (data.Count == 0)
       {
@@ -168,10 +166,10 @@ public class SpawnManager
   }
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, FromFile);
+    DataManager.SetupWatcher(Pattern, FromFile);
   }
 
-  public static Dictionary<SpawnSystem.SpawnData, ZDO> ZDO = new();
+  public static Dictionary<SpawnSystem.SpawnData, ZPackage?> ZDO = new();
 
 }
 
@@ -183,21 +181,14 @@ public class SpawnZDO
   {
     if (!SpawnManager.ZDO.TryGetValue(critter, out var data)) return;
     if (!critter.m_prefab.TryGetComponent<ZNetView>(out var view)) return;
-    ZNetView.m_initZDO = ZDOMan.instance.CreateNewZDO(spawnPoint);
-    Data.CopyData(data.Clone(), ZNetView.m_initZDO);
-    ZNetView.m_initZDO.m_rotation = Quaternion.identity;
-    ZNetView.m_initZDO.m_type = view.m_type;
-    ZNetView.m_initZDO.m_distant = view.m_distant;
-    ZNetView.m_initZDO.m_persistent = view.m_persistent;
-    ZNetView.m_initZDO.m_prefab = view.GetPrefabName().GetStableHashCode();
-    ZNetView.m_initZDO.m_dataRevision = 1;
+    DataHelper.InitZDO(spawnPoint, Quaternion.identity, null, data, view);
   }
 
   private static string PrefabOverride(string dummy, string prefab)
   {
     return prefab;
   }
-  static ZDO? DataOverride(ZDO? zdo, string source, string prefab) => zdo;
+  static ZPackage? DataOverride(ZPackage? pgk, string source, string prefab) => pgk;
   static void Postfix(SpawnSystem.SpawnData critter, Vector3 spawnPoint)
   {
     if (!SpawnManager.Objects.TryGetValue(critter, out var objects)) return;

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Service;
 using UnityEngine;
 
-using DataOverride = System.Func<ZDO?, string, string, ZDO?>;
+using DataOverride = System.Func<ZPackage?, string, string, ZPackage?>;
 
 namespace ExpandWorld;
 
@@ -27,11 +28,18 @@ public class Spawn
       BPO(source, obj, pos, rot, dataOverride, prefabOverride, spawned);
     }
   }
-  private static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, ZDO? data = null)
+  private static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3? scale, ZPackage? data = null)
   {
     if (data == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
-    Data.InitZDO(position, rotation, data, view);
+    var zdo = DataHelper.InitZDO(position, rotation, scale, data, view);
+    // Users very easily might have creator on their blueprints or copied data.
+    // This causes enemies to attack them because they are considered player built.
+    // So far no reason to keep this data.
+    ZNetView.m_initZDO.RemoveLong(ZDOVars.s_creator);
+    // For random damage, health is not needed.
+    if (IgnoreHealth)
+      zdo?.RemoveFloat(ZDOVars.s_health);
   }
 
   // Spawning a object should support following scenarions:
@@ -80,11 +88,11 @@ public class Spawn
       return null;
     }
     var data = dataOverride(obj.Data, source, obj.Prefab);
-    SetData(prefab, pos, rot, data);
+    SetData(prefab, pos, rot, obj.Scale, data);
 
     //ExpandWorld.Log.LogDebug($"Spawning {obj.Prefab} at {Helper.Print(pos)} {source}");
     var go = UnityEngine.Object.Instantiate(prefab, pos, rot);
-    Data.CleanGhostInit(go);
+    DataManager.CleanGhostInit(go);
     if (ZNetView.m_ghostInit)
     {
       if (spawned != null)
@@ -103,7 +111,7 @@ public class Spawn
   {
     Dictionary<string, List<Tuple<float, string>>> swaps = new();
     // Empty items are kept to support spawning nothing.
-    var list = objectSwap.Select(s => Data.ToList(s, false)).Where(l => l.Count > 0).ToList();
+    var list = objectSwap.Select(s => DataManager.ToList(s, false)).Where(l => l.Count > 0).ToList();
     // Complicated logic to support:
     // 1. Multiple rows for the same object.
     // 2. Multiple swaps in the same row.
@@ -127,12 +135,12 @@ public class Spawn
     return swaps;
   }
 
-  private static List<Tuple<float, ZDO?>> ParseDataItems(IEnumerable<string> items, float weight) => items.Select(s => Parse.Split(s, false, ':')).Select(s => Tuple.Create(Parse.Float(s, 1, 1f) * weight, Data.ToZDO(s[0]))).ToList();
-  public static Dictionary<string, List<Tuple<float, ZDO?>>> LoadData(string[] objectData)
+  private static List<Tuple<float, ZPackage?>> ParseDataItems(IEnumerable<string> items, float weight) => items.Select(s => Parse.Split(s, false, ':')).Select(s => Tuple.Create(Parse.Float(s, 1, 1f) * weight, DataManager.Deserialize(s[0]))).ToList();
+  public static Dictionary<string, List<Tuple<float, ZPackage?>>> LoadData(string[] objectData)
   {
-    Dictionary<string, List<Tuple<float, ZDO?>>> swaps = new();
+    Dictionary<string, List<Tuple<float, ZPackage?>>> swaps = new();
     // Empty items are kept to support spawning nothing.
-    var list = objectData.Select(s => Data.ToList(s, false)).Where(l => l.Count > 0).ToList();
+    var list = objectData.Select(s => DataManager.ToList(s, false)).Where(l => l.Count > 0).ToList();
     // Complicated logic to support:
     // 1. Multiple rows for the same object.
     // 2. Multiple swaps in the same row.
@@ -168,7 +176,7 @@ public class Spawn
     }
     return swaps[swaps.Count - 1].Item2;
   }
-  public static ZDO? RandomizeData(List<Tuple<float, ZDO?>> swaps)
+  public static ZPackage? RandomizeData(List<Tuple<float, ZPackage?>> swaps)
   {
     if (swaps.Count == 0)
       return null;

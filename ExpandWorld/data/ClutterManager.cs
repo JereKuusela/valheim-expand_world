@@ -29,7 +29,7 @@ public class ClutterManager
       ExpandWorld.Log.LogWarning($"Failed to find clutter prefab {data.prefab}.");
     clutter.m_enabled = data.enabled;
     clutter.m_amount = data.amount;
-    clutter.m_biome = Data.ToBiomes(data.biome);
+    clutter.m_biome = DataManager.ToBiomes(data.biome);
     clutter.m_instanced = data.instanced;
     clutter.m_onUncleared = data.onUncleared;
     clutter.m_onCleared = data.onCleared;
@@ -62,7 +62,7 @@ public class ClutterManager
       prefab = clutter.m_prefab.name,
       enabled = clutter.m_enabled,
       amount = clutter.m_amount,
-      biome = Data.FromBiomes(clutter.m_biome),
+      biome = DataManager.FromBiomes(clutter.m_biome),
       instanced = clutter.m_instanced,
       onUncleared = clutter.m_onUncleared,
       onCleared = clutter.m_onCleared,
@@ -94,13 +94,13 @@ public class ClutterManager
   {
     if (!Helper.IsServer() || !Configuration.DataClutter) return;
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(ClutterSystem.instance.m_clutter.Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(ClutterSystem.instance.m_clutter.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataClutter ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataClutter ? DataManager.Read(Pattern) : "";
     Configuration.valueClutterData.Value = yaml;
     Set(yaml);
   }
@@ -113,7 +113,7 @@ public class ClutterManager
     if (yaml == "" || !Configuration.DataClutter) return;
     try
     {
-      var data = Data.Deserialize<ClutterData>(yaml, FileName)
+      var data = DataManager.Deserialize<ClutterData>(yaml, FileName)
         .Select(FromData).Where(clutter => clutter.m_prefab).ToList();
       if (data.Count == 0)
       {
@@ -134,6 +134,6 @@ public class ClutterManager
   }
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, FromFile);
+    DataManager.SetupWatcher(Pattern, FromFile);
   }
 }

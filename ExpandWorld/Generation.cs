@@ -84,9 +84,9 @@ public class WorldGeneration
   static bool Prefix(WorldGenerator __instance)
   {
     if (__instance.m_world.m_menu) return true;
-    if (!Data.IsReady) return false;
+    if (!DataManager.IsReady) return false;
     if (HasLoaded)
-      Game.m_instance.StartCoroutine(Coroutine(__instance));
+      Game.instance.StartCoroutine(Coroutine(__instance));
     else
       GenerateSync(__instance);
     return false;

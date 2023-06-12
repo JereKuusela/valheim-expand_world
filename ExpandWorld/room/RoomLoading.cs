@@ -18,7 +18,7 @@ public class RoomLoading
 
   // For finding rooms with wrong case.
   private static Dictionary<string, string> RoomNames = new();
-  public static List<string> ParseRooms(string names) => Data.ToList(names).Select(s => RoomLoading.RoomNames.TryGetValue(s, out var name) ? name : s).ToList();
+  public static List<string> ParseRooms(string names) => DataManager.ToList(names).Select(s => RoomLoading.RoomNames.TryGetValue(s, out var name) ? name : s).ToList();
   public static void Initialize()
   {
     DefaultEntries.Clear();
@@ -29,7 +29,7 @@ public class RoomLoading
   }
   private static void ToFile()
   {
-    var yaml = Data.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
 
@@ -155,14 +155,14 @@ public class RoomLoading
     var snapPieces = data.connections.Select(c => c.position).ToArray();
     var roomData = CreateProxy(data.name, data.centerPiece, snapPieces);
     var room = roomData.m_room;
-    var missingThemes = Data.ToList(data.theme).Where(s => !NameToTheme.ContainsKey(s.ToLowerInvariant())).ToArray();
+    var missingThemes = DataManager.ToList(data.theme).Where(s => !NameToTheme.ContainsKey(s.ToLowerInvariant())).ToArray();
     foreach (var theme in missingThemes)
     {
       var nextValue = (Room.Theme)(2 * (int)NameToTheme.Values.Max());
       NameToTheme[theme.ToLowerInvariant()] = nextValue;
       ThemeToName[nextValue] = theme;
     }
-    room.m_theme = Data.ToEnum<Room.Theme>(data.theme);
+    room.m_theme = DataManager.ToEnum<Room.Theme>(data.theme);
     room.m_entrance = data.entrance;
     room.m_endCap = data.endCap;
     room.m_divider = data.divider;
@@ -189,7 +189,7 @@ public class RoomLoading
     RoomData data = new()
     {
       name = room.gameObject.name,
-      theme = Data.FromEnum(room.m_theme),
+      theme = DataManager.FromEnum(room.m_theme),
       entrance = room.m_entrance,
       endCap = room.m_endCap,
       divider = room.m_divider,
@@ -215,8 +215,8 @@ public class RoomLoading
   {
     try
     {
-      var yaml = Data.Read(Pattern);
-      return Data.Deserialize<RoomData>(yaml, FileName).Select(FromData).Where(room => room.m_room).ToList();
+      var yaml = DataManager.Read(Pattern);
+      return DataManager.Deserialize<RoomData>(yaml, FileName).Select(FromData).Where(room => room.m_room).ToList();
     }
     catch (Exception e)
     {
@@ -241,14 +241,14 @@ public class RoomLoading
     foreach (var entry in missing)
       ExpandWorld.Log.LogWarning(entry.m_room.name);
     var yaml = File.ReadAllText(FilePath);
-    var data = Data.Deserialize<RoomData>(yaml, FileName).ToList();
+    var data = DataManager.Deserialize<RoomData>(yaml, FileName).ToList();
     data.AddRange(missing.Select(ToData));
     // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
+    File.WriteAllText(FilePath, DataManager.Serializer().Serialize(data));
     return true;
   }
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, Load);
+    DataManager.SetupWatcher(Pattern, Load);
   }
 }

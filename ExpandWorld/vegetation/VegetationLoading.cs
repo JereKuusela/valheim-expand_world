@@ -28,6 +28,7 @@ public class VegetationLoading
   {
     VegetationSpawning.Scale.Clear();
     VegetationSpawning.ZDO.Clear();
+    VegetationSpawning.SpawnCondition.Clear();
     if (Helper.IsClient()) return;
     ZoneSystem.instance.m_vegetation = DefaultEntries;
     if (!Configuration.DataVegetation)
@@ -37,7 +38,7 @@ public class VegetationLoading
     }
     if (!File.Exists(FilePath))
     {
-      var yaml = Data.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
+      var yaml = DataManager.Serializer().Serialize(DefaultEntries.Select(ToData).ToList());
       File.WriteAllText(FilePath, yaml);
       // Watcher triggers reload.
       return;
@@ -64,8 +65,8 @@ public class VegetationLoading
   {
     try
     {
-      var yaml = Data.Read(Pattern);
-      return Data.Deserialize<VegetationData>(yaml, FileName).Select(FromData)
+      var yaml = DataManager.Read(Pattern);
+      return DataManager.Deserialize<VegetationData>(yaml, FileName).Select(FromData)
         .Where(veg => veg.m_prefab).ToList();
     }
     catch (Exception e)
@@ -103,10 +104,10 @@ public class VegetationLoading
     foreach (var veg in missing)
       ExpandWorld.Log.LogWarning(veg.m_prefab.name);
     var yaml = File.ReadAllText(FilePath);
-    var data = Data.Deserialize<VegetationData>(yaml, FileName).ToList();
+    var data = DataManager.Deserialize<VegetationData>(yaml, FileName).ToList();
     data.AddRange(missing.Select(ToData));
     // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, Data.Serializer().Serialize(data));
+    File.WriteAllText(FilePath, DataManager.Serializer().Serialize(data));
     return true;
   }
 
@@ -124,8 +125,8 @@ public class VegetationLoading
       m_scaleMax = Parse.Scale(data.scaleMax).x,
       m_randTilt = data.randTilt,
       m_chanceToUseGroundTilt = data.chanceToUseGroundTilt,
-      m_biome = Data.ToBiomes(data.biome),
-      m_biomeArea = Data.ToBiomeAreas(data.biomeArea),
+      m_biome = DataManager.ToBiomes(data.biome),
+      m_biomeArea = DataManager.ToBiomeAreas(data.biomeArea),
       m_blockCheck = data.blockCheck,
       m_minAltitude = data.minAltitude,
       m_maxAltitude = data.maxAltitude,
@@ -158,10 +159,7 @@ public class VegetationLoading
       VegetationSpawning.Scale[veg] = scale;
     if (data.data != "")
     {
-      ZPackage pkg = new(data.data);
-      ZDO zdo = new();
-      Data.Deserialize(zdo, pkg);
-      VegetationSpawning.ZDO[veg] = zdo;
+      VegetationSpawning.ZDO[veg] = DataManager.Deserialize(data.data);
     }
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
     {
@@ -170,6 +168,14 @@ public class VegetationLoading
     else if (BlueprintManager.Load(data.prefab, data.centerPiece))
     {
       veg.m_prefab = new GameObject(data.prefab);
+    }
+    if (veg.m_enable)
+    {
+      VegetationSpawning.SpawnCondition.Add(veg, new VegetationSpawnCondition()
+      {
+        forbiddenGlobalKeys = DataManager.ToHashList(data.forbiddenGlobalKey),
+        requiredGlobalKeys = DataManager.ToHashList(data.requiredGlobalKey),
+      });
     }
     return veg;
   }
@@ -186,8 +192,8 @@ public class VegetationLoading
       scaleMax = veg.m_scaleMax.ToString(CultureInfo.InvariantCulture),
       randTilt = veg.m_randTilt,
       chanceToUseGroundTilt = veg.m_chanceToUseGroundTilt,
-      biome = Data.FromBiomes(veg.m_biome),
-      biomeArea = Data.FromBiomeAreas(veg.m_biomeArea),
+      biome = DataManager.FromBiomes(veg.m_biome),
+      biomeArea = DataManager.FromBiomeAreas(veg.m_biomeArea),
       blockCheck = veg.m_blockCheck,
       minAltitude = veg.m_minAltitude,
       maxAltitude = veg.m_maxAltitude,
@@ -215,6 +221,6 @@ public class VegetationLoading
 
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, Load);
+    DataManager.SetupWatcher(Pattern, Load);
   }
 }

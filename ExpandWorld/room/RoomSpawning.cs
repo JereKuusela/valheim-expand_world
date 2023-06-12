@@ -21,7 +21,7 @@ public class RoomSpawning
   public static Dictionary<string, DungeonDB.RoomData> Prefabs = new();
 
   public static Dictionary<string, RoomData> Data = new();
-  public static Dictionary<string, Dictionary<string, List<Tuple<float, ZDO?>>>> ObjectData = new();
+  public static Dictionary<string, Dictionary<string, List<Tuple<float, ZPackage?>>>> ObjectData = new();
 
   public static Dictionary<string, List<BlueprintObject>> Objects = new();
   public static Dictionary<string, Dictionary<string, List<Tuple<float, string>>>> ObjectSwaps = new();
@@ -150,9 +150,9 @@ public class RoomSpawning
     return Spawn.RandomizeSwap(swaps);
   }
 
-  public static ZDO? DataOverride(ZDO? zdo, string dungeon, string prefab)
+  public static ZPackage? DataOverride(ZPackage? pkg, string dungeon, string prefab)
   {
-    if (zdo != null) return zdo;
+    if (pkg != null) return pkg;
     if (!ObjectData.TryGetValue(dungeon, out var objectData)) return null;
     if (!objectData.TryGetValue(prefab, out var data)) return null;
     return Spawn.RandomizeData(data);

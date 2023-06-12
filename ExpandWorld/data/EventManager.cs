@@ -22,15 +22,15 @@ public class EventManager
       m_duration = data.duration,
       m_nearBaseOnly = data.nearBaseOnly,
       m_pauseIfNoPlayerInArea = data.pauseIfNoPlayerInArea,
-      m_biome = Data.ToBiomes(data.biome),
-      m_requiredGlobalKeys = Data.ToList(data.requiredGlobalKeys),
-      m_notRequiredGlobalKeys = Data.ToList(data.notRequiredGlobalKeys),
+      m_biome = DataManager.ToBiomes(data.biome),
+      m_requiredGlobalKeys = DataManager.ToList(data.requiredGlobalKeys),
+      m_notRequiredGlobalKeys = DataManager.ToList(data.notRequiredGlobalKeys),
       m_startMessage = data.startMessage,
       m_endMessage = data.endMessage,
       m_forceMusic = data.forceMusic,
       m_forceEnvironment = data.forceEnvironment
     };
-    EventToRequirentEnvironment[data.name] = Data.ToList(data.requiredEnvironments);
+    EventToRequirentEnvironment[data.name] = DataManager.ToList(data.requiredEnvironments);
     return random;
   }
   public static EventData ToData(RandomEvent random)
@@ -44,9 +44,9 @@ public class EventManager
       duration = random.m_duration,
       nearBaseOnly = random.m_nearBaseOnly,
       pauseIfNoPlayerInArea = random.m_pauseIfNoPlayerInArea,
-      biome = Data.FromBiomes(random.m_biome),
-      requiredGlobalKeys = Data.FromList(random.m_requiredGlobalKeys),
-      notRequiredGlobalKeys = Data.FromList(random.m_notRequiredGlobalKeys),
+      biome = DataManager.FromBiomes(random.m_biome),
+      requiredGlobalKeys = DataManager.FromList(random.m_requiredGlobalKeys),
+      notRequiredGlobalKeys = DataManager.FromList(random.m_notRequiredGlobalKeys),
       startMessage = random.m_startMessage,
       endMessage = random.m_endMessage,
       forceMusic = random.m_forceMusic,
@@ -59,13 +59,13 @@ public class EventManager
   {
     if (!Helper.IsServer() || !Configuration.DataEvents) return;
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataEvents ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataEvents ? DataManager.Read(Pattern) : "";
     Configuration.valueEventData.Value = yaml;
     Set(yaml);
   }
@@ -79,7 +79,7 @@ public class EventManager
     try
     {
       EventToRequirentEnvironment.Clear();
-      var data = Data.Deserialize<EventData>(yaml, FileName).Select(FromData).ToList();
+      var data = DataManager.Deserialize<EventData>(yaml, FileName).Select(FromData).ToList();
       ExpandWorld.Log.LogInfo($"Reloading event data ({data.Count} entries).");
       RandEventSystem.instance.m_events = data;
     }
@@ -91,6 +91,6 @@ public class EventManager
   }
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, FromFile);
+    DataManager.SetupWatcher(Pattern, FromFile);
   }
 }

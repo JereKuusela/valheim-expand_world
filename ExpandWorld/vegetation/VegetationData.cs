@@ -69,7 +69,17 @@ public class VegetationData
   [DefaultValue(1f)]
   public float forestTresholdMax = 1f;
   [DefaultValue("")]
+  public string requiredGlobalKey = "";
+  [DefaultValue("")]
+  public string forbiddenGlobalKey = "";
+  [DefaultValue("")]
   public string data = "";
   [DefaultValue("piece_bpcenterpoint")]
   public string centerPiece = "piece_bpcenterpoint";
+}
+
+public class VegetationSpawnCondition
+{
+  public int[] requiredGlobalKeys = new int[0];
+  public int[] forbiddenGlobalKeys = new int[0];
 }

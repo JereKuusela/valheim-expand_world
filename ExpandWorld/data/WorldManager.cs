@@ -91,7 +91,7 @@ public class WorldManager
 
   public static WorldData FromData(WorldData data)
   {
-    data._biome = Data.ToBiomes(data.biome);
+    data._biome = DataManager.ToBiomes(data.biome);
     data._biomeSeed = BiomeManager.GetTerrain(data._biome);
     if (int.TryParse(data.seed, out var seed))
       data._seed = seed;
@@ -107,13 +107,13 @@ public class WorldManager
   {
     if (!Helper.IsServer() || !Configuration.DataWorld) return;
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(GetBiome.GetData().Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(GetBiome.GetData().Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataWorld ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataWorld ? DataManager.Read(Pattern) : "";
     Configuration.valueWorldData.Value = yaml;
     Set(yaml);
   }
@@ -126,7 +126,7 @@ public class WorldManager
     if (yaml == "" || !Configuration.DataWorld) return;
     try
     {
-      var data = Data.Deserialize<WorldData>(yaml, FileName)
+      var data = DataManager.Deserialize<WorldData>(yaml, FileName)
         .Select(FromData).ToList();
       if (data.Count == 0)
       {
@@ -146,6 +146,6 @@ public class WorldManager
   }
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, FromFile);
+    DataManager.SetupWatcher(Pattern, FromFile);
   }
 }

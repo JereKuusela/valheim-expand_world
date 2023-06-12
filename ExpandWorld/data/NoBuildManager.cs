@@ -42,7 +42,7 @@ public class NoBuildManager
         dungeon = dungeon,
       };
     }).ToList();
-    Configuration.valueNoBuildData.Value = Data.Serializer().Serialize(data);
+    Configuration.valueNoBuildData.Value = DataManager.Serializer().Serialize(data);
   }
   private static Dictionary<Vector2i, NoBuildData> NoBuild = new();
   public static bool IsInsideNoBuildZone(Vector3 point)
@@ -75,7 +75,7 @@ public class NoBuildManager
     if (yaml == "") return;
     try
     {
-      var data = Data.Deserialize<NoBuildData>(yaml, "");
+      var data = DataManager.Deserialize<NoBuildData>(yaml, "");
       ExpandWorld.Log.LogInfo($"Reloading no build data ({data.Count} entries).");
       NoBuild = data.ToDictionary(data => ZoneSystem.instance.GetZone(new(data.X, 0, data.Z)));
     }

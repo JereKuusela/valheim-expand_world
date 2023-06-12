@@ -33,24 +33,24 @@ public class EnvironmentManager
     env.m_isCold = data.isCold;
     env.m_isColdAtNight = data.isColdAtNight;
     env.m_alwaysDark = data.alwaysDark;
-    env.m_ambColorNight = Data.Sanity(data.ambColorNight);
-    env.m_ambColorDay = Data.Sanity(data.ambColorDay);
-    env.m_fogColorNight = Data.Sanity(data.fogColorNight);
-    env.m_fogColorMorning = Data.Sanity(data.fogColorMorning);
-    env.m_fogColorDay = Data.Sanity(data.fogColorDay);
-    env.m_fogColorEvening = Data.Sanity(data.fogColorEvening);
-    env.m_fogColorSunNight = Data.Sanity(data.fogColorSunNight);
-    env.m_fogColorSunMorning = Data.Sanity(data.fogColorSunMorning);
-    env.m_fogColorSunDay = Data.Sanity(data.fogColorSunDay);
-    env.m_fogColorSunEvening = Data.Sanity(data.fogColorSunEvening);
+    env.m_ambColorNight = DataManager.Sanity(data.ambColorNight);
+    env.m_ambColorDay = DataManager.Sanity(data.ambColorDay);
+    env.m_fogColorNight = DataManager.Sanity(data.fogColorNight);
+    env.m_fogColorMorning = DataManager.Sanity(data.fogColorMorning);
+    env.m_fogColorDay = DataManager.Sanity(data.fogColorDay);
+    env.m_fogColorEvening = DataManager.Sanity(data.fogColorEvening);
+    env.m_fogColorSunNight = DataManager.Sanity(data.fogColorSunNight);
+    env.m_fogColorSunMorning = DataManager.Sanity(data.fogColorSunMorning);
+    env.m_fogColorSunDay = DataManager.Sanity(data.fogColorSunDay);
+    env.m_fogColorSunEvening = DataManager.Sanity(data.fogColorSunEvening);
     env.m_fogDensityNight = data.fogDensityNight;
     env.m_fogDensityMorning = data.fogDensityMorning;
     env.m_fogDensityDay = data.fogDensityDay;
     env.m_fogDensityEvening = data.fogDensityEvening;
-    env.m_sunColorNight = Data.Sanity(data.sunColorNight);
-    env.m_sunColorMorning = Data.Sanity(data.sunColorMorning);
-    env.m_sunColorDay = Data.Sanity(data.sunColorDay);
-    env.m_sunColorEvening = Data.Sanity(data.sunColorEvening);
+    env.m_sunColorNight = DataManager.Sanity(data.sunColorNight);
+    env.m_sunColorMorning = DataManager.Sanity(data.sunColorMorning);
+    env.m_sunColorDay = DataManager.Sanity(data.sunColorDay);
+    env.m_sunColorEvening = DataManager.Sanity(data.sunColorEvening);
     env.m_lightIntensityDay = data.lightIntensityDay;
     env.m_lightIntensityNight = data.lightIntensityNight;
     env.m_sunAngle = data.sunAngle;
@@ -115,13 +115,13 @@ public class EnvironmentManager
   {
     if (!Helper.IsServer() || !Configuration.DataEnvironments) return;
     if (File.Exists(FilePath)) return;
-    var yaml = Data.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
     if (!Helper.IsServer()) return;
-    var yaml = Configuration.DataEnvironments ? Data.Read(Pattern) : "";
+    var yaml = Configuration.DataEnvironments ? DataManager.Read(Pattern) : "";
     Configuration.valueEnvironmentData.Value = yaml;
     Set(yaml);
   }
@@ -145,7 +145,7 @@ public class EnvironmentManager
     if (yaml == "" || !Configuration.DataEnvironments) return;
     try
     {
-      var data = Data.Deserialize<EnvironmentData>(yaml, FileName)
+      var data = DataManager.Deserialize<EnvironmentData>(yaml, FileName)
         .Select(FromData).ToList();
       if (data.Count == 0)
       {
@@ -172,6 +172,6 @@ public class EnvironmentManager
   }
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, FromFile);
+    DataManager.SetupWatcher(Pattern, FromFile);
   }
 }

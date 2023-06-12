@@ -43,5 +43,5 @@ public class InitializeWhenDimensionsChange
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.Update))]
 public class Map_WaitForConfigSync
 {
-  static bool Prefix() => Data.IsReady;
+  static bool Prefix() => DataManager.IsReady;
 }

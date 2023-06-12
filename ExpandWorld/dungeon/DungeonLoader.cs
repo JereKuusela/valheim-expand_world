@@ -29,7 +29,7 @@ public partial class Loader
       .Select(loc => loc.m_prefab ? loc.m_prefab.GetComponentInChildren<DungeonGenerator>() : null!)
       .Where(dg => dg != null)
       .Distinct(new DgComparer()).ToList();
-    var yaml = Data.Serializer().Serialize(dgs.Select(To).ToList());
+    var yaml = DataManager.Serializer().Serialize(dgs.Select(To).ToList());
     File.WriteAllText(FilePath, yaml);
   }
 
@@ -37,7 +37,7 @@ public partial class Loader
   {
     try
     {
-      var data = Data.Deserialize<DungeonData>(Data.Read(Pattern), FileName);
+      var data = DataManager.Deserialize<DungeonData>(DataManager.Read(Pattern), FileName);
       return data.ToDictionary(data => data.name, From);
     }
     catch (Exception e)
@@ -76,7 +76,7 @@ public partial class Loader
 
   public static void SetupWatcher()
   {
-    Data.SetupWatcher(Pattern, Load);
+    DataManager.SetupWatcher(Pattern, Load);
   }
 }
 

@@ -9,26 +9,22 @@ namespace ExpandWorld;
 
 public class BlueprintObject
 {
-  static readonly int HashScale = "scale".GetStableHashCode();
   public string Prefab = "";
   public Vector3 Pos;
   public Quaternion Rot;
-  public ZDO? Data;
+  public ZPackage? Data;
   public float Chance = 1f;
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, ZDO? data, float chance)
+  public Vector3? Scale;
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, ZPackage? data, float chance)
   {
     Prefab = name;
     Pos = pos;
     Rot = rot.normalized;
     Data = data;
     Chance = chance;
+    // Some blueprints have the scale only in the data, so don't override it with the default.
     if (scale != Vector3.one)
-    {
-      Data ??= new();
-      // Scale is actually stored in the ZDO, so this will make the handling easier.
-      Data.m_vec3 ??= new();
-      Data.m_vec3[HashScale] = new Vector3(scale.x, scale.y, scale.z);
-    }
+      Scale = scale;
   }
 }
 
@@ -217,14 +213,7 @@ public class Blueprints
     var scaleZ = InvariantFloat(split, 12, 1f);
     var data = split.Length > 13 ? split[13] : "";
     var chance = split.Length > 14 ? InvariantFloat(split, 14, 1f) : 1f;
-    ZDO? zdo = null;
-    if (data != "")
-    {
-      zdo = new();
-      ZPackage pkg = new(data);
-      Data.Deserialize(zdo, pkg);
-    }
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), zdo, chance);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), DataManager.Deserialize(data), chance);
   }
   private static Vector3 GetPlanBuildSnapPoint(string row)
   {
@@ -254,14 +243,7 @@ public class Blueprints
     var posZ = InvariantFloat(split, 7);
     var data = split.Length > 8 ? split[8] : "";
     var chance = split.Length > 9 ? InvariantFloat(split, 9, 1f) : 1f;
-    ZDO? zdo = null;
-    if (data != "")
-    {
-      zdo = new();
-      ZPackage pkg = new(data);
-      Data.Deserialize(zdo, pkg);
-    }
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, zdo, chance);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, DataManager.Deserialize(data), chance);
   }
   private static float InvariantFloat(string[] row, int index, float defaultValue = 0f)
   {

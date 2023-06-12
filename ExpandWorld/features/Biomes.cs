@@ -39,43 +39,6 @@ public class GetMapColor
 public class HeightmapGetBiome
 {
   public static bool Nature = false;
-  private static readonly Dictionary<Heightmap.Biome, float> Weights = new();
-
-  public static Heightmap.Biome GetBiome(Heightmap __instance, float x, float z)
-  {
-    Weights.Clear();
-    Weights[__instance.m_cornerBiomes[0]] = 0;
-    Weights[__instance.m_cornerBiomes[1]] = 0;
-    Weights[__instance.m_cornerBiomes[2]] = 0;
-    Weights[__instance.m_cornerBiomes[3]] = 0;
-    Weights[__instance.m_cornerBiomes[0]] += __instance.Distance(x, z, 0f, 0f);
-    Weights[__instance.m_cornerBiomes[1]] += __instance.Distance(x, z, 1f, 0f);
-    Weights[__instance.m_cornerBiomes[2]] += __instance.Distance(x, z, 0f, 1f);
-    Weights[__instance.m_cornerBiomes[3]] += __instance.Distance(x, z, 1f, 1f);
-    var result = Heightmap.Biome.None;
-    var num = -99999f;
-    foreach (var kvp in Weights)
-    {
-      if (kvp.Value > num)
-      {
-        result = kvp.Key;
-        num = kvp.Value;
-      }
-    }
-    return result;
-  }
-  static bool Prefix(Heightmap __instance, Vector3 point, ref Heightmap.Biome __result)
-  {
-    if (__instance.m_isDistantLod) return true;
-    if (__instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[1] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[2] && __instance.m_cornerBiomes[0] == __instance.m_cornerBiomes[3])
-    {
-      __result = __instance.m_cornerBiomes[0];
-      return false;
-    }
-    __instance.WorldToNormalizedHM(point, out var x, out var z);
-    __result = GetBiome(__instance, x, z);
-    return false;
-  }
   static Heightmap.Biome Postfix(Heightmap.Biome biome)
   {
     if (Nature) return BiomeManager.GetNature(biome);

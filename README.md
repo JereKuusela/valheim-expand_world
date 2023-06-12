@@ -500,6 +500,10 @@ Note: Missing vegetation are automatically added to the file. To disable, set `e
   - Larger values would be more away from the forest center.
 - forestTresholdMin (default: `0`): Minimum forest value.
 - forestTresholdMax (default: `0`): Maximum forest value.
+- requiredGlobalKey: List of [global keys](https://valheim.fandom.com/wiki/Global_Keys). If all are set, the vegetation is placed.
+  - Note: This doesn't affect already generated zones. Intended to be used with Upgrade World + Cron Job mods.
+- forbiddenGlobalKey: List of [global keys](https://valheim.fandom.com/wiki/Global_Keys). If any is set, the vegetation is not placed.
+  - Note: This doesn't affect already generated zones. Intended to be used with Upgrade World + Cron Job mods.
 - data: ZDO data override. For example to create hidden stashes with Spawner Tweaks mod (`object copy` from World Edit Commands).
 - centerPiece (default: `piece_bpcenterpoint`): Which object determines the blueprint bottom and center point. If the object is not found, the blueprint is centered automatically and placed 0.05 meters towards the ground.
 

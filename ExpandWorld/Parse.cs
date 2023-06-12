@@ -58,12 +58,12 @@ public static class Parse
   }
   public static List<BlueprintObject> Objects(string[] args)
   {
-    return args.Select(s => Parse.Split(s)).Select(split => new BlueprintObject(
+    return args.Select(s => Split(s)).Select(split => new BlueprintObject(
         split[0],
         VectorXZY(split, 1),
         AngleYXZ(split, 4),
         VectorXZY(split, 7, Vector3.one),
-        Data.ToZDO(split.Length > 11 ? split[11] : ""),
+        DataManager.Deserialize(split.Length > 11 ? split[11] : ""),
         Float(split, 10, 1f)
       )).ToList();
   }
