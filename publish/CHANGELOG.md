@@ -1,3 +1,6 @@
+- v1.46
+  - Fixes custom data.
+
 - v1.45
   - Adds new fields `requiredGlobalKey` and `forbiddenGlobalKey` to the `expand_vegetation.yaml` file.
   - Updated for the new game version.

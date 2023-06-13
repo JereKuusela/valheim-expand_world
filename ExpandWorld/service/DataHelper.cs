@@ -66,19 +66,20 @@ public class DataHelper
       for (var i = 0; i < count; ++i)
         ints[pkg.ReadInt()] = pkg.ReadInt();
     }
-    if ((num & 16) != 0)
-    {
-      var count = pkg.ReadByte();
-      var strings = ZDOExtraData.s_strings.ContainsKey(id) ? ZDOExtraData.s_strings[id] : new();
-      for (var i = 0; i < count; ++i)
-        strings[pkg.ReadInt()] = pkg.ReadString();
-    }
+    // Intended to come before strings.
     if ((num & 64) != 0)
     {
       var count = pkg.ReadByte();
       var longs = ZDOExtraData.s_longs.ContainsKey(id) ? ZDOExtraData.s_longs[id] : new();
       for (var i = 0; i < count; ++i)
         longs[pkg.ReadInt()] = pkg.ReadLong();
+    }
+    if ((num & 16) != 0)
+    {
+      var count = pkg.ReadByte();
+      var strings = ZDOExtraData.s_strings.ContainsKey(id) ? ZDOExtraData.s_strings[id] : new();
+      for (var i = 0; i < count; ++i)
+        strings[pkg.ReadInt()] = pkg.ReadString();
     }
     if ((num & 128) != 0)
     {
