@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -212,13 +213,12 @@ public class BiomeManager
         return terrain;
       return GetBiome(data.biome);
     });
-    var indexToBiome = BiomeToData.Keys.ToArray();
-    Dictionary<Heightmap.Biome, int> biomeToIndex = new();
-    for (int i = 0; i < indexToBiome.Length; i++)
-      biomeToIndex[indexToBiome[i]] = i;
-    typeof(Heightmap).GetField(nameof(Heightmap.s_indexToBiome), BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, indexToBiome);
-    typeof(Heightmap).GetField(nameof(Heightmap.s_tempBiomeWeights), BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, new float[indexToBiome.Length]);
-    typeof(Heightmap).GetField(nameof(Heightmap.s_biomeToIndex), BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, biomeToIndex);
+    GetBiomeHM.IndexToBiome = BiomeToDisplayName.Keys.ToArray();
+    GetBiomeHM.Weights = new float[GetBiomeHM.IndexToBiome.Length];
+    GetBiomeHM.BiomeToIndex = new();
+    for (int i = 0; i < GetBiomeHM.IndexToBiome.Length; i++)
+      GetBiomeHM.BiomeToIndex[GetBiomeHM.IndexToBiome[i]] = i;
+
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
     Environments = rawData.Select(FromData).ToList();
     // This tracks if content (environments) have been loaded.

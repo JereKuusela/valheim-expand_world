@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 namespace ExpandWorld;
 
@@ -80,6 +81,6 @@ public class VegetationData
 
 public class VegetationSpawnCondition
 {
-  public int[] requiredGlobalKeys = new int[0];
-  public int[] forbiddenGlobalKeys = new int[0];
+  public List<string> requiredGlobalKeys = new();
+  public List<string> forbiddenGlobalKeys = new();
 }

@@ -111,5 +111,8 @@ public static class Helper
   {
     return items.Select(key).Distinct().ToHashSet();
   }
+
+  public static bool HasAnyGlobalKey(List<string> keys) => keys.Any(ZoneSystem.instance.m_globalKeys.Contains);
+  public static bool HasEveryGlobalKey(List<string> keys) => keys.All(ZoneSystem.instance.m_globalKeys.Contains);
 }
 

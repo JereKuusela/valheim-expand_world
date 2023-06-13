@@ -36,8 +36,45 @@ public class GetMapColor
 }
 
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiome))]
-public class HeightmapGetBiome
+public class GetBiomeHM
 {
+  public static float[] Weights = Heightmap.s_tempBiomeWeights;
+  public static Heightmap.Biome[] IndexToBiome = Heightmap.s_indexToBiome;
+  public static Dictionary<Heightmap.Biome, int> BiomeToIndex = Heightmap.s_biomeToIndex;
+  // Unable to resize readonly arrays so copy paste the implementation.
+  static bool Prefix(Heightmap __instance, Vector3 point, ref Heightmap.Biome __result)
+  {
+    var hm = __instance;
+    if (hm.m_isDistantLod)
+    {
+      __result = WorldGenerator.instance.GetBiome(point.x, point.z);
+      return false;
+    }
+    if (hm.m_cornerBiomes[0] == hm.m_cornerBiomes[1] && hm.m_cornerBiomes[0] == hm.m_cornerBiomes[2] && hm.m_cornerBiomes[0] == hm.m_cornerBiomes[3])
+    {
+      __result = hm.m_cornerBiomes[0];
+      return false;
+    }
+    hm.WorldToNormalizedHM(point, out var x, out var z);
+    for (int i = 1; i < Weights.Length; i++)
+      Weights[i] = 0f;
+    Weights[BiomeToIndex[hm.m_cornerBiomes[0]]] += Heightmap.Distance(x, z, 0f, 0f);
+    Weights[BiomeToIndex[hm.m_cornerBiomes[1]]] += Heightmap.Distance(x, z, 1f, 0f);
+    Weights[BiomeToIndex[hm.m_cornerBiomes[2]]] += Heightmap.Distance(x, z, 0f, 1f);
+    Weights[BiomeToIndex[hm.m_cornerBiomes[3]]] += Heightmap.Distance(x, z, 1f, 1f);
+    int num = BiomeToIndex[Heightmap.Biome.None];
+    float num2 = -99999f;
+    for (int j = 1; j < Weights.Length; j++)
+    {
+      if (Weights[j] > num2)
+      {
+        num = j;
+        num2 = Weights[j];
+      }
+    }
+    __result = IndexToBiome[num];
+    return false;
+  }
   public static bool Nature = false;
   static Heightmap.Biome Postfix(Heightmap.Biome biome)
   {
@@ -63,7 +100,7 @@ public class ResetBiomeOffsets
 {
   static void Prefix()
   {
-    GetBiome.Offsets.Clear();
+    GetBiomeWG.Offsets.Clear();
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
@@ -72,21 +109,21 @@ public class SetBiomeOffsets
   [HarmonyPriority(Priority.VeryHigh)]
   static void Prefix(WorldGenerator __instance)
   {
-    if (GetBiome.Offsets.Count > 0) return;
-    GetBiome.Offsets[Heightmap.Biome.Swamp] = __instance.m_offset0;
-    GetBiome.Offsets[Heightmap.Biome.Plains] = __instance.m_offset1;
-    GetBiome.Offsets[Heightmap.Biome.BlackForest] = __instance.m_offset2;
+    if (GetBiomeWG.Offsets.Count > 0) return;
+    GetBiomeWG.Offsets[Heightmap.Biome.Swamp] = __instance.m_offset0;
+    GetBiomeWG.Offsets[Heightmap.Biome.Plains] = __instance.m_offset1;
+    GetBiomeWG.Offsets[Heightmap.Biome.BlackForest] = __instance.m_offset2;
     // Not used in the base game code but might as well reuse the value.
-    GetBiome.Offsets[Heightmap.Biome.Meadows] = __instance.m_offset3;
-    GetBiome.Offsets[Heightmap.Biome.Mistlands] = __instance.m_offset4;
-    GetBiome.Offsets[Heightmap.Biome.AshLands] = (float)UnityEngine.Random.Range(-10000, 10000);
-    GetBiome.Offsets[Heightmap.Biome.DeepNorth] = (float)UnityEngine.Random.Range(-10000, 10000);
-    GetBiome.Offsets[Heightmap.Biome.Mountain] = (float)UnityEngine.Random.Range(-10000, 10000);
-    GetBiome.Offsets[Heightmap.Biome.Ocean] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.Meadows] = __instance.m_offset3;
+    GetBiomeWG.Offsets[Heightmap.Biome.Mistlands] = __instance.m_offset4;
+    GetBiomeWG.Offsets[Heightmap.Biome.AshLands] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.DeepNorth] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.Mountain] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.Ocean] = (float)UnityEngine.Random.Range(-10000, 10000);
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
-public class GetBiome
+public class GetBiomeWG
 {
   public static List<WorldData> GetData() => Data ?? WorldManager.GetDefault(WorldGenerator.instance);
   public static List<WorldData>? Data = null;

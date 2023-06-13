@@ -79,8 +79,8 @@ public class VegetationSpawning
       if (!SpawnCondition.TryGetValue(veg, out var data)) continue;
       // Spawn condition only for enabled vegs.
       veg.m_enable = true;
-      if (GlobalKeyManager.HasAny(data.forbiddenGlobalKeys)) veg.m_enable = false;
-      if (!GlobalKeyManager.HasEvery(data.requiredGlobalKeys)) veg.m_enable = false;
+      if (Helper.HasAnyGlobalKey(data.forbiddenGlobalKeys)) veg.m_enable = false;
+      if (!Helper.HasEveryGlobalKey(data.requiredGlobalKeys)) veg.m_enable = false;
     }
   }
 }

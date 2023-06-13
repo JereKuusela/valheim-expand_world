@@ -169,12 +169,12 @@ public class VegetationLoading
     {
       veg.m_prefab = new GameObject(data.prefab);
     }
-    if (veg.m_enable)
+    if (veg.m_enable && (data.forbiddenGlobalKey != "" || data.requiredGlobalKey != ""))
     {
       VegetationSpawning.SpawnCondition.Add(veg, new VegetationSpawnCondition()
       {
-        forbiddenGlobalKeys = DataManager.ToHashList(data.forbiddenGlobalKey),
-        requiredGlobalKeys = DataManager.ToHashList(data.requiredGlobalKey),
+        forbiddenGlobalKeys = DataManager.ToList(data.forbiddenGlobalKey),
+        requiredGlobalKeys = DataManager.ToList(data.requiredGlobalKey),
       });
     }
     return veg;

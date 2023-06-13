@@ -107,7 +107,7 @@ public class WorldManager
   {
     if (!Helper.IsServer() || !Configuration.DataWorld) return;
     if (File.Exists(FilePath)) return;
-    var yaml = DataManager.Serializer().Serialize(GetBiome.GetData().Select(ToData).ToList());
+    var yaml = DataManager.Serializer().Serialize(GetBiomeWG.GetData().Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
@@ -134,8 +134,8 @@ public class WorldManager
         return;
       }
       ExpandWorld.Log.LogInfo($"Reloading world data ({data.Count} entries).");
-      GetBiome.Data = data;
-      GetBiome.CheckAngles = data.Any(x => x.minSector != 0f || x.maxSector != 1f);
+      GetBiomeWG.Data = data;
+      GetBiomeWG.CheckAngles = data.Any(x => x.minSector != 0f || x.maxSector != 1f);
       Generate.World();
     }
     catch (Exception e)

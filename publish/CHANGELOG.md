@@ -1,3 +1,6 @@
+- v1.47
+  - Fixes crash.
+
 - v1.46
   - Fixes custom data.
 

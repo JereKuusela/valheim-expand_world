@@ -169,7 +169,6 @@ public class DataManager : MonoBehaviour
 
   public static string FromList(IEnumerable<string> array) => string.Join(", ", array);
   public static List<string> ToList(string str, bool removeEmpty = true) => Parse.Split(str, removeEmpty).ToList();
-  public static int[] ToHashList(string str, bool removeEmpty = true) => Parse.Split(str, removeEmpty).Select(s => s.ToLowerInvariant().GetStableHashCode()).ToArray();
   public static Dictionary<string, string> ToDict(string str) => ToList(str).Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0].Trim(), s => s[1].Trim());
   public static ZPackage? Deserialize(string data) => data == "" ? null : new(data);
   public static string FromBiomes(Heightmap.Biome biome)

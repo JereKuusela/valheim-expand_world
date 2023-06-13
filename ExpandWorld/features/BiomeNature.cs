@@ -17,12 +17,12 @@ public class PlayerUpdatePlacementGhost
 [HarmonyPatch(typeof(Plant), nameof(Plant.UpdateHealth))]
 public class PlantUpdateHealth
 {
-  static void Prefix() => HeightmapGetBiome.Nature = true;
-  static void Finalizer() => HeightmapGetBiome.Nature = false;
+  static void Prefix() => GetBiomeHM.Nature = true;
+  static void Finalizer() => GetBiomeHM.Nature = false;
 }
 [HarmonyPatch(typeof(FootStep), nameof(FootStep.GetGroundMaterial))]
 public class FootStepGetGroundMaterial
 {
-  static void Prefix() => HeightmapGetBiome.Nature = true;
-  static void Finalizer() => HeightmapGetBiome.Nature = false;
+  static void Prefix() => GetBiomeHM.Nature = true;
+  static void Finalizer() => GetBiomeHM.Nature = false;
 }
