@@ -54,7 +54,7 @@ public class SpawnManager
       spawn.m_minAltitude = spawn.m_maxAltitude > 0f ? 0f : -1000f;
     if (data.data != "")
     {
-      ZDO[spawn] = DataManager.Deserialize(data.data);
+      ZDO[spawn] = DataHelper.Deserialize(data.data);
     }
     if (data.objects != null)
     {
@@ -63,7 +63,7 @@ public class SpawnManager
         Parse.VectorXZY(split, 1),
         Quaternion.identity,
         Vector3.one,
-        DataManager.Deserialize(split.Length > 5 ? split[5] : ""),
+        DataHelper.Deserialize(split.Length > 5 ? split[5] : ""),
         Parse.Float(split, 4, 1f)
       )).ToList();
     }

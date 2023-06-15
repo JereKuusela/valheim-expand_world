@@ -4,12 +4,7 @@ namespace Service;
 
 public class DataHelper
 {
-  public static ZPackage? Deserialize(string data)
-  {
-    if (data == "") return null;
-    ZPackage pkg = new(data);
-    return pkg;
-  }
+  public static ZPackage? Deserialize(string data) => data == "" ? null : new(data);
   public static ZDO? InitZDO(Vector3 pos, Quaternion rot, Vector3? scale, ZPackage? data, GameObject obj)
   {
     if (!obj.TryGetComponent<ZNetView>(out var view)) return null;
@@ -36,57 +31,87 @@ public class DataHelper
   }
   private static void Load(ZPackage pkg, ZDO zdo)
   {
+    pkg.SetPos(0);
     var id = zdo.m_uid;
     var num = pkg.ReadInt();
     if ((num & 1) != 0)
     {
       var count = pkg.ReadByte();
-      var floats = ZDOExtraData.s_floats.ContainsKey(id) ? ZDOExtraData.s_floats[id] : new();
+      if (!ZDOExtraData.s_floats.ContainsKey(id))
+        ZDOExtraData.s_floats[id] = new();
       for (var i = 0; i < count; ++i)
-        floats[pkg.ReadInt()] = pkg.ReadSingle();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_floats[id][key] = pkg.ReadSingle();
+      }
     }
     if ((num & 2) != 0)
     {
       var count = pkg.ReadByte();
-      var vecs = ZDOExtraData.s_vec3.ContainsKey(id) ? ZDOExtraData.s_vec3[id] : new();
+      if (!ZDOExtraData.s_vec3.ContainsKey(id))
+        ZDOExtraData.s_vec3[id] = new();
       for (var i = 0; i < count; ++i)
-        vecs[pkg.ReadInt()] = pkg.ReadVector3();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_vec3[id][key] = pkg.ReadVector3();
+      }
+
     }
     if ((num & 4) != 0)
     {
       var count = pkg.ReadByte();
-      var quats = ZDOExtraData.s_quats.ContainsKey(id) ? ZDOExtraData.s_quats[id] : new();
+      if (!ZDOExtraData.s_quats.ContainsKey(id))
+        ZDOExtraData.s_quats[id] = new();
       for (var i = 0; i < count; ++i)
-        quats[pkg.ReadInt()] = pkg.ReadQuaternion();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_quats[id][key] = pkg.ReadQuaternion();
+      }
     }
     if ((num & 8) != 0)
     {
       var count = pkg.ReadByte();
-      var ints = ZDOExtraData.s_ints.ContainsKey(id) ? ZDOExtraData.s_ints[id] : new();
+      if (!ZDOExtraData.s_ints.ContainsKey(id))
+        ZDOExtraData.s_ints[id] = new();
       for (var i = 0; i < count; ++i)
-        ints[pkg.ReadInt()] = pkg.ReadInt();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_ints[id][key] = pkg.ReadInt();
+      }
     }
     // Intended to come before strings.
     if ((num & 64) != 0)
     {
       var count = pkg.ReadByte();
-      var longs = ZDOExtraData.s_longs.ContainsKey(id) ? ZDOExtraData.s_longs[id] : new();
+      if (!ZDOExtraData.s_longs.ContainsKey(id))
+        ZDOExtraData.s_longs[id] = new();
       for (var i = 0; i < count; ++i)
-        longs[pkg.ReadInt()] = pkg.ReadLong();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_longs[id][key] = pkg.ReadLong();
+      }
     }
     if ((num & 16) != 0)
     {
       var count = pkg.ReadByte();
-      var strings = ZDOExtraData.s_strings.ContainsKey(id) ? ZDOExtraData.s_strings[id] : new();
+      if (!ZDOExtraData.s_strings.ContainsKey(id))
+        ZDOExtraData.s_strings[id] = new();
       for (var i = 0; i < count; ++i)
-        strings[pkg.ReadInt()] = pkg.ReadString();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_strings[id][key] = pkg.ReadString();
+      }
     }
     if ((num & 128) != 0)
     {
       var count = pkg.ReadByte();
-      var byteArrays = ZDOExtraData.s_byteArrays.ContainsKey(id) ? ZDOExtraData.s_byteArrays[id] : new();
+      if (!ZDOExtraData.s_byteArrays.ContainsKey(id))
+        ZDOExtraData.s_byteArrays[id] = new();
       for (var i = 0; i < count; ++i)
-        byteArrays[pkg.ReadInt()] = pkg.ReadByteArray();
+      {
+        var key = pkg.ReadInt();
+        ZDOExtraData.s_byteArrays[id][key] = pkg.ReadByteArray();
+      }
     }
   }
 }

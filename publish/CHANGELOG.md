@@ -1,3 +1,6 @@
+- v1.48
+  - Fixes another data loading issue.
+
 - v1.47
   - Fixes crash.
 

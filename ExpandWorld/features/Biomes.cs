@@ -38,43 +38,6 @@ public class GetMapColor
 [HarmonyPatch(typeof(Heightmap), nameof(Heightmap.GetBiome))]
 public class GetBiomeHM
 {
-  public static float[] Weights = Heightmap.s_tempBiomeWeights;
-  public static Heightmap.Biome[] IndexToBiome = Heightmap.s_indexToBiome;
-  public static Dictionary<Heightmap.Biome, int> BiomeToIndex = Heightmap.s_biomeToIndex;
-  // Unable to resize readonly arrays so copy paste the implementation.
-  static bool Prefix(Heightmap __instance, Vector3 point, ref Heightmap.Biome __result)
-  {
-    var hm = __instance;
-    if (hm.m_isDistantLod)
-    {
-      __result = WorldGenerator.instance.GetBiome(point.x, point.z);
-      return false;
-    }
-    if (hm.m_cornerBiomes[0] == hm.m_cornerBiomes[1] && hm.m_cornerBiomes[0] == hm.m_cornerBiomes[2] && hm.m_cornerBiomes[0] == hm.m_cornerBiomes[3])
-    {
-      __result = hm.m_cornerBiomes[0];
-      return false;
-    }
-    hm.WorldToNormalizedHM(point, out var x, out var z);
-    for (int i = 1; i < Weights.Length; i++)
-      Weights[i] = 0f;
-    Weights[BiomeToIndex[hm.m_cornerBiomes[0]]] += Heightmap.Distance(x, z, 0f, 0f);
-    Weights[BiomeToIndex[hm.m_cornerBiomes[1]]] += Heightmap.Distance(x, z, 1f, 0f);
-    Weights[BiomeToIndex[hm.m_cornerBiomes[2]]] += Heightmap.Distance(x, z, 0f, 1f);
-    Weights[BiomeToIndex[hm.m_cornerBiomes[3]]] += Heightmap.Distance(x, z, 1f, 1f);
-    int num = BiomeToIndex[Heightmap.Biome.None];
-    float num2 = -99999f;
-    for (int j = 1; j < Weights.Length; j++)
-    {
-      if (Weights[j] > num2)
-      {
-        num = j;
-        num2 = Weights[j];
-      }
-    }
-    __result = IndexToBiome[num];
-    return false;
-  }
   public static bool Nature = false;
   static Heightmap.Biome Postfix(Heightmap.Biome biome)
   {

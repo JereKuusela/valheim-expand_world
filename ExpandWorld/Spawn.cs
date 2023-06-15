@@ -135,7 +135,7 @@ public class Spawn
     return swaps;
   }
 
-  private static List<Tuple<float, ZPackage?>> ParseDataItems(IEnumerable<string> items, float weight) => items.Select(s => Parse.Split(s, false, ':')).Select(s => Tuple.Create(Parse.Float(s, 1, 1f) * weight, DataManager.Deserialize(s[0]))).ToList();
+  private static List<Tuple<float, ZPackage?>> ParseDataItems(IEnumerable<string> items, float weight) => items.Select(s => Parse.Split(s, false, ':')).Select(s => Tuple.Create(Parse.Float(s, 1, 1f) * weight, DataHelper.Deserialize(s[0]))).ToList();
   public static Dictionary<string, List<Tuple<float, ZPackage?>>> LoadData(string[] objectData)
   {
     Dictionary<string, List<Tuple<float, ZPackage?>>> swaps = new();

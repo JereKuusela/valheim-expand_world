@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Service;
 using UnityEngine;
 namespace ExpandWorld;
 
@@ -213,7 +214,7 @@ public class Blueprints
     var scaleZ = InvariantFloat(split, 12, 1f);
     var data = split.Length > 13 ? split[13] : "";
     var chance = split.Length > 14 ? InvariantFloat(split, 14, 1f) : 1f;
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), DataManager.Deserialize(data), chance);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), new(scaleX, scaleY, scaleZ), DataHelper.Deserialize(data), chance);
   }
   private static Vector3 GetPlanBuildSnapPoint(string row)
   {
@@ -243,7 +244,7 @@ public class Blueprints
     var posZ = InvariantFloat(split, 7);
     var data = split.Length > 8 ? split[8] : "";
     var chance = split.Length > 9 ? InvariantFloat(split, 9, 1f) : 1f;
-    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, DataManager.Deserialize(data), chance);
+    return new BlueprintObject(name, new(posX, posY, posZ), new(rotX, rotY, rotZ, rotW), Vector3.one, DataHelper.Deserialize(data), chance);
   }
   private static float InvariantFloat(string[] row, int index, float defaultValue = 0f)
   {

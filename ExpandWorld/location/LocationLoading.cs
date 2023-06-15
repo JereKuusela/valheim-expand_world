@@ -32,7 +32,7 @@ public class LocationLoading
     }
 
     if (data.data != "")
-      ZDO[data.prefab] = DataManager.Deserialize(data.data);
+      ZDO[data.prefab] = DataHelper.Deserialize(data.data);
     if (data.dungeon != "")
       Dungeons[data.prefab] = data.dungeon;
     if (data.objectSwap != null)

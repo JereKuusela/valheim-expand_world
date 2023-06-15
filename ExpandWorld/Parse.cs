@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Service;
 using UnityEngine;
 namespace ExpandWorld;
 
@@ -63,7 +64,7 @@ public static class Parse
         VectorXZY(split, 1),
         AngleYXZ(split, 4),
         VectorXZY(split, 7, Vector3.one),
-        DataManager.Deserialize(split.Length > 11 ? split[11] : ""),
+        DataHelper.Deserialize(split.Length > 11 ? split[11] : ""),
         Float(split, 10, 1f)
       )).ToList();
   }

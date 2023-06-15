@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -159,7 +160,7 @@ public class VegetationLoading
       VegetationSpawning.Scale[veg] = scale;
     if (data.data != "")
     {
-      VegetationSpawning.ZDO[veg] = DataManager.Deserialize(data.data);
+      VegetationSpawning.ZDO[veg] = DataHelper.Deserialize(data.data);
     }
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
     {

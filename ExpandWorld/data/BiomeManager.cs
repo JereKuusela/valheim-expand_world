@@ -213,12 +213,6 @@ public class BiomeManager
         return terrain;
       return GetBiome(data.biome);
     });
-    GetBiomeHM.IndexToBiome = BiomeToDisplayName.Keys.ToArray();
-    GetBiomeHM.Weights = new float[GetBiomeHM.IndexToBiome.Length];
-    GetBiomeHM.BiomeToIndex = new();
-    for (int i = 0; i < GetBiomeHM.IndexToBiome.Length; i++)
-      GetBiomeHM.BiomeToIndex[GetBiomeHM.IndexToBiome[i]] = i;
-
     BiomeForestMultiplier = rawData.Any(data => data.forestMultiplier != 1f);
     Environments = rawData.Select(FromData).ToList();
     // This tracks if content (environments) have been loaded.
@@ -255,5 +249,26 @@ public class BiomeManager
       else FromFile();
     };
     DataManager.SetupWatcher(Pattern, callback);
+  }
+
+  // These must be stored in static fields to avoid garbage collection.
+  static readonly float[] biomeWeights = new float[30];
+  static readonly Heightmap.Biome[] indexToBiome = biomeWeights.Select((_, i) => (Heightmap.Biome)(2 << (i - 1))).ToArray();
+  // dotnet caches/inlines access to static readonly fields.
+  // So the readonly arrays must be resized in advance.
+  public static void SetupBiomeArrays()
+  {
+#pragma warning disable CS8500
+    unsafe
+    {
+      fixed (void* ptr = &Heightmap.s_indexToBiome)
+        *(object*)ptr = indexToBiome;
+      fixed (void* ptr = &Heightmap.s_tempBiomeWeights)
+        *(object*)ptr = biomeWeights;
+    }
+#pragma warning restore CS8500
+    // Dictionary can be updated in the place.
+    for (int i = 0; i < indexToBiome.Length; i++)
+      Heightmap.s_biomeToIndex[indexToBiome[i]] = i;
   }
 }
