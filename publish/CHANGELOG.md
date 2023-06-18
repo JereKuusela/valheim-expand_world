@@ -1,3 +1,7 @@
+- v1.49
+  - Fixes dungeons not generating correctly if the `bounds` field was missing.
+  - Fixes wrong biomes near some biome borders.
+
 - v1.48
   - Fixes another data loading issue.
 

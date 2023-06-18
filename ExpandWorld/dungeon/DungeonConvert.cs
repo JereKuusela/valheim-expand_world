@@ -16,9 +16,9 @@ public partial class Loader
       ExpandWorld.Log.LogWarning($"Failed to find dungeon algorithm {data.algorithm}.");
     dg.name = data.name;
     if (data.bounds == "")
-      dg.m_zoneSize = new Vector3(64f, 64f, 64f);
+      dg.m_zoneSize = new Vector3(64f, 256f, 64f);
     else if (data.bounds.Contains(","))
-      dg.m_zoneSize = Parse.VectorXZY(data.bounds, new Vector3(64f, 64f, 64f));
+      dg.m_zoneSize = Parse.VectorXZY(data.bounds, new Vector3(64f, 256f, 64f));
     else
       dg.m_zoneSize = Parse.Float(data.bounds) * Vector3.one;
     dg.m_alternativeFunctionality = data.alternative || data.roomWeights;

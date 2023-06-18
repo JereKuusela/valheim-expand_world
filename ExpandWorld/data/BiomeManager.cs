@@ -253,7 +253,7 @@ public class BiomeManager
 
   // These must be stored in static fields to avoid garbage collection.
   static readonly float[] biomeWeights = new float[30];
-  static readonly Heightmap.Biome[] indexToBiome = biomeWeights.Select((_, i) => (Heightmap.Biome)(2 << (i - 1))).ToArray();
+  static readonly Heightmap.Biome[] indexToBiome = biomeWeights.Select((_, i) => (Heightmap.Biome)(i < 2 ? i : 2 << (i - 2))).ToArray();
   // dotnet caches/inlines access to static readonly fields.
   // So the readonly arrays must be resized in advance.
   public static void SetupBiomeArrays()

@@ -37,81 +37,52 @@ public class DataHelper
     if ((num & 1) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_floats.ContainsKey(id))
-        ZDOExtraData.s_floats[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_floats, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_floats[id][key] = pkg.ReadSingle();
-      }
+        ZDOExtraData.s_floats[id].SetValue(pkg.ReadInt(), pkg.ReadSingle());
     }
     if ((num & 2) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_vec3.ContainsKey(id))
-        ZDOExtraData.s_vec3[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_vec3, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_vec3[id][key] = pkg.ReadVector3();
-      }
-
+        ZDOExtraData.s_vec3[id].SetValue(pkg.ReadInt(), pkg.ReadVector3());
     }
     if ((num & 4) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_quats.ContainsKey(id))
-        ZDOExtraData.s_quats[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_quats, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_quats[id][key] = pkg.ReadQuaternion();
-      }
+        ZDOExtraData.s_quats[id].SetValue(pkg.ReadInt(), pkg.ReadQuaternion());
     }
     if ((num & 8) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_ints.ContainsKey(id))
-        ZDOExtraData.s_ints[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_ints, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_ints[id][key] = pkg.ReadInt();
-      }
+        ZDOExtraData.s_ints[id].SetValue(pkg.ReadInt(), pkg.ReadInt());
     }
     // Intended to come before strings.
     if ((num & 64) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_longs.ContainsKey(id))
-        ZDOExtraData.s_longs[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_longs, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_longs[id][key] = pkg.ReadLong();
-      }
+        ZDOExtraData.s_longs[id].SetValue(pkg.ReadInt(), pkg.ReadLong());
     }
     if ((num & 16) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_strings.ContainsKey(id))
-        ZDOExtraData.s_strings[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_strings, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_strings[id][key] = pkg.ReadString();
-      }
+        ZDOExtraData.s_strings[id].SetValue(pkg.ReadInt(), pkg.ReadString());
     }
     if ((num & 128) != 0)
     {
       var count = pkg.ReadByte();
-      if (!ZDOExtraData.s_byteArrays.ContainsKey(id))
-        ZDOExtraData.s_byteArrays[id] = new();
+      ZDOHelper.Init(ZDOExtraData.s_byteArrays, id);
       for (var i = 0; i < count; ++i)
-      {
-        var key = pkg.ReadInt();
-        ZDOExtraData.s_byteArrays[id][key] = pkg.ReadByteArray();
-      }
+        ZDOExtraData.s_byteArrays[id].SetValue(pkg.ReadInt(), pkg.ReadByteArray());
     }
   }
 }

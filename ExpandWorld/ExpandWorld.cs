@@ -13,7 +13,7 @@ public class ExpandWorld : BaseUnityPlugin
 {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.48";
+  public const string VERSION = "1.49";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
