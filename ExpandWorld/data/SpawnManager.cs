@@ -119,14 +119,14 @@ public class SpawnManager
   }
   public static void ToFile()
   {
-    if (!Helper.IsServer() || !Configuration.DataSpawns) return;
+    if (Helper.IsClient() || !Configuration.DataSpawns) return;
     if (File.Exists(FilePath)) return;
     var yaml = Save();
     Configuration.valueSpawnData.Value = yaml;
   }
   public static void FromFile()
   {
-    if (!Helper.IsServer()) return;
+    if (Helper.IsClient()) return;
     var yaml = Configuration.DataSpawns ? DataManager.Read(Pattern) : "";
     Configuration.valueSpawnData.Value = yaml;
     Set(yaml);

@@ -45,7 +45,7 @@ public class InitializeContent
 {
   static void Postfix()
   {
-    if (ZNet.instance.IsServer())
+    if (Helper.IsServer())
     {
       EventManager.ToFile();
       EnvironmentManager.ToFile();

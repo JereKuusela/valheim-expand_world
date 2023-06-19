@@ -57,14 +57,14 @@ public class EventManager
 
   public static void ToFile()
   {
-    if (!Helper.IsServer() || !Configuration.DataEvents) return;
+    if (Helper.IsClient() || !Configuration.DataEvents) return;
     if (File.Exists(FilePath)) return;
     var yaml = DataManager.Serializer().Serialize(RandEventSystem.instance.m_events.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
-    if (!Helper.IsServer()) return;
+    if (Helper.IsClient()) return;
     var yaml = Configuration.DataEvents ? DataManager.Read(Pattern) : "";
     Configuration.valueEventData.Value = yaml;
     Set(yaml);

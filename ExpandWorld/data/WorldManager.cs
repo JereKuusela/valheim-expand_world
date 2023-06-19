@@ -105,14 +105,14 @@ public class WorldManager
 
   public static void ToFile()
   {
-    if (!Helper.IsServer() || !Configuration.DataWorld) return;
+    if (Helper.IsClient() || !Configuration.DataWorld) return;
     if (File.Exists(FilePath)) return;
     var yaml = DataManager.Serializer().Serialize(GetBiomeWG.GetData().Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
-    if (!Helper.IsServer()) return;
+    if (Helper.IsClient()) return;
     var yaml = Configuration.DataWorld ? DataManager.Read(Pattern) : "";
     Configuration.valueWorldData.Value = yaml;
     Set(yaml);

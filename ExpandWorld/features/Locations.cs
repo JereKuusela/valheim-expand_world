@@ -136,7 +136,7 @@ public class ClearAreasFromAdjacentZones
         // No location in the zone.
         if (!__instance.m_locationInstances.TryGetValue(new(i, j), out var item)) continue;
         // Check for corrupted locations.
-        if (item.m_location == null) continue;
+        if (item.m_location == null || item.m_location.m_location == null) continue;
         // No clear area in the location.
         if (!item.m_location.m_location.m_clearArea) continue;
         // If fits inside the zone, no need to add it.

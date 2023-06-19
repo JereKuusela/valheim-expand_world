@@ -1,3 +1,7 @@
+- v1.50
+  - Fixes `expand_biomes.yaml` file not being created.
+  - Fixes custom biomes not loading correctly.
+
 - v1.49
   - Fixes dungeons not generating correctly if the `bounds` field was missing.
   - Fixes wrong biomes near some biome borders.

@@ -55,7 +55,8 @@ public static class Helper
   public static float AltitudeToBaseHeight(float altitude) => HeightToBaseHeight(AltitudeToHeight(altitude));
   public static float BaseHeightToAltitude(float baseHeight) => baseHeight * 200f - Configuration.WaterLevel;
   public static bool IsServer() => ZNet.instance && ZNet.instance.IsServer();
-  public static bool IsClient() => ZNet.instance && !ZNet.instance.IsServer();
+  // Note: Intended that is client when no Znet instance (so stuff isn't loaded in the main menu).
+  public static bool IsClient() => !IsServer();
   public static Vector3 RandomValue(Range<Vector3> range)
   {
     if (range.Uniform)

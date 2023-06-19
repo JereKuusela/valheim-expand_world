@@ -24,12 +24,11 @@ public class BiomeManager
   }
   public static BiomeEnvironment ToData(EnvEntry env)
   {
-    BiomeEnvironment data = new()
+    return new()
     {
       environment = env.m_environment,
       weight = env.m_weight
     };
-    return data;
   }
   private static readonly Dictionary<string, Heightmap.Biome> OriginalBiomes = new() {
     { "None", Heightmap.Biome.None},
@@ -73,7 +72,7 @@ public class BiomeManager
   }
   public static BiomeData ToData(BiomeEnvSetup biome)
   {
-    BiomeData data = new()
+    return new()
     {
       biome = DataManager.FromBiomes(biome.m_biome),
       environments = biome.m_environments.Select(ToData).ToArray(),
@@ -86,19 +85,19 @@ public class BiomeManager
       // Reduces the mountains on the map.
       mapColorMultiplier = biome.m_biome == Heightmap.Biome.AshLands ? 0.5f : 1f
     };
-    return data;
   }
 
   public static void ToFile()
   {
-    if (!Helper.IsServer() || !Configuration.DataBiome) return;
+    if (Helper.IsClient() || !Configuration.DataBiome) return;
     if (File.Exists(FilePath)) return;
+    ExpandWorld.Log.LogWarning("Writing biomes to file: " + EnvMan.instance.m_biomes.Count);
     var yaml = DataManager.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
-    if (!Helper.IsServer()) return;
+    if (Helper.IsClient()) return;
     var yaml = Configuration.DataBiome ? DataManager.Read(Pattern) : "";
     Configuration.valueBiomeData.Value = yaml;
     Set(yaml);
@@ -167,7 +166,6 @@ public class BiomeManager
     NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     var biomeNumber = (int)Heightmap.Biome.Mistlands * 2;
-    var index = 10;
     foreach (var item in rawData)
     {
       var biome = (Heightmap.Biome)biomeNumber;
@@ -192,10 +190,8 @@ public class BiomeManager
         BiomeToData[biome] = item;
         continue;
       }
-      Heightmap.s_biomeToIndex[biome] = index;
-      index += 1;
-      NameToBiome.Add(item.biome.ToLower(), biome);
       BiomeToData[biome] = item;
+      NameToBiome.Add(item.biome.ToLower(), biome);
       if (item.paint != "") BiomeToColor[biome] = Terrain.ParsePaint(item.paint);
       biomeNumber *= 2;
     }

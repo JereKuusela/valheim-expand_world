@@ -113,14 +113,14 @@ public class EnvironmentManager
 
   public static void ToFile()
   {
-    if (!Helper.IsServer() || !Configuration.DataEnvironments) return;
+    if (Helper.IsClient() || !Configuration.DataEnvironments) return;
     if (File.Exists(FilePath)) return;
     var yaml = DataManager.Serializer().Serialize(EnvMan.instance.m_environments.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }
   public static void FromFile()
   {
-    if (!Helper.IsServer()) return;
+    if (Helper.IsClient()) return;
     var yaml = Configuration.DataEnvironments ? DataManager.Read(Pattern) : "";
     Configuration.valueEnvironmentData.Value = yaml;
     Set(yaml);

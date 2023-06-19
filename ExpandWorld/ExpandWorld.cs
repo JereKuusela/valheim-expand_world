@@ -13,7 +13,7 @@ public class ExpandWorld : BaseUnityPlugin
 {
   public const string GUID = "expand_world";
   public const string NAME = "Expand World";
-  public const string VERSION = "1.49";
+  public const string VERSION = "1.50";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -24,14 +24,12 @@ public class ExpandWorld : BaseUnityPlugin
     ModRequired = true,
     IsLocked = true
   };
-  public static string ConfigName = "";
-  public static string YamlDirectory = "";
+  public static string ConfigName = $"{GUID}.cfg";
+  public static string YamlDirectory = Path.Combine(Paths.ConfigPath, GUID);
   public void Awake()
   {
-    BiomeManager.SetupBiomeArrays();
     Log = Logger;
-    ConfigName = $"{GUID}.cfg";
-    YamlDirectory = Path.Combine(Paths.ConfigPath, GUID);
+    BiomeManager.SetupBiomeArrays();
     YamlCleanUp();
     if (!Directory.Exists(YamlDirectory))
       Directory.CreateDirectory(YamlDirectory);
