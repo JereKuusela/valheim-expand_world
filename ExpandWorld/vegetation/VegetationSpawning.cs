@@ -12,7 +12,7 @@ public class VegetationSpawning
   public static Dictionary<ZoneSystem.ZoneVegetation, Range<Vector3>> Scale = new();
   public static Dictionary<ZoneSystem.ZoneVegetation, ZPackage?> ZDO = new();
   public static Dictionary<ZoneSystem.ZoneVegetation, VegetationSpawnCondition> SpawnCondition = new();
-  private static ZoneSystem.ZoneVegetation Veg = new();
+  private static ZoneSystem.ZoneVegetation CurrentVegetation = new();
   private static ZoneSystem.SpawnMode Mode = ZoneSystem.SpawnMode.Client;
   private static List<GameObject> SpawnedObjects = new();
   static void Prefix(ZoneSystem.SpawnMode mode, List<GameObject> spawnedObjects)
@@ -22,30 +22,30 @@ public class VegetationSpawning
   }
   static ZoneSystem.ZoneVegetation SetVeg(ZoneSystem.ZoneVegetation veg)
   {
-    Veg = veg;
+    CurrentVegetation = veg;
     return veg;
   }
 
-  private static ZPackage? DataOverride(ZPackage? data, string dummy, string prefab)
+  private static ZPackage? DataOverride(ZPackage? data, string prefab)
   {
     if (data != null) return data;
-    if (!ZDO.TryGetValue(Veg, out data)) return null;
+    if (!ZDO.TryGetValue(CurrentVegetation, out data)) return null;
     return data;
   }
 
-  private static string PrefabOverride(string dummy, string prefab)
+  private static string PrefabOverride(string prefab)
   {
     return prefab;
   }
   static GameObject Instantiate(GameObject prefab, Vector3 pos, Quaternion rot)
   {
-    return DataManager.Instantiate(prefab, pos, rot, DataOverride(null, "", ""));
+    return DataManager.Instantiate(prefab, pos, rot, DataOverride(null, ""));
   }
   static GameObject InstantiateBlueprint(GameObject prefab, Vector3 position, Quaternion rotation)
   {
     if (Mode == ZoneSystem.SpawnMode.Ghost)
       ZNetView.StartGhostInit();
-    Spawn.Blueprint("", prefab.name, position, rotation, DataOverride, PrefabOverride, SpawnedObjects);
+    Spawn.Blueprint(prefab.name, position, rotation, DataOverride, PrefabOverride, SpawnedObjects);
     if (Mode == ZoneSystem.SpawnMode.Ghost)
       ZNetView.FinishGhostInit();
     // Blueprints spawn a dummy non-ZNetView object, so no extra stuff is needed.
@@ -53,7 +53,7 @@ public class VegetationSpawning
   }
   static void SetScale(ZNetView view, Vector3 scale)
   {
-    if (Scale.TryGetValue(Veg, out var randomScale))
+    if (Scale.TryGetValue(CurrentVegetation, out var randomScale))
       scale = Helper.RandomValue(randomScale);
     view.SetLocalScale(scale);
   }

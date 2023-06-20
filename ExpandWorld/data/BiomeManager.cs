@@ -91,7 +91,6 @@ public class BiomeManager
   {
     if (Helper.IsClient() || !Configuration.DataBiome) return;
     if (File.Exists(FilePath)) return;
-    ExpandWorld.Log.LogWarning("Writing biomes to file: " + EnvMan.instance.m_biomes.Count);
     var yaml = DataManager.Serializer().Serialize(EnvMan.instance.m_biomes.Select(ToData).ToList());
     File.WriteAllText(FilePath, yaml);
   }

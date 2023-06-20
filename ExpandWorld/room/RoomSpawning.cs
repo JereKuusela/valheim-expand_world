@@ -17,6 +17,7 @@ namespace ExpandWorld;
 [HarmonyPatch(typeof(DungeonGenerator))]
 public class RoomSpawning
 {
+  public static string CurrentRoom = "";
   // Note: OverrideRoomData will change the parameters of the room prefab. Don't use them for anything.
   public static Dictionary<string, DungeonDB.RoomData> Prefabs = new();
 
@@ -66,7 +67,7 @@ public class RoomSpawning
     // Clients already have proper rooms.
     if (mode == ZoneSystem.SpawnMode.Client) return true;
     var parameters = room.m_room;
-    Dungeon.Spawner.RoomName = parameters.name;
+    CurrentRoom = parameters.name;
     var baseName = Parse.Name(parameters.name);
     // Combine the base room prefab and the room parameters.
     if (Prefabs.TryGetValue(baseName, out var roomData))
@@ -82,7 +83,7 @@ public class RoomSpawning
     }
     if (BlueprintManager.TryGet(parameters.name, out var bp))
     {
-      Spawn.Blueprint(Dungeon.Spawner.LocationName, bp, pos, rot, DataOverride, PrefabOverride, null);
+      Spawn.Blueprint(bp, pos, rot, DataOverride, PrefabOverride, null);
     }
     return true;
   }
@@ -91,7 +92,7 @@ public class RoomSpawning
   [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPostfix]
   static void PlaceRoomCustomObjects(DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
-    Dungeon.Spawner.RoomName = "";
+    CurrentRoom = "";
     if (mode == ZoneSystem.SpawnMode.Client) return;
     if (!Objects.TryGetValue(room.m_room.name, out var objects)) return;
     int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
@@ -100,7 +101,7 @@ public class RoomSpawning
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      Spawn.BPO(Dungeon.Spawner.LocationName, obj, pos, rot, DataOverride, PrefabOverride, null);
+      Spawn.BPO(obj, pos, rot, DataOverride, PrefabOverride, null);
     }
     UnityEngine.Random.state = state;
   }
@@ -143,17 +144,17 @@ public class RoomSpawning
       room.name = Parse.Name(room.name);
   }
 
-  public static string PrefabOverride(string room, string prefab)
+  public static string PrefabOverride(string prefab)
   {
-    if (!ObjectSwaps.TryGetValue(room, out var objectSwaps)) return prefab;
+    if (!ObjectSwaps.TryGetValue(CurrentRoom, out var objectSwaps)) return prefab;
     if (!objectSwaps.TryGetValue(prefab, out var swaps)) return prefab;
     return Spawn.RandomizeSwap(swaps);
   }
 
-  public static ZPackage? DataOverride(ZPackage? pkg, string dungeon, string prefab)
+  public static ZPackage? DataOverride(ZPackage? pkg, string prefab)
   {
     if (pkg != null) return pkg;
-    if (!ObjectData.TryGetValue(dungeon, out var objectData)) return null;
+    if (!ObjectData.TryGetValue(CurrentRoom, out var objectData)) return null;
     if (!objectData.TryGetValue(prefab, out var data)) return null;
     return Spawn.RandomizeData(data);
   }

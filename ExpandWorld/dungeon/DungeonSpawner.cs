@@ -9,44 +9,38 @@ namespace ExpandWorld.Dungeon;
 [HarmonyPatch(typeof(DungeonGenerator))]
 public class Spawner
 {
-  ///<summary>Dungeon doesn't know its location so it must be tracked manually.</summary>
-  public static string LocationName = "";
-
+  public static string CurrentDungeon = "";
   public static Dictionary<string, FakeDungeonGenerator> Generators = new();
-  public static string RoomName = "";
-  public static string DungeonName = "";
 
-
-  private static string PrefabDungeonOverride(string dungeon, string prefab)
+  private static string PrefabDungeonOverride(string prefab)
   {
-    if (!Generators.TryGetValue(dungeon, out var gen)) return prefab;
+    if (!Generators.TryGetValue(CurrentDungeon, out var gen)) return prefab;
     if (!gen.m_objectSwaps.TryGetValue(prefab, out var swaps)) return prefab;
     return Spawn.RandomizeSwap(swaps);
   }
-  private static string PrefabOverride(string dungeonRoom, string prefab)
+  private static string PrefabOverride(string prefab)
   {
-    var split = dungeonRoom.Split('|');
-    prefab = PrefabDungeonOverride(split[0], prefab);
-    if (split.Length > 1)
-      prefab = RoomSpawning.PrefabOverride(split[1], prefab);
+    prefab = LocationSpawning.PrefabOverride(prefab);
+    prefab = PrefabDungeonOverride(prefab);
+    prefab = RoomSpawning.PrefabOverride(prefab);
     return prefab;
   }
 
-  private static ZPackage? DataDungeonOverride(ZPackage? pgk, string dungeon, string prefab)
+  private static ZPackage? DataDungeonOverride(ZPackage? pgk, string prefab)
   {
     if (pgk != null) return pgk;
-    if (!Generators.TryGetValue(dungeon, out var gen)) return null;
+    if (!Generators.TryGetValue(CurrentDungeon, out var gen)) return null;
     if (!gen.m_objectData.TryGetValue(prefab, out var data)) return null;
     return Spawn.RandomizeData(data);
   }
-  public static ZPackage? DataOverride(ZPackage? pgk, string dungeonRoom, string prefab)
+  public static ZPackage? DataOverride(ZPackage? pgk, string prefab)
   {
     if (pgk != null) return pgk;
-    var split = dungeonRoom.Split('|');
-    if (split.Length > 1)
-      pgk = RoomSpawning.DataOverride(pgk, split[1], prefab);
+    pgk = RoomSpawning.DataOverride(pgk, prefab);
     if (pgk != null) return pgk;
-    return DataDungeonOverride(pgk, split[0], prefab);
+    pgk = DataDungeonOverride(pgk, prefab);
+    if (pgk != null) return pgk;
+    return LocationSpawning.DataOverride(pgk, prefab);
   }
 
   ///<summary>Implements object data and swapping from location data.</summary>
@@ -56,8 +50,7 @@ public class Spawner
     // Revert to the default behaviour as a fail safe.
     if (Helper.IsClient()) return Object.Instantiate(prefab, pos, rot);
     BlueprintObject bpo = new(Utils.GetPrefabName(prefab), pos, rot, prefab.transform.localScale, null, 1f);
-    var source = $"{DungeonName}|{RoomName}";
-    var obj = Spawn.BPO(source, bpo, DataOverride, PrefabOverride, null);
+    var obj = Spawn.BPO(bpo, DataOverride, PrefabOverride, null);
     return obj ?? LocationSpawning.DummySpawn;
   }
 
@@ -82,17 +75,17 @@ public class Spawner
   [HarmonyPatch(nameof(DungeonGenerator.Generate), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
   static void Generate(DungeonGenerator __instance)
   {
-    if (LocationName == "") return;
+    if (LocationSpawning.CurrentLocation == "") return;
     var dungeonName = Utils.GetPrefabName(__instance.gameObject);
-    if (LocationLoading.LocationData.TryGetValue(LocationName, out var data) && data.dungeon != "")
+    if (LocationLoading.LocationData.TryGetValue(LocationSpawning.CurrentLocation, out var data) && data.dungeon != "")
       dungeonName = data.dungeon;
     Override(__instance, dungeonName);
-    DungeonName = dungeonName;
+    CurrentDungeon = dungeonName;
   }
   [HarmonyPatch(nameof(DungeonGenerator.Generate), typeof(ZoneSystem.SpawnMode)), HarmonyPostfix]
   static void GenerateEnd()
   {
-    DungeonName = "";
+    CurrentDungeon = "";
   }
 
 

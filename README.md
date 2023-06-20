@@ -339,12 +339,12 @@ Locations are pregenerated at world generation. You must use `genloc` command to
 - forestTresholdMax (default: `0`): Maximum forest value (if only in forests).
 - groundOffset (default: `0` meters): Placed above the ground.
 - data: ZDO data override. For example to change altars with Spawner Tweaks mod (`object copy` from World Edit Commands).
-- objectSwap: Changes location objects to other objects, doesn't include dungeons.
+- objectSwap: Changes location objects to other objects, also includes dungeons.
     - See [Object swaps](https://github.com/JereKuusela/valheim-expand_world#Object_swaps) for details.
     - [Example](https://github.com/JereKuusela/valheim-expand_world/blob/main/examples/examples_locations.md#location-adding-new-objects)
-- objectData: Replaces object data in the location, doesn't include dungeons.
+- objectData: Replaces object data in the location, also includes dungeons.
   - See [Object data](https://github.com/JereKuusela/valheim-expand_world#Object_data) for details.
-- objects: Extra objects in the location.
+- objects: Extra objects in the location, relative to the location center.
   - See [Custom objects](https://github.com/JereKuusela/valheim-expand_world#Custom_objects) for details.
 - randomDamage (default: `false`): If true, pieces are randomly damaged.
 - exteriorRadius: How many meters are cleared, leveled or no build. If not given for blueprints, this is the radius of the blueprint (+ 2 meters).

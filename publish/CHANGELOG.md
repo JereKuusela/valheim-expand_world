@@ -1,3 +1,6 @@
+- v1.51
+  - Changes the fields `objectSwap` and `objectData` in the `expand_locations.yaml` to also affect dungeons (reverting previous change).
+
 - v1.50
   - Fixes `expand_biomes.yaml` file not being created.
   - Fixes custom biomes not loading correctly.

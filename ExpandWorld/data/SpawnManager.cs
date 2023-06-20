@@ -184,18 +184,18 @@ public class SpawnZDO
     DataHelper.InitZDO(spawnPoint, Quaternion.identity, null, data, view);
   }
 
-  private static string PrefabOverride(string dummy, string prefab)
+  private static string PrefabOverride(string prefab)
   {
     return prefab;
   }
-  static ZPackage? DataOverride(ZPackage? pgk, string source, string prefab) => pgk;
+  static ZPackage? DataOverride(ZPackage? pgk, string prefab) => pgk;
   static void Postfix(SpawnSystem.SpawnData critter, Vector3 spawnPoint)
   {
     if (!SpawnManager.Objects.TryGetValue(critter, out var objects)) return;
     foreach (var obj in objects)
     {
       if (obj.Chance < 1f && UnityEngine.Random.value > obj.Chance) continue;
-      Spawn.BPO("", obj, spawnPoint, Quaternion.identity, DataOverride, PrefabOverride, null);
+      Spawn.BPO(obj, spawnPoint, Quaternion.identity, DataOverride, PrefabOverride, null);
     }
   }
 }
