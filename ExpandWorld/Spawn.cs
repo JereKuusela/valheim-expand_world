@@ -74,6 +74,8 @@ public class Spawn
   private static GameObject? SharedBPO(BlueprintObject obj, Vector3 pos, Quaternion rot, DataOverride dataOverride, Func<string, string> prefabOverride, List<GameObject>? spawned)
   {
     pos += rot * obj.Pos;
+    if (obj.SnapToGround)
+      pos.y = ZoneSystem.instance.GetGroundHeight(pos);
     rot *= obj.Rot;
     obj.Prefab = prefabOverride(obj.Prefab);
     var prefab = ZNetScene.instance.GetPrefab(obj.Prefab);

@@ -650,9 +650,11 @@ The objects are added relative to the spawn or location center.
 ```
   - objects:
     # Format is:
-    - id, posX,posY,posZ, rotT,rotX,rotZ, scaleX,scaleY,scaleZ, chance, data
+    - id, posX,posZ,posY, rotY,rotX,rotZ, scaleX,scaleZ,scaleY, chance, data
     # Adds a mushroom at the center to visually show where it is.
     - GlowingMushroom, 0,0,0
+    # Adds a mushroom 20 meters away from the center that snaps to the ground.
+    - GlowingMushroom, 20,0,snap
     # Adds a bigger mushroom if the first one wasn't big enough.
     - GlowingMushroom, 0,0,0 0,0,0 2,2,2
     # Adds a chest near the center with 90 degrees rotation that has a 50% chance to appear.

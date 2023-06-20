@@ -16,13 +16,15 @@ public class BlueprintObject
   public ZPackage? Data;
   public float Chance = 1f;
   public Vector3? Scale;
-  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, ZPackage? data, float chance)
+  public bool SnapToGround = false;
+  public BlueprintObject(string name, Vector3 pos, Quaternion rot, Vector3 scale, ZPackage? data, float chance, bool snapToGround = false)
   {
     Prefab = name;
     Pos = pos;
     Rot = rot.normalized;
     Data = data;
     Chance = chance;
+    SnapToGround = snapToGround;
     // Some blueprints have the scale only in the data, so don't override it with the default.
     if (scale != Vector3.one)
       Scale = scale;

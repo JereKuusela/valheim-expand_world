@@ -65,7 +65,8 @@ public static class Parse
         AngleYXZ(split, 4),
         VectorXZY(split, 7, Vector3.one),
         DataHelper.Deserialize(split.Length > 11 ? split[11] : ""),
-        Float(split, 10, 1f)
+        Float(split, 10, 1f),
+        split.Length > 3 && split[3].ToLowerInvariant() == "snap"
       )).ToList();
   }
   public static string[] Split(string arg, bool removeEmpty = true, char split = ',') => arg.Split(split).Select(s => s.Trim()).Where(s => !removeEmpty || s != "").ToArray();
