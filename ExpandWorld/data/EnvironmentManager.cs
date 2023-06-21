@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HarmonyLib;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -12,6 +13,7 @@ public class EnvironmentManager
   public static string FilePath = Path.Combine(ExpandWorld.YamlDirectory, FileName);
   public static string Pattern = "expand_environments*.yaml";
   private static Dictionary<string, EnvSetup> Originals = new();
+  public static Dictionary<string, EnvironmentExtra> Extra = new();
   public static EnvSetup FromData(EnvironmentData data)
   {
     EnvSetup env = new()
@@ -63,7 +65,27 @@ public class EnvironmentManager
     env.m_musicEvening = data.musicEvening;
     env.m_musicDay = data.musicDay;
     env.m_musicNight = data.musicNight;
+
+    EnvironmentExtra extra = new();
+    if (data.statusEffects != "")
+      extra.statusEffects = DataManager.ToList(data.statusEffects).Select(ParseStatus).ToList();
+    if (data.dayStatusEffects != "")
+      extra.dayStatusEffects = DataManager.ToList(data.dayStatusEffects).Select(ParseStatus).ToList();
+    if (data.nightStatusEffects != "")
+      extra.nightStatusEffects = DataManager.ToList(data.nightStatusEffects).Select(ParseStatus).ToList();
+    if (extra.IsValid())
+      Extra[data.name] = extra;
     return env;
+  }
+  public static EnvironmentStatus ParseStatus(string str)
+  {
+    var split = str.Split(':');
+    return new()
+    {
+      hash = split[0].GetStableHashCode(),
+      amount = Parse.Float(split, 1, 0f),
+      extraAmount = Parse.Float(split, 2, 0f),
+    };
   }
   public static EnvironmentData ToData(EnvSetup env)
   {
@@ -142,6 +164,7 @@ public class EnvironmentManager
   private static void Set(string yaml)
   {
     SetOriginals();
+    Extra.Clear();
     if (yaml == "" || !Configuration.DataEnvironments) return;
     try
     {
@@ -173,5 +196,107 @@ public class EnvironmentManager
   public static void SetupWatcher()
   {
     DataManager.SetupWatcher(Pattern, FromFile);
+  }
+}
+
+[HarmonyPatch(typeof(Player), nameof(Player.UpdateEnvStatusEffects))]
+public class UpdateEnvStatusEffects
+{
+
+  private static void Remove(SEMan seman, List<EnvironmentStatus> es)
+  {
+    foreach (var statusEffect in es)
+      Remove(seman, statusEffect);
+  }
+  private static void Remove(SEMan seman, EnvironmentStatus es)
+  {
+    var statusEffect = seman.GetStatusEffect(es.hash);
+    if (statusEffect == null) return;
+    // Expiring status effects should expire their own.
+    // But permanent ones should be removed.
+    if (statusEffect.m_ttl > 0f) return;
+    ExpandWorld.Log.LogInfo($"Removing {statusEffect.name}");
+    seman.RemoveStatusEffect(es.hash);
+  }
+  private static void Add(SEMan seman, List<EnvironmentStatus> es)
+  {
+    foreach (var statusEffect in es)
+      Add(seman, statusEffect);
+  }
+  private static float DamageTimer = 0f;
+  private static readonly float TickRate = 1f;
+  private static void Add(SEMan seman, EnvironmentStatus es)
+  {
+    var amount = es.amount;
+    var extraAmount = es.extraAmount;
+    // Custom duration is handled manually.
+    // Also damage effects shouldn't be reseted (since it messed up the damage calculation).
+    var reset = amount == 0;
+    seman.AddStatusEffect(es.hash, reset, (int)es.amount, es.extraAmount);
+    if (amount == 0 && extraAmount == 0) return;
+    var se = seman.GetStatusEffect(es.hash);
+    // To avoid spamming damage calculations, only tick once per second.
+    var addDamage = DamageTimer >= TickRate;
+    if (se is SE_Burning burning)
+    {
+      if (!addDamage) return;
+      var hasDamage = (burning.m_fireDamageLeft + burning.m_spiritDamageLeft) > 0;
+      // Fire stacks, so the damage must match the tick rate.
+      if (hasDamage) amount = amount * TickRate / se.m_ttl;
+      // Extra amount not used for the initial tick.
+      else extraAmount = 0f;
+      // Heuristic to try detect the damage type.
+      if (burning.NameHash() == Character.s_statusEffectSpirit || burning.m_spiritDamageLeft > 0f)
+        burning.AddSpiritDamage(amount + extraAmount);
+      else
+        burning.AddFireDamage(amount + extraAmount);
+    }
+    else if (se is SE_Poison poison)
+    {
+      if (!addDamage) return;
+      // Poison doesn't stack so full damage can always be added.
+      poison.AddDamage(amount + extraAmount);
+    }
+    else if (se is SE_Shield)
+    {
+      // Nothing to do here.
+      return;
+    }
+    else
+      se.m_time = se.m_ttl - amount;
+
+  }
+  private static string PreviousWeather = "";
+  private static bool PreviousDay = false;
+  static void Postfix(Player __instance, float dt)
+  {
+    if (__instance != Player.m_localPlayer) return;
+    DamageTimer += dt;
+    var seman = __instance.GetSEMan();
+    var name = EnvMan.instance.GetCurrentEnvironment()?.m_name ?? "";
+    var day = EnvMan.instance.IsDay();
+    if (EnvironmentManager.Extra.TryGetValue(PreviousWeather, out var extra))
+    {
+      if (name != PreviousWeather)
+      {
+        Remove(seman, extra.statusEffects);
+        Remove(seman, extra.dayStatusEffects);
+        Remove(seman, extra.nightStatusEffects);
+      }
+      if (day != PreviousDay)
+      {
+        if (day) Remove(seman, extra.nightStatusEffects);
+        else Remove(seman, extra.dayStatusEffects);
+      }
+    }
+    if (EnvironmentManager.Extra.TryGetValue(name, out extra))
+    {
+      Add(seman, extra.statusEffects);
+      if (day) Add(seman, extra.dayStatusEffects);
+      else Add(seman, extra.nightStatusEffects);
+    }
+    PreviousWeather = name;
+    PreviousDay = day;
+    if (DamageTimer >= TickRate) DamageTimer = 0f;
   }
 }

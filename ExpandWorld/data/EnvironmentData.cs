@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 
@@ -68,4 +69,24 @@ public class EnvironmentData
   public float lightIntensityNight = 0f;
   [DefaultValue(60f)]
   public float sunAngle = 60f;
+  [DefaultValue("")]
+  public string statusEffects = "";
+  [DefaultValue("")]
+  public string dayStatusEffects = "";
+  [DefaultValue("")]
+  public string nightStatusEffects = "";
+}
+
+public class EnvironmentStatus
+{
+  public int hash;
+  public float amount;
+  public float extraAmount;
+}
+public class EnvironmentExtra
+{
+  public List<EnvironmentStatus> statusEffects = new();
+  public List<EnvironmentStatus> dayStatusEffects = new();
+  public List<EnvironmentStatus> nightStatusEffects = new();
+  public bool IsValid() => statusEffects.Count > 0 || dayStatusEffects.Count > 0 || nightStatusEffects.Count > 0;
 }

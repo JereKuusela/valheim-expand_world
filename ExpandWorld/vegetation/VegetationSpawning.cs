@@ -55,9 +55,9 @@ public class VegetationSpawning
       scale = Helper.RandomValue(extra.scale);
     view.SetLocalScale(scale);
   }
-  private static bool InsideClearArea(List<ZoneSystem.ClearArea> areas, Vector3 point, ZoneSystem.ZoneVegetation veg)
+  private static bool InsideClearArea(List<ZoneSystem.ClearArea> areas, Vector3 point)
   {
-    var size = Extra.TryGetValue(veg, out var extra) ? extra.clearRadius : 0;
+    var size = Extra.TryGetValue(CurrentVegetation, out var extra) ? extra.clearRadius : 0;
     foreach (var clearArea in areas)
     {
       var distance = Utils.DistanceXZ(point, clearArea.m_center);
@@ -72,8 +72,7 @@ public class VegetationSpawning
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(ZoneSystem.ZoneVegetation), nameof(ZoneSystem.ZoneVegetation.m_enable))))
       .Insert(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(SetVeg).operand))
       .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(ZoneSystem), nameof(ZoneSystem.InsideClearArea))))
-      .SetAndAdvance(OpCodes.Ldloc_S, 5)
-      .Insert(new CodeInstruction(OpCodes.Call, Transpilers.EmitDelegate(InsideClearArea).operand))
+      .Set(OpCodes.Call, Transpilers.EmitDelegate(InsideClearArea).operand)
       .MatchForward(false, new CodeMatch(OpCodes.Call, instantiator))
       .Set(OpCodes.Call, Transpilers.EmitDelegate(Instantiate).operand)
       .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZNetView), nameof(ZNetView.SetLocalScale))))
