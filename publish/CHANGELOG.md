@@ -1,5 +1,6 @@
 - v1.51
   - Adds terrain snap support to the `objects` fields.
+  - Adds a new field `clearRadius` to the `expand_vegetation.yaml` file.
   - Changes the fields `objectSwap` and `objectData` in the `expand_locations.yaml` to also affect dungeons (reverting previous change).
   - Fixes the scale not working on extra objects.
 

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEngine;
+
 namespace ExpandWorld;
 
 public class VegetationData
@@ -69,6 +71,8 @@ public class VegetationData
   public float forestTresholdMin = 0f;
   [DefaultValue(1f)]
   public float forestTresholdMax = 1f;
+  [DefaultValue(0f)]
+  public float clearRadius = 0f;
   [DefaultValue("")]
   public string requiredGlobalKey = "";
   [DefaultValue("")]
@@ -79,8 +83,13 @@ public class VegetationData
   public string centerPiece = "piece_bpcenterpoint";
 }
 
-public class VegetationSpawnCondition
+public class VegetationExtra
 {
-  public List<string> requiredGlobalKeys = new();
-  public List<string> forbiddenGlobalKeys = new();
+  public List<string>? requiredGlobalKeys;
+  public List<string>? forbiddenGlobalKeys;
+  public ZPackage? data;
+  public Range<Vector3>? scale;
+  public float clearRadius = 0;
+
+  public bool IsValid() => requiredGlobalKeys != null || forbiddenGlobalKeys != null || data != null || scale != null || clearRadius != 0f;
 }

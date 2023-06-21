@@ -27,9 +27,7 @@ public class VegetationLoading
   }
   public static void Load()
   {
-    VegetationSpawning.Scale.Clear();
-    VegetationSpawning.ZDO.Clear();
-    VegetationSpawning.SpawnCondition.Clear();
+    VegetationSpawning.Extra.Clear();
     if (Helper.IsClient()) return;
     ZoneSystem.instance.m_vegetation = DefaultEntries;
     if (!Configuration.DataVegetation)
@@ -155,13 +153,16 @@ public class VegetationLoading
     {
       Uniform = data.scaleUniform
     };
+    VegetationExtra extra = new()
+    {
+      clearRadius = data.clearRadius
+    };
     // Minor optimization to skip RNG calls if there is nothing to randomize.
     if (Helper.IsMultiAxis(scale))
-      VegetationSpawning.Scale[veg] = scale;
+      extra.scale = scale;
     if (data.data != "")
-    {
-      VegetationSpawning.ZDO[veg] = DataHelper.Deserialize(data.data);
-    }
+      extra.data = DataHelper.Deserialize(data.data);
+
     if (ZNetScene.instance.m_namedPrefabs.TryGetValue(hash, out var obj))
     {
       veg.m_prefab = obj;
@@ -170,14 +171,12 @@ public class VegetationLoading
     {
       veg.m_prefab = new GameObject(data.prefab);
     }
-    if (veg.m_enable && (data.forbiddenGlobalKey != "" || data.requiredGlobalKey != ""))
-    {
-      VegetationSpawning.SpawnCondition.Add(veg, new VegetationSpawnCondition()
-      {
-        forbiddenGlobalKeys = DataManager.ToList(data.forbiddenGlobalKey),
-        requiredGlobalKeys = DataManager.ToList(data.requiredGlobalKey),
-      });
-    }
+    if (veg.m_enable && data.requiredGlobalKey != "")
+      extra.requiredGlobalKeys = DataManager.ToList(data.requiredGlobalKey);
+    if (veg.m_enable && data.forbiddenGlobalKey != "")
+      extra.forbiddenGlobalKeys = DataManager.ToList(data.forbiddenGlobalKey);
+    if (extra.IsValid())
+      VegetationSpawning.Extra.Add(veg, extra);
     return veg;
   }
   public static VegetationData ToData(ZoneSystem.ZoneVegetation veg)

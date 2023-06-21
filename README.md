@@ -500,6 +500,9 @@ Note: Missing vegetation are automatically added to the file. To disable, set `e
   - Larger values would be more away from the forest center.
 - forestTresholdMin (default: `0`): Minimum forest value.
 - forestTresholdMax (default: `0`): Maximum forest value.
+- clearRadius (default: `0` meters): Extra distance away from location clear areas.
+  - Note: By default, only the vegetation center point is checked. So big objects can have part of them inside clear areas.
+  - If this is a problem, increase the value.
 - requiredGlobalKey: List of [global keys](https://valheim.fandom.com/wiki/Global_Keys). If all are set, the vegetation is placed.
   - Note: This doesn't affect already generated zones. Intended to be used with Upgrade World + Cron Job mods.
 - forbiddenGlobalKey: List of [global keys](https://valheim.fandom.com/wiki/Global_Keys). If any is set, the vegetation is not placed.
