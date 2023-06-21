@@ -30,7 +30,8 @@ public class Spawn
   }
   private static void SetData(GameObject prefab, Vector3 position, Quaternion rotation, Vector3? scale, ZPackage? data = null)
   {
-    if (data == null) return;
+    // No override needed.
+    if (data == null && scale == null) return;
     if (!prefab.TryGetComponent<ZNetView>(out var view)) return;
     var zdo = DataHelper.InitZDO(position, rotation, scale, data, view);
     // Users very easily might have creator on their blueprints or copied data.
