@@ -103,10 +103,10 @@ public class VegetationLoading
     foreach (var veg in missing)
       ExpandWorld.Log.LogWarning(veg.m_prefab.name);
     var yaml = File.ReadAllText(FilePath);
-    var data = DataManager.Deserialize<VegetationData>(yaml, FileName).ToList();
-    data.AddRange(missing.Select(ToData));
-    // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, DataManager.Serializer().Serialize(data));
+    var data = DataManager.Serializer().Serialize(missing.Select(ToData));
+    // Directly appending is risky but necessary to keep comments, etc.
+    yaml += "\n" + data;
+    File.WriteAllText(FilePath, yaml);
     return true;
   }
 

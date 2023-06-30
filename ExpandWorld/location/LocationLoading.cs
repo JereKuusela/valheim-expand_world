@@ -214,10 +214,10 @@ public class LocationLoading
     foreach (var item in missing)
       ExpandWorld.Log.LogWarning(item);
     var yaml = File.ReadAllText(FilePath);
-    var data = DataManager.Deserialize<LocationData>(yaml, FileName).ToList();
-    data.AddRange(missing.Select(ToData));
-    // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, DataManager.Serializer().Serialize(data));
+    var data = DataManager.Serializer().Serialize(missing.Select(ToData));
+    // Directly appending is risky but necessary to keep comments, etc.
+    yaml += "\n" + data;
+    File.WriteAllText(FilePath, yaml);
     return true;
   }
   private static List<ZoneSystem.ZoneLocation> FromFile()

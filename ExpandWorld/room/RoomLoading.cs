@@ -241,10 +241,10 @@ public class RoomLoading
     foreach (var entry in missing)
       ExpandWorld.Log.LogWarning(entry.m_room.name);
     var yaml = File.ReadAllText(FilePath);
-    var data = DataManager.Deserialize<RoomData>(yaml, FileName).ToList();
-    data.AddRange(missing.Select(ToData));
-    // Directly appending is risky if something goes wrong (like missing a linebreak).
-    File.WriteAllText(FilePath, DataManager.Serializer().Serialize(data));
+    var data = DataManager.Serializer().Serialize(missing.Select(ToData));
+    // Directly appending is risky but necessary to keep comments, etc.
+    yaml += "\n" + data;
+    File.WriteAllText(FilePath, yaml);
     return true;
   }
   public static void SetupWatcher()
