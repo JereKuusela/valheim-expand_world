@@ -4,6 +4,7 @@
   - Adds new fields `statusEffects`, `dayStatusEffects` and `nightStatusEffects` to the `expand_environments.yaml` file.
   - Changes the fields `objectSwap` and `objectData` in the `expand_locations.yaml` to also affect dungeons (reverting previous change).
   - Fixes the scale not working on extra objects.
+  - Fixes dungeon being blocked by CLLC dungeon reset.
 
 - v1.50
   - Fixes `expand_biomes.yaml` file not being created.

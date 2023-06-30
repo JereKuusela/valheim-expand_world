@@ -63,7 +63,7 @@ public class RoomSpawning
   [HarmonyPatch(nameof(DungeonGenerator.PlaceRoom), typeof(DungeonDB.RoomData), typeof(Vector3), typeof(Quaternion), typeof(RoomConnection), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
   static bool ReplaceRoom(ref DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
-    if (!Configuration.DataRooms) return true;
+    if (!Configuration.DataRooms || Helper.IsClient()) return true;
     // Clients already have proper rooms.
     if (mode == ZoneSystem.SpawnMode.Client) return true;
     var parameters = room.m_room;
@@ -93,7 +93,7 @@ public class RoomSpawning
   static void PlaceRoomCustomObjects(DungeonDB.RoomData room, Vector3 pos, Quaternion rot, ZoneSystem.SpawnMode mode)
   {
     CurrentRoom = "";
-    if (mode == ZoneSystem.SpawnMode.Client) return;
+    if (mode == ZoneSystem.SpawnMode.Client || Helper.IsClient()) return;
     if (!Objects.TryGetValue(room.m_room.name, out var objects)) return;
     int seed = (int)pos.x * 4271 + (int)pos.y * 9187 + (int)pos.z * 2134;
     UnityEngine.Random.State state = UnityEngine.Random.state;
@@ -115,6 +115,7 @@ public class RoomSpawning
   [HarmonyPatch(nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
   static void SetupAvailableRooms()
   {
+    if (Helper.IsClient()) return;
     // To support live reloading for blueprints, the connections must be refreshed every time.
     foreach (var roomData in DungeonGenerator.m_availableRooms)
     {
@@ -137,6 +138,7 @@ public class RoomSpawning
   [HarmonyPatch(nameof(DungeonGenerator.Save)), HarmonyPrefix]
   static void CleanRoomsForSaving()
   {
+    if (Prefabs.Count == 0 || Helper.IsClient()) return;
     // Blueprints add a dummy room which shouldn't be saved.
     DungeonGenerator.m_placedRooms = DungeonGenerator.m_placedRooms.Where(IsBaseRoom).ToList();
     // Restore base names to save the rooms as vanilla compatible.

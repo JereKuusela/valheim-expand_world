@@ -75,7 +75,7 @@ public class Spawner
   [HarmonyPatch(nameof(DungeonGenerator.Generate), typeof(ZoneSystem.SpawnMode)), HarmonyPrefix]
   static void Generate(DungeonGenerator __instance)
   {
-    if (LocationSpawning.CurrentLocation == "") return;
+    if (LocationSpawning.CurrentLocation == "" || Helper.IsClient()) return;
     var dungeonName = Utils.GetPrefabName(__instance.gameObject);
     if (LocationLoading.LocationData.TryGetValue(LocationSpawning.CurrentLocation, out var data) && data.dungeon != "")
       dungeonName = data.dungeon;
@@ -120,6 +120,7 @@ public class Spawner
   [HarmonyPatch(nameof(DungeonGenerator.SetupAvailableRooms)), HarmonyPostfix]
   public static void SetupAvailableRooms(DungeonGenerator __instance)
   {
+    if (Helper.IsClient()) return;
     var name = Utils.GetPrefabName(__instance.gameObject);
     if (!Generators.TryGetValue(name, out var gen)) return;
     if (gen.m_excludedRooms.Count == 0) return;
