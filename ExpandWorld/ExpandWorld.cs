@@ -64,6 +64,7 @@ public class ExpandWorld : BaseUnityPlugin
     SpawnThat.Run();
     CustomRaids.Run();
     Marketplace.Run();
+    BetterContinents.Run();
   }
   public void LateUpdate()
   {

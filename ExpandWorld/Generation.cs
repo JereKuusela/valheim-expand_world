@@ -78,7 +78,7 @@ public class WorldGeneration
     wg.m_streams = wg.PlaceStreams();
     ExpandWorld.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
     stopwatch.Stop();
-    WorldGeneration.HasLoaded = true;
+    HasLoaded = true;
   }
   public static bool HasLoaded = false;
   static bool Prefix(WorldGenerator __instance)
@@ -173,6 +173,11 @@ public class MapGeneration
     {
       DoFakeGenerate = false;
       return false;
+    }
+    if (BetterContinents.IsEnabled())
+    {
+      ExpandWorld.Log.LogInfo($"Better Contintents enabled, skipping map generation.");
+      return true;
     }
     if (!WorldGeneration.HasLoaded || WorldGeneration.Generating) return false;
     Game.instance.StartCoroutine(Coroutine(__instance));
