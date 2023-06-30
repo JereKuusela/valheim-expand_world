@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using HarmonyLib;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -49,15 +47,15 @@ public class BiomeManager
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToTerrain = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static Dictionary<Heightmap.Biome, Heightmap.Biome> BiomeToNature = NameToBiome.ToDictionary(kvp => kvp.Value, kvp => kvp.Value);
   private static readonly Dictionary<Heightmap.Biome, Color> BiomeToColor = new();
-  private static readonly Dictionary<Heightmap.Biome, BiomeData> BiomeToData = new();
+  private static readonly Dictionary<Heightmap.Biome, BiomeData> BiomeData = new();
   public static bool TryGetColor(Heightmap.Biome biome, out Color color) => BiomeToColor.TryGetValue(biome, out color);
-  public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeToData.TryGetValue(biome, out data);
+  public static bool TryGetData(Heightmap.Biome biome, out BiomeData data) => BiomeData.TryGetValue(biome, out data);
   public static bool TryGetBiome(string name, out Heightmap.Biome biome) => NameToBiome.TryGetValue(name.ToLower(), out biome);
   public static Heightmap.Biome GetBiome(string name) => NameToBiome.TryGetValue(name.ToLower(), out var biome) ? biome : Heightmap.Biome.None;
   public static bool TryGetDisplayName(Heightmap.Biome biome, out string name) => BiomeToDisplayName.TryGetValue(biome, out name);
   public static Heightmap.Biome GetTerrain(Heightmap.Biome biome) => BiomeToTerrain.TryGetValue(biome, out var terrain) ? terrain : biome;
   public static Heightmap.Biome GetNature(Heightmap.Biome biome) => BiomeToNature.TryGetValue(biome, out var nature) ? nature : biome;
-  public static BiomeEnvSetup FromData(BiomeData data)
+  public static BiomeEnvSetup FromData(BiomeYaml data)
   {
     var biome = new BiomeEnvSetup
     {
@@ -70,7 +68,7 @@ public class BiomeManager
     };
     return biome;
   }
-  public static BiomeData ToData(BiomeEnvSetup biome)
+  public static BiomeYaml ToData(BiomeEnvSetup biome)
   {
     return new()
     {
@@ -112,14 +110,14 @@ public class BiomeManager
   }
   public static bool BiomeForestMultiplier = false;
 
-  private static List<BiomeData> Parse(string yaml)
+  private static List<BiomeYaml> Parse(string yaml)
   {
-    List<BiomeData> rawData = new();
+    List<BiomeYaml> rawData = new();
     if (Configuration.DataBiome)
     {
       try
       {
-        rawData = DataManager.Deserialize<BiomeData>(yaml, FileName);
+        rawData = DataManager.Deserialize<BiomeYaml>(yaml, FileName);
       }
       catch (Exception e)
       {
@@ -160,7 +158,7 @@ public class BiomeManager
     var rawData = Parse(yaml);
     if (rawData.Count > 0)
       ExpandWorld.Log.LogInfo($"Reloading biome data ({rawData.Count} entries).");
-    BiomeToData.Clear();
+    BiomeData.Clear();
     BiomeToColor.Clear();
     NameToBiome = OriginalBiomes.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
@@ -184,12 +182,11 @@ public class BiomeManager
         var key = "biome_" + biome.ToString().ToLower();
         Localization.instance.m_translations[key] = name;
       }
+      BiomeData extra = new(item);
+      if (extra.IsValid())
+        BiomeData[biome] = extra;
       if (isDefaultBiome)
-      {
-        BiomeToData[biome] = item;
         continue;
-      }
-      BiomeToData[biome] = item;
       NameToBiome.Add(item.biome.ToLower(), biome);
       if (item.paint != "") BiomeToColor[biome] = Terrain.ParsePaint(item.paint);
       biomeNumber *= 2;
