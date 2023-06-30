@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 
 namespace ExpandWorld;
 
-public class EnvironmentData
+public class EnvironmentYaml
 {
   public string name = "";
   [DefaultValue("")]
@@ -77,16 +78,18 @@ public class EnvironmentData
   public string nightStatusEffects = "";
 }
 
-public class EnvironmentStatus
+public class EnvironmentData
 {
-  public int hash;
-  public float amount;
-  public float extraAmount;
-}
-public class EnvironmentExtra
-{
-  public List<EnvironmentStatus> statusEffects = new();
-  public List<EnvironmentStatus> dayStatusEffects = new();
-  public List<EnvironmentStatus> nightStatusEffects = new();
+  public List<Status> statusEffects = new();
+  public List<Status> dayStatusEffects = new();
+  public List<Status> nightStatusEffects = new();
+  public EnvironmentData(EnvironmentYaml data) {
+    if (data.statusEffects != "")
+      statusEffects = DataManager.ToList(data.statusEffects).Select(s => new Status(s)).ToList();
+    if (data.dayStatusEffects != "")
+      dayStatusEffects = DataManager.ToList(data.dayStatusEffects).Select(s => new Status(s)).ToList();
+    if (data.nightStatusEffects != "")
+      nightStatusEffects = DataManager.ToList(data.nightStatusEffects).Select(s => new Status(s)).ToList();
+  }
   public bool IsValid() => statusEffects.Count > 0 || dayStatusEffects.Count > 0 || nightStatusEffects.Count > 0;
 }

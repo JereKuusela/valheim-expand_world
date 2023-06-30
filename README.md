@@ -265,7 +265,7 @@ The file `expand_environments.yaml` sets the available weathers. Command `ew_mus
 - sunAngle (default: `60`): ???.
 - statusEffects: List of status effects that are active in this environment.
   - Format is `name1:amount1,name2:amount2,...`
-  - For damage dealing effects, amount set the total damage. For example `Burning:100` for 20 damage per second over 5 seconds.
+  - For damage dealing effects, there are three amounts. For example `Burning:100` for 20 damage per second over 5 seconds.
   - For other effects, amount sets the duration in seconds. For example `CorpseRun:10` for 10 seconds of corpse run.
   - Note: Normal effects are still active. There is no point to add Freezing to non-freezing environments.
 - dayStatusEffects: List of status effects that are active in this environment during the day.
@@ -728,3 +728,5 @@ Note: Object data is not changed if the custom object has set a specific data.
       # Not recommended to use this way for longer data values.
       - idB, CAAAAAECXKVYFAAAAA==, CAAAAAJrzPp8AAAAAHZc4rL6DUI8:2
 ```
+
+# Status effects
