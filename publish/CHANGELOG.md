@@ -1,8 +1,7 @@
 - v1.51
   - Adds terrain snap support to the `objects` fields.
   - Adds a new field `clearRadius` to the `expand_vegetation.yaml` file.
-  - Adds new fields `statusEffects`, `dayStatusEffects` and `nightStatusEffects` to the `expand_biomes.yaml` file.
-  - Adds new fields `statusEffects`, `dayStatusEffects` and `nightStatusEffects` to the `expand_environments.yaml` file.
+  - Adds new fields `statusEffects`, `dayStatusEffects` and `nightStatusEffects` to the `expand_biomes.yaml` and `expand_environments.yaml` file.
   - Changes the fields `objectSwap` and `objectData` in the `expand_locations.yaml` to also affect dungeons (reverting previous change).
   - Changes the automatic data migration to keep comments and other changes.
   - Disables minimap generation if Better Continents is enabled (performance + compatiblity).

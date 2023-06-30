@@ -161,6 +161,12 @@ You can add up to 22 new biomes (on top of the 9 default ones).
 - musicEvening: Music override for the evening time.
 - musicNight: Music override for the night time.
 - noBuild (default: `false`): If true, players can't build in this biome.
+- statusEffects: List of status effects that are active in this environment.
+  - Format is `name1:amount1,name2:amount2,...`
+  - See [Status effects](https://github.com/JereKuusela/valheim-expand_world#Status_effects) for details.
+  - Note: Normal effects are still active. There is no point to add Freezing to non-freezing environments.
+- dayStatusEffects: List of status effects that are active in this environment during the day.
+- nightStatusEffects: List of status effects that are active in this environment during the night.
 
 ## World
 
@@ -265,8 +271,7 @@ The file `expand_environments.yaml` sets the available weathers. Command `ew_mus
 - sunAngle (default: `60`): ???.
 - statusEffects: List of status effects that are active in this environment.
   - Format is `name1:amount1,name2:amount2,...`
-  - For damage dealing effects, there are three amounts. For example `Burning:100` for 20 damage per second over 5 seconds.
-  - For other effects, amount sets the duration in seconds. For example `CorpseRun:10` for 10 seconds of corpse run.
+  - See [Status effects](https://github.com/JereKuusela/valheim-expand_world#Status_effects) for details.
   - Note: Normal effects are still active. There is no point to add Freezing to non-freezing environments.
 - dayStatusEffects: List of status effects that are active in this environment during the day.
 - nightStatusEffects: List of status effects that are active in this environment during the night.
@@ -730,3 +735,26 @@ Note: Object data is not changed if the custom object has set a specific data.
 ```
 
 # Status effects
+
+Both the biome and the current environment can apply status effects to the player. Effects can be active during the day, night or both.
+
+The order is:
+
+1. When the biome changes, previous "permanent" effects are instantly removed.
+2. When the weather changes, previous "permanent" effects are instantly removed.
+3. When the night starts,  previous "permanent" day time effects are instantly removed.
+4. When the day starts, previous "permanent" night time effects are instantly removed.
+5. Effects from the current biome and time of the day are refreshed.
+6. Effects from the current environment and time of the day are refreshed.
+
+Multiple formats:
+
+- `name`: Effect is applied with the default duration. Some effects don't have a default duration and are applied "permanently".
+  - For example `BeltStrength`.
+- `name:duration`: Effect is applied with the given duration. Duration 0 can be used for a "permanent" effect.
+  - For example `CorpseRun:10` for 10 seconds of corpse run.
+- `name:damage:damage_ignore_armor:damage_ignore_all`: Used for damage dealing effects (Burning, Poison and Spirit). The duration can't be set.
+  - For example `Burning:50` for 50 damage over 5 seconds (reduced by armor and resistances).
+  - For example `Poison:0:100` for 100 poison damage over time (reduced by resistance)-
+  - For example `Spirit:0:0:50` for 50 damage over 3 seconds (ignores armor and resistances).
+  - For example `Burning:100:50:25` with Fire resist and 25 armor would deal 25 + 50 / 2 + (100 / 2 - 25) = 25 + 25 + 25 = 75 damage over 5 seconds.
