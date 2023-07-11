@@ -1,5 +1,6 @@
 - v1.52
   - Adds a new setting to disable automatic data migration.
+  - Adds a new setting to disable automatic config reload (requires restart to take effect).
 
 - v1.51
   - Adds terrain snap support to the `objects` fields.

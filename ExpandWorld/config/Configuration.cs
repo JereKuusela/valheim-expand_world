@@ -83,6 +83,8 @@ public partial class Configuration
   public static bool DataWorld => configDataWorld.Value;
   public static ConfigEntry<bool> configDataMigration;
   public static bool DataMigration => configDataMigration.Value;
+  public static ConfigEntry<bool> configDataReload;
+  public static bool DataReload => configDataReload.Value;
 
 
   public static ConfigEntry<string> configSeed;
@@ -168,6 +170,7 @@ public partial class Configuration
     InitWater(wrapper);
 
     section = "4. Data";
+    configDataReload = wrapper.Bind(section, "Automatic data reload", false, true, "Data is loaded automatically on file changes. Requires restart to take effect.");
     configDataMigration = wrapper.Bind(section, "Automatic data migration", false, true, "Automatically add missing location, rooms and vegetation entries.");
     configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
     configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);

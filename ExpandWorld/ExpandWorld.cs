@@ -39,19 +39,21 @@ public class ExpandWorld : BaseUnityPlugin
     harmony.PatchAll();
     try
     {
-
-      SetupWatcher();
-      BiomeManager.SetupWatcher();
-      LocationLoading.SetupWatcher();
-      VegetationLoading.SetupWatcher();
-      EventManager.SetupWatcher();
-      SpawnManager.SetupWatcher();
-      WorldManager.SetupWatcher();
-      ClutterManager.SetupWatcher();
-      EnvironmentManager.SetupWatcher();
-      Dungeon.Loader.SetupWatcher();
-      RoomLoading.SetupWatcher();
-      DataManager.SetupBlueprintWatcher();
+      if (Configuration.DataReload)
+      {
+        SetupWatcher();
+        BiomeManager.SetupWatcher();
+        LocationLoading.SetupWatcher();
+        VegetationLoading.SetupWatcher();
+        EventManager.SetupWatcher();
+        SpawnManager.SetupWatcher();
+        WorldManager.SetupWatcher();
+        ClutterManager.SetupWatcher();
+        EnvironmentManager.SetupWatcher();
+        Dungeon.Loader.SetupWatcher();
+        RoomLoading.SetupWatcher();
+        DataManager.SetupBlueprintWatcher();
+      }
     }
     catch (Exception e)
     {

@@ -120,6 +120,8 @@ Note: Some files are server side only. Use single player for testing so that you
 
 Note: Some files automatically add missing entries to add new content automatically. If you want to remove entries, set enabled to false instead. Automatic data migration can be disabled from the config.
 
+Note: Editing files automatically reloads them. This can be disabled from the config (requires restart to take effect). If disabled, the world must be reloaded to load any changes.
+
 ### Blueprints
 
 Dungeons, locations and vegetation support using blueprints to spawn multiple objects. Both PlanBuild .blueprint and BuildShare .vbuild files are supported (however PlanBuild files are preferred).
