@@ -79,10 +79,10 @@ public class SetBiomeOffsets
     // Not used in the base game code but might as well reuse the value.
     GetBiomeWG.Offsets[Heightmap.Biome.Meadows] = __instance.m_offset3;
     GetBiomeWG.Offsets[Heightmap.Biome.Mistlands] = __instance.m_offset4;
-    GetBiomeWG.Offsets[Heightmap.Biome.AshLands] = (float)UnityEngine.Random.Range(-10000, 10000);
-    GetBiomeWG.Offsets[Heightmap.Biome.DeepNorth] = (float)UnityEngine.Random.Range(-10000, 10000);
-    GetBiomeWG.Offsets[Heightmap.Biome.Mountain] = (float)UnityEngine.Random.Range(-10000, 10000);
-    GetBiomeWG.Offsets[Heightmap.Biome.Ocean] = (float)UnityEngine.Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.AshLands] = Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.DeepNorth] = Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.Mountain] = Random.Range(-10000, 10000);
+    GetBiomeWG.Offsets[Heightmap.Biome.Ocean] = Random.Range(-10000, 10000);
   }
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
@@ -123,11 +123,11 @@ public class GetBiomeWG
 
     foreach (var item in Data)
     {
-      if (item.minAltitude > altitude || item.maxAltitude < altitude) continue;
+      if (item.minAltitude >= altitude || item.maxAltitude <= altitude) continue;
       var mag = magnitude;
       var min = ConvertDist(item.minDistance);
       if (min > 0)
-        min += (item.wiggleDistance ? num : 0f);
+        min += item.wiggleDistance ? num : 0f;
       else if (min == 0f)
         min = -0.1f; // To handle the center (0,0) correctly.
       var max = ConvertDist(item.maxDistance);
@@ -144,7 +144,7 @@ public class GetBiomeWG
         mag = new Vector2(Configuration.WorldStretch * wx + curveX, Configuration.WorldStretch * wy + curveY).magnitude;
         min += new Vector2(curveX, curveY).magnitude;
       }
-      var distOk = mag > min && (max >= radius || mag <= max);
+      var distOk = mag > min && (max >= radius || mag < max);
       if (!distOk) continue;
       if (CheckAngles)
       {
@@ -158,7 +158,7 @@ public class GetBiomeWG
         }
       }
       var seed = item._seed ?? GetOffset(obj, item._biomeSeed);
-      if (item.amount < 1f && Mathf.PerlinNoise((seed + bx / item.stretch) * 0.001f, (seed + by / item.stretch) * 0.001f) < 1 - item.amount) continue;
+      if (item.amount < 1f && Mathf.PerlinNoise((seed + bx / item.stretch) * 0.001f, (seed + by / item.stretch) * 0.001f) <= 1 - item.amount) continue;
       return item._biome;
     }
     return Heightmap.Biome.Ocean;

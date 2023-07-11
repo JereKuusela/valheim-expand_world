@@ -170,8 +170,8 @@ public partial class Configuration
     InitWater(wrapper);
 
     section = "4. Data";
-    configDataReload = wrapper.Bind(section, "Automatic data reload", false, true, "Data is loaded automatically on file changes. Requires restart to take effect.");
-    configDataMigration = wrapper.Bind(section, "Automatic data migration", false, true, "Automatically add missing location, rooms and vegetation entries.");
+    configDataReload = wrapper.Bind(section, "Automatic data reload", true, false, "Data is loaded automatically on file changes. Requires restart to take effect.");
+    configDataMigration = wrapper.Bind(section, "Automatic data migration", true, false, "Automatically add missing location, rooms and vegetation entries.");
     configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
     configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     configDataBiome = wrapper.Bind(section, "Biome data", true, true, "Use biome data");

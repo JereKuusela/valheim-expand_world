@@ -76,15 +76,15 @@ public class WorldManager
         amount = 0.6f,
       },
       new() {
-        biome = "meadows",
-        _biome = Heightmap.Biome.Meadows,
-        _biomeSeed = Heightmap.Biome.Meadows,
-        maxDistance = 0.5f,
-      },
-      new() {
         biome = "blackforest",
         _biome = Heightmap.Biome.BlackForest,
         _biomeSeed = Heightmap.Biome.BlackForest,
+        minDistance = 0.5f,
+      },
+      new() {
+        biome = "meadows",
+        _biome = Heightmap.Biome.Meadows,
+        _biomeSeed = Heightmap.Biome.Meadows,
       },
     };
   }
