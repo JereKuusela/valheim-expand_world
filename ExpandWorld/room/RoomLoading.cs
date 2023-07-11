@@ -75,7 +75,7 @@ public class RoomLoading
       ExpandWorld.Log.LogInfo($"Reloading default room data ({DefaultEntries.Count} entries).");
       return;
     }
-    if (AddMissingEntries(data))
+    if (Configuration.DataMigration && AddMissingEntries(data))
     {
       // Watcher triggers reload.
       return;

@@ -141,7 +141,7 @@ public class BiomeManager
       ExpandWorld.Log.LogInfo($"Preloading biome names ({rawData.Count} entries).");
     var originalNames = OriginalBiomes.Select(kvp => kvp.Key.ToLower()).ToHashSet();
     BiomeToDisplayName = OriginalBiomes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
-    var biomeNumber = ((int)Heightmap.Biome.Mistlands * 2);
+    var biomeNumber = (int)Heightmap.Biome.Mistlands * 2;
     foreach (var item in rawData)
     {
       if (originalNames.Contains(item.biome.ToLower())) continue;

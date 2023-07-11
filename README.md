@@ -118,6 +118,8 @@ Data can be split to multiple files. The files are loaded alphabetically in reve
 
 Note: Some files are server side only. Use single player for testing so that your client has access to all of the information. Mods that cause clients to regenerate dungeons or locations may not work correctly.
 
+Note: Some files automatically add missing entries to add new content automatically. If you want to remove entries, set enabled to false instead. Automatic data migration can be disabled from the config.
+
 ### Blueprints
 
 Dungeons, locations and vegetation support using blueprints to spawn multiple objects. Both PlanBuild .blueprint and BuildShare .vbuild files are supported (however PlanBuild files are preferred).

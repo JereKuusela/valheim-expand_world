@@ -160,7 +160,7 @@ public class LocationLoading
       }
       else
       {
-        if (AddMissingEntries(data))
+        if (Configuration.DataMigration && AddMissingEntries(data))
         {
           // Watcher triggers reload.
           return;

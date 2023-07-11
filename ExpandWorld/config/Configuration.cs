@@ -81,6 +81,9 @@ public partial class Configuration
   public static bool DataBiome => configDataBiome.Value;
   public static ConfigEntry<bool> configDataWorld;
   public static bool DataWorld => configDataWorld.Value;
+  public static ConfigEntry<bool> configDataMigration;
+  public static bool DataMigration => configDataMigration.Value;
+
 
   public static ConfigEntry<string> configSeed;
   public static string Seed => configSeed.Value;
@@ -165,6 +168,7 @@ public partial class Configuration
     InitWater(wrapper);
 
     section = "4. Data";
+    configDataMigration = wrapper.Bind(section, "Automatic data migration", false, true, "Automatically add missing location, rooms and vegetation entries.");
     configDataEnvironments = wrapper.Bind(section, "Environment data", true, false, "Use environment data");
     configDataEnvironments.SettingChanged += (s, e) => EnvironmentManager.FromSetting(valueEnvironmentData.Value);
     configDataBiome = wrapper.Bind(section, "Biome data", true, true, "Use biome data");

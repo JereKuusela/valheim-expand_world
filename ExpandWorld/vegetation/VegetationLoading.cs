@@ -50,7 +50,7 @@ public class VegetationLoading
       ExpandWorld.Log.LogInfo($"Reloading default vegetation data ({DefaultEntries.Count} entries).");
       return;
     }
-    if (AddMissingEntries(data))
+    if (Configuration.DataMigration && AddMissingEntries(data))
     {
       // Watcher triggers reload.
       return;
