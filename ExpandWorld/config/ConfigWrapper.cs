@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using BepInEx.Configuration;
-using ExpandWorld;
 using ServerSync;
 
 namespace Service;
@@ -13,10 +12,12 @@ public class ConfigWrapper
 
   private readonly ConfigFile ConfigFile;
   private readonly ConfigSync ConfigSync;
-  public ConfigWrapper(string command, ConfigFile configFile, ConfigSync configSync)
+  private readonly Action Regenerate;
+  public ConfigWrapper(string command, ConfigFile configFile, ConfigSync configSync, Action regenerate)
   {
     ConfigFile = configFile;
     ConfigSync = configSync;
+    Regenerate = regenerate;
 
     new Terminal.ConsoleCommand(command, "[key] [value] - Toggles or sets a config value.", (Terminal.ConsoleEventArgs args) =>
     {
@@ -51,10 +52,10 @@ public class ConfigWrapper
     return configEntry;
   }
   public ConfigEntry<bool> BindLocking(string group, string name, bool value, string description) => BindLocking(group, name, value, new ConfigDescription(description));
-  public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, ConfigDescription description, bool synchronizedSetting = true)
+  public ConfigEntry<T> Bind<T>(string group, string name, T value, bool automaticRegenerate, ConfigDescription description, bool synchronizedSetting = true)
   {
     var configEntry = ConfigFile.Bind(group, name, value, description);
-    if (forceRegen)
+    if (automaticRegenerate)
       configEntry.SettingChanged += ForceRegen;
     if (configEntry is ConfigEntry<bool> boolEntry)
       Register(boolEntry);
@@ -66,8 +67,7 @@ public class ConfigWrapper
     return configEntry;
   }
   public ConfigEntry<T> Bind<T>(string group, string name, T value, bool forceRegen, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, forceRegen, new ConfigDescription(description), synchronizedSetting);
-  private static void ForceRegen(object e, System.EventArgs s) => Generate.World();
-
+  private void ForceRegen(object e, EventArgs s) => Regenerate();
   public static Dictionary<ConfigEntry<string>, float> Floats = new();
   public static Dictionary<ConfigEntry<string>, int?> Ints = new();
   public static Dictionary<ConfigEntry<int>, float> Amounts = new();

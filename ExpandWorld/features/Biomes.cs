@@ -66,6 +66,16 @@ public class ResetBiomeOffsets
     GetBiomeWG.Offsets.Clear();
   }
 }
+
+[HarmonyPatch(typeof(Minimap), nameof(Minimap.GetMaskColor))]
+public class GetMaskColor
+{
+  static void Prefix(ref Heightmap.Biome biome)
+  {
+    biome = BiomeManager.GetTerrain(biome);
+  }
+}
+
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
 public class SetBiomeOffsets
 {
@@ -98,13 +108,15 @@ public class GetBiomeWG
     if (Offsets.TryGetValue(biome, out var value)) return value;
     return obj.m_offset0;
   }
-  private static float ConvertDist(float percent) => percent * Configuration.WorldRadius;
+  private static float ConvertDist(float percent) => percent * World.Radius;
 
   private static Heightmap.Biome Get(WorldGenerator obj, float wx, float wy)
   {
     Data ??= WorldManager.GetDefault(obj);
-    var magnitude = new Vector2(Configuration.WorldStretch * wx, Configuration.WorldStretch * wy).magnitude;
-    if (magnitude > Configuration.WorldTotalRadius)
+    var sx = wx * World.Stretch;
+    var sy = wy * World.Stretch;
+    var magnitude = new Vector2(sx, sy).magnitude;
+    if (magnitude > World.TotalRadius)
       return Heightmap.Biome.Ocean;
     var altitude = Helper.BaseHeightToAltitude(obj.GetBaseHeight(wx, wy, false));
     var num = obj.WorldAngle(wx, wy) * Configuration.WiggleWidth;
@@ -117,9 +129,9 @@ public class GetBiomeWG
       if (wiggledAngle < 0f) wiggledAngle += 1f;
       if (wiggledAngle >= 1f) wiggledAngle -= 1f;
     }
-    var radius = Configuration.WorldRadius;
-    var bx = wx / Configuration.BiomeStretch;
-    var by = wy / Configuration.BiomeStretch;
+    var radius = World.Radius;
+    var bx = wx / World.BiomeStretch;
+    var by = wy / World.BiomeStretch;
 
     foreach (var item in Data)
     {
@@ -135,13 +147,13 @@ public class GetBiomeWG
       {
         var centerX = ConvertDist(item.centerX);
         var centerY = ConvertDist(item.centerY);
-        mag = new Vector2(Configuration.WorldStretch * wx - centerX, Configuration.WorldStretch * wy - centerY).magnitude;
+        mag = new Vector2(sx - centerX, sy - centerY).magnitude;
       }
       if (item.curveX != 0f || item.curveY != 0f)
       {
         var curveX = ConvertDist(item.curveX);
         var curveY = ConvertDist(item.curveY);
-        mag = new Vector2(Configuration.WorldStretch * wx + curveX, Configuration.WorldStretch * wy + curveY).magnitude;
+        mag = new Vector2(sx + curveX, sy + curveY).magnitude;
         min += new Vector2(curveX, curveY).magnitude;
       }
       var distOk = mag > min && (max >= radius || mag < max);
@@ -166,8 +178,6 @@ public class GetBiomeWG
   static bool Prefix(WorldGenerator __instance, ref float wx, ref float wy, ref Heightmap.Biome __result)
   {
     if (__instance.m_world.m_menu) return true;
-    wx /= Configuration.WorldStretch;
-    wy /= Configuration.WorldStretch;
     if (!Configuration.DataWorld) return true;
     __result = Get(__instance, wx, wy);
     return false;

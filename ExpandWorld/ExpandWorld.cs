@@ -4,8 +4,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using Service;
-using UnityEngine;
-
+// TODO: Biomes should be optimized. Scale them by world size on load.
 namespace ExpandWorld;
 [BepInDependency(SpawnThat.GUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(GUID, NAME, VERSION)]
@@ -26,6 +25,13 @@ public class ExpandWorld : BaseUnityPlugin
   };
   public static string ConfigName = $"{GUID}.cfg";
   public static string YamlDirectory = Path.Combine(Paths.ConfigPath, GUID);
+  public void InvokeRegenerate()
+  {
+    // Debounced for smooth config editing.
+    CancelInvoke("Regenerate");
+    Invoke("Regenerate", 1.0f);
+  }
+  public void Regenerate() => World.AutomaticRegenerate();
   public void Awake()
   {
     Log = Logger;
@@ -33,7 +39,7 @@ public class ExpandWorld : BaseUnityPlugin
     YamlCleanUp();
     if (!Directory.Exists(YamlDirectory))
       Directory.CreateDirectory(YamlDirectory);
-    ConfigWrapper wrapper = new("expand_config", Config, ConfigSync);
+    ConfigWrapper wrapper = new("expand_config", Config, ConfigSync, InvokeRegenerate);
     Configuration.Init(wrapper);
     Harmony harmony = new(GUID);
     harmony.PatchAll();
@@ -65,12 +71,6 @@ public class ExpandWorld : BaseUnityPlugin
     BiomeManager.NamesFromFile();
     SpawnThat.Run();
     CustomRaids.Run();
-    Marketplace.Run();
-    BetterContinents.Run();
-  }
-  public void LateUpdate()
-  {
-    Generate.CheckRegen(Time.deltaTime);
   }
 #pragma warning disable IDE0051
   private void OnDestroy()
@@ -125,19 +125,5 @@ public class SetCommands
   static void Postfix()
   {
     new DebugCommands();
-  }
-}
-
-
-
-[HarmonyPatch(typeof(ZRpc), nameof(ZRpc.SetLongTimeout))]
-public class IncreaseTimeout
-{
-  static bool Prefix()
-  {
-    if (Configuration.ServerOnly) return true;
-    ZRpc.m_timeout = 300f;
-    ZLog.Log(string.Format("ZRpc timeout set to {0}s ", ZRpc.m_timeout));
-    return false;
   }
 }

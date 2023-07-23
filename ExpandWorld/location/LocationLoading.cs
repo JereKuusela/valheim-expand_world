@@ -60,8 +60,8 @@ public class LocationLoading
     loc.m_inForest = data.inForest;
     loc.m_forestTresholdMin = data.forestTresholdMin;
     loc.m_forestTresholdMax = data.forestTresholdMax;
-    loc.m_minDistance = data.minDistance;
-    loc.m_maxDistance = data.maxDistance;
+    loc.m_minDistance = data.minDistance * 10000f;
+    loc.m_maxDistance = data.maxDistance * 10000f;
     loc.m_minAltitude = data.minAltitude;
     loc.m_maxAltitude = data.maxAltitude;
     return loc;
@@ -94,12 +94,8 @@ public class LocationLoading
     data.inForest = loc.m_inForest;
     data.forestTresholdMin = loc.m_forestTresholdMin;
     data.forestTresholdMax = loc.m_forestTresholdMax;
-    data.minDistance = loc.m_minDistance;
-    if (data.minDistance > 2f)
-      data.minDistance /= 10000f;
-    data.maxDistance = loc.m_maxDistance;
-    if (data.maxDistance > 2f)
-      data.maxDistance /= 10000f;
+    data.minDistance = loc.m_minDistance / 10000f;
+    data.maxDistance = loc.m_maxDistance / 10000f;
     data.minAltitude = loc.m_minAltitude;
     if (loc.m_maxAltitude == 1000f)
       data.maxAltitude = 10000f;

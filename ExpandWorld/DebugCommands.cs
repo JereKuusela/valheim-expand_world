@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -20,41 +21,9 @@ public class DebugCommands
   }
   public DebugCommands()
   {
-    new Terminal.ConsoleCommand("ew_lakes", "Pings lakes", args =>
+    new Terminal.ConsoleCommand("ew_map", "Refreshes the world map.", (args) =>
     {
-      foreach (Minimap.PinData pin in args.Context.m_findPins)
-        Minimap.instance.RemovePin(pin);
-      args.Context.m_findPins.Clear();
-      foreach (var lake in WorldGenerator.instance.m_lakes)
-      {
-        Vector3 pos = new(lake.x, 0f, lake.y);
-        args.Context.m_findPins.Add(Minimap.instance.AddPin(pos, Minimap.PinType.Icon3, "", false, true, Player.m_localPlayer.GetPlayerID()));
-      }
-      args.Context.AddString($"Found {WorldGenerator.instance.m_lakes.Count} lakes.");
-    }, true);
-    new Terminal.ConsoleCommand("ew_rivers", "Pings rivers", args =>
-    {
-      foreach (Minimap.PinData pin in args.Context.m_findPins)
-        Minimap.instance.RemovePin(pin);
-      args.Context.m_findPins.Clear();
-      foreach (var river in WorldGenerator.instance.m_rivers)
-      {
-        Vector3 pos = new(river.center.x, 0f, river.center.y);
-        args.Context.m_findPins.Add(Minimap.instance.AddPin(pos, Minimap.PinType.Icon3, "", false, true, Player.m_localPlayer.GetPlayerID()));
-      }
-      args.Context.AddString($"Found {WorldGenerator.instance.m_rivers.Count} rivers.");
-    }, true);
-    new Terminal.ConsoleCommand("ew_streams", "Pings streams", args =>
-    {
-      foreach (Minimap.PinData pin in args.Context.m_findPins)
-        Minimap.instance.RemovePin(pin);
-      args.Context.m_findPins.Clear();
-      foreach (var stream in WorldGenerator.instance.m_streams)
-      {
-        Vector3 pos = new(stream.center.x, 0f, stream.center.y);
-        args.Context.m_findPins.Add(Minimap.instance.AddPin(pos, Minimap.PinType.Icon3, "", false, true, Player.m_localPlayer.GetPlayerID()));
-      }
-      args.Context.AddString($"Found {WorldGenerator.instance.m_streams.Count} streams.");
+      World.RegenerateMap();
     }, true);
     new Terminal.ConsoleCommand("ew_spawns", "Forces spawn file creation.", (args) =>
     {
@@ -64,7 +33,7 @@ public class DebugCommands
     {
       var precision = 100f;
       if (args.Length > 1 && int.TryParse(args[1], out var value)) precision = (float)value;
-      var r = Configuration.WorldRadius;
+      var r = World.Radius;
       var start = -(float)Math.Ceiling(r / precision) * precision;
       Dictionary<Heightmap.Biome, int> biomes = new();
       for (var x = start; x <= r; x += precision)
@@ -131,26 +100,6 @@ public class DebugCommands
       }).ToList();
       ZLog.Log(string.Join("\n", dgs));
       args.Context.AddString($"Logged {dgs.Count} dungeons to the log file.");
-    }, true);
-    new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
-    {
-      var wg = WorldGenerator.m_instance;
-      if (wg == null) return;
-      List<string> lines = new() {
-        "Main: " + wg.m_world.m_seedName,
-        "Generator: " + wg.m_world.m_worldGenVersion,
-        "World: " + wg.m_world.m_seed,
-        "Offset X: " + wg.m_offset0,
-        "Offset Y: " + wg.m_offset1,
-        "Height: " + wg.m_offset3,
-        "Meadows: " + wg.m_offset3,
-        "Black forest: " + wg.m_offset2,
-        "Swamp: "+ wg.m_offset0,
-        "Plains: "+ wg.m_offset1,
-        "Mistlands: " + wg.m_offset4
-      };
-      ZLog.Log(string.Join("\n", lines));
-      args.Context.AddString(string.Join("\n", lines));
     }, true);
   }
 }

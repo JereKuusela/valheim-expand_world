@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Service;
 using UnityEngine;
 
 namespace ExpandWorld;
@@ -210,7 +211,7 @@ public class BiomeManager
     // This tracks if content (environments) have been loaded.
     if (ZoneSystem.instance.m_locationsByHash.Count > 0)
       LoadEnvironments();
-    Generate.World();
+    World.AutomaticRegenerate();
   }
   public static void LoadEnvironments()
   {

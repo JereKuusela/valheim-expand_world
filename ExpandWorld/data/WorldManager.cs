@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Service;
+
 namespace ExpandWorld;
 
 public class WorldManager
@@ -136,7 +138,7 @@ public class WorldManager
       ExpandWorld.Log.LogInfo($"Reloading world data ({data.Count} entries).");
       GetBiomeWG.Data = data;
       GetBiomeWG.CheckAngles = data.Any(x => x.minSector != 0f || x.maxSector != 1f);
-      Generate.World();
+      World.AutomaticRegenerate();
     }
     catch (Exception e)
     {
