@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net4.8</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <nullable>enable</nullable>
+    <DoILRepack>false</DoILRepack>
+  </PropertyGroup>
+  <Target Name="CopyDLL" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(ProjectDir)\..\..\Libs" />
+    <Message Text="Copied to Libs folder." Importance="High" />
+  </Target>
+  <ItemGroup>
+    <Reference Include="BepInExll">
+      <HintPath>..\..\Libs\BepinEx.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Libs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\Libs\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

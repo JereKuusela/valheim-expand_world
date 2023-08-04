@@ -19,3 +19,11 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 3. Expand World Data: <https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Data/>
     - Everything else in the world generation.
     - Some features only require server side installation.
+
+## Migration
+
+Installing this mod pack over the existing Expand World should work automatically.
+
+Old config and yaml files are automatically used by the new mods.
+
+If there are issues, remove the `Expand World.dll` manually.
