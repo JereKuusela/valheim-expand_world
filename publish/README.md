@@ -8,15 +8,18 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 ## Mod pack
 
-1. Expand World Size: <https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Size/>
+1. [Expand World Size](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Size/)
+    - [Documentation](https://github.com/JereKuusela/valheim-expand_world_size)
     - Change world size.
     - Background minimap generation.
     - World seed customization.
-2. Expand World Rivers: <https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Rivers/>
+2. [Expand World Rivers](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Rivers/)
+    - [Documentation](https://github.com/JereKuusela/valheim-expand_world_rivers)
     - Rivers and streams.
     - Wave height.
     - Water level.
-3. Expand World Data: <https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Data/>
+3. [Expand World Data](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Data/)
+    - [Documentation](https://github.com/JereKuusela/valheim-expand_world_data)
     - Everything else in the world generation.
     - Some features only require server side installation.
 
@@ -25,6 +28,8 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 Installing this mod pack over the existing Expand World should work automatically.
 
 Old config and yaml files are automatically used by the new mods.
+
+If biomes borders have changed, make sure that "Legacy Generation" is enabled in the `expand_world_data.cfg`.
 
 If there are issues, remove the `Expand World.dll` manually.
 
