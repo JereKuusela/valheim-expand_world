@@ -22,6 +22,11 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
     - [Documentation](https://github.com/JereKuusela/valheim-expand_world_data)
     - Everything else in the world generation.
     - Some features only require server side installation.
+4. [Expand World Events](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Events/)
+    - [Documentation](https://github.com/JereKuusela/valheim-expand_world_events)
+    - Some features only require server side installation.
+5. [Expand World Spawns](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Spawns/)
+    - [Documentation](https://github.com/JereKuusela/valheim-expand_world_spawns)
 
 ## Migration
 
