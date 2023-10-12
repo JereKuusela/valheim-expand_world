@@ -27,6 +27,10 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
     - Some features only require server side installation.
 5. [Expand World Spawns](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Spawns/)
     - [Documentation](https://github.com/JereKuusela/valheim-expand_world_spawns)
+    - Not part of the pack, install separately if needed.
+6. [Expand World Prefabs](https://valheim.thunderstore.io/package/JereKuusela/Expand_World_Prefabs/)
+    - [Documentation](https://github.com/JereKuusela/valheim-expand_world_prefabs)
+    - Not part of the pack, install separately if needed.
 
 ## Migration
 

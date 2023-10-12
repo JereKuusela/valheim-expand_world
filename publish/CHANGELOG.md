@@ -1,3 +1,6 @@
+- v1.56
+  - Removes EW Spawns as most modpacks that used this have Spawn That.
+
 - v1.55
   - Adds split mods to the pack.
 
